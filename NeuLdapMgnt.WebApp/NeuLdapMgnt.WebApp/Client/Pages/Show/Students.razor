@@ -1,0 +1,16 @@
+﻿@page "/students"
+
+<PageTitle>Students</PageTitle>
+
+<h1>Students</h1>
+
+<BaseTableStudentsLayout Students="Lists.GetStudents()" />
+
+@code {
+	protected override void OnInitialized()
+	{
+		Utils.EnsureAuthentication(NavManager);
+	}
+}
+
+
