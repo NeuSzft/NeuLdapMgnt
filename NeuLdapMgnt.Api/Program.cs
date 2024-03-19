@@ -67,7 +67,8 @@ internal static class Program {
             });
         });
 
-        // Set up swagger
+        // Add other services
+        builder.Services.AddCors();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
@@ -84,6 +85,9 @@ internal static class Program {
         app.UseAuthentication();
         app.UseAuthorization();
 
+        // Set CORS
+        app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+        
         // Add swagger middlewares when in development mode
         if (app.Environment.IsDevelopment()) {
             app.UseSwagger();
