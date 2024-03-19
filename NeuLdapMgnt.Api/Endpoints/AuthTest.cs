@@ -10,7 +10,7 @@ internal static class Endpoints {
     public static void MapAuthTestEndpoints(this WebApplication app) {
         app.MapGet("/auth/test", () => Results.Ok()).RequireAuthorization();
 
-        app.MapGet("/auth/token", () => {
+        app.MapGet("/auth/token", (HttpContext context) => {
             JwtSecurityToken jwt = new(
                 Program.TokenIssuer,
                 "TestUser",
@@ -22,6 +22,7 @@ internal static class Endpoints {
 
             string token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
+            context.Response.Cookies.Append("jwt", token);
             return Results.Text(token);
         });
     }
