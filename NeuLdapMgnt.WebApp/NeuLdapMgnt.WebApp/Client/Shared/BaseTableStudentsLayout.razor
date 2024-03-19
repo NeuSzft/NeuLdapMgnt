@@ -1,0 +1,118 @@
+﻿@inherits LayoutComponentBase
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
+				Id
+				@if (sortBy == "Id")
+				{
+					<i class="bi @GetSortIcon(isAscending)"></i>
+				}
+				else
+				{
+					<i class="bi bi-chevron-expand"></i>
+				}
+			</th>
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
+				Name
+				@if (sortBy == "Name")
+				{
+					<i class="bi @GetSortIcon(isAscending)"></i>
+				}
+				else
+				{
+					<i class="bi bi-chevron-expand"></i>
+				}
+			</th>
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Class"))">
+				Class
+				@if (sortBy == "Class")
+				{
+					<i class="bi @GetSortIcon(isAscending)"></i>
+				}
+				else
+				{
+					<i class="bi bi-chevron-expand"></i>
+				}
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Students)
+		{
+			<tr>
+				<td>@item.Id</td>
+				<td>@item.FirstName @item.LastName</td>
+				<td>@(item.ClassNumber).@(item.ClassSymbol)</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+@code {
+	[Parameter]
+	public List<StudentModel> Students { get; set; } = new List<StudentModel>();
+
+	private string sortBy = "";
+	private bool isAscending = true;
+
+	private void SortTable(string propertyName)
+	{
+		if (sortBy == propertyName)
+		{
+			isAscending = !isAscending;
+		}
+		else
+		{
+			sortBy = propertyName;
+			isAscending = true;
+		}
+
+		switch (propertyName)
+		{
+			case "Id":
+				Students = isAscending 
+				? Students
+					.OrderBy(s => s.Id)
+					.ToList() 
+				: Students
+					.OrderByDescending(s => s.Id)
+					.ToList();
+				break;
+
+			case "Name":
+				Students = isAscending 
+				? Students
+					.OrderBy(s => s.FirstName)
+					.ThenBy(s => s.LastName)
+					.ToList() 
+				: Students
+					.OrderByDescending(s => s.FirstName).
+					ThenByDescending(s => s.LastName)
+					.ToList();
+				break;
+
+			case "Class":
+				Students = isAscending
+				? Students
+					.OrderBy(s => s.ClassNumber)
+					.ThenBy(s => s.ClassSymbol)
+					.ToList()
+				: Students
+					.OrderByDescending(s => s.ClassNumber)
+					.ThenByDescending(s => s.ClassSymbol)
+					.ToList();
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	private string GetSortIcon(bool asc)
+	{
+		return asc ? "bi-chevron-up" : "bi-chevron-down";
+	}
+}
+
