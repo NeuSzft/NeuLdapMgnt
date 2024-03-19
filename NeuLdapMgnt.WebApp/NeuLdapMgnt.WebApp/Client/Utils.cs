@@ -8,10 +8,10 @@ namespace NeuLdapMgnt.WebApp.Client
 	{
 		private readonly HttpClient _httpClient;
 		private readonly Uri _url = new("http://localhost:5000");
-		private string _token = string.Empty;
+		private string? _token = null;
 
 		public event Action? AuthenticationStateChanged;
-		public bool IsAuthenticated => _token != string.Empty;
+		public bool IsAuthenticated => _token != null;
 
 		public Utils()
 		{
@@ -24,11 +24,7 @@ namespace NeuLdapMgnt.WebApp.Client
 
 		public void EnsureAuthentication(NavigationManager navManager)
 		{
-			if (IsAuthenticated)
-			{
-				navManager.NavigateTo("home");
-			}
-			else
+			if (!IsAuthenticated)
 			{
 				navManager.NavigateTo("login");
 			}
@@ -42,6 +38,12 @@ namespace NeuLdapMgnt.WebApp.Client
 			_token = await response.Content.ReadAsStringAsync();
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
+			AuthenticationStateChanged?.Invoke();
+		}
+
+		public void Logout()
+		{
+			_token = null;
 			AuthenticationStateChanged?.Invoke();
 		}
 
