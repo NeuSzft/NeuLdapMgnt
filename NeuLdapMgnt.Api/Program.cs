@@ -85,7 +85,7 @@ internal static class Program {
         app.UseAuthentication();
         app.UseAuthorization();
 
-        // Set CORS
+        // Set CORS to accept any connection
         app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
         
         // Add swagger middlewares when in development mode

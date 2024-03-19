@@ -22,7 +22,10 @@ internal static class Endpoints {
 
             string token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            context.Response.Cookies.Append("jwt", token);
+            context.Response.Cookies.Append("jwt", token, new CookieOptions {
+                Expires = jwt.ValidTo,
+                Secure  = true
+            });
             return Results.Text(token);
         });
     }
