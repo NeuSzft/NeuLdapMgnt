@@ -1,34 +1,53 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">NeuLdapMgnt.WebApp</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
+	<div class="container-fluid">
+		<a class="navbar-brand" href="">Neu LDAP Management</a>
+		<button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</div>
 </div>
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-    </nav>
+	<nav class="flex-column">
+		@if (!isAuthenticated)
+		{
+			<div class="nav-item px-3">
+				<NavLink class="nav-link" href="login">
+					<span class="oi oi-account-login" aria-hidden="true"></span> Login
+				</NavLink>
+			</div>
+		}
+		else
+		{
+			<div class="nav-item px-3">
+				<NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
+					<span class="oi oi-home" aria-hidden="true"></span> Home
+				</NavLink>
+			</div>
+		}
+	</nav>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
+	private bool collapseNavMenu = true;
+	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+	private bool isAuthenticated;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+	protected override void OnInitialized()
+	{
+		isAuthenticated = Utils.IsAuthenticated;
+		Utils.AuthenticationStateChanged += OnAutheticationChanged;
+	}
 
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+	private void OnAutheticationChanged()
+	{
+		isAuthenticated = Utils.IsAuthenticated;
+		StateHasChanged();
+	}
+
+	private void ToggleNavMenu()
+	{
+		collapseNavMenu = !collapseNavMenu;
+	}
 }
+
