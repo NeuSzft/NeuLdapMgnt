@@ -1,15 +1,16 @@
 ﻿{
-  "$schema": "http://json.schemastore.org/launchsettings.json",
-  "profiles": {
-    "http": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": false,
-      "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5138",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+    "$schema": "http://json.schemastore.org/launchsettings.json",
+    "profiles": {
+        "http": {
+            "commandName": "Project",
+            "dotnetRunMessages": true,
+            "launchBrowser": false,
+            "launchUrl": "swagger",
+            "applicationUrl": "http://localhost:5000",
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "SECURITY_KEY": "Tgk0Y7z4efQbPPr0j4OEiYgsZx7+n9A7Z5FIYjwSKCyiVXOIXi2hlIAoBOMw9WFvULjjWIJiZW6ZBFYbOm2+HKYV6824APdf8g/TfdX3fhPN+FU02ZkMleSXePh9rfYBXAq9Knnawrx563NpQ0Gqxsj8qjk9ryASImafiIcvuTlbXr8TykH7e8S2qZ9IOYGHDd18cdTAuvORMjlrrcBSmxc1llRcUMbkQnEpX0OAbjMvo655tkK8B0JvBTOmr/tZvG+DQmi6rLxxUQxiy8+fHuvDBjB/I6Byho4U0Fifb8Uj+IqY7DNh9svfA745g82ofo9SSUKP2FuZ/Zc57ejBGw=="
+            }
+        }
     }
-  }
 }
