@@ -14,9 +14,9 @@
 					<i class="bi bi-chevron-expand"></i>
 				}
 			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("OM"))">
-				OM
-				@if (sortBy == "OM")
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Username"))">
+				Username
+				@if (sortBy == "Username")
 				{
 					<i class="bi @GetSortIcon(isAscending)"></i>
 				}
@@ -36,27 +36,15 @@
 					<i class="bi bi-chevron-expand"></i>
 				}
 			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Class"))">
-				Class
-				@if (sortBy == "Class")
-				{
-					<i class="bi @GetSortIcon(isAscending)"></i>
-				}
-				else
-				{
-					<i class="bi bi-chevron-expand"></i>
-				}
-			</th>
 		</tr>
 	</thead>
 	<tbody>
-		@foreach (var student in Students)
+		@foreach (var admin in Admins)
 		{
 			<tr>
-				<td>@student.Id</td>
-				<td>@student.OM</td>
-				<td>@student.FirstName @student.LastName</td>
-				<td>@(student.ClassNumber).@(student.ClassSymbol)</td>
+				<td>@admin.Id</td>
+				<td>@admin.Username</td>
+				<td>@admin.FirstName @admin.LastName</td>
 			</tr>
 		}
 	</tbody>
@@ -64,7 +52,7 @@
 
 @code {
 	[Parameter]
-	public List<StudentModel> Students { get; set; } = new();
+	public List<AdminModel> Admins { get; set; } = new();
 
 	private string sortBy = "";
 	private bool isAscending = true;
@@ -84,46 +72,34 @@
 		switch (propertyName)
 		{
 			case "Id":
-				Students = isAscending
-				? Students
+				Admins = isAscending 
+				? Admins
 					.OrderBy(x => x.Id)
-					.ToList()
-				: Students
+					.ToList() 
+				: Admins
 					.OrderByDescending(x => x.Id)
 					.ToList();
 				break;
 
-			case "OM":
-				Students = isAscending
-				? Students
-					.OrderBy(x => x.OM)
+			case "Username":
+				Admins = isAscending
+				? Admins
+					.OrderBy(x => x.Username)
 					.ToList()
-				: Students
-					.OrderByDescending(x => x.OM)
+				: Admins
+					.OrderByDescending(x => x.Username)
 					.ToList();
 				break;
 
 			case "Name":
-				Students = isAscending
-				? Students
+				Admins = isAscending 
+				? Admins
 					.OrderBy(x => x.FirstName)
 					.ThenBy(x => x.LastName)
-					.ToList()
-				: Students
+					.ToList() 
+				: Admins
 					.OrderByDescending(x => x.FirstName)
 					.ThenByDescending(x => x.LastName)
-					.ToList();
-				break;
-
-			case "Class":
-				Students = isAscending
-				? Students
-					.OrderBy(x => x.ClassNumber)
-					.ThenBy(x => x.ClassSymbol)
-					.ToList()
-				: Students
-					.OrderByDescending(x => x.ClassNumber)
-					.ThenByDescending(x => x.ClassSymbol)
 					.ToList();
 				break;
 

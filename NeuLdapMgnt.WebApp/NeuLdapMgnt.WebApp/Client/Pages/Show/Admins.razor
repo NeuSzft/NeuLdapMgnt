@@ -1,0 +1,15 @@
+﻿@page "/admins"
+
+<PageTitle>Admins</PageTitle>
+
+<h1>Admins</h1>
+
+<BaseTableAdmins Admins="Lists.GetAdmins()"/>
+
+@code {
+	protected override void OnInitialized()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+	}
+}
+
