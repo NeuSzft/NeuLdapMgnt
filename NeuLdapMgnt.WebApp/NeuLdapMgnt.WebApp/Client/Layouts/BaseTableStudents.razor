@@ -39,12 +39,12 @@
 		</tr>
 	</thead>
 	<tbody>
-		@foreach (var item in Students)
+		@foreach (var student in Students)
 		{
 			<tr>
-				<td>@item.Id</td>
-				<td>@item.FirstName @item.LastName</td>
-				<td>@(item.ClassNumber).@(item.ClassSymbol)</td>
+				<td>@student.Id</td>
+				<td>@student.FirstName @student.LastName</td>
+				<td>@(student.ClassNumber).@(student.ClassSymbol)</td>
 			</tr>
 		}
 	</tbody>
@@ -52,7 +52,7 @@
 
 @code {
 	[Parameter]
-	public List<StudentModel> Students { get; set; } = new List<StudentModel>();
+	public List<StudentModel> Students { get; set; } = new();
 
 	private string sortBy = "";
 	private bool isAscending = true;
@@ -74,34 +74,34 @@
 			case "Id":
 				Students = isAscending 
 				? Students
-					.OrderBy(s => s.Id)
+					.OrderBy(x => x.Id)
 					.ToList() 
 				: Students
-					.OrderByDescending(s => s.Id)
+					.OrderByDescending(x => x.Id)
 					.ToList();
 				break;
 
 			case "Name":
 				Students = isAscending 
 				? Students
-					.OrderBy(s => s.FirstName)
-					.ThenBy(s => s.LastName)
+					.OrderBy(x => x.FirstName)
+					.ThenBy(x => x.LastName)
 					.ToList() 
 				: Students
-					.OrderByDescending(s => s.FirstName).
-					ThenByDescending(s => s.LastName)
+					.OrderByDescending(x => x.FirstName)
+					.ThenByDescending(x => x.LastName)
 					.ToList();
 				break;
 
 			case "Class":
 				Students = isAscending
 				? Students
-					.OrderBy(s => s.ClassNumber)
-					.ThenBy(s => s.ClassSymbol)
+					.OrderBy(x => x.ClassNumber)
+					.ThenBy(x => x.ClassSymbol)
 					.ToList()
 				: Students
-					.OrderByDescending(s => s.ClassNumber)
-					.ThenByDescending(s => s.ClassSymbol)
+					.OrderByDescending(x => x.ClassNumber)
+					.ThenByDescending(x => x.ClassSymbol)
 					.ToList();
 				break;
 
@@ -110,9 +110,6 @@
 		}
 	}
 
-	private string GetSortIcon(bool asc)
-	{
-		return asc ? "bi-chevron-up" : "bi-chevron-down";
-	}
+	private string GetSortIcon(bool asc) => asc ? "bi-chevron-up" : "bi-chevron-down";
 }
 

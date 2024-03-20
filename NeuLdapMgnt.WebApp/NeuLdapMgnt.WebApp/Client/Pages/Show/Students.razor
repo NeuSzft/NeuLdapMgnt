@@ -4,12 +4,12 @@
 
 <h1>Students</h1>
 
-<BaseTableStudentsLayout Students="Lists.GetStudents()" />
+<BaseTableStudents Students="Lists.GetStudents()" />
 
 @code {
 	protected override void OnInitialized()
 	{
-		Utils.EnsureAuthentication(NavManager);
+		ApiRequests.EnsureAuthentication(NavManager);
 	}
 }
 

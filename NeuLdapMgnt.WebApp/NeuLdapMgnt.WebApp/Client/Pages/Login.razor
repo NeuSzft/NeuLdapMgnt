@@ -27,8 +27,8 @@
 	{
 		try
 		{
-			await Utils.GetToken();
-			await Utils.GetTest();
+			await ApiRequests.GetToken();
+			await ApiRequests.GetTest();
 			NavManager.NavigateTo("home");
 		}
 		catch (Exception e)

@@ -7,5 +7,6 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton<Utils>();
+builder.Services.AddSingleton<ApiRequests>();
 
 await builder.Build().RunAsync();

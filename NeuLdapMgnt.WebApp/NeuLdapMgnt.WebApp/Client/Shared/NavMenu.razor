@@ -45,7 +45,7 @@
 				</div>
 			</div>
 			<div class="nav-item px-3">
-				<a class="nav-link" href="login" @onclick="Utils.Logout">
+				<a class="nav-link" href="login" @onclick="ApiRequests.Logout">
 					<span class="oi oi-account-logout" aria-hidden="true"></span> Logout
 				</a>
 			</div>
@@ -60,13 +60,13 @@
 
 	protected override void OnInitialized()
 	{
-		isAuthenticated = Utils.IsAuthenticated;
-		Utils.AuthenticationStateChanged += OnAutheticationChanged;
+		isAuthenticated = ApiRequests.IsAuthenticated;
+		ApiRequests.AuthenticationStateChanged += OnAutheticationChanged;
 	}
 
 	private void OnAutheticationChanged()
 	{
-		isAuthenticated = Utils.IsAuthenticated;
+		isAuthenticated = ApiRequests.IsAuthenticated;
 		StateHasChanged();
 	}
 
