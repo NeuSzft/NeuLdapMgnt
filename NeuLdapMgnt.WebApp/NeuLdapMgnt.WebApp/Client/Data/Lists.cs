@@ -1,20 +1,21 @@
 ﻿using NeuLdapMgnt.WebApp.Client.Models;
+using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.WebApp.Client.Data
 {
 	public static class Lists
 	{
-		private static List<StudentModel> Students { get; set; } = new()
+		private static List<Student> Students { get; set; } = new()
 		{
-			new (6021, "73358355233", "Valamilyen", "Pistike", 11, "a"),
-			new (6022, "72654768165", "Akármilyen", "Huculu", 12, "b"),
-			new (6343, "68419681654", "Tóth", "Muculu", 13, "c"),
-			new (6034, "72981654865", "Valamilyen", "Valaki", 11, "d"),
-			new (6341, "79816541685", "Valaki", "Ismeretlen", 9, "a/1"),
-			new (8721, "79816541685", "Asus", "Matrica", 10, "a/2"),
-			new (7256, "79816541685", "Intel", "Alaplap", 10, "b/1"),
-			new (6112, "79816541685", "Amd", "Processzor", 10, "a"),
-			new (7132, "79816541685", "Sok", "Ram", 10, "b/2")
+			new ("73358355233", 6000, 6000, "Valamilyen", "Pistike", "11.a", "Husveti"),
+			new ("72654768165", 6022, 6022, "Akármilyen", "Huculu", "12.b"),
+			new ("68419681654", 6343, 6343, "Tóth", "Muculu", "13.c"),
+			new ("72981654865", 6434, 6434, "Valamilyen", "Valaki", "11.d"),
+			new ("79816541685", 9341, 9341, "Valaki", "Ismeretlen", "9.a/1"),
+			new ("79816541685", 6721, 6721, "Asus", "Matrica", "10.a/2"),
+			new ("79816541685", 7256, 7256, "Intel", "Alaplap", "10.b/1", "I9"),
+			new ("79816541685", 6112, 6112, "Amd", "Processzor", "10.a"),
+			new ("79816541685", 7132, 7132, "Sok", "Ram", "10.b/2")
 		};
 
 		private static List<TeacherModel> Teachers { get; set; } = new()
@@ -35,7 +36,7 @@ namespace NeuLdapMgnt.WebApp.Client.Data
 			new (1010, "OKoiuhnasd", "Valaki", "Ismeretlen")
 		};
 
-		public static List<StudentModel> GetStudents() => Students;
+		public static List<Student> GetStudents() => Students;
 		public static List<TeacherModel> GetTeachers() => Teachers;
 		public static List<AdminModel> GetAdmins() => Admins;
 	}
