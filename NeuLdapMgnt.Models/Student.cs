@@ -4,14 +4,14 @@ namespace NeuLdapMgnt.Models
 {
 	public class Student : Person
 	{
-		[Required, StringLength(11), RegularExpression("^[7][0-9]{10}$")]
+		[Required, StringLength(11, ErrorMessage = "The OM field length must be 11."), RegularExpression("^[7][0-9]{10}$", ErrorMessage = "The OM field is not a valid OM.")]
 		[LdapAttribute("uid")]
 		public override string Id { get; set; }
 
-		[Required, Range(6000, int.MaxValue)]
+		[Required, Range(6000, 9999)]
 		public override int Uid { get; set; }
 
-		[Required, Range(6000, int.MaxValue)]
+		[Required, Range(6000, 9999)]
 		public override int Gid { get; set; }
 
 		[Required]
