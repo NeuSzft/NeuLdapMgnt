@@ -14,9 +14,9 @@
 					<i class="bi bi-chevron-expand"></i>
 				}
 			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
-				Name
-				@if (sortBy == "Name")
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Username"))">
+				Username
+				@if (sortBy == "Username")
 				{
 					<i class="bi @GetSortIcon(isAscending)"></i>
 				}
@@ -25,9 +25,9 @@
 					<i class="bi bi-chevron-expand"></i>
 				}
 			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Phone"))">
-				Phone
-				@if (sortBy == "Phone")
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
+				Name
+				@if (sortBy == "Name")
 				{
 					<i class="bi @GetSortIcon(isAscending)"></i>
 				}
@@ -43,8 +43,8 @@
 		{
 			<tr>
 				<td>@teacher.Id</td>
-				<td>@teacher.FirstName @teacher.LastName</td>
-				<td>@(teacher.Phone)</td>
+				<td>@teacher.Username</td>
+				<td>@teacher.FullName</td>
 			</tr>
 		}
 	</tbody>
@@ -52,7 +52,7 @@
 
 @code {
 	[Parameter]
-	public List<TeacherModel> Teachers { get; set; } = new();
+	public List<Teacher> Teachers { get; set; } = new();
 
 	private string sortBy = "";
 	private bool isAscending = true;
@@ -84,22 +84,20 @@
 			case "Name":
 				Teachers = isAscending 
 				? Teachers
-					.OrderBy(x => x.FirstName)
-					.ThenBy(x => x.LastName)
+					.OrderBy(x => x.FullName)
 					.ToList() 
 				: Teachers
-					.OrderByDescending(x => x.FirstName)
-					.ThenByDescending(x => x.LastName)
+					.OrderByDescending(x => x.FullName)
 					.ToList();
 				break;
 
-			case "Phone":
+			case "Username":
 				Teachers = isAscending
 				? Teachers
-					.OrderBy(x => x.Phone)
+					.OrderBy(x => x.Username)
 					.ToList()
 				: Teachers
-					.OrderByDescending(x => x.Phone)
+					.OrderByDescending(x => x.Username)
 					.ToList();
 				break;
 

@@ -5,7 +5,7 @@ namespace NeuLdapMgnt.Models
 {
 	public class Teacher : Person
 	{
-		[Required, StringLength(11), RegularExpression("^[7][0-9]{10}$")]
+		[Required]
 		[LdapAttribute("uid")]
 		public override string Id { get; set; }
 
