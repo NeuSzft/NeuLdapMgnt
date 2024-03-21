@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace NeuLdapMgnt.Models
 {
+    [LdapObjectClasses("inetOrgPerson", "posixAccount")]
 	public abstract class Person
 	{
 		[Required]
