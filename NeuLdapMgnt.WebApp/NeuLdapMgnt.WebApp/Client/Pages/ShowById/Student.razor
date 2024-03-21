@@ -1,0 +1,96 @@
+﻿@page "/students/{id}"
+
+<PageTitle>Student @Id</PageTitle>
+
+@if (student is null)
+{
+	<div class="d-flex justify-content-center mt-5">
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+}
+else
+{
+	<h3>@student.FullName</h3>
+	<EditForm Model="@student" class="d-flex flex-column gap-2">
+		<DataAnnotationsValidator />
+
+		<button class="btn btn-primary mb-3" @onclick="ToggleEditMode">Edit</button>
+
+		<div class="input-group">
+			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1">Name</span>
+			<InputText type="text" aria-label="First name" class="form-control" readonly="@isReadonly" placeholder="First name" @bind-Value="student.FirstName" />
+			<InputText type="text" aria-label="Middle name" class="form-control" readonly="@isReadonly" placeholder="Middle name" @bind-Value="student.MiddleName" />
+			<InputText type="text" aria-label="Last name" class="form-control" readonly="@isReadonly" placeholder="Last name" @bind-Value="student.LastName" />
+		</div>
+		<ValidationMessage For="() => student.FirstName" />
+		<ValidationMessage For="() => student.MiddleName" />
+		<ValidationMessage For="() => student.LastName" />
+
+		<div class="input-group">
+			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="uid">OM</span>
+			<InputText class="form-control" readonly="@isReadonly" id="uid" @bind-Value="student.Id" />
+		</div>
+		<ValidationMessage For="() => student.Id" />
+
+		<div class="input-group">
+			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="roomNumber">Class</span>
+			<InputText class="form-control" readonly="@isReadonly" id="roomNumber" @bind-Value="student.Class" />
+		</div>
+		<ValidationMessage For="() => student.Class" />
+
+		<div class="input-group">
+			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="cn">Username</span>
+			<InputText class="form-control" readonly="@isReadonly" id="cn" @bind-Value="student.Username" />
+		</div>
+		<ValidationMessage For="() => student.Username" />
+
+		<div class="input-group">
+			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="uidNumber">User Id</span>
+			<InputNumber class="form-control" readonly="@isReadonly" id="uidNumber" @bind-Value="student.Uid" />
+		</div>
+		<ValidationMessage For="() => student.Uid" />
+
+		<div class="input-group">
+			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="gidNumber">Group Id</span>
+			<InputNumber class="form-control" readonly="@isReadonly" id="gidNumber" @bind-Value="student.Gid" />
+		</div>
+		<ValidationMessage For="() => student.Gid" />
+
+		<div class="input-group">
+			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="email">Email</span>
+			<InputText class="form-control" readonly="@isReadonly" id="email" placeholder="student@example.com" @bind-Value="student.Email" />
+		</div>
+		<ValidationMessage For="() => student.Email" />
+
+		<div class="input-group">
+			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="homeDirectory">Directory</span>
+			<InputText class="form-control" readonly="@isReadonly" id="homeDirectory" placeholder="/home/student" @bind-Value="student.HomeDirectory" />
+		</div>
+		<ValidationMessage For="() => student.HomeDirectory" />
+
+		<div class="input-group">
+			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="password">Password</span>
+			<InputText type="password" class="form-control" readonly="@isReadonly" id="password" @bind-Value="student.Password" />
+		</div>
+		<ValidationMessage For="() => student.Password" />
+
+	</EditForm>
+}
+
+@code {
+	[Parameter]
+	public string Id { get; set; } = null!;
+
+	private NeuLdapMgnt.Models.Student? student;
+	private bool isReadonly = true;
+
+	private void ToggleEditMode() => isReadonly = !isReadonly;
+
+	protected override void OnInitialized()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+		student = Lists.GetStudents().FirstOrDefault(x => x.Id.Equals(Id));
+	}
+}

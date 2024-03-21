@@ -12,10 +12,10 @@ namespace NeuLdapMgnt.WebApp.Client.Data
 			new ("68419681654", 6343, 6343, "Tóth", "Muculu", "13.c"),
 			new ("72981654865", 6434, 6434, "Valamilyen", "Valaki", "11.d"),
 			new ("79816541685", 9341, 9341, "Valaki", "Ismeretlen", "9.a/1"),
-			new ("79816541685", 6721, 6721, "Asus", "Matrica", "10.a/2"),
-			new ("79816541685", 7256, 7256, "Intel", "Alaplap", "10.b/1", "I9"),
-			new ("79816541685", 6112, 6112, "Amd", "Processzor", "10.a"),
-			new ("79816541685", 7132, 7132, "Sok", "Ram", "10.b/2")
+			new ("79811231685", 6721, 6721, "Asus", "Matrica", "10.a/2"),
+			new ("79813425168", 7256, 7256, "Intel", "Alaplap", "10.b/1", "I9"),
+			new ("79816546785", 6112, 6112, "Amd", "Processzor", "10.a"),
+			new ("79816547485", 7132, 7132, "Sok", "Ram", "10.b/2")
 		};
 
 		private static List<Teacher> Teachers { get; set; } = new()
