@@ -1,32 +1,31 @@
 ﻿@inherits LayoutComponentBase
 
+
+<div class="d-flex justify-content-between mb-2">
+	<input type="search"
+		   class="form-control w-25"
+		   placeholder="Search by OM, Name, Class..."
+		   @onblur="UpdateSearchQuery"
+		   @onkeypress="HandleKeyPress"
+		   @bind-value="searchQuery" />
+	<button class="btn btn-warning" @onclick="EditSelected" disabled="@isStudentSelected">Change Class</button>
+</div>
+
 <table class="table table-striped">
 	<thead>
 		<tr>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Uid"))">
-				Uid
-				@if (sortBy == "Uid")
+			<th class="user-select-none col-1" role="button" @onclick="SelectAllStudents">
+				@if (!AreAllFilteredStudentsSelected())
 				{
-					<i class="bi @GetSortIcon(isAscending)"></i>
+					<span>Select all</span>
 				}
 				else
 				{
-					<i class="bi bi-chevron-expand"></i>
-				}
-			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Username"))">
-				Username
-				@if (sortBy == "Username")
-				{
-					<i class="bi @GetSortIcon(isAscending)"></i>
-				}
-				else
-				{
-					<i class="bi bi-chevron-expand"></i>
+					<span>Deselect all</span>
 				}
 			</th>
 			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
-				Id
+				OM
 				@if (sortBy == "Id")
 				{
 					<i class="bi @GetSortIcon(isAscending)"></i>
@@ -58,19 +57,25 @@
 					<i class="bi bi-chevron-expand"></i>
 				}
 			</th>
-			<th>View</th>
+			<th class="user-select-none text-end pe-4">View</th>
 		</tr>
 	</thead>
 	<tbody>
-		@foreach (var student in Students)
+		@foreach (var student in GetFilteredStudents())
 		{
 			<tr>
-				<td>@student.Uid</td>
-				<td>@student.Username</td>
+				<td>
+					<input class="form-check-input m-auto"
+						   type="checkbox"
+						   checked="@selectedStudents.Contains(student)"
+						   @onchange="() => SelectStudent(student)" />
+				</td>
 				<td>@student.Id</td>
 				<td>@student.FullName</td>
 				<td>@student.Class</td>
-				<td><button class="btn btn-primary" @onclick="() => ShowStudent(student.Id)">More</button></td>
+				<td class="text-end">
+					<button class="btn btn-primary" @onclick="() => ShowStudent(student.Id)">More</button>
+				</td>
 			</tr>
 		}
 	</tbody>
@@ -80,8 +85,79 @@
 	[Parameter]
 	public List<Student> Students { get; set; } = new();
 
+	private List<Student> selectedStudents = new();
+	private bool isStudentSelected => !selectedStudents.Any();
 	private string sortBy = "";
 	private bool isAscending = true;
+	private string? searchQuery = string.Empty;
+
+	private IEnumerable<Student> GetFilteredStudents()
+	{
+		if (string.IsNullOrWhiteSpace(searchQuery))
+		{
+			return Students;
+		}
+		else
+		{
+			return Students.Where(x =>
+				x.Id.StartsWith(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+				x.FullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+				x.Class.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+		}
+	}
+
+	private void SelectStudent(Student student)
+	{
+		if (selectedStudents.Contains(student))
+		{
+			selectedStudents.Remove(student);
+		}
+		else
+		{
+			selectedStudents.Add(student);
+		}
+	}
+
+	private void SelectAllStudents()
+	{
+		var filteredStudents = GetFilteredStudents().ToList();
+		if (AreAllFilteredStudentsSelected())
+		{
+			selectedStudents.Clear();
+		}
+		else
+		{
+			selectedStudents = filteredStudents;
+		}
+
+		StateHasChanged();
+	}
+
+	private void EditSelected()
+	{
+		selectedStudents.ForEach(x => Console.WriteLine(x.Id));
+	}
+
+	private bool AreAllFilteredStudentsSelected()
+	{
+		var filteredStudents = GetFilteredStudents().ToList();
+		return filteredStudents.Any() && filteredStudents.All(student => selectedStudents.Contains(student));
+	}
+
+	private void UpdateSearchQuery()
+	{
+		selectedStudents.Clear();
+		StateHasChanged();
+	}
+
+	private void HandleKeyPress(KeyboardEventArgs e)
+	{
+		if (e.Key == "Enter") UpdateSearchQuery();
+	}
+
+	private void ShowStudent(string id) => NavManager.NavigateTo($"/students/{id}");
+
+	private string GetSortIcon(bool asc) => asc ? "bi-chevron-up" : "bi-chevron-down";
 
 	private void SortTable(string propertyName)
 	{
@@ -97,63 +173,29 @@
 
 		switch (propertyName)
 		{
-			case "Uid":
-				Students = isAscending
-				? Students
-					.OrderBy(x => x.Uid)
-					.ToList()
-				: Students
-					.OrderByDescending(x => x.Uid)
-					.ToList();
-				break;
-
 			case "Id":
 				Students = isAscending
-				? Students
-					.OrderBy(x => x.Id)
-					.ToList()
-				: Students
-					.OrderByDescending(x => x.Id)
-					.ToList();
-				break;
-
-			case "Username":
-				Students = isAscending
-				? Students
-					.OrderBy(x => x.Username)
-					.ToList()
-				: Students
-					.OrderByDescending(x => x.Username)
-					.ToList();
+					? Students.OrderBy(x => x.Id).ToList()
+					: Students.OrderByDescending(x => x.Id).ToList();
 				break;
 
 			case "Name":
 				Students = isAscending
-				? Students
-					.OrderBy(x => x.FullName)
-					.ToList()
-				: Students
-					.OrderByDescending(x => x.FullName)
-					.ToList();
+					? Students.OrderBy(x => x.FullName).ToList()
+					: Students.OrderByDescending(x => x.FullName).ToList();
 				break;
 
 			case "Class":
 				Students = isAscending
-				? Students
-					.OrderBy(x => x.Class)
-					.ToList()
-				: Students
-					.OrderByDescending(x => x.Class)
-					.ToList();
+					? Students.OrderBy(x => x.Class).ToList()
+					: Students.OrderByDescending(x => x.Class).ToList();
 				break;
 
 			default:
 				break;
 		}
+
+		StateHasChanged();
 	}
-
-	private string GetSortIcon(bool asc) => asc ? "bi-chevron-up" : "bi-chevron-down";
-
-	private void ShowStudent(string id) => NavManager.NavigateTo($"/students/{id}");
 }
 
