@@ -35,7 +35,7 @@ namespace NeuLdapMgnt.Models
 
 		[Required, EmailAddress]
 		[LdapAttribute("mail")]
-		public string Mail { get; set; }
+		public string Email { get; set; }
 
 		[Required]
 		[LdapAttribute("homeDirectory")]
@@ -57,7 +57,7 @@ namespace NeuLdapMgnt.Models
 			LastName = lastName;
 			MiddleName = middleName;
 			Username = string.Join("", FirstName[..3], LastName[..3]).ToLower();
-			Mail = $"{Id}@neu.ldap.hu";
+			Email = $"{Id}@neu.ldap.hu";
 		}
 
 		protected abstract string GeneratePassword();
