@@ -6,7 +6,7 @@
 {
 	<div class="d-flex justify-content-center mt-5">
 		<div class="spinner-border" role="status">
-			<span class="visually-hidden">Loading...</span>
+			<label class="visually-hidden">Loading...</label>
 		</div>
 	</div>
 }
@@ -14,63 +14,63 @@ else
 {
 	<h3>@student.FullName</h3>
 	
-	<EditForm Model="@student" class="d-flex flex-column gap-2">
+	<EditForm Model="@student" class="d-flex flex-column gap-2 mt-3">
 		<DataAnnotationsValidator />
 
 		<div class="input-group">
-			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1">Name</span>
-			<InputText type="text" aria-label="First name" class="form-control" readonly="@isReadonly" placeholder="First name" @bind-Value="student.FirstName" />
-			<InputText type="text" aria-label="Middle name" class="form-control" readonly="@isReadonly" placeholder="Middle name" @bind-Value="student.MiddleName" />
-			<InputText type="text" aria-label="Last name" class="form-control" readonly="@isReadonly" placeholder="Last name" @bind-Value="student.LastName" />
+			<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="uid">OM</label>
+			<InputText class="form-control" readonly="@isReadonly" id="uid" @bind-Value="student.Id" />
+		</div>
+		<ValidationMessage For="() => student.Id" />
+
+		<div class="input-group">
+			<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="givenName">Name</label>
+			<InputText class="form-control" readonly="@isReadonly" placeholder="First name" id="givenName" @bind-Value="student.FirstName" />
+			<InputText class="form-control" readonly="@isReadonly" placeholder="Middle name" @bind-Value="student.MiddleName" />
+			<InputText class="form-control" readonly="@isReadonly" placeholder="Last name" @bind-Value="student.LastName" />
 		</div>
 		<ValidationMessage For="() => student.FirstName" />
 		<ValidationMessage For="() => student.MiddleName" />
 		<ValidationMessage For="() => student.LastName" />
 
 		<div class="input-group">
-			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="uid">OM</span>
-			<InputText class="form-control" readonly="@isReadonly" id="uid" @bind-Value="student.Id" />
-		</div>
-		<ValidationMessage For="() => student.Id" />
-
-		<div class="input-group">
-			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="roomNumber">Class</span>
+			<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="roomNumber">Class</label>
 			<InputText class="form-control" readonly="@isReadonly" id="roomNumber" @bind-Value="student.Class" />
 		</div>
 		<ValidationMessage For="() => student.Class" />
 
 		<div class="input-group">
-			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="cn">Username</span>
+			<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="cn">Username</label>
 			<InputText class="form-control" readonly="@isReadonly" id="cn" @bind-Value="student.Username" />
 		</div>
 		<ValidationMessage For="() => student.Username" />
 
 		<div class="input-group">
-			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="uidNumber">User Id</span>
+			<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="uidNumber">User Id</label>
 			<InputNumber class="form-control" readonly="@isReadonly" id="uidNumber" @bind-Value="student.Uid" />
 		</div>
 		<ValidationMessage For="() => student.Uid" />
 
 		<div class="input-group">
-			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="gidNumber">Group Id</span>
+			<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="gidNumber">Group Id</label>
 			<InputNumber class="form-control" readonly="@isReadonly" id="gidNumber" @bind-Value="student.Gid" />
 		</div>
 		<ValidationMessage For="() => student.Gid" />
 
 		<div class="input-group">
-			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="email">Email</span>
+			<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="email">Email</label>
 			<InputText class="form-control" readonly="@isReadonly" id="email" placeholder="student@example.com" @bind-Value="student.Email" />
 		</div>
 		<ValidationMessage For="() => student.Email" />
 
 		<div class="input-group">
-			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="homeDirectory">Directory</span>
+			<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="homeDirectory">Directory</label>
 			<InputText class="form-control" readonly="@isReadonly" id="homeDirectory" placeholder="/home/student" @bind-Value="student.HomeDirectory" />
 		</div>
 		<ValidationMessage For="() => student.HomeDirectory" />
 
 		<div class="input-group">
-			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="password">Password</span>
+			<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="password">Password</label>
 			<InputText type="password" class="form-control" readonly="@isReadonly" id="password" @bind-Value="student.Password" />
 		</div>
 		<ValidationMessage For="() => student.Password" />
@@ -78,7 +78,7 @@ else
 
 	<div class="row mt-2 mb-5">
 		<div class="col text-end">
-			@if (isEditMode)
+			@if (!isEditMode)
 			{
 				<button class="btn btn-primary" style="width:10em" @onclick="ToggleEditMode">Edit</button>
 			}
