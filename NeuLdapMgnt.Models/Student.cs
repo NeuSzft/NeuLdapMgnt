@@ -9,11 +9,9 @@ namespace NeuLdapMgnt.Models
 		public override string Id { get; set; }
 
 		[Required, Range(6000, int.MaxValue)]
-		[LdapAttribute("uidNumber")]
 		public override int Uid { get; set; }
 
 		[Required, Range(6000, int.MaxValue)]
-		[LdapAttribute("gidNumber")]
 		public override int Gid { get; set; }
 
 		[Required]
