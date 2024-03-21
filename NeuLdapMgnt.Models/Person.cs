@@ -6,10 +6,6 @@ namespace NeuLdapMgnt.Models
 {
 	public abstract class Person
 	{
-		private string mail;
-		private string username;
-		private string fullName;
-
 		[Required]
 		[LdapAttribute("uid")]
 		public abstract string Id { get; set; }
@@ -24,11 +20,7 @@ namespace NeuLdapMgnt.Models
 
 		[Required]
 		[LdapAttribute("cn")]
-		public string Username
-		{
-			get => string.Join("", FirstName[..3], LastName[..3]).ToLower();
-			set => username = value;
-		}
+		public string Username { get; set; }
 
 		[Required, MinLength(3)]
 		[LdapAttribute("givenName")]
@@ -43,26 +35,18 @@ namespace NeuLdapMgnt.Models
 
 		[Required, EmailAddress]
 		[LdapAttribute("mail")]
-		public string Mail
-		{
-			get => $"{Id}@neu.ldap.hu";
-			set => mail = value;
-		}
+		public string Mail { get; set; }
 
 		[Required]
 		[LdapAttribute("homeDirectory")]
-		public abstract string HomeDirectory { get; }
+		public string HomeDirectory => $"/home/{Username}";
 
 		[Required, PasswordPropertyText, MinLength(8)]
 		[LdapAttribute("userPassword")]
-		public string Password { get; set; }
+		public string Password { get; set; } = null!;
 
 		[LdapAttribute("displayName")]
-		public string FullName
-		{
-			get => string.Join(' ', FirstName, MiddleName, LastName);
-			set => fullName = value;
-		}
+		public string FullName => string.Join(' ', FirstName, MiddleName, LastName);
 
 		protected Person(string id, int uid, int gid, string firstName, string lastName, string? middleName = null)
 		{
@@ -72,6 +56,8 @@ namespace NeuLdapMgnt.Models
 			FirstName = firstName;
 			LastName = lastName;
 			MiddleName = middleName;
+			Username = string.Join("", FirstName[..3], LastName[..3]).ToLower();
+			Mail = $"{Id}@neu.ldap.hu";
 		}
 
 		protected abstract string GeneratePassword();

@@ -17,13 +17,10 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("gidNumber")]
 		public override int Gid { get; set; }
 
-		[Required]
-		[LdapAttribute("homeDirectory")]
-		public override string HomeDirectory => $"/home/teachers/{Id}";
-
 		public Teacher(string id, int uid, int gid, string firstName, string lastName, string? middleName = null)
 			: base(id, uid, gid, firstName, lastName, middleName)
 		{
+			Id = id;
 			Password = GeneratePassword();
 		}
 

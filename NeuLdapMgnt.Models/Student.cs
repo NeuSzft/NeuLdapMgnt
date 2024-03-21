@@ -20,10 +20,6 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("roomNumber")]
 		public string Class { get; set; }
 
-		[Required]
-		[LdapAttribute("homeDirectory")]
-		public override string HomeDirectory => $"/home/{Username}";
-
 		public Student(string id, int uid, int gid, string firstName, string lastName, string @class, string? middleName = null)
 			: base(id, uid, gid, firstName, lastName, middleName)
 		{
