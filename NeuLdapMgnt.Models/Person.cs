@@ -39,26 +39,28 @@ namespace NeuLdapMgnt.Models
 
 		[Required]
 		[LdapAttribute("homeDirectory")]
-		public string HomeDirectory => $"/home/{Username}";
+		public string HomeDirectory { get; set; }
 
 		[Required, PasswordPropertyText, MinLength(8)]
 		[LdapAttribute("userPassword")]
 		public string Password { get; set; } = null!;
 
 		[LdapAttribute("displayName")]
-		public string FullName => string.Join(' ', FirstName, MiddleName, LastName);
+		public string FullName { get; set; }
 
-		protected Person(string id, int uid, int gid, string firstName, string lastName, string? middleName = null)
+        protected Person(string id, int uid, int gid, string firstName, string lastName, string? middleName = null)
 		{
-			Id = id;
-			Uid = uid;
-			Gid = gid;
-			FirstName = firstName;
-			LastName = lastName;
-			MiddleName = middleName;
-			Username = string.Join("", FirstName[..3], LastName[..3]).ToLower();
-			Email = $"{Id}@neu.ldap.hu";
-		}
+			Id            = id;
+			Uid           = uid;
+			Gid           = gid;
+			FirstName     = firstName;
+			LastName      = lastName;
+			MiddleName    = middleName;
+			Username      = string.Join("", FirstName[..3], LastName[..3]).ToLower();
+			Email         = $"{Id}@neu.ldap.hu";
+            HomeDirectory = $"/home/{Username}";
+            FullName      = string.Join(' ', FirstName, MiddleName, LastName);
+        }
 
 		protected abstract string GeneratePassword();
 	}
