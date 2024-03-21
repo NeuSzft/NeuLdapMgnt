@@ -37,7 +37,7 @@ public sealed class LdapHelper : IDisposable {
             return Connection.SendRequest(request);
         }
         catch (DirectoryException e) {
-            error = e.Message;
+            error = e.GetError();
             Logger?.LogError(e.ToString());
             return null;
         }
@@ -65,7 +65,7 @@ public sealed class LdapHelper : IDisposable {
             return ParseEntry<T>(entry);
         }
         catch (Exception e) {
-            error = e.Message;
+            error = e.GetError();
             return null;
         }
     }
