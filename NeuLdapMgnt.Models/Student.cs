@@ -24,9 +24,8 @@ namespace NeuLdapMgnt.Models
 			: base(id, uid, gid, firstName, lastName, middleName)
 		{
 			Id = id;
-			Uid = uid;
-			Gid = gid;
 			Class = @class;
+			Password = GeneratePassword();
 		}
 
 		protected override string GeneratePassword() => string.Join('.', FirstName, LastName, Uid);
