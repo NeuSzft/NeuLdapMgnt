@@ -13,10 +13,9 @@
 else
 {
 	<h3>@student.FullName</h3>
+	
 	<EditForm Model="@student" class="d-flex flex-column gap-2">
 		<DataAnnotationsValidator />
-
-		<button class="btn btn-primary mb-3" @onclick="ToggleEditMode">Edit</button>
 
 		<div class="input-group">
 			<span class="input-group-text col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1">Name</span>
@@ -75,8 +74,20 @@ else
 			<InputText type="password" class="form-control" readonly="@isReadonly" id="password" @bind-Value="student.Password" />
 		</div>
 		<ValidationMessage For="() => student.Password" />
-
 	</EditForm>
+
+	<div class="row mt-2 mb-5">
+		<div class="col text-end">
+			@if (isEditMode)
+			{
+				<button class="btn btn-primary" style="width:10em" @onclick="ToggleEditMode">Edit</button>
+			}
+			else
+			{
+				<button class="btn btn-success" style="width:10em" @onclick="ToggleEditMode">Save</button>
+			}
+		</div>
+	</div>
 }
 
 @code {
@@ -84,9 +95,14 @@ else
 	public string Id { get; set; } = null!;
 
 	private NeuLdapMgnt.Models.Student? student;
+	private bool isEditMode;
 	private bool isReadonly = true;
 
-	private void ToggleEditMode() => isReadonly = !isReadonly;
+	private void ToggleEditMode()
+	{
+		isEditMode = !isEditMode;
+		isReadonly = !isReadonly;
+	}
 
 	protected override void OnInitialized()
 	{
