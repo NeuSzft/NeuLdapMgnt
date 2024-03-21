@@ -25,9 +25,9 @@
 					<i class="bi bi-chevron-expand"></i>
 				}
 			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("OM"))">
-				OM
-				@if (sortBy == "OM")
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
+				Id
+				@if (sortBy == "Id")
 				{
 					<i class="bi @GetSortIcon(isAscending)"></i>
 				}
@@ -66,8 +66,8 @@
 			<tr>
 				<td>@student.Uid</td>
 				<td>@student.Username</td>
-				<td>@student.OM</td>
-				<td>@student.GetFullName()</td>
+				<td>@student.Id</td>
+				<td>@student.FullName</td>
 				<td>@student.Class</td>
 			</tr>
 		}
@@ -105,13 +105,13 @@
 					.ToList();
 				break;
 
-			case "OM":
+			case "Id":
 				Students = isAscending
 				? Students
-					.OrderBy(x => x.OM)
+					.OrderBy(x => x.Id)
 					.ToList()
 				: Students
-					.OrderByDescending(x => x.OM)
+					.OrderByDescending(x => x.Id)
 					.ToList();
 				break;
 
@@ -128,12 +128,10 @@
 			case "Name":
 				Students = isAscending
 				? Students
-					.OrderBy(x => x.FirstName)
-					.ThenBy(x => x.LastName)
+					.OrderBy(x => x.FullName)
 					.ToList()
 				: Students
-					.OrderByDescending(x => x.FirstName)
-					.ThenByDescending(x => x.LastName)
+					.OrderByDescending(x => x.FullName)
 					.ToList();
 				break;
 

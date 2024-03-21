@@ -18,13 +18,13 @@ namespace NeuLdapMgnt.WebApp.Client.Data
 			new ("79816541685", 7132, 7132, "Sok", "Ram", "10.b/2")
 		};
 
-		private static List<TeacherModel> Teachers { get; set; } = new()
+		private static List<Teacher> Teachers { get; set; } = new()
 		{
-			new (5000, "Elso", "Pistike", "+3612345678"),
-			new (5424, "Harmat", "Huculu", "+3601235874"),
-			new (5452, "Tóth", "Laci", "+3666666666"),
-			new (5100, "Akarmilyen", "Valaki","+3609825874"),
-			new (5041, "Valaki", "Ismeretlen", "+3647898749")
+			new ("Tanar vagyok", 5000, 5000, "Elso", "Pistike", "Kozep"),
+			new ("Tanar vagyok", 5424, 5424, "Harmat", "Huculu"),
+			new ("Tanar vagyok", 5452, 5452, "Tóth", "Laci"),
+			new ("Tanar vagyok", 5100, 5100, "Akarmilyen", "Valaki", "Hihi"),
+			new ("Tanar vagyok", 5041, 5041, "Valaki", "Ismeretlen", "Aki")
 		};
 
 		private static List<AdminModel> Admins { get; set; } = new()
@@ -37,7 +37,7 @@ namespace NeuLdapMgnt.WebApp.Client.Data
 		};
 
 		public static List<Student> GetStudents() => Students;
-		public static List<TeacherModel> GetTeachers() => Teachers;
+		public static List<Teacher> GetTeachers() => Teachers;
 		public static List<AdminModel> GetAdmins() => Admins;
 	}
 }
