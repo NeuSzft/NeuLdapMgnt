@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 using System.Linq;
 using System.Net;
@@ -46,11 +47,9 @@ public sealed class LdapHelper : IDisposable {
     public static readonly string AnyFilter = "(objectClass=*)";
 
     public static T ParseEntry<T>(SearchResultEntry entry) where T : class {
-        Type             type = typeof(T);
-        ConstructorInfo? ctor = type.GetConstructor(Type.EmptyTypes);
-        T                obj  = ctor?.Invoke(null) as T ?? (T)RuntimeHelpers.GetUninitializedObject(type);
+        T obj = Utils.ForceCreateClassObj<T>();
 
-        foreach (PropertyInfo info in type.GetProperties())
+        foreach (PropertyInfo info in typeof(T).GetProperties())
             if (info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute) {
                 string? value = entry.Attributes[attribute.Name].GetValues(typeof(string)).FirstOrDefault() as string;
                 info.SetValue(obj, Convert.ChangeType(value, info.PropertyType));
@@ -68,5 +67,11 @@ public sealed class LdapHelper : IDisposable {
             error = e.GetError();
             return null;
         }
+    }
+
+    public static IEnumerable<DirectoryAttribute> GetDirectoryAttribute(object entity) {
+        foreach (PropertyInfo info in entity.GetType().GetProperties())
+            if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute)
+                yield return new(attribute.Name, info.GetValue(entity)?.ToString() ?? "<!> NULL <!>");
     }
 }

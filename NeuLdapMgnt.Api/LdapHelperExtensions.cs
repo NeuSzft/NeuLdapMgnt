@@ -65,9 +65,8 @@ public static class LdapHelperExtensions {
         if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
             request.Attributes.Add(new("objectClass", objectClasses.Classes.Cast<object>().ToArray()));
 
-        foreach (PropertyInfo info in type.GetProperties())
-            if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute)
-                request.Attributes.Add(new(attribute.Name, info.GetValue(entity)?.ToString()));
+        foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttribute(entity))
+            request.Attributes.Add(attribute);
 
         bool created = helper.TryRequest(request, out var error) is not null;
         return new(created ? StatusCodes.Status201Created : StatusCodes.Status400BadRequest, error);
@@ -102,5 +101,34 @@ public static class LdapHelperExtensions {
 
         bool deleted = helper.TryRequest(request, out var error) is not null;
         return new(deleted ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest, error);
+    }
+
+    public static LdapOperationResult<dynamic> TempRefill<T>(this LdapHelper helper, IEnumerable<T> items, Func<T, string> idGetter) where T : class {
+        Type type = typeof(T);
+
+        DirectoryAttribute? objectClassesAttribute = null;
+        if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
+            objectClassesAttribute = new("objectClass", objectClasses.Classes.Cast<object>().ToArray());
+
+        int          completed = 0;
+        List<string> errors    = new();
+
+        foreach (T entity in items) {
+            string id = idGetter(entity);
+
+            AddRequest request = new($"uid={id},ou={type.GetOuName()},{helper.DnBase}");
+            if (objectClassesAttribute is not null)
+                request.Attributes.Add(objectClassesAttribute);
+
+            foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttribute(entity))
+                request.Attributes.Add(attribute);
+
+            if (helper.TryRequest(request, out var error) is not null)
+                completed++;
+            if (error is not null)
+                errors.Add($"{id}: {error}");
+        }
+
+        return new(StatusCodes.Status207MultiStatus, null, new { completed, failed = items.Count() - completed, errors });
     }
 }
