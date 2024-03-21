@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using NeuLdapMgnt.Api.Connectors;
 using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api.Endpoints;
@@ -9,28 +8,44 @@ namespace NeuLdapMgnt.Api.Endpoints;
 public static class StudentEndpoints {
     public static void MapStudentEndpoints(this WebApplication app) {
         app.MapGet("/students", (LdapHelper ldapHelper) => {
-               IEnumerable<Student> students = ldapHelper.GetAllStudents();
+               IEnumerable<Student> students = ldapHelper.GetAllEntities<Student>();
                return Results.Ok(students);
            })
            .WithOpenApi()
-           .Produces<Student>();
+           .Produces<IEnumerable<Student>>();
 
-        app.MapGet("/students/{id}", (LdapHelper ldapHelper, string id) => {
-               if (ldapHelper.TryGetStudent(id, out var error) is { } student)
-                   return Results.Ok(student);
-               return Results.NotFound(error);
-           })
+        app.MapGet("/students/{id}", (LdapHelper ldapHelper, string id) =>
+               ldapHelper.TryGetEntity<Student>(id).ToResult()
+           )
            .WithOpenApi()
            .Produces<Student>()
+           .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status404NotFound);
 
-        app.MapPost("/students", (LdapHelper ldapHelper, Student student) => {
-               bool success = ldapHelper.TryAddStudent(student, student.Id, out var error);
-               return success ? Results.Created() : Results.BadRequest(error);
-           })
+        app.MapPost("/students", (LdapHelper ldapHelper, Student student) =>
+               ldapHelper.TryAddEntity(student, student.Id).ToResult()
+           )
            .WithOpenApi()
            .Accepts<Student>("application/json")
            .Produces(StatusCodes.Status201Created)
-           .Produces<string>(StatusCodes.Status400BadRequest);
+           .Produces<string>(StatusCodes.Status400BadRequest)
+           .Produces<string>(StatusCodes.Status409Conflict);
+
+        app.MapPut("/students/{id}", (LdapHelper ldapHelper, Student student, string id) =>
+               ldapHelper.TryModifyEntity(student, id).ToResult()
+           )
+           .WithOpenApi()
+           .Accepts<Student>("application/json")
+           .Produces(StatusCodes.Status200OK)
+           .Produces<string>(StatusCodes.Status400BadRequest)
+           .Produces<string>(StatusCodes.Status404NotFound);
+
+        app.MapDelete("/students/{id}", (LdapHelper ldapHelper, string id) =>
+               ldapHelper.TryDeleteEntity<Student>(id).ToResult()
+           )
+           .WithOpenApi()
+           .Produces(StatusCodes.Status200OK)
+           .Produces<string>(StatusCodes.Status400BadRequest)
+           .Produces<string>(StatusCodes.Status404NotFound);
     }
 }

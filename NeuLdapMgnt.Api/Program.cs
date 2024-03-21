@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NeuLdapMgnt.Api.Endpoints;
+using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;
 
@@ -17,8 +19,8 @@ internal static class Program {
 
     public static void Main(string[] args) {
         LdapHelper ldapHelper = new("localhost", 389, "cn=admin,dc=test,dc=local", "admin") { DnBase = "dc=test,dc=local" };
-        ldapHelper.TryRequest(new AddRequest("ou=students,dc=test,dc=local", "organizationalUnit"));
-        ldapHelper.TryRequest(new AddRequest("ou=teachers,dc=test,dc=local", "organizationalUnit"));
+        foreach (Type type in new[] { typeof(Student), typeof(Teacher) })
+            ldapHelper.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldapHelper.DnBase}", "organizationalUnit"));
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
@@ -48,6 +50,7 @@ internal static class Program {
         }
 
         // Map endpoints
+        app.MapStudentEndpoints();
 
         // Print the current security key as a base64 string
         app.Logger.LogCritical($"Key: {Convert.ToBase64String(SecurityKey.Key)}");
