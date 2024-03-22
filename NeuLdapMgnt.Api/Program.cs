@@ -51,6 +51,7 @@ internal static class Program {
 
         // Map endpoints
         app.MapStudentEndpoints();
+        app.MapManagementEndpoints();
 
         // Print the current security key as a base64 string
         app.Logger.LogCritical($"Key: {Convert.ToBase64String(SecurityKey.Key)}");
