@@ -3,6 +3,34 @@
 <EditForm Model="@studentUpdated" OnValidSubmit="HandleValidSubmit" class="d-flex flex-column gap-2 my-3">
 	<DataAnnotationsValidator />
 
+	<div class="row">
+		<div class="col text-end">
+			@if (IsReadonly)
+			{
+				<button type="button" class="btn btn-warning px-4" @onclick="ToggleReadonly">
+					<i class="bi bi-pen"></i>
+				</button>
+			}
+			else
+			{
+				<div class="btn-group" role="group">
+					@if (CanDelete)
+					{
+						<button type="button" class="btn btn-danger px-4" @onclick="ToggleReadonly">
+							<i class="bi bi-trash-fill"></i>
+						</button>
+					}
+					<button type="submit" class="btn btn-success px-4">
+						<i class="bi bi-check-lg"></i>
+					</button>
+					<button type="button" class="btn btn-primary px-4" @onclick="ToggleReadonly">
+						<i class="bi bi-x-lg"></i>
+					</button>
+				</div>
+			}
+		</div>
+	</div>
+
 	<div class="input-group">
 		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="uid">OM</label>
 		<InputNumber class="form-control"
@@ -15,33 +43,23 @@
 	<ValidationMessage For="() => studentUpdated.Id" />
 
 	<div class="input-group">
-		<label class="input-group-text user-select-none col-12 col-lg-2 col-xxl-1">Name</label>
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="givenName">First</label>
+		<label class="input-group-text user-select-none col-12 col-xxl-1">Name</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="givenName">First</label>
 		<InputText class="form-control" readonly="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
 
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="middleName">Middle</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="middleName">Middle</label>
 		<InputText class="form-control" readonly="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
 
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="lastName">Last</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="lastName">Last</label>
 		<InputText class="form-control" readonly="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
 	</div>
 	<ValidationMessage For="() => studentUpdated.FirstName" />
 	<ValidationMessage For="() => studentUpdated.MiddleName" />
 	<ValidationMessage For="() => studentUpdated.LastName" />
 
-		<!--
-
 	<div class="input-group">
-		<label class="input-group-text user-select-none col-12 col-md-3 col-lg-2 col-xxl-1" for="roomNumber">Class</label>
-		<InputText class="form-control" readonly="@IsReadonly" id="roomNumber" @bind-Value="studentUpdated.Class" />
-	</div>
-	<ValidationMessage For="() => studentUpdated.Class" />
-
-		-->
-
-	<div class="input-group mb-3">
-		<label class="input-group-text user-select-none col-12 col-lg-2 col-xxl-1">Class</label>
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="classYearSelect">Year</label>
+		<label class="input-group-text user-select-none col-12 col-xxl-1">Class</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="classYearSelect">Year</label>
 		<InputSelect class="form-select" id="classYearSelect" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassYear">
 			@foreach (var year in Student.AllowedYears)
 			{
@@ -56,7 +74,7 @@
 			}
 		</InputSelect>
 
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="classGroupSelect">Group</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="classGroupSelect">Group</label>
 		<InputSelect class="form-select" id="classGroupSelect" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassGroup">
 			@foreach (var group in Student.AllowedGroups)
 			{
@@ -71,7 +89,7 @@
 			}
 		</InputSelect>
 
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="classSubGroupSelect">Sub-Group</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1 text-wrap" for="classSubGroupSelect">Sub Group</label>
 		<InputSelect class="form-select" id="classSubGroupSelect" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassSubGroup">
 			<option value=""></option>
 			@foreach (var subGroup in Student.AllowedSubGroups)
@@ -87,7 +105,7 @@
 			}
 		</InputSelect>
 	</div>
-	
+
 	<div class="input-group">
 		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="cn">Username</label>
 		<InputText class="form-control" readonly="@IsReadonly" id="cn" @bind-Value="studentUpdated.Username" />
@@ -133,28 +151,6 @@
 		<InputText type="password" class="form-control" readonly="@IsReadonly" id="password" @bind-Value="studentUpdated.Password" />
 	</div>
 	<ValidationMessage For="() => studentUpdated.Password" />
-
-	<div class="row">
-		<div class="col text-end">
-			@if (IsReadonly)
-			{
-				<button type="button" class="btn btn-primary px-3" @onclick="ToggleReadonly">
-					<i class="bi bi-pen"></i>
-				</button>
-			}
-			else
-			{
-				<div class="btn-group" role="group">
-					<button type="submit" class="btn btn-success px-3">
-						<i class="bi bi-check-lg"></i>
-					</button>
-					<button type="button" class="btn btn-danger px-3" @onclick="ToggleReadonly">
-						<i class="bi bi-x-lg"></i>
-					</button>
-				</div>
-			}
-		</div>
-	</div>
 </EditForm>
 
 @code {
@@ -166,6 +162,9 @@
 
 	[Parameter]
 	public bool IsReadonly { get; set; }
+
+	[Parameter]
+	public bool CanDelete { get; set; } = true;
 
 	private Student? studentOriginal;
 	private Student? studentUpdated;

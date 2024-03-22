@@ -192,12 +192,12 @@
 					? Students
 						.OrderBy(x => x.ClassYear)
 						.ThenBy(x => x.ClassGroup)
-						//.ThenBy(x => x.ClassSubGroup)
+						.ThenBy(x => x.ClassSubGroup)
 						.ToList()
 					: Students
-						.OrderByDescending(x => x.Class)
+						.OrderByDescending(x => x.ClassYear)
 						.ThenByDescending(x => x.ClassGroup)
-						//.ThenByDescending(x => x.ClassSubGroup)
+						.ThenByDescending(x => x.ClassSubGroup)
 						.ToList();
 				break;
 
