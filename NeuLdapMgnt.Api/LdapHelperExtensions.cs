@@ -43,7 +43,7 @@ public static class LdapHelperExtensions {
         return response?.Entries.Count == 1;
     }
 
-    public static IEnumerable<T> GetAllEntities<T>(this LdapHelper helper) where T : class {
+    public static IEnumerable<T> GetAllEntities<T>(this LdapHelper helper) where T : class, new() {
         SearchRequest   request  = new($"ou={typeof(T).GetOuName()},{helper.DnBase}", LdapHelper.AnyFilter, SearchScope.Subtree, null);
         SearchResponse? response = helper.TryRequest(request) as SearchResponse;
 
@@ -55,7 +55,7 @@ public static class LdapHelperExtensions {
                 yield return entity;
     }
 
-    public static LdapOperationResult<T> TryGetEntity<T>(this LdapHelper helper, long id) where T : class {
+    public static LdapOperationResult<T> TryGetEntity<T>(this LdapHelper helper, long id) where T : class, new() {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{helper.DnBase}", LdapHelper.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = helper.TryRequest(request, out var error) as SearchResponse;
 

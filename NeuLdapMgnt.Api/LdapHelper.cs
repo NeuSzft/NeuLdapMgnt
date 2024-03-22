@@ -46,8 +46,8 @@ public sealed class LdapHelper : IDisposable {
 
     public static readonly string AnyFilter = "(objectClass=*)";
 
-    public static T ParseEntry<T>(SearchResultEntry entry) where T : class {
-        T obj = Utils.ForceCreateClassObj<T>();
+    public static T ParseEntry<T>(SearchResultEntry entry) where T : class, new() {
+        T obj = new();
 
         foreach (PropertyInfo info in typeof(T).GetProperties())
             if (info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute) {
@@ -58,7 +58,7 @@ public sealed class LdapHelper : IDisposable {
         return obj;
     }
 
-    public static T? TryParseEntry<T>(SearchResultEntry entry, out string? error) where T : class {
+    public static T? TryParseEntry<T>(SearchResultEntry entry, out string? error) where T : class,new() {
         try {
             error = null;
             return ParseEntry<T>(entry);

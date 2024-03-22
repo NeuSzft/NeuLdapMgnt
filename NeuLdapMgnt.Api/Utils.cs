@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
@@ -22,12 +20,6 @@ internal static class Utils {
         return new(base64Key is null ? RandomNumberGenerator.GetBytes(size) : Convert.FromBase64String(base64Key));
     }
 
-    public static T ForceCreateClassObj<T>() where T : class {
-        Type             type = typeof(T);
-        ConstructorInfo? ctor = type.GetConstructor(Type.EmptyTypes);
-        return ctor?.Invoke(null) as T ?? (T)RuntimeHelpers.GetUninitializedObject(type);
-    }
-
     public static async Task<List<Student>> CsvToStudents(StreamReader reader, int startUid = 6000) {
         List<Student> students = new();
 
@@ -35,7 +27,7 @@ internal static class Utils {
             if (line.Length == 0)
                 continue;
 
-            Student student = ForceCreateClassObj<Student>();
+            Student student = new();
             students.Add(student);
 
             string[] arr = line.Split(',');
