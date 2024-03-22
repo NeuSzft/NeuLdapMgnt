@@ -71,10 +71,10 @@
 						   @onchange="() => SelectStudent(student)" />
 				</td>
 				<td>@student.Id</td>
-				<td>@student.FullName</td>
-				<td>@student.Class</td>
+				<td>@student.GetFullName()</td>
+				<td>@student.GetClass()</td>
 				<td class="text-end">
-					<button class="btn btn-primary" @onclick="() => ShowStudent(student.Id)">
+					<button class="btn btn-primary" @onclick="() => ShowStudent(student.Id.ToString())">
 						<i class="bi bi-search"></i>
 					</button>
 				</td>
@@ -102,9 +102,9 @@
 		else
 		{
 			return Students.Where(x =>
-				x.Id.StartsWith(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-				x.FullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-				x.Class.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+				x.Id.ToString().StartsWith(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+				x.GetFullName().Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+				x.GetClass().Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
 		}
 	}
 
@@ -183,14 +183,22 @@
 
 			case "Name":
 				Students = isAscending
-					? Students.OrderBy(x => x.FullName).ToList()
-					: Students.OrderByDescending(x => x.FullName).ToList();
+					? Students.OrderBy(x => x.GetFullName()).ToList()
+					: Students.OrderByDescending(x => x.GetFullName()).ToList();
 				break;
 
 			case "Class":
 				Students = isAscending
-					? Students.OrderBy(x => x.Class).ToList()
-					: Students.OrderByDescending(x => x.Class).ToList();
+					? Students
+						.OrderBy(x => x.ClassYear)
+						.ThenBy(x => x.ClassGroup)
+						//.ThenBy(x => x.ClassSubGroup)
+						.ToList()
+					: Students
+						.OrderByDescending(x => x.Class)
+						.ThenByDescending(x => x.ClassGroup)
+						//.ThenByDescending(x => x.ClassSubGroup)
+						.ToList();
 				break;
 
 			default:

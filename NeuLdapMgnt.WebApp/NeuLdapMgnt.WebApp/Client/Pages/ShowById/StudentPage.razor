@@ -12,7 +12,7 @@
 }
 else
 {
-	<h3>@student.FullName</h3>
+	<h3>@student.GetFullName()</h3>
 	<BaseEditFormStudent TheStudent="student" OnStudentUpdated="HandleStudentUpdated" IsReadonly="isReadonly" />
 }
 
@@ -23,17 +23,23 @@ else
 	[Parameter]
 	public EventCallback<Student> OnStudentUpdated { get; set; }
 
-	private Student? student /*= new()*/; // Create a factory for student
+	private Student student = StudentFactory.CreateEmptyStudent().Build(); // Create a factory for student
 	private bool isReadonly = true;
 
 	protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
-		student = Lists.GetStudents().FirstOrDefault(x => x.Id.Equals(Id));
+
+		long.TryParse(Id, out long id);
+		var searchedStudent = Lists.GetStudents().FirstOrDefault(x => x.Id.Equals(id));
+
+		if (searchedStudent is null) return;
+		student = searchedStudent;
 	}
 
 	private async Task HandleStudentUpdated(Student updatedStudent)
 	{
+		Console.WriteLine("CHECK IF STUDENT IS THE SAME");
 		if (student.Equals(updatedStudent)) return;
 		
 		try
