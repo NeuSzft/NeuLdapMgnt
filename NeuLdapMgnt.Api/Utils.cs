@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using NeuLdapMgnt.Models;
 using PluralizeService.Core;
-using RuntimeHelpers = System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace NeuLdapMgnt.Api;
 
@@ -19,22 +20,6 @@ internal static class Utils {
     public static SymmetricSecurityKey LoadOrCreateSecurityKey(string env, int size = 256) {
         string? base64Key = Environment.GetEnvironmentVariable(env);
         return new(base64Key is null ? RandomNumberGenerator.GetBytes(size) : Convert.FromBase64String(base64Key));
-    }
-
-    /// Returns <paramref name="defaultStr"/> if the string is null or has a length of zero.
-    public static string DefaultIfNullOrEmpty(this string? str, string defaultStr) {
-        if (str is null || str.Length == 0)
-            return defaultStr;
-        return str;
-    }
-
-    public static string GetError(this Exception e) {
-        Type type = e.GetType();
-        return e.Message.DefaultIfNullOrEmpty(type.FullName ?? type.Name);
-    }
-
-    public static string GetOuName(this Type type) {
-        return PluralizationProvider.Pluralize(type.Name.ToLower());
     }
 
     public static T ForceCreateClassObj<T>() where T : class {
@@ -67,5 +52,27 @@ internal static class Utils {
         }
 
         return students;
+    }
+}
+
+internal static class ExtensionsUtils {
+    /// Returns <paramref name="defaultStr"/> if the string is null or has a length of zero.
+    public static string DefaultIfNullOrEmpty(this string? str, string defaultStr) {
+        if (str is null || str.Length == 0)
+            return defaultStr;
+        return str;
+    }
+
+    public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> collection) {
+        return collection.Where(x => x is not null).Cast<T>();
+    }
+
+    public static string GetError(this Exception e) {
+        Type type = e.GetType();
+        return e.Message.DefaultIfNullOrEmpty(type.FullName ?? type.Name);
+    }
+
+    public static string GetOuName(this Type type) {
+        return PluralizationProvider.Pluralize(type.Name.ToLower());
     }
 }
