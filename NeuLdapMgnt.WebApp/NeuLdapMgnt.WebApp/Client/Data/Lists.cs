@@ -1,30 +1,21 @@
 ﻿using NeuLdapMgnt.WebApp.Client.Models;
 using NeuLdapMgnt.Models;
+using NeuLdapMgnt.Models.Factory;
+using System.Runtime.CompilerServices;
 
 namespace NeuLdapMgnt.WebApp.Client.Data
 {
 	public static class Lists
 	{
-		public static List<Student> Students { get; set; } = new()
-		{
-			new ("73358355233", 6000, 6000, "Valamilyen", "Pistike", "11.a", "Husveti"),
-			new ("72654768165", 6022, 6022, "Akármilyen", "Huculu", "12.b"),
-			new ("68419681654", 6343, 6343, "Tóth", "Muculu", "13.c"),
-			new ("72981654865", 6434, 6434, "Valamilyen", "Valaki", "11.d"),
-			new ("79816541685", 9341, 9341, "Valaki", "Ismeretlen", "9.a/1"),
-			new ("79811231685", 6721, 6721, "Asus", "Matrica", "10.a/2"),
-			new ("79813425168", 7256, 7256, "Intel", "Alaplap", "10.b/1", "I9"),
-			new ("79816546785", 6112, 6112, "Amd", "Processzor", "10.a"),
-			new ("79816547485", 7132, 7132, "Sok", "Ram", "10.b/2")
-		};
+		public static List<Student> Students { get; set; } = new();
 
 		private static List<Teacher> Teachers { get; set; } = new()
 		{
-			new ("Tanar vagyok", 5000, 5000, "Elso", "Pistike", "Kozep"),
-			new ("Tanar vagyok", 5424, 5424, "Harmat", "Huculu"),
-			new ("Tanar vagyok", 5452, 5452, "Tóth", "Laci"),
-			new ("Tanar vagyok", 5100, 5100, "Akarmilyen", "Valaki", "Hihi"),
-			new ("Tanar vagyok", 5041, 5041, "Valaki", "Ismeretlen", "Aki")
+			//new ("Tanar vagyok", 5000, 5000, "Elso", "Pistike", "Kozep"),
+			//new ("Tanar vagyok", 5424, 5424, "Harmat", "Huculu"),
+			//new ("Tanar vagyok", 5452, 5452, "Tóth", "Laci"),
+			//new ("Tanar vagyok", 5100, 5100, "Akarmilyen", "Valaki", "Hihi"),
+			//new ("Tanar vagyok", 5041, 5041, "Valaki", "Ismeretlen", "Aki")
 		};
 
 		private static List<AdminModel> Admins { get; set; } = new()
@@ -39,5 +30,32 @@ namespace NeuLdapMgnt.WebApp.Client.Data
 		public static List<Student> GetStudents() => Students;
 		public static List<Teacher> GetTeachers() => Teachers;
 		public static List<AdminModel> GetAdmins() => Admins;
+		public static Random? random { get; set; }
+		public static void GenerateStudents(int count)
+		{
+			random = new();
+			for (int i = 0; i < count; i++)
+			{
+				Student student = StudentFactory
+					.CreateEmptyStudent()
+					.SetId(70000000000 + i)
+					.SetUid(6000 + Students.Count)
+					.SetGid(6000 + Students.Count)
+					.SetUsername($"User{i}")
+					.SetFirstName("Kis")
+					.SetMiddleName("Pista")
+					.SetLastName($"Ifjabbik {i}.")
+					.SetPassword($"password{i}")
+					.SetEmail($"{i}@example.com")
+					.SetClass(
+						random.Next(Student.AllowedYears[0], Student.AllowedYears[^1] + 1),
+						Student.AllowedGroups[random.Next(Student.AllowedGroups.Length)],
+						random.Next(3))
+					.SetHomeDirectory($"/home/{i}")
+					.Build();
+
+				Students.Add(student);
+			}
+		}
 	}
 }
