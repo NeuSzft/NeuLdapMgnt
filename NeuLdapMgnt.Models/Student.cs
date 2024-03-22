@@ -1,8 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models
 {
@@ -16,7 +15,6 @@ namespace NeuLdapMgnt.Models
 		public static readonly int[] AllowedSubGroups = new[] { 1, 2 };
 
 		[Required, Range(70000000000, 79999999999)]
-		[LdapAttribute("uid")]
 		public override long Id { get; set; } = AllowedIdRange.Min;
 
 		[Required, Range(6000, 6999)]
@@ -25,26 +23,15 @@ namespace NeuLdapMgnt.Models
 		[Required, Range(6000, 6999)]
 		public override int Gid { get; set; } = AllowedGidRange.Min;
 
-		public override string Username { get; set; } = string.Empty;
-		public override string FirstName { get; set; } = string.Empty;
-		public override string LastName { get; set; } = string.Empty;
-		public override string Email { get; set; } = string.Empty;
-		public override string HomeDirectory { get; set; } = string.Empty;
-		public override string FullName { get; set; } = string.Empty;
-		public override string? MiddleName { get; set; } = string.Empty;
-		public override string Password { get; set; } = string.Empty;
-
-		[Required]
+		[Required, RegularExpression(@"^((9|10|11|12)\.[A-E])|([1-2]/(13|14)[A-B])$", ErrorMessage = "Valid class formats: '9.A' '12.E' '2/14A'")]
+        [JsonRequired, JsonPropertyName("class")]
 		[LdapAttribute("roomNumber")]
 		public string Class { get; set; } = string.Empty;
 
-		[Required, Range(8, 14)]
 		public int ClassYear { get; set; } = 0;
 
-		[Required]
 		public string ClassGroup { get; set; } = string.Empty;
 
-		[AllowNull, Range(1, 2)]
 		public int? ClassSubGroup { get; set; } = null;
 
 		public string GetClass()

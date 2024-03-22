@@ -27,7 +27,7 @@ public static class ModelValidator {
     public static ModelValidationResult<T> ValidateJson<T>(string json) where T : class {
         T? obj;
         try {
-            obj = JsonSerializer.Deserialize<T>(json)!;
+            obj = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { AllowTrailingCommas = true })!;
         }
         catch (JsonException e) {
             return new(null, [e.GetError()]);

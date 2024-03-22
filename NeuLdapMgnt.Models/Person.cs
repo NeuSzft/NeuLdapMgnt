@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models
 {
@@ -9,46 +10,57 @@ namespace NeuLdapMgnt.Models
 	public abstract class Person
 	{
 		[Required]
+        [JsonPropertyName("id")]
 		[LdapAttribute("uid")]
-		public abstract long Id { get; set; }
+		public virtual long Id { get; set; }
 
 		[Required]
+        [JsonRequired, JsonPropertyName("uid")]
 		[LdapAttribute("uidNumber")]
-		public abstract int Uid { get; set; }
+		public virtual int Uid { get; set; }
 
 		[Required]
+        [JsonRequired, JsonPropertyName("gid")]
 		[LdapAttribute("gidNumber")]
-		public abstract int Gid { get; set; }
+		public virtual int Gid { get; set; }
 
 		[Required]
+        [JsonRequired, JsonPropertyName("username")]
 		[LdapAttribute("cn")]
-		public abstract string Username { get; set; }
+		public virtual string Username { get; set; }
 
 		[Required, MinLength(3, ErrorMessage = "The field First name must be a string with a minimum length of '3'.")]
+        [JsonRequired, JsonPropertyName("first_name")]
 		[LdapAttribute("givenName")]
-		public abstract string FirstName { get; set; }
+		public virtual string FirstName { get; set; }
 
 		[Required, MinLength(3, ErrorMessage = "The field Last name must be a string with a minimum length of '3'.")]
+        [JsonRequired, JsonPropertyName("last_name")]
 		[LdapAttribute("sn")]
-		public abstract string LastName { get; set; }
+		public virtual string LastName { get; set; }
 
 		[AllowNull]
-		public abstract string? MiddleName { get; set; }
+        [JsonPropertyName("middle_name")]
+		public virtual string? MiddleName { get; set; }
 
 		[Required, EmailAddress]
+        [JsonRequired, JsonPropertyName("email")]
 		[LdapAttribute("mail")]
-		public abstract string Email { get; set; }
+		public virtual string Email { get; set; }
 
 		[Required]
+        [JsonRequired, JsonPropertyName("home_directory")]
 		[LdapAttribute("homeDirectory")]
-		public abstract string HomeDirectory { get; set; }
+		public virtual string HomeDirectory { get; set; }
 
 		[Required, PasswordPropertyText, MinLength(8)]
+        [JsonRequired, JsonPropertyName("password")]
 		[LdapAttribute("userPassword")]
-		public abstract string Password { get; set; }
+		public virtual string Password { get; set; }
 
+        [JsonPropertyName("full_name")]
 		[LdapAttribute("displayName")]
-		public abstract string FullName { get; set; }
+		public virtual string FullName { get; set; }
 
 		public string GetFullName() => string.Join(" ", FirstName, MiddleName, LastName);
 	}
