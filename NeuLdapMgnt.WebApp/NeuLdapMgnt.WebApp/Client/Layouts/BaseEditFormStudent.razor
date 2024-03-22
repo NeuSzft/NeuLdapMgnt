@@ -15,21 +15,21 @@
 	<ValidationMessage For="() => studentUpdated.Id" />
 
 	<div class="input-group">
-		<label class="input-group-text user-select-none col-12 col-lg-2 col-xxl-1">Name</label>
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="givenName">First</label>
+		<label class="input-group-text user-select-none col-12 col-xxl-1">Name</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="givenName">First</label>
 		<InputText class="form-control" readonly="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
 
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="middleName">Middle</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="middleName">Middle</label>
 		<InputText class="form-control" readonly="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
 
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="lastName">Last</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="lastName">Last</label>
 		<InputText class="form-control" readonly="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
 	</div>
 	<ValidationMessage For="() => studentUpdated.FirstName" />
 	<ValidationMessage For="() => studentUpdated.MiddleName" />
 	<ValidationMessage For="() => studentUpdated.LastName" />
 
-		<!--
+	<!--
 
 	<div class="input-group">
 		<label class="input-group-text user-select-none col-12 col-md-3 col-lg-2 col-xxl-1" for="roomNumber">Class</label>
@@ -37,11 +37,11 @@
 	</div>
 	<ValidationMessage For="() => studentUpdated.Class" />
 
-		-->
+	-->
 
 	<div class="input-group mb-3">
-		<label class="input-group-text user-select-none col-12 col-lg-2 col-xxl-1">Class</label>
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="classYearSelect">Year</label>
+		<label class="input-group-text user-select-none col-12 col-xxl-1">Class</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="classYearSelect">Year</label>
 		<InputSelect class="form-select" id="classYearSelect" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassYear">
 			@foreach (var year in Student.AllowedYears)
 			{
@@ -56,7 +56,7 @@
 			}
 		</InputSelect>
 
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="classGroupSelect">Group</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="classGroupSelect">Group</label>
 		<InputSelect class="form-select" id="classGroupSelect" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassGroup">
 			@foreach (var group in Student.AllowedGroups)
 			{
@@ -71,7 +71,7 @@
 			}
 		</InputSelect>
 
-		<label class="input-group-text user-select-none col-3 col-sm-4 col-lg-2 col-xxl-1" for="classSubGroupSelect">Sub-Group</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1" for="classSubGroupSelect">Sub-Group</label>
 		<InputSelect class="form-select" id="classSubGroupSelect" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassSubGroup">
 			<option value=""></option>
 			@foreach (var subGroup in Student.AllowedSubGroups)
@@ -87,7 +87,7 @@
 			}
 		</InputSelect>
 	</div>
-	
+
 	<div class="input-group">
 		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="cn">Username</label>
 		<InputText class="form-control" readonly="@IsReadonly" id="cn" @bind-Value="studentUpdated.Username" />
