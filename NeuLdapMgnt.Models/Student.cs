@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace NeuLdapMgnt.Models
 {
-	public class Student : Person
+	public sealed class Student : Person, IEquatable<Student>
 	{
 		[Required, StringLength(11, ErrorMessage = "The OM field length must be 11."), RegularExpression("^[7][0-9]{10}$", ErrorMessage = "The OM field is not a valid OM.")]
 		[LdapAttribute("uid")]
@@ -27,5 +28,27 @@ namespace NeuLdapMgnt.Models
 		}
 
 		protected override string GeneratePassword() => string.Join('.', FirstName, LastName, Uid);
+
+		public bool Equals(Student? other)
+		{
+			if (other == null) return false;
+
+			return Id == other.Id
+				&& FirstName == other.FirstName
+				&& MiddleName == other.MiddleName
+				&& LastName == other.LastName
+				&& Class == other.Class
+				&& Username == other.Username
+				&& Uid == other.Uid
+				&& Gid == other.Gid
+				&& Email == other.Email
+				&& HomeDirectory == other.HomeDirectory
+				&& Password == other.Password;
+		}
+
+		public override int GetHashCode()
+		{
+			return HashCode.Combine(Id, FirstName, LastName, Class, Username);
+		}
 	}
 }
