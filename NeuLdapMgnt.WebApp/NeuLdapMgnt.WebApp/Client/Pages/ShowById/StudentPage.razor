@@ -1,0 +1,55 @@
+﻿@page "/students/{id}"
+
+<PageTitle>Student @Id</PageTitle>
+
+@if (student is null)
+{
+	<div class="d-flex justify-content-center mt-5">
+		<div class="spinner-border" role="status">
+			<label class="visually-hidden">Loading...</label>
+		</div>
+	</div>
+}
+else
+{
+	<h3>@student.FullName</h3>
+	<BaseEditFormStudent TheStudent="student" OnStudentUpdated="HandleStudentUpdated" IsReadonly="isReadonly" />
+}
+
+@code {
+	[Parameter]
+	public string Id { get; set; } = null!;
+
+	[Parameter]
+	public EventCallback<Student> OnStudentUpdated { get; set; }
+
+	private Student? student /*= new()*/; // Create a factory for student
+	private bool isReadonly = true;
+
+	protected override void OnInitialized()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+		student = Lists.GetStudents().FirstOrDefault(x => x.Id.Equals(Id));
+	}
+
+	private async Task HandleStudentUpdated(Student updatedStudent)
+	{
+		if (student.Equals(updatedStudent)) return;
+		
+		try
+		{
+			//await ApiRequests.UpdateStudentAsync(updatedStudent);
+			Lists.Students.Remove(student);
+			Lists.Students.Add(updatedStudent);
+
+			Console.WriteLine(updatedStudent.Id);
+			NavManager.NavigateTo("students");
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e.Message);
+		}
+	}
+
+	private async Task HandleValidSubmit() => await OnStudentUpdated.InvokeAsync(student);
+}

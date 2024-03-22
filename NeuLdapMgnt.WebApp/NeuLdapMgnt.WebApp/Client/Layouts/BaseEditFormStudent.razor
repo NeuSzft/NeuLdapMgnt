@@ -1,0 +1,124 @@
+﻿@inherits LayoutComponentBase
+
+<EditForm Model="@studentUpdated" OnValidSubmit="HandleValidSubmit" class="d-flex flex-column gap-2 my-3">
+	<DataAnnotationsValidator />
+
+	<div class="input-group">
+		<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="uid">OM</label>
+		<InputText class="form-control" readonly="@IsReadonly" id="uid" @bind-Value="studentUpdated!.Id" />
+	</div>
+	<ValidationMessage For="() => studentUpdated.Id" />
+
+	<div class="input-group">
+		<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="givenName">Name</label>
+		<InputText class="form-control" readonly="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
+		<InputText class="form-control" readonly="@IsReadonly" placeholder="Middle name" @bind-Value="studentUpdated.MiddleName" />
+		<InputText class="form-control" readonly="@IsReadonly" placeholder="Last name" @bind-Value="studentUpdated.LastName" />
+	</div>
+	<ValidationMessage For="() => studentUpdated.FirstName" />
+	<ValidationMessage For="() => studentUpdated.MiddleName" />
+	<ValidationMessage For="() => studentUpdated.LastName" />
+
+	<div class="input-group">
+		<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="roomNumber">Class</label>
+		<InputText class="form-control" readonly="@IsReadonly" id="roomNumber" @bind-Value="studentUpdated.Class" />
+	</div>
+	<ValidationMessage For="() => studentUpdated.Class" />
+
+	<div class="input-group">
+		<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="cn">Username</label>
+		<InputText class="form-control" readonly="@IsReadonly" id="cn" @bind-Value="studentUpdated.Username" />
+	</div>
+	<ValidationMessage For="() => studentUpdated.Username" />
+
+	<div class="input-group">
+		<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="uidNumber">User Id</label>
+		<InputNumber class="form-control" readonly="@IsReadonly" id="uidNumber" @bind-Value="studentUpdated.Uid" min="6000" />
+	</div>
+	<ValidationMessage For="() => studentUpdated.Uid" />
+
+	<div class="input-group">
+		<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="gidNumber">Group Id</label>
+		<InputNumber class="form-control" readonly="@IsReadonly" id="gidNumber" @bind-Value="studentUpdated.Gid" min="6000" />
+	</div>
+	<ValidationMessage For="() => studentUpdated.Gid" />
+
+	<div class="input-group">
+		<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="email">Email</label>
+		<InputText class="form-control" readonly="@IsReadonly" id="email" placeholder="Student@example.com" @bind-Value="studentUpdated.Email" />
+	</div>
+	<ValidationMessage For="() => studentUpdated.Email" />
+
+	<div class="input-group">
+		<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="homeDirectory">Directory</label>
+		<InputText class="form-control" readonly="@IsReadonly" id="homeDirectory" placeholder="/home/Student" @bind-Value="studentUpdated.HomeDirectory" />
+	</div>
+	<ValidationMessage For="() => studentUpdated.HomeDirectory" />
+
+	<div class="input-group">
+		<label class="input-group-text user-select-none col-12 col-sm-4 col-md-3 col-lg-2 col-xxl-1" for="password">Password</label>
+		<InputText type="password" class="form-control" readonly="@IsReadonly" id="password" @bind-Value="studentUpdated.Password" />
+	</div>
+	<ValidationMessage For="() => studentUpdated.Password" />
+
+	<div class="row">
+		<div class="col text-end">
+			@if (IsReadonly)
+			{
+				<button type="button" class="btn btn-primary px-3" @onclick="ToggleReadonly">
+					<i class="bi bi-pen"></i>
+				</button>
+			}
+			else
+			{
+				<div class="btn-group" role="group">
+					<button type="submit" class="btn btn-success px-3">
+						<i class="bi bi-check-lg"></i>
+					</button>
+					<button type="button" class="btn btn-danger px-3" @onclick="ToggleReadonly">
+						<i class="bi bi-x-lg"></i>
+					</button>
+				</div>
+			}
+		</div>
+	</div>
+</EditForm>
+
+@code {
+	[Parameter]
+	public Student? TheStudent { get; set; }
+
+	[Parameter]
+	public EventCallback<Student> OnStudentUpdated { get; set; }
+
+	[Parameter]
+	public bool IsReadonly { get; set; }
+
+	private Student? studentOriginal;
+	private Student? studentUpdated;
+
+	protected override void OnInitialized()
+	{
+		if (TheStudent is null)
+		{
+			studentOriginal = Utils.GetClone<Student>(new ("", 6000, 6000, "", "", ""));
+			studentUpdated = Utils.GetClone<Student>(studentOriginal!);
+		}
+		else
+		{
+			studentOriginal = Utils.GetClone<Student>(TheStudent);
+			studentUpdated = Utils.GetClone<Student>(studentOriginal!);
+		}
+	}
+
+	private async Task HandleValidSubmit()
+	{
+		await OnStudentUpdated.InvokeAsync(studentUpdated);
+	}
+
+	private void ToggleReadonly()
+	{
+		studentUpdated = Utils.GetClone<Student>(studentOriginal!);
+		IsReadonly = !IsReadonly;
+	}
+}
