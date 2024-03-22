@@ -71,7 +71,7 @@
 			}
 		</InputSelect>
 
-		<label class="input-group-text user-select-none col-6 col-xl-1" for="classSubGroupSelect">Sub-Group</label>
+		<label class="input-group-text user-select-none col-6 col-xl-1 text-wrap" for="classSubGroupSelect">Sub Group</label>
 		<InputSelect class="form-select" id="classSubGroupSelect" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassSubGroup">
 			<option value=""></option>
 			@foreach (var subGroup in Student.AllowedSubGroups)
