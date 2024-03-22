@@ -26,7 +26,12 @@ public record LdapOperationResult<T>(int Code, string? Message, T? Value = defau
 
 public record MultiStatusResponse(int Successful, int Failed, IEnumerable<string> Errors) {
     public IResult ToResult() {
-        return Results.Json(new { Successful, Failed, Errors }, new JsonSerializerOptions { WriteIndented = true }, "application/json", StatusCodes.Status207MultiStatus);
+        var data = new {
+            successful = Successful,
+            failed     = Failed,
+            errors     = Errors
+        };
+        return Results.Json(data, new JsonSerializerOptions { WriteIndented = true }, "application/json", StatusCodes.Status207MultiStatus);
     }
 }
 
