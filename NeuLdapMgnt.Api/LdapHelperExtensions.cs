@@ -36,7 +36,7 @@ public record MultiStatusResponse(int Successful, int Failed, IEnumerable<string
 }
 
 public static class LdapHelperExtensions {
-    public static bool EntityExists<T>(this LdapHelper helper, string id) where T : class {
+    public static bool EntityExists<T>(this LdapHelper helper, long id) where T : class {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{helper.DnBase}", LdapHelper.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = helper.TryRequest(request) as SearchResponse;
 
@@ -55,7 +55,7 @@ public static class LdapHelperExtensions {
                 yield return entity;
     }
 
-    public static LdapOperationResult<T> TryGetEntity<T>(this LdapHelper helper, string id) where T : class {
+    public static LdapOperationResult<T> TryGetEntity<T>(this LdapHelper helper, long id) where T : class {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{helper.DnBase}", LdapHelper.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = helper.TryRequest(request, out var error) as SearchResponse;
 
@@ -66,7 +66,7 @@ public static class LdapHelperExtensions {
         return new(entity is null ? StatusCodes.Status400BadRequest : StatusCodes.Status200OK, error, entity);
     }
 
-    public static LdapOperationResult TryAddEntity<T>(this LdapHelper helper, T entity, string id) where T : class {
+    public static LdapOperationResult TryAddEntity<T>(this LdapHelper helper, T entity, long id) where T : class {
         if (helper.EntityExists<T>(id))
             return new(StatusCodes.Status409Conflict, "The object already exists.");
 
@@ -83,7 +83,7 @@ public static class LdapHelperExtensions {
         return new(created ? StatusCodes.Status201Created : StatusCodes.Status400BadRequest, error);
     }
 
-    public static LdapOperationResult TryModifyEntity<T>(this LdapHelper helper, T entity, string id) where T : class {
+    public static LdapOperationResult TryModifyEntity<T>(this LdapHelper helper, T entity, long id) where T : class {
         if (!helper.EntityExists<T>(id))
             return new(StatusCodes.Status404NotFound, "The object does not exist.");
 
@@ -104,7 +104,7 @@ public static class LdapHelperExtensions {
         return new(modified ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest, error);
     }
 
-    public static LdapOperationResult TryDeleteEntity<T>(this LdapHelper helper, string id) where T : class {
+    public static LdapOperationResult TryDeleteEntity<T>(this LdapHelper helper, long id) where T : class {
         if (!helper.EntityExists<T>(id))
             return new(StatusCodes.Status404NotFound, "The object does not exist.");
 
@@ -114,7 +114,7 @@ public static class LdapHelperExtensions {
         return new(deleted ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest, error);
     }
 
-    public static MultiStatusResponse TempRefill<T>(this LdapHelper helper, IEnumerable<T> items, Func<T, string> idGetter) where T : class {
+    public static MultiStatusResponse TempRefill<T>(this LdapHelper helper, IEnumerable<T> items, Func<T, long> idGetter) where T : class {
         Type type = typeof(T);
 
         DirectoryAttribute? objectClassesAttribute = null;
@@ -125,7 +125,7 @@ public static class LdapHelperExtensions {
         List<string> errors    = new();
 
         foreach (T entity in items) {
-            string id = idGetter(entity);
+            long id = idGetter(entity);
 
             AddRequest request = new($"uid={id},ou={type.GetOuName()},{helper.DnBase}");
             if (objectClassesAttribute is not null)

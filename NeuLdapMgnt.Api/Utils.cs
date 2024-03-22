@@ -39,7 +39,9 @@ internal static class Utils {
             students.Add(student);
 
             string[] arr = line.Split(',');
-            student.Id        = arr[0];
+            long.TryParse(arr[0], out var id);
+
+            student.Id        = id;
             student.Uid       = startUid;
             student.Gid       = startUid;
             student.FirstName = arr[1].Trim('"');
