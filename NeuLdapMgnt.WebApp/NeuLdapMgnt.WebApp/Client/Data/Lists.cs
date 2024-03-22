@@ -5,7 +5,7 @@ namespace NeuLdapMgnt.WebApp.Client.Data
 {
 	public static class Lists
 	{
-		private static List<Student> Students { get; set; } = new()
+		public static List<Student> Students { get; set; } = new()
 		{
 			new ("73358355233", 6000, 6000, "Valamilyen", "Pistike", "11.a", "Husveti"),
 			new ("72654768165", 6022, 6022, "Akármilyen", "Huculu", "12.b"),
