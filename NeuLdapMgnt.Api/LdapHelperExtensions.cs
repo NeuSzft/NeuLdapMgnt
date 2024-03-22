@@ -24,6 +24,12 @@ public record LdapOperationResult<T>(int Code, string? Message, T? Value = defau
     }
 }
 
+public record MultiStatusResponse(int Successful, int Failed, IEnumerable<string> Errors) {
+    public IResult ToResult() {
+        return Results.Json(new { Successful, Failed, Errors }, new JsonSerializerOptions { WriteIndented = true }, "application/json", StatusCodes.Status207MultiStatus);
+    }
+}
+
 public static class LdapHelperExtensions {
     public static bool EntityExists<T>(this LdapHelper helper, string id) where T : class {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{helper.DnBase}", LdapHelper.AnyFilter, SearchScope.Base, null);
@@ -103,7 +109,7 @@ public static class LdapHelperExtensions {
         return new(deleted ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest, error);
     }
 
-    public static LdapOperationResult<dynamic> TempRefill<T>(this LdapHelper helper, IEnumerable<T> items, Func<T, string> idGetter) where T : class {
+    public static MultiStatusResponse TempRefill<T>(this LdapHelper helper, IEnumerable<T> items, Func<T, string> idGetter) where T : class {
         Type type = typeof(T);
 
         DirectoryAttribute? objectClassesAttribute = null;
@@ -129,6 +135,6 @@ public static class LdapHelperExtensions {
                 errors.Add($"{id}: {error}");
         }
 
-        return new(StatusCodes.Status207MultiStatus, null, new { completed, failed = items.Count() - completed, errors });
+        return new(completed, items.Count() - completed, errors);
     }
 }
