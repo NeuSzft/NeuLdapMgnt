@@ -11,7 +11,7 @@ namespace NeuLdapMgnt.Models
 		public static readonly (int Min, int Max) AllowedUidRange = new(6000, 6999);
 		public static readonly (int Min, int Max) AllowedGidRange = new(6000, 6999);
 		public static readonly int[] AllowedYears = new[] { 8, 9, 10, 11, 12, 13, 14 };
-		public static readonly string[] AllowedGroups = new[] { "A", "B", "C", "D", "E", "Ny", "Rsze" };
+		public static readonly string[] AllowedGroups = new[] { "A", "B", "C", "D", "E", "Ny", "Rsze", "Szft" };
 		public static readonly int[] AllowedSubGroups = new[] { 1, 2 };
 
 		[Required, Range(70000000000, 79999999999)]
@@ -23,8 +23,8 @@ namespace NeuLdapMgnt.Models
 		[Required, Range(6000, 6999)]
 		public override int Gid { get; set; } = AllowedGidRange.Min;
 
-		[Required, RegularExpression(@"^((9|10|11|12)\.[A-E])|([1-2]/(13|14)[A-B])$", ErrorMessage = "Valid class formats: '9.A' '12.E' '2/14A'")]
-        [JsonRequired, JsonPropertyName("class")]
+		[Required, RegularExpression(@"^((9|10|11|12)\.[A-E])|([1-2]/(13|14)\.[A-B](\.Ny|\.Rsze|\.Szft)?)$", ErrorMessage = "Valid class formats: '9.A' '12.E' '2/14A'")]
+		[JsonRequired, JsonPropertyName("class")]
 		[LdapAttribute("roomNumber")]
 		public string Class { get; set; } = string.Empty;
 
@@ -36,9 +36,9 @@ namespace NeuLdapMgnt.Models
 
 		public string GetClass()
 		{
-			return $"{ClassYear}." +
-				$"{ClassGroup.ToUpper()}" +
-				$"{(ClassSubGroup is null ? "" : $"/{ClassSubGroup}")}";
+			return $"{(ClassSubGroup is null ? "" : $"{ClassSubGroup}/")}" +
+				$"{ClassYear}." +
+				$"{ClassGroup[0].ToString().ToUpper()}{ClassGroup[1..]}";
 		}
 
 		public bool Equals(Student? other)

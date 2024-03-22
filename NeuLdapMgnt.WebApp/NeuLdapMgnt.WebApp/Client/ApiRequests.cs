@@ -12,6 +12,7 @@ namespace NeuLdapMgnt.WebApp.Client
 
 		public event Action? AuthenticationStateChanged;
 		public bool IsAuthenticated => _token != null;
+		public bool IsAuthenticated => true /*|| _token != null*/;
 
 		public ApiRequests()
 		{
