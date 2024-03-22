@@ -22,18 +22,24 @@ public static class StudentEndpoints {
            .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status404NotFound);
 
-        app.MapPost("/students", (LdapHelper ldapHelper, Student student) =>
-               ldapHelper.TryAddEntity(student, student.Id).ToResult()
-           )
+        app.MapPost("/students", async (LdapHelper ldapHelper, HttpRequest request) => {
+               var validation = await ModelValidator.ValidateRequest<Student>(request);
+               return validation.Result is null
+                   ? validation.ToResult()
+                   : ldapHelper.TryAddEntity(validation.Result, validation.Result.Id).ToResult();
+           })
            .WithOpenApi()
            .Accepts<Student>("application/json")
            .Produces(StatusCodes.Status201Created)
            .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status409Conflict);
 
-        app.MapPut("/students/{id}", (LdapHelper ldapHelper, Student student, string id) =>
-               ldapHelper.TryModifyEntity(student, id).ToResult()
-           )
+        app.MapPut("/students/{id}", async (LdapHelper ldapHelper, HttpRequest request, string id) => {
+               var validation = await ModelValidator.ValidateRequest<Student>(request);
+               return validation.Result is null
+                   ? validation.ToResult()
+                   : ldapHelper.TryModifyEntity(validation.Result, id).ToResult();
+           })
            .WithOpenApi()
            .Accepts<Student>("application/json")
            .Produces(StatusCodes.Status200OK)
