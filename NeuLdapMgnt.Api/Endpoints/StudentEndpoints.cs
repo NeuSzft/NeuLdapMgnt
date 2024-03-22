@@ -14,7 +14,7 @@ public static class StudentEndpoints {
            .WithOpenApi()
            .Produces<IEnumerable<Student>>();
 
-        app.MapGet("/students/{id}", (LdapHelper ldapHelper, string id) =>
+        app.MapGet("/students/{id}", (LdapHelper ldapHelper, long id) =>
                ldapHelper.TryGetEntity<Student>(id).ToResult()
            )
            .WithOpenApi()
@@ -34,7 +34,7 @@ public static class StudentEndpoints {
            .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status409Conflict);
 
-        app.MapPut("/students/{id}", async (LdapHelper ldapHelper, HttpRequest request, string id) => {
+        app.MapPut("/students/{id}", async (LdapHelper ldapHelper, HttpRequest request, long id) => {
                var validation = await ModelValidator.ValidateRequest<Student>(request);
                return validation.Result is null
                    ? validation.ToResult()
@@ -46,7 +46,7 @@ public static class StudentEndpoints {
            .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status404NotFound);
 
-        app.MapDelete("/students/{id}", (LdapHelper ldapHelper, string id) =>
+        app.MapDelete("/students/{id}", (LdapHelper ldapHelper, long id) =>
                ldapHelper.TryDeleteEntity<Student>(id).ToResult()
            )
            .WithOpenApi()
