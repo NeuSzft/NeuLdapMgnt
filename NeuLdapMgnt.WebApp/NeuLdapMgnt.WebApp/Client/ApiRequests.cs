@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using NeuLdapMgnt.Models;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -11,7 +12,6 @@ namespace NeuLdapMgnt.WebApp.Client
 		private string? _token = null;
 
 		public event Action? AuthenticationStateChanged;
-		public bool IsAuthenticated => _token != null;
 		public bool IsAuthenticated => true /*|| _token != null*/;
 
 		public ApiRequests()
@@ -22,11 +22,17 @@ namespace NeuLdapMgnt.WebApp.Client
 				DefaultRequestHeaders = { Accept = { new MediaTypeWithQualityHeaderValue("application/json") } }
 			};
 		}
+
 		public void EnsureAuthentication(NavigationManager navManager)
+		{
+			if (!IsAuthenticated) navManager.NavigateTo("login");
+		}
+
+		private void EnsureAuthentication()
 		{
 			if (!IsAuthenticated)
 			{
-				navManager.NavigateTo("login");
+				throw new InvalidOperationException("User is not authenticated.");
 			}
 		}
 
@@ -61,6 +67,38 @@ namespace NeuLdapMgnt.WebApp.Client
 		public async Task GetTest()
 		{
 			var response = await _httpClient.GetAsync("/auth/test");
+			response.EnsureSuccessStatusCode();
+		}
+
+		public async Task<IEnumerable<Student>> GetStudentsAsync()
+		{
+			EnsureAuthentication();
+			var response = await _httpClient.GetFromJsonAsync<IEnumerable<Student>>("/students");
+			return response ?? Enumerable.Empty<Student>();
+		}
+
+		public async Task<Student> AddStudentAsync(Student student)
+		{
+			EnsureAuthentication();
+
+			var response = await _httpClient.PostAsJsonAsync("/students", student);
+			response.EnsureSuccessStatusCode();
+
+			var content = await response.Content.ReadFromJsonAsync<Student>();
+			return content!;
+		}
+
+		public async Task UpdateStudentAsync(Student student)
+		{
+			EnsureAuthentication();
+			var response = await _httpClient.PutAsJsonAsync($"/students/{student.Id}", student);
+			response.EnsureSuccessStatusCode();
+		}
+
+		public async Task DeleteStudentAsync(int id)
+		{
+			EnsureAuthentication();
+			var response = await _httpClient.DeleteAsync($"/students/{id}");
 			response.EnsureSuccessStatusCode();
 		}
 	}
