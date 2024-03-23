@@ -72,10 +72,10 @@
 				</td>
 				<td>@student.Id</td>
 				<td>@student.GetFullName()</td>
-				<td>@student.GetClass()</td>
+				<td>@student.Class</td>
 				<td class="text-end">
 					<button class="btn btn-primary" @onclick="() => ShowStudent(student.Id.ToString())">
-						<i class="bi bi-search"></i>
+						<i class="bi bi-eye"></i>
 					</button>
 				</td>
 			</tr>
@@ -104,7 +104,7 @@
 			return Students.Where(x =>
 				x.Id.ToString().StartsWith(searchQuery, StringComparison.OrdinalIgnoreCase) ||
 				x.GetFullName().Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-				x.GetClass().Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+				x.Class.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
 		}
 	}
 

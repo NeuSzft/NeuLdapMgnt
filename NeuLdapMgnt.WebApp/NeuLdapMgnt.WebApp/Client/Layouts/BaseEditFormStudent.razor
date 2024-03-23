@@ -20,10 +20,10 @@
 							<i class="bi bi-trash-fill"></i>
 						</button>
 					}
-					<button type="submit" class="btn btn-success px-4">
-						<i class="bi bi-check-lg"></i>
+					<button type="submit" class="btn btn-primary px-4">
+						<i class="bi bi-floppy"></i>
 					</button>
-					<button type="button" class="btn btn-primary px-4" @onclick="ToggleReadonly">
+					<button type="button" class="btn btn-success px-4" @onclick="ToggleReadonly">
 						<i class="bi bi-x-lg"></i>
 					</button>
 				</div>
@@ -31,111 +31,126 @@
 		</div>
 	</div>
 
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="uid">OM</label>
+	<div class="form-floating">
 		<InputNumber class="form-control"
 					 readonly="@IsReadonly"
-					 id="uid"
+					 id="student-id"
 					 min="@Student.AllowedIdRange.Min"
 					 max="@Student.AllowedIdRange.Max"
 					 @bind-Value="studentUpdated!.Id" />
-	</div>
-	<ValidationMessage For="() => studentUpdated.Id" />
-
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-12 col-xxl-1">Name</label>
-		<label class="input-group-text user-select-none col-6 col-xl-1" for="givenName">First</label>
-		<InputText class="form-control" readonly="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
-
-		<label class="input-group-text user-select-none col-6 col-xl-1" for="middleName">Middle</label>
-		<InputText class="form-control" readonly="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
-
-		<label class="input-group-text user-select-none col-6 col-xl-1" for="lastName">Last</label>
-		<InputText class="form-control" readonly="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
-	</div>
-	<ValidationMessage For="() => studentUpdated.FirstName" />
-	<ValidationMessage For="() => studentUpdated.MiddleName" />
-	<ValidationMessage For="() => studentUpdated.LastName" />
-
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-12 col-xxl-1">Class</label>
-		<label class="input-group-text user-select-none col-6 col-xl-1" for="classYearSelect">Year</label>
-		<select class="form-select" id="classYearSelect" disabled="@IsReadonly" @bind="studentUpdated.ClassYear" @onblur="OnClassChange">
-			@foreach (var year in Student.AllowedYears)
-			{
-				<option value="@year" selected="@year.Equals(studentUpdated.ClassYear)">@year</option>
-			}
-		</select>
-
-		<label class="input-group-text user-select-none col-6 col-xl-1" for="classGroupSelect">Group</label>
-		<select class="form-select" id="classGroupSelect" disabled="@IsReadonly" @bind="studentUpdated.ClassGroup" @onblur="OnClassChange">
-			@foreach (var group in Student.AllowedGroups)
-			{
-				<option value="@group" selected="@group.Equals(studentUpdated.ClassGroup)">@group</option>
-			}
-		</select>
-
-		<label class="input-group-text user-select-none col-6 col-xl-1 text-wrap" for="classSubGroupSelect">Sub Group</label>
-		<select class="form-select" id="classSubGroupSelect" disabled="@IsReadonly" @bind="studentUpdated.ClassSubGroup" @onblur="OnClassChange">
-			<option value=""></option>
-			@foreach (var subGroup in Student.AllowedSubGroups)
-			{
-				<option value="@subGroup" selected="@subGroup.Equals(studentUpdated.ClassSubGroup)">@subGroup</option>
-			}
-		</select>
+		<label for="student-id">OM</label>
+		<ValidationMessage For="() => studentUpdated.Id" />
 	</div>
 
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="class">Class</label>
-		<InputText type="class" class="form-control" readonly="true" id="class" @bind-Value="studentUpdated.Class" />
-	</div>
-	<ValidationMessage For="() => studentUpdated.Class" />
+	<div class="input-group gap-2">
+		<label class="input-group-text user-select-none col-12 rounded" for="givenName">Name</label>
 
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="cn">Username</label>
-		<InputText class="form-control" readonly="@IsReadonly" id="cn" @bind-Value="studentUpdated.Username" />
-	</div>
-	<ValidationMessage For="() => studentUpdated.Username" />
+		<div class="form-floating col-12 col-md">
+			<InputText class="form-control" readonly="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
+			<label for="given-name">First</label>
+			<ValidationMessage For="() => studentUpdated.FirstName" />
+		</div>
 
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="uidNumber">User Id</label>
+		<div class="form-floating col-12 col-md">
+			<InputText class="form-control" readonly="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
+			<label for="middle-name">Middle</label>
+			<ValidationMessage For="() => studentUpdated.MiddleName" />
+		</div>
+
+		<div class="form-floating col-12 col-md">
+			<InputText class="form-control" readonly="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
+			<label for="last-name">Last</label>
+			<ValidationMessage For="() => studentUpdated.LastName" />
+		</div>
+	</div>
+
+	<div class="input-group gap-2 align-items-center">
+		<label class="input-group-text user-select-none col-12 rounded" for="classYearSelect">Class @studentUpdated.Class</label>
+
+		<div class="form-floating col">
+			<select class="form-select" id="class-year-select" disabled="@IsReadonly" @bind="studentUpdated.ClassYear">
+				@for (int year = Student.AllowedYearsRange.Min; year <= Student.AllowedYearsRange.Max; year++)
+				{
+					<option value="@year" selected="@year.Equals(studentUpdated.ClassYear)">@year</option>
+				}
+			</select>
+			<label for="class-year-select">Year</label>
+		</div>
+
+		<div class="form-floating col">
+			<select class="form-select" id="class-group-select" disabled="@IsReadonly" @bind="studentUpdated.ClassGroup">
+				@foreach (var group in Student.AllowedGroups)
+				{
+					<option value="@group" selected="@group.Equals(studentUpdated.ClassGroup)">@group</option>
+				}
+			</select>
+			<label for="class-group-select">Group</label>
+		</div>
+
+		<div class="form-floating col">
+			<select class="form-select" id="class-sub-group-select" disabled="@IsReadonly" @bind="studentUpdated.ClassSubGroup">
+				<option value=""></option>
+				@for (int subGroup = Student.AllowedSubGroupsRange.Min; subGroup <= Student.AllowedSubGroupsRange.Max; subGroup++)
+				{
+					<option value="@subGroup" selected="@subGroup.Equals(studentUpdated.ClassSubGroup)">@subGroup</option>
+				}
+			</select>
+			<label for="class-sub-group-select">Sub Group</label>
+		</div>
+		<ValidationMessage For="() => studentUpdated.Class" />
+	</div>
+
+	<div class="form-floating">
+		<InputText class="form-control" readonly="@IsReadonly" id="username" @bind-Value="studentUpdated.Username" />
+		<label for="username">Username</label>
+		<ValidationMessage For="() => studentUpdated.Username" />
+	</div>
+
+	<div class="form-floating">
+		<InputText class="form-control" readonly="@IsReadonly" placeholder="Last name" id="last-name" @bind-Value="studentUpdated.LastName" />
+		<label for="last-name">Last</label>
+		<ValidationMessage For="() => studentUpdated.LastName" />
+	</div>
+
+	<div class="form-floating">
 		<InputNumber class="form-control"
 					 readonly="@IsReadonly"
-					 id="uidNumber"
+					 id="user-id"
 					 min="@Student.AllowedUidRange.Min"
 					 max="@Student.AllowedUidRange.Max"
 					 @bind-Value="studentUpdated.Uid" />
+		<label for="user-id">User Id</label>
+		<ValidationMessage For="() => studentUpdated.Uid" />
 	</div>
-	<ValidationMessage For="() => studentUpdated.Uid" />
 
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="gidNumber">Group Id</label>
+	<div class="form-floating">
 		<InputNumber class="form-control"
 					 readonly="@IsReadonly"
-					 id="gidNumber"
+					 id="group-id"
 					 min="@Student.AllowedGidRange.Min"
 					 max="@Student.AllowedGidRange.Max"
 					 @bind-Value="studentUpdated.Gid" />
+		<label for="group-id">Group Id</label>
+		<ValidationMessage For="() => studentUpdated.Gid" />
 	</div>
-	<ValidationMessage For="() => studentUpdated.Gid" />
 
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="email">Email</label>
+	<div class="form-floating">
 		<InputText class="form-control" readonly="@IsReadonly" id="email" placeholder="Student@example.com" @bind-Value="studentUpdated.Email" />
+		<label for="email">Email</label>
+		<ValidationMessage For="() => studentUpdated.Email" />
 	</div>
-	<ValidationMessage For="() => studentUpdated.Email" />
 
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="homeDirectory">Directory</label>
-		<InputText class="form-control" readonly="@IsReadonly" id="homeDirectory" placeholder="/home/Student" @bind-Value="studentUpdated.HomeDirectory" />
+	<div class="form-floating">
+		<InputText class="form-control" readonly="@IsReadonly" id="home-directory" placeholder="/home/Student" @bind-Value="studentUpdated.HomeDirectory" />
+		<label for="home-directory">Directory</label>
+		<ValidationMessage For="() => studentUpdated.HomeDirectory" />
 	</div>
-	<ValidationMessage For="() => studentUpdated.HomeDirectory" />
 
-	<div class="input-group">
-		<label class="input-group-text user-select-none col-3 col-lg-2 col-xxl-1" for="password">Password</label>
+	<div class="form-floating">
 		<InputText type="password" class="form-control" readonly="@IsReadonly" id="password" @bind-Value="studentUpdated.Password" />
+		<label for="password">Password</label>
+		<ValidationMessage For="() => studentUpdated.Password" />
 	</div>
-	<ValidationMessage For="() => studentUpdated.Password" />
 </EditForm>
 
 @code {
@@ -158,7 +173,6 @@
 	{
 		studentOriginal = Utils.GetClone<Student>(TheStudent)!;
 		studentUpdated = Utils.GetClone<Student>(studentOriginal)!;
-		OnClassChange();
 	}
 
 	private async Task HandleValidSubmit()
@@ -171,11 +185,5 @@
 	{
 		studentUpdated = Utils.GetClone<Student>(studentOriginal)!;
 		IsReadonly = !IsReadonly;
-		OnClassChange();
-	}
-
-	private void OnClassChange()
-	{
-		studentUpdated.Class = studentUpdated.GetClass();
 	}
 }

@@ -1,7 +1,6 @@
 ﻿using NeuLdapMgnt.WebApp.Client.Models;
 using NeuLdapMgnt.Models;
 using NeuLdapMgnt.Models.Factory;
-using System.Runtime.CompilerServices;
 
 namespace NeuLdapMgnt.WebApp.Client.Data
 {
@@ -48,7 +47,7 @@ namespace NeuLdapMgnt.WebApp.Client.Data
 					.SetPassword($"password{i}")
 					.SetEmail($"{i}@example.com")
 					.SetClass(
-						random.Next(Student.AllowedYears[0], Student.AllowedYears[^1] + 1),
+						random.Next(Student.AllowedYearsRange.Min, Student.AllowedYearsRange.Max + 1),
 						Student.AllowedGroups[random.Next(Student.AllowedGroups.Length)],
 						random.Next(3))
 					.SetHomeDirectory($"/home/{i}")

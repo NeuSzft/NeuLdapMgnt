@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models
@@ -10,9 +9,13 @@ namespace NeuLdapMgnt.Models
 		public static readonly (long Min, long Max) AllowedIdRange = new(70000000000, 79999999999);
 		public static readonly (int Min, int Max) AllowedUidRange = new(6000, 6999);
 		public static readonly (int Min, int Max) AllowedGidRange = new(6000, 6999);
-		public static readonly int[] AllowedYears = new[] { 8, 9, 10, 11, 12, 13, 14 };
+		public static readonly (int Min, int Max) AllowedYearsRange = new(8, 14);
+		public static readonly (int Min, int Max) AllowedSubGroupsRange = new(1, 2);
 		public static readonly string[] AllowedGroups = new[] { "A", "B", "C", "D", "E", "Ny", "Rsze", "Szft" };
-		public static readonly int[] AllowedSubGroups = new[] { 1, 2 };
+
+		private int classYear;
+		private string classGroup = string.Empty;
+		private int? classSubGroup = null;
 
 		[Required, Range(70000000000, 79999999999)]
 		public override long Id { get; set; } = AllowedIdRange.Min;
@@ -28,17 +31,39 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("roomNumber")]
 		public string Class { get; set; } = string.Empty;
 
-		public int ClassYear { get; set; } = 0;
-
-		public string ClassGroup { get; set; } = string.Empty;
-
-		public int? ClassSubGroup { get; set; } = null;
-
-		public string GetClass()
+		public int ClassYear
 		{
-			return $"{(ClassSubGroup is null ? "" : $"{ClassSubGroup}/")}" +
-				$"{ClassYear}." +
-				$"{ClassGroup[0].ToString().ToUpper()}{ClassGroup[1..]}";
+			get => classYear;
+			set
+			{
+				classYear = value;
+				UpdateClass();
+			}
+		}
+
+		public string ClassGroup
+		{
+			get => classGroup;
+			set
+			{
+				classGroup = value;
+				UpdateClass();
+			}
+		}
+
+		public int? ClassSubGroup
+		{
+			get => classSubGroup;
+			set
+			{
+				classSubGroup = value;
+				UpdateClass();
+			}
+		}
+
+		private void UpdateClass()
+		{
+			Class = $"{(ClassSubGroup.HasValue ? $"{ClassSubGroup}/" : "")}{ClassYear}.{ClassGroup}";
 		}
 
 		public bool Equals(Student? other)
@@ -49,7 +74,7 @@ namespace NeuLdapMgnt.Models
 				&& FirstName == other.FirstName
 				&& MiddleName == other.MiddleName
 				&& LastName == other.LastName
-				&& GetClass() == other.GetClass()
+				&& Class == other.Class
 				&& Username == other.Username
 				&& Uid == other.Uid
 				&& Gid == other.Gid

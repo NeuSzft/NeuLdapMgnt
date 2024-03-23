@@ -1,4 +1,6 @@
-﻿namespace NeuLdapMgnt.Models.Factory
+﻿using System.Text;
+
+namespace NeuLdapMgnt.Models.Factory
 {
 	public static class StudentFactory
 	{
@@ -44,8 +46,44 @@
 			{
 				_student.ClassYear = year;
 				_student.ClassGroup = group;
-				_student.ClassSubGroup = subGroup;
+				_student.ClassSubGroup = subGroup == 0 ? null : subGroup;
+				UpdateClass();
 				return this;
+			}
+
+			public Builder SetClass(string @class)
+			{
+				if (@class.Contains('/'))
+				{
+					string[] classSplit = @class.Split('/', '.', System.StringSplitOptions.TrimEntries);
+					_student.ClassYear = int.Parse(classSplit[1]);
+					_student.ClassGroup = classSplit[2];
+					_student.ClassSubGroup = int.Parse(classSplit[0]);
+					UpdateClass();
+				}
+				else
+				{
+					string[] classSplit = @class.Split('.', System.StringSplitOptions.TrimEntries);
+					_student.ClassYear = int.Parse(classSplit[0]);
+					_student.ClassGroup = classSplit[1];
+					UpdateClass();
+				}
+
+				return this;
+			}
+
+			private void UpdateClass()
+			{
+				StringBuilder builder = new();
+
+				if (_student.ClassSubGroup is not null)
+				{
+					builder.Append($"{_student.ClassSubGroup}/");
+				}
+				builder.Append($"{_student.ClassYear}.");
+				builder.Append($"{_student.ClassGroup[0].ToString().ToUpper()}{_student.ClassGroup[1..]}");
+
+				_student.Class = builder.ToString();
 			}
 
 			public Builder SetUsername(string username)
