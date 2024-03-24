@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models
@@ -61,6 +62,14 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("displayName")]
 		public virtual string FullName { get; set; } = string.Empty;
 
-		public string GetFullName() => string.Join(" ", FirstName, MiddleName, LastName);
+		public string GetFullName()
+		{
+			TextInfo textInfo = new CultureInfo("hu-HU", false).TextInfo;
+			string capitalizedFirstName = textInfo.ToTitleCase(FirstName);
+			string? capitalizedMiddleName = string.IsNullOrEmpty(MiddleName) ? null : textInfo.ToTitleCase(MiddleName);
+			string capitalizedLastName = textInfo.ToTitleCase(LastName);
+
+			return string.Join(" ", capitalizedFirstName, capitalizedMiddleName, capitalizedLastName);
+		}
 	}
 }

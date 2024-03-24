@@ -1,6 +1,6 @@
 ﻿@page "/students/{id}"
 
-<PageTitle>Student @Id</PageTitle>
+<PageTitle>@student.GetFullName()</PageTitle>
 
 @if (student is null)
 {
@@ -12,7 +12,7 @@
 }
 else
 {
-	<h3>@student.GetFullName()</h3>
+	<h3>[@student.Class] @student.GetFullName()</h3>
 	<BaseEditFormStudent TheStudent="student" OnStudentUpdated="HandleStudentUpdated" IsReadonly="isReadonly" />
 }
 

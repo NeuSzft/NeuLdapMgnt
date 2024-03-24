@@ -24,7 +24,14 @@
 	</div>
 
 	<div class="input-group gap-2">
-		<label class="input-group-text user-select-none col-12 rounded" for="givenName">Name</label>
+		<label class="input-group-text user-select-none col-12 rounded gap-2" for="givenName">
+			Name
+			@if (!IsReadonly)
+			{
+				
+				<span>[@studentUpdated.GetFullName()]</span>
+			}
+		</label>
 
 		<div class="form-floating col-12 col-md">
 			<InputText class="form-control" readonly="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
@@ -33,20 +40,27 @@
 		</div>
 
 		<div class="form-floating col-12 col-md">
-			<InputText class="form-control" readonly="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
-			<label for="middle-name">Middle</label>
-			<ValidationMessage For="() => studentUpdated.MiddleName" />
-		</div>
-
-		<div class="form-floating col-12 col-md">
 			<InputText class="form-control" readonly="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
 			<label for="last-name">Last</label>
 			<ValidationMessage For="() => studentUpdated.LastName" />
 		</div>
+
+		<div class="form-floating col-12 col-md">
+			<InputText class="form-control" readonly="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
+			<label for="middle-name">Middle</label>
+			<ValidationMessage For="() => studentUpdated.MiddleName" />
+		</div>
 	</div>
 
 	<div class="input-group gap-2 align-items-center">
-		<label class="input-group-text user-select-none col-12 rounded" for="classYearSelect">Class @studentUpdated.Class</label>
+		<label class="input-group-text user-select-none col-12 rounded gap-2" for="classYearSelect">
+			Class
+			@if (!IsReadonly)
+			{
+				<br />
+				<span>[@studentUpdated.Class]</span>
+			}
+		</label>
 
 		<div class="form-floating col">
 			<InputSelect class="form-select" id="class-year-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassYear">
@@ -70,7 +84,7 @@
 
 		<div class="form-floating col">
 			<InputSelect class="form-select" id="class-sub-group-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassSubGroup">
-				<option value=""></option>
+				<option value="" selected="@(studentUpdated.ClassSubGroup is null)">-</option>
 				@for (int subGroup = Student.AllowedSubGroupsRange.Min; subGroup <= Student.AllowedSubGroupsRange.Max; subGroup++)
 				{
 					<option value="@subGroup" selected="@subGroup.Equals(studentUpdated.ClassSubGroup)">@subGroup</option>
