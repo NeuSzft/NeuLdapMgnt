@@ -1,0 +1,36 @@
+﻿@page "/students/enrollment"
+
+<PageTitle>Enroll student</PageTitle>
+
+<h3>Enroll student</h3>
+
+<FileUpload OnFileUploaded="OnFileUploaded" />
+
+<BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="HandleStudentUpdated" />
+
+@code {
+	private Student? student = StudentFactory.CreateEmptyStudent().Build();
+
+
+	private async Task HandleStudentUpdated(Student studentUpdated)
+	{
+		if (student!.Equals(studentUpdated)) return;
+
+		try
+		{
+			//await ApiRequests.AddStudentAsync(editedStudent);
+			Lists.Students.Add(studentUpdated);
+			NavManager.NavigateTo("students");
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e.Message);
+		}
+	}
+
+	private void OnFileUploaded(IBrowserFile file)
+	{
+		Console.WriteLine("Uploaded");
+	}
+}
+

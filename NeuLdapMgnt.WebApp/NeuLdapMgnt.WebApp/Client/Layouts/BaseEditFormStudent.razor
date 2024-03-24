@@ -1,12 +1,12 @@
 ﻿@inherits LayoutComponentBase
 
-<EditForm Model="@studentUpdated" OnValidSubmit="HandleValidSubmit" class="d-flex flex-column gap-2 my-3">
+<EditForm Model="@studentUpdated" OnValidSubmit="HandleValidSubmit" class="d-flex flex-column gap-2">
 	<DataAnnotationsValidator />
 
 	<div class="text-end">
 		@if (IsReadonly)
 		{
-			<button type="button" class="btn btn-warning" @onclick="ToggleReadonly">
+			<button type="button" class="btn btn-warning mt-2" @onclick="ToggleReadonly">
 				<i class="bi bi-pencil-square"></i> Edit
 			</button>
 		}
@@ -26,10 +26,10 @@
 	<div class="input-group gap-2">
 		<label class="input-group-text user-select-none col-12 rounded gap-2" for="givenName">
 			Name
-			@if (!IsReadonly)
+			@if (!IsReadonly && studentUpdated.GetFullName().Length > 2)
 			{
-				
 				<span>[@studentUpdated.GetFullName()]</span>
+				
 			}
 		</label>
 
@@ -53,9 +53,9 @@
 	</div>
 
 	<div class="input-group gap-2 align-items-center">
-		<label class="input-group-text user-select-none col-12 rounded gap-2" for="classYearSelect">
+		<label class="input-group-text user-select-none col-12 rounded gap-2" for="class-year-select">
 			Class
-			@if (!IsReadonly)
+			@if (!IsReadonly && studentUpdated.ClassYear != 0)
 			{
 				<br />
 				<span>[@studentUpdated.Class]</span>
@@ -165,13 +165,13 @@
 	public Student TheStudent { get; set; } = StudentFactory.CreateEmptyStudent().Build();
 
 	[Parameter]
-	public EventCallback<Student> OnStudentUpdated { get; set; }
+	public EventCallback<Student> OnSubmit { get; set; }
 
 	[Parameter]
 	public bool IsReadonly { get; set; }
 
 	[Parameter]
-	public bool CanDelete { get; set; } = true;
+	public bool CanDelete { get; set; }
 
 	private Student studentOriginal = StudentFactory.CreateEmptyStudent().Build();
 	private Student studentUpdated = StudentFactory.CreateEmptyStudent().Build();
@@ -182,10 +182,12 @@
 		studentUpdated = Utils.GetClone<Student>(studentOriginal)!;
 	}
 
+	protected override void OnParametersSet() => StateHasChanged();
+
 	private async Task HandleValidSubmit()
 	{
 		Console.WriteLine("AWAITING UPDATE");
-		await OnStudentUpdated.InvokeAsync(studentUpdated);
+		await OnSubmit.InvokeAsync(studentUpdated);
 	}
 
 	private void ToggleReadonly()

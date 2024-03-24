@@ -13,7 +13,7 @@
 else
 {
 	<h3>[@student.Class] @student.GetFullName()</h3>
-	<BaseEditFormStudent TheStudent="student" OnStudentUpdated="HandleStudentUpdated" IsReadonly="isReadonly" />
+	<BaseEditFormStudent TheStudent="student" OnSubmit="HandleEditedStudent" IsReadonly="true" CanDelete="true" />
 }
 
 @code {
@@ -23,8 +23,7 @@ else
 	[Parameter]
 	public EventCallback<Student> OnStudentUpdated { get; set; }
 
-	private Student student = StudentFactory.CreateEmptyStudent().Build(); // Create a factory for student
-	private bool isReadonly = true;
+	private Student student = StudentFactory.CreateEmptyStudent().Build();
 
 	protected override void OnInitialized()
 	{
@@ -37,18 +36,15 @@ else
 		student = searchedStudent;
 	}
 
-	private async Task HandleStudentUpdated(Student updatedStudent)
+	private async Task HandleEditedStudent(Student editedStudent)
 	{
-		Console.WriteLine("CHECK IF STUDENT IS THE SAME");
-		if (student.Equals(updatedStudent)) return;
-		
+		if (student.Equals(editedStudent)) return;
+
 		try
 		{
-			//await ApiRequests.UpdateStudentAsync(updatedStudent);
-			Lists.Students.Remove(student);
-			Lists.Students.Add(updatedStudent);
-
-			Console.WriteLine(updatedStudent.Id);
+			//await ApiRequests.UpdateStudentAsync(editedStudent);
+			int studentIndex = Lists.Students.IndexOf(student);
+			Lists.Students[studentIndex] = editedStudent;
 			NavManager.NavigateTo("students");
 		}
 		catch (Exception e)
