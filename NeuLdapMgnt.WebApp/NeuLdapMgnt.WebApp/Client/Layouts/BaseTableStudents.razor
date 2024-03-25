@@ -2,7 +2,7 @@
 
 <div class="row justify-content-between g-2">
 	<div class="input-group col">
-		<label class="input-group-text for=" searchbar""><i class="bi bi-funnel"></i></label>
+		<label class="input-group-text" for="searchbar"><i class="bi bi-funnel"></i></label>
 		<div class="form-floating">
 			<input type="search"
 				   class="form-control rounded-0 rounded-end"
@@ -13,7 +13,7 @@
 		</div>
 		<div class="col text-end">
 			<button class="btn btn-warning col" @onclick="EditSelected" disabled="@isStudentSelected">
-				
+
 				Edit selected
 			</button>
 		</div>
@@ -167,7 +167,7 @@
 
 	private bool AreAllFilteredStudentsSelected()
 	{
-		return selectedStudents.Count > 0 
+		return selectedStudents.Count > 0
 			&& selectedStudents.Count.Equals(filteredStudents.Count);
 	}
 
