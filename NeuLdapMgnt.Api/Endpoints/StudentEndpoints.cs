@@ -12,14 +12,20 @@ public static class StudentEndpoints {
                return Results.Ok(students);
            })
            .WithOpenApi()
-           .Produces<IEnumerable<Student>>();
+           .WithTags("Students")
+           .RequireAuthorization()
+           .Produces<IEnumerable<Student>>()
+           .Produces<string>(StatusCodes.Status401Unauthorized);
 
         app.MapGet("/students/{id}", (LdapHelper ldapHelper, long id) =>
                ldapHelper.TryGetEntity<Student>(id).ToResult()
            )
            .WithOpenApi()
+           .WithTags("Students")
+           .RequireAuthorization()
            .Produces<Student>()
            .Produces<string>(StatusCodes.Status400BadRequest)
+           .Produces<string>(StatusCodes.Status401Unauthorized)
            .Produces<string>(StatusCodes.Status404NotFound);
 
         app.MapPost("/students", async (LdapHelper ldapHelper, HttpRequest request) => {
@@ -29,9 +35,12 @@ public static class StudentEndpoints {
                    : ldapHelper.TryAddEntity(validation.Result, validation.Result.Id).ToResult();
            })
            .WithOpenApi()
+           .WithTags("Students")
+           .RequireAuthorization()
            .Accepts<Student>("application/json")
            .Produces(StatusCodes.Status201Created)
            .Produces<string>(StatusCodes.Status400BadRequest)
+           .Produces<string>(StatusCodes.Status401Unauthorized)
            .Produces<string>(StatusCodes.Status409Conflict);
 
         app.MapPut("/students/{id}", async (LdapHelper ldapHelper, HttpRequest request, long id) => {
@@ -41,17 +50,23 @@ public static class StudentEndpoints {
                    : ldapHelper.TryModifyEntity(validation.Result, id).ToResult();
            })
            .WithOpenApi()
+           .WithTags("Students")
+           .RequireAuthorization()
            .Accepts<Student>("application/json")
            .Produces(StatusCodes.Status200OK)
            .Produces<string>(StatusCodes.Status400BadRequest)
+           .Produces<string>(StatusCodes.Status401Unauthorized)
            .Produces<string>(StatusCodes.Status404NotFound);
 
         app.MapDelete("/students/{id}", (LdapHelper ldapHelper, long id) =>
                ldapHelper.TryDeleteEntity<Student>(id).ToResult()
            )
            .WithOpenApi()
+           .WithTags("Students")
+           .RequireAuthorization()
            .Produces(StatusCodes.Status200OK)
            .Produces<string>(StatusCodes.Status400BadRequest)
+           .Produces<string>(StatusCodes.Status401Unauthorized)
            .Produces<string>(StatusCodes.Status404NotFound);
     }
 }

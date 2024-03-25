@@ -1,6 +1,8 @@
 ﻿using System;
 using System.DirectoryServices.Protocols;
 using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,13 +24,61 @@ internal static class Program {
         foreach (Type type in new[] { typeof(Student), typeof(Teacher) })
             ldapHelper.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldapHelper.DnBase}", "organizationalUnit"));
 
-        WebApplicationBuilder builder = WebApplication.CreateBuilder();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+        // Create jwt authentication scheme
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
+            options.TokenValidationParameters = new TokenValidationParameters {
+                ValidateAudience = false,
+                ValidateIssuer   = true,
+                ValidateLifetime = true,
+
+                IssuerSigningKey = SecurityKey,
+                ValidIssuers     = new[] { TokenIssuer },
+                ValidAlgorithms  = new[] { SecurityAlgorithms.HmacSha512 }
+            };
+
+            options.Events = new JwtBearerEvents {
+                // Fail if Authorization header is missing
+                OnMessageReceived = (MessageReceivedContext context) => {
+                    if (context.Request.Headers.Authorization.Count == 0)
+                        context.Fail("missing");
+                    return Task.CompletedTask;
+                },
+
+                // Return 401 from middleware if authentication fails
+                OnChallenge = async (JwtBearerChallengeContext context) => {
+                    context.HandleResponse();
+
+                    string? message = context.AuthenticateFailure switch {
+                        { Message: "missing" } => "Missing json web token.",
+                        not null               => "Invalid json web token.",
+                        _                      => null
+                    };
+
+                    if (message is not null) {
+                        context.Response.StatusCode  = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "text/plain";
+                        await context.Response.WriteAsync(context.ErrorDescription.DefaultIfNullOrEmpty(message));
+                        await context.Response.CompleteAsync();
+                    }
+                },
+            };
+        });
+
+        // Add authorization policy that uses the previously created authentication scheme
+        builder.Services.AddAuthorization(options => {
+            options.AddPolicy(JwtBearerDefaults.AuthenticationScheme + "Policy", policy => {
+                policy.RequireAuthenticatedUser();
+                policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+            });
+        });
 
         // Add other services
         builder.Services.AddCors();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton<LdapHelper>(_ => ldapHelper);
+        builder.Services.AddSwaggerWrapperGen();
 
         WebApplication app = builder.Build();
         ldapHelper.Logger = app.Logger;
@@ -45,11 +95,11 @@ internal static class Program {
 
         // Add swagger middlewares when in development mode
         if (app.Environment.IsDevelopment()) {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerWrapper();
         }
 
         // Map endpoints
+        app.MapAuthEndpoints();
         app.MapStudentEndpoints();
         app.MapManagementEndpoints();
 
