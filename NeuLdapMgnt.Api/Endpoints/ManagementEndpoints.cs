@@ -11,6 +11,7 @@ public static class ManagementEndpoints {
                return ldapHelper.TempRefill(await Utils.CsvToStudents(reader), student => student.Id).ToResult();
            })
            .WithOpenApi()
+           .WithTags("Management")
            .DisableAntiforgery()
            .Accepts<IFormFile>("text/csv")
            .Produces(StatusCodes.Status207MultiStatus);
