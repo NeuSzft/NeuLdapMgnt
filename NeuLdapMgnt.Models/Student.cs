@@ -9,9 +9,9 @@ namespace NeuLdapMgnt.Models
 		public static readonly (long Min, long Max) AllowedIdRange = new(70000000000, 79999999999);
 		public static readonly (int Min, int Max) AllowedUidRange = new(6000, 6999);
 		public static readonly (int Min, int Max) AllowedGidRange = new(6000, 6999);
-		public static readonly (int Min, int Max) AllowedYearsRange = new(8, 14);
+		public static readonly (int Min, int Max) AllowedYearsRange = new(9, 14);
 		public static readonly (int Min, int Max) AllowedSubGroupsRange = new(1, 2);
-		public static readonly string[] AllowedGroups = new[] { "A", "B", "C", "D", "E", "Ny", "Rsze", "Szft" };
+		public static readonly string[] AllowedGroups = { "A", "B", "C", "D", "E", "Ny", "A.RSZE", "B.RSZE" };
 
 		private int classYear;
 		private string classGroup = string.Empty;
@@ -26,7 +26,7 @@ namespace NeuLdapMgnt.Models
 		[Required, Range(6000, 6999)]
 		public override int Gid { get; set; } = AllowedGidRange.Min;
 
-		[Required, RegularExpression(@"^((9|10|11|12)\.[A-E])|([1-2]/(13|14)\.[A-B](\.Ny|\.Rsze|\.Szft)?)$", ErrorMessage = "Valid class formats: '9.A' '12.E' '2/14A'")]
+		[Required, RegularExpression(@"^((9\.Ny)|((9|10|11|12|13)\.[A-E])|((1\/13|2\/14)[A-B](\.RSZE)?))$", ErrorMessage = "Class does not exist")]
 		[JsonRequired, JsonPropertyName("class")]
 		[LdapAttribute("roomNumber")]
 		public string Class { get; set; } = string.Empty;
@@ -62,9 +62,9 @@ namespace NeuLdapMgnt.Models
 		}
 
 		private void UpdateClass()
-		{
-			Class = $"{(ClassSubGroup.HasValue ? $"{ClassSubGroup}/" : "")}{ClassYear}.{ClassGroup}";
-		}
+        {
+            Class = classSubGroup.HasValue ? $"{ClassSubGroup}/{ClassYear}{ClassGroup}" : $"{ClassYear}.{ClassGroup}";
+        }
 
 		public bool Equals(Student? other)
 		{
