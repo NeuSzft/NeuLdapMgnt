@@ -1,4 +1,3 @@
-using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +25,13 @@ internal static class SwaggerWrapper {
 
     public static IServiceCollection AddSwaggerWrapperGen(this IServiceCollection services) {
         services.AddSwaggerGen(options => {
+            options.SupportNonNullableReferenceTypes();
+
+            options.SwaggerDoc("api", new OpenApiInfo {
+                Title   = "Neu LDAP Management API",
+                Version = "1.0.0"
+            });
+
             options.AddSecurityDefinition("Basic", new OpenApiSecurityScheme {
                 Type   = SecuritySchemeType.Http,
                 In     = ParameterLocation.Header,
@@ -47,8 +53,11 @@ internal static class SwaggerWrapper {
     }
 
     public static IApplicationBuilder UseSwaggerWrapper(this IApplicationBuilder app) {
-        app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwagger(options => options.RouteTemplate = "/docs/{documentName}/endpoints.json");
+        app.UseSwaggerUI(options => {
+            options.SwaggerEndpoint($"/docs/api/endpoints.json", "API Endpoints");
+            options.RoutePrefix = "docs";
+        });
 
         return app;
     }
