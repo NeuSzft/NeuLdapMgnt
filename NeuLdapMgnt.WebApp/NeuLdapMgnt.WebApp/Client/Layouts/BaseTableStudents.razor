@@ -13,7 +13,6 @@
 		</div>
 		<div class="col text-end">
 			<button class="btn btn-warning col" @onclick="EditSelected" disabled="@isStudentSelected">
-
 				Edit selected
 			</button>
 		</div>
@@ -202,18 +201,16 @@
 				break;
 
 			case "Class":
-				filteredStudents = isAscending
-					? filteredStudents
-						.OrderBy(x => x.ClassYear)
-						.ThenBy(x => x.ClassGroup)
-						.ThenBy(x => x.ClassSubGroup)
-						.ToList()
-					: filteredStudents
-						.OrderByDescending(x => x.ClassYear)
-						.ThenByDescending(x => x.ClassGroup)
-						.ThenByDescending(x => x.ClassSubGroup)
-						.ToList();
-				break;
+                filteredStudents = isAscending
+                    ? filteredStudents
+                      .OrderBy(x => x.ClassYearOrderValue())
+                      .ThenBy(x => x.ClassGroup)
+                      .ToList()
+                    : filteredStudents
+                      .OrderByDescending(x => x.ClassYearOrderValue())
+                      .ThenByDescending(x => x.ClassGroup)
+                      .ToList();
+                break;
 
 			default:
 				break;

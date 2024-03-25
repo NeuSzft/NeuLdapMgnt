@@ -47,7 +47,7 @@ namespace NeuLdapMgnt.WebApp.Client.Data
 					.SetPassword($"password{i}")
 					.SetEmail($"{i}@example.com")
 					.SetClass(
-						random.Next(Student.AllowedYearsRange.Min, Student.AllowedYearsRange.Max + 1),
+                        Student.AllowedYears[random.Next(Student.AllowedYears.Length)],
 						Student.AllowedGroups[random.Next(Student.AllowedGroups.Length)],
 						random.Next(3))
 					.SetHomeDirectory($"/home/{i}")

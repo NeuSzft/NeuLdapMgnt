@@ -6,16 +6,14 @@ namespace NeuLdapMgnt.Models
 {
 	public sealed class Student : Person, IEquatable<Student>
 	{
-		public static readonly (long Min, long Max) AllowedIdRange = new(70000000000, 79999999999);
-		public static readonly (int Min, int Max) AllowedUidRange = new(6000, 6999);
-		public static readonly (int Min, int Max) AllowedGidRange = new(6000, 6999);
-		public static readonly (int Min, int Max) AllowedYearsRange = new(9, 14);
-		public static readonly (int Min, int Max) AllowedSubGroupsRange = new(1, 2);
-		public static readonly string[] AllowedGroups = { "A", "B", "C", "D", "E", "Ny", "A.RSZE", "B.RSZE" };
+		public static readonly (long Min, long Max) AllowedIdRange  = new(70000000000, 79999999999);
+		public static readonly (int Min, int Max)   AllowedUidRange = new(6000, 6999);
+		public static readonly (int Min, int Max)   AllowedGidRange = new(6000, 6999);
+        public static readonly string[]             AllowedYears    = { "9", "10", "11", "12", "13", "1/13", "2/14" };
+		public static readonly string[]             AllowedGroups   = { "A", "B", "C", "D", "E", "Ny", "A.RSZE", "B.RSZE" };
 
-		private int classYear;
-		private string classGroup = string.Empty;
-		private int? classSubGroup = null;
+        private string classYear  = string.Empty;
+        private string classGroup = string.Empty;
 
 		[Required, Range(70000000000, 79999999999)]
 		public override long Id { get; set; } = AllowedIdRange.Min;
@@ -31,7 +29,7 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("roomNumber")]
 		public string Class { get; set; } = string.Empty;
 
-		public int ClassYear
+		public string ClassYear
 		{
 			get => classYear;
 			set
@@ -51,22 +49,18 @@ namespace NeuLdapMgnt.Models
 			}
 		}
 
-		public int? ClassSubGroup
-		{
-			get => classSubGroup;
-			set
-			{
-				classSubGroup = value;
-				UpdateClass();
-			}
-		}
+        private void UpdateClass() => Class = ClassYear.Contains('/') ? $"{ClassYear}{ClassGroup}" : $"{ClassYear}.{ClassGroup}";
 
-		private void UpdateClass()
+        public int ClassYearOrderValue()
         {
-            Class = classSubGroup.HasValue ? $"{ClassSubGroup}/{ClassYear}{ClassGroup}" : $"{ClassYear}.{ClassGroup}";
+            if (ClassGroup == "Ny")
+                return 0;
+            if (ClassYear.Contains('/'))
+                return int.Parse(ClassYear[2..] + '0');
+            return int.Parse(ClassYear);
         }
 
-		public bool Equals(Student? other)
+        public bool Equals(Student? other)
 		{
 			if (other == null) return false;
 

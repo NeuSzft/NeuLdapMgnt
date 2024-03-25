@@ -42,11 +42,10 @@ namespace NeuLdapMgnt.Models.Factory
 				return this;
 			}
 
-			public Builder SetClass(int year, string group, int? subGroup = null)
+			public Builder SetClass(string year, string group, int? subGroup = null)
 			{
 				_student.ClassYear = year;
 				_student.ClassGroup = group;
-				_student.ClassSubGroup = subGroup == 0 ? null : subGroup;
 				UpdateClass();
 				return this;
 			}
@@ -56,15 +55,14 @@ namespace NeuLdapMgnt.Models.Factory
 				if (@class.Contains('/'))
 				{
 					string[] classSplit = @class.Split('/', '.', System.StringSplitOptions.TrimEntries);
-					_student.ClassYear = int.Parse(classSplit[1]);
+					_student.ClassYear = classSplit[1];
 					_student.ClassGroup = classSplit[2];
-					_student.ClassSubGroup = int.Parse(classSplit[0]);
 					UpdateClass();
 				}
 				else
 				{
 					string[] classSplit = @class.Split('.', System.StringSplitOptions.TrimEntries);
-					_student.ClassYear = int.Parse(classSplit[0]);
+					_student.ClassYear = classSplit[0];
 					_student.ClassGroup = classSplit[1];
 					UpdateClass();
 				}
@@ -76,10 +74,6 @@ namespace NeuLdapMgnt.Models.Factory
 			{
 				StringBuilder builder = new();
 
-				if (_student.ClassSubGroup is not null)
-				{
-					builder.Append($"{_student.ClassSubGroup}/");
-				}
 				builder.Append($"{_student.ClassYear}.");
 				builder.Append($"{_student.ClassGroup[0].ToString().ToUpper()}{_student.ClassGroup[1..]}");
 

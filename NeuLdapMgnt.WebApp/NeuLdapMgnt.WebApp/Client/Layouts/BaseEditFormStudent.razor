@@ -29,7 +29,7 @@
 			@if (!IsReadonly && studentUpdated.GetFullName().Length > 2)
 			{
 				<span>[@studentUpdated.GetFullName()]</span>
-				
+
 			}
 		</label>
 
@@ -55,7 +55,7 @@
 	<div class="input-group gap-2 align-items-center">
 		<label class="input-group-text user-select-none col-12 rounded gap-2" for="class-year-select">
 			Class
-			@if (!IsReadonly && studentUpdated.ClassYear != 0)
+			@if (!IsReadonly && studentUpdated.ClassYear != string.Empty)
 			{
 				<br />
 				<span>[@studentUpdated.Class]</span>
@@ -64,7 +64,7 @@
 
 		<div class="form-floating col">
 			<InputSelect class="form-select" id="class-year-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassYear">
-				@for (int year = Student.AllowedYearsRange.Min; year <= Student.AllowedYearsRange.Max; year++)
+				@foreach(string year in Student.AllowedYears)
 				{
 					<option value="@year" selected="@year.Equals(studentUpdated.ClassYear)">@year</option>
 				}
@@ -80,17 +80,6 @@
 				}
 			</InputSelect>
 			<label for="class-group-select">Group</label>
-		</div>
-
-		<div class="form-floating col">
-			<InputSelect class="form-select" id="class-sub-group-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassSubGroup">
-				<option value="" selected="@(studentUpdated.ClassSubGroup is null)">-</option>
-				@for (int subGroup = Student.AllowedSubGroupsRange.Min; subGroup <= Student.AllowedSubGroupsRange.Max; subGroup++)
-				{
-					<option value="@subGroup" selected="@subGroup.Equals(studentUpdated.ClassSubGroup)">@subGroup</option>
-				}
-			</InputSelect>
-			<label for="class-sub-group-select">Sub Group</label>
 		</div>
 	</div>
 	<ValidationMessage For="() => studentUpdated.Class" />
