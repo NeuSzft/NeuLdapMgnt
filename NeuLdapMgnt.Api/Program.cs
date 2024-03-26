@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,8 +44,20 @@ internal static class Program {
             options.Events = new JwtBearerEvents {
                 // Fail if Authorization header is missing
                 OnMessageReceived = (MessageReceivedContext context) => {
-                    if (context.Request.Headers.Authorization.Count == 0)
+                    var headerValues = context.Request.Headers.Authorization;
+                    if (headerValues.Count == 0 || headerValues.ToString()[..6].ToLower() != "bearer")
                         context.Fail("missing");
+
+                    return Task.CompletedTask;
+                },
+
+                // Send back a new token on successful authentication
+                OnTokenValidated = (TokenValidatedContext context) => {
+                    AuthenticationHeaderValue header = AuthenticationHeaderValue.Parse(context.Request.Headers.Authorization.ToString());
+                    JwtSecurityToken          token  = new JwtSecurityTokenHandler().ReadJwtToken(header.Parameter!);
+
+                    context.Response.Headers.TryAdd("New-Authorization", AuthHelper.RenewToken(token));
+
                     return Task.CompletedTask;
                 },
 
@@ -50,19 +65,19 @@ internal static class Program {
                 OnChallenge = async (JwtBearerChallengeContext context) => {
                     context.HandleResponse();
 
-                    string? message = context.AuthenticateFailure switch {
+                    string? error = context.AuthenticateFailure switch {
                         { Message: "missing" } => "Missing json web token.",
                         not null               => "Invalid json web token.",
                         _                      => null
                     };
 
-                    if (message is not null) {
+                    if (error is not null) {
                         context.Response.StatusCode  = StatusCodes.Status401Unauthorized;
                         context.Response.ContentType = "text/plain";
-                        await context.Response.WriteAsync(context.ErrorDescription.DefaultIfNullOrEmpty(message));
+                        await context.Response.WriteAsync(context.ErrorDescription.DefaultIfNullOrEmpty(error));
                         await context.Response.CompleteAsync();
                     }
-                },
+                }
             };
         });
 
