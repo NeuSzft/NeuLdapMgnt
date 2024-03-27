@@ -15,7 +15,8 @@ public static class StudentEndpoints {
            .WithTags("Students")
            .RequireAuthorization()
            .Produces<IEnumerable<Student>>()
-           .Produces<string>(StatusCodes.Status401Unauthorized);
+           .Produces<string>(StatusCodes.Status401Unauthorized)
+           .Produces<string>(StatusCodes.Status503ServiceUnavailable, "text/plain");
 
         app.MapGet("/students/{id}", (LdapHelper ldapHelper, long id) =>
                ldapHelper.TryGetEntity<Student>(id).ToResult()
@@ -26,7 +27,8 @@ public static class StudentEndpoints {
            .Produces<Student>()
            .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status401Unauthorized)
-           .Produces<string>(StatusCodes.Status404NotFound);
+           .Produces<string>(StatusCodes.Status404NotFound)
+           .Produces<string>(StatusCodes.Status503ServiceUnavailable, "text/plain");
 
         app.MapPost("/students", async (LdapHelper ldapHelper, HttpRequest request) => {
                var validation = await ModelValidator.ValidateRequest<Student>(request);
@@ -41,7 +43,8 @@ public static class StudentEndpoints {
            .Produces(StatusCodes.Status201Created)
            .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status401Unauthorized)
-           .Produces<string>(StatusCodes.Status409Conflict);
+           .Produces<string>(StatusCodes.Status409Conflict)
+           .Produces<string>(StatusCodes.Status503ServiceUnavailable, "text/plain");
 
         app.MapPut("/students/{id}", async (LdapHelper ldapHelper, HttpRequest request, long id) => {
                var validation = await ModelValidator.ValidateRequest<Student>(request);
@@ -56,7 +59,8 @@ public static class StudentEndpoints {
            .Produces(StatusCodes.Status200OK)
            .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status401Unauthorized)
-           .Produces<string>(StatusCodes.Status404NotFound);
+           .Produces<string>(StatusCodes.Status404NotFound)
+           .Produces<string>(StatusCodes.Status503ServiceUnavailable, "text/plain");
 
         app.MapDelete("/students/{id}", (LdapHelper ldapHelper, long id) =>
                ldapHelper.TryDeleteEntity<Student>(id).ToResult()
@@ -67,6 +71,7 @@ public static class StudentEndpoints {
            .Produces(StatusCodes.Status200OK)
            .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status401Unauthorized)
-           .Produces<string>(StatusCodes.Status404NotFound);
+           .Produces<string>(StatusCodes.Status404NotFound)
+           .Produces<string>(StatusCodes.Status503ServiceUnavailable, "text/plain");
     }
 }

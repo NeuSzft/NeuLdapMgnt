@@ -117,6 +117,8 @@ public static class LdapHelperExtensions {
     public static MultiStatusResponse TempRefill<T>(this LdapHelper helper, IEnumerable<T> items, Func<T, long> idGetter) where T : class {
         Type type = typeof(T);
 
+        helper.TryRequest(new AddRequest($"ou={type.GetOuName()},{helper.DnBase}", "organizationalUnit"));
+
         DirectoryAttribute? objectClassesAttribute = null;
         if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
             objectClassesAttribute = new("objectClass", objectClasses.Classes.Cast<object>().ToArray());

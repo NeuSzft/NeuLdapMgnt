@@ -14,6 +14,7 @@ public static class ManagementEndpoints {
            .WithTags("Management")
            .DisableAntiforgery()
            .Accepts<IFormFile>("text/csv")
-           .Produces(StatusCodes.Status207MultiStatus);
+           .Produces(StatusCodes.Status207MultiStatus)
+           .Produces<string>(StatusCodes.Status503ServiceUnavailable, "text/plain");
     }
 }
