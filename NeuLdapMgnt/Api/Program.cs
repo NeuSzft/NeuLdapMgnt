@@ -53,7 +53,7 @@ internal static class Program {
                     AuthenticationHeaderValue header = AuthenticationHeaderValue.Parse(context.Request.Headers.Authorization.ToString());
                     JwtSecurityToken          token  = new JwtSecurityTokenHandler().ReadJwtToken(header.Parameter!);
 
-                    context.Response.Headers.TryAdd("New-Authorization", AuthHelper.RenewToken(token));
+                    context.Response.Headers.TryAdd("New-Authorization", $"Bearer {AuthHelper.RenewToken(token)}");
 
                     return Task.CompletedTask;
                 },
