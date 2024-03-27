@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using NeuLdapMgnt.Models;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace NeuLdapMgnt.WebApp.Client
 {
@@ -12,7 +14,7 @@ namespace NeuLdapMgnt.WebApp.Client
 		private string? _token = null;
 
 		public event Action? AuthenticationStateChanged;
-		public bool IsAuthenticated => true /*|| _token != null*/;
+		public bool IsAuthenticated => _token != null;
 
 		public ApiRequests()
 		{
@@ -38,7 +40,10 @@ namespace NeuLdapMgnt.WebApp.Client
 
 		public async Task LoginAsync(string username, string password)
 		{
-			var response = await _httpClient.PostAsJsonAsync("/login", new { username, password });
+			string credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(username + ":" + password));
+			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
+
+			var response = await _httpClient.GetAsync("/auth");
 			response.EnsureSuccessStatusCode();
 
 			_token = await response.Content.ReadAsStringAsync();
@@ -46,35 +51,36 @@ namespace NeuLdapMgnt.WebApp.Client
 
 			AuthenticationStateChanged?.Invoke();
 		}
-
 		public void Logout()
 		{
 			_token = null;
 			AuthenticationStateChanged?.Invoke();
 		}
 
-		public async Task GetToken()
+		private void UpdateToken(HttpResponseMessage response)
 		{
-			var response = await _httpClient.GetAsync("/auth/token");
-			response.EnsureSuccessStatusCode();
+			var authHeader = response.Headers.FirstOrDefault(x => string.Equals(x.Key, "New-Authorization", StringComparison.OrdinalIgnoreCase));
 
-			_token = await response.Content.ReadAsStringAsync();
+			if (authHeader.Value is null)
+			{
+				throw new ArgumentException("Something went wrong");
+			}
+
+			_token = authHeader.Value.FirstOrDefault();
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-
-			AuthenticationStateChanged?.Invoke();
-		}
-
-		public async Task GetTest()
-		{
-			var response = await _httpClient.GetAsync("/auth/test");
-			response.EnsureSuccessStatusCode();
 		}
 
 		public async Task<IEnumerable<Student>> GetStudentsAsync()
 		{
 			EnsureAuthentication();
-			var response = await _httpClient.GetFromJsonAsync<IEnumerable<Student>>("/students");
-			return response ?? Enumerable.Empty<Student>();
+
+			var response = await _httpClient.GetAsync("/students");
+			response.EnsureSuccessStatusCode();
+			UpdateToken(response);
+
+			var students = await response.Content.ReadFromJsonAsync<IEnumerable<Student>>();
+
+			return students ?? Enumerable.Empty<Student>();
 		}
 
 		public async Task<Student> AddStudentAsync(Student student)
@@ -83,6 +89,7 @@ namespace NeuLdapMgnt.WebApp.Client
 
 			var response = await _httpClient.PostAsJsonAsync("/students", student);
 			response.EnsureSuccessStatusCode();
+			UpdateToken(response);
 
 			var content = await response.Content.ReadFromJsonAsync<Student>();
 			return content!;
@@ -91,15 +98,33 @@ namespace NeuLdapMgnt.WebApp.Client
 		public async Task UpdateStudentAsync(Student student)
 		{
 			EnsureAuthentication();
+
 			var response = await _httpClient.PutAsJsonAsync($"/students/{student.Id}", student);
 			response.EnsureSuccessStatusCode();
+			UpdateToken(response);
 		}
 
 		public async Task DeleteStudentAsync(int id)
 		{
 			EnsureAuthentication();
+
 			var response = await _httpClient.DeleteAsync($"/students/{id}");
 			response.EnsureSuccessStatusCode();
+			UpdateToken(response);
+		}
+
+		public async Task UploadFile(IBrowserFile file)
+		{
+			EnsureAuthentication();
+
+			var stream = file.OpenReadStream();
+
+			var content = new StreamContent(stream);
+			content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+
+			var response = await _httpClient.PostAsync("/management/refill", content);
+			response.EnsureSuccessStatusCode();
+			UpdateToken(response);
 		}
 	}
 }

@@ -3,34 +3,33 @@
 
 <PageTitle>Login</PageTitle>
 
-<EditForm Model="@loginModel" OnValidSubmit="HandleLogin" class="d-flex flex-column gap-3 mt-5 mx-auto col-12 col-lg-6 col-xl-4">
+<EditForm Model="@credentials" OnValidSubmit="HandleLogin" class="d-flex flex-column gap-3 mt-5 mx-auto col-12 col-lg-6 col-xl-4">
 	<DataAnnotationsValidator />
 
 	<div class="form-group">
 		<label class="form-label" for="username">Username</label>
-		<InputText class="form-control" id="username" @bind-Value="loginModel.Username" />
-		<ValidationMessage For="() => loginModel.Username" />
+		<InputText class="form-control" id="username" @bind-Value="credentials.Username" />
+		<ValidationMessage For="() => credentials.Username" />
 	</div>
 
 	<div class="form-group">
 		<label class="form-label" for="password">Password</label>
-		<InputText class="form-control" id="password" @bind-Value="loginModel.Password" type="password" />
-		<ValidationMessage For="() => loginModel.Password" />
+		<InputText class="form-control" id="password" @bind-Value="credentials.Password" type="password" />
+		<ValidationMessage For="() => credentials.Password" />
 	</div>
 
 	<button type="submit" class="btn btn-primary">Login</button>
 </EditForm>
 
 @code {
-	private LoginModel loginModel = new();
+	private LoginModel credentials = new();
 
 	private async Task HandleLogin()
 	{
 		try
 		{
-			await ApiRequests.GetToken();
-			await ApiRequests.GetTest();
-			NavManager.NavigateTo("home");
+			await ApiRequests.LoginAsync(credentials.Username, credentials.Password);
+			NavManager.NavigateTo("/home");
 		}
 		catch (Exception e)
 		{

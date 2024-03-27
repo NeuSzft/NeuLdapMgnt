@@ -7,9 +7,18 @@
 <BaseTableStudents Students="Lists.GetStudents()" />
 
 @code {
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
+		try
+		{
+			var students = await ApiRequests.GetStudentsAsync();
+			Lists.Students = new(students);
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
 	}
 }
 

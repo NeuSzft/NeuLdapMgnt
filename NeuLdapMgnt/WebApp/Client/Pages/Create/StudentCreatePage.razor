@@ -28,9 +28,16 @@
 		}
 	}
 
-	private void OnFileUploaded(IBrowserFile file)
+	private async Task OnFileUploaded(IBrowserFile file)
 	{
-		Console.WriteLine("Uploaded");
+		try
+		{
+			await ApiRequests.UploadFile(file);
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
 	}
 }
 
