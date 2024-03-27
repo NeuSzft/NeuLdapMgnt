@@ -116,7 +116,7 @@ internal static class Program {
         });
 
         // Set CORS to accept any connection
-        app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+        app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().WithExposedHeaders("New-Authorization"));
 
         // Add swagger middlewares when in development mode
         if (app.Environment.IsDevelopment()) {
