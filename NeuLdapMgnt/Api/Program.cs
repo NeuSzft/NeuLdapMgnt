@@ -23,7 +23,9 @@ internal static class Program {
     public static readonly string TokenIssuer = Assembly.GetExecutingAssembly().FullName!;
 
     public static void Main(string[] args) {
-        LdapHelper            ldapHelper = new("localhost", 389, "cn=admin,dc=test,dc=local", "admin") { DnBase = "dc=test,dc=local" };
+        LdapHelper            ldapHelper = LdapHelper.FromEnvs();
+        ldapHelper.DnBase = "dc=test,dc=local";
+
         WebApplicationBuilder builder    = WebApplication.CreateBuilder(args);
 
         // Create jwt authentication scheme
@@ -116,7 +118,7 @@ internal static class Program {
         });
 
         // Set CORS to accept any connection
-        app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+        app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().WithExposedHeaders("New-Authorization"));
 
         // Add swagger middlewares when in development mode
         if (app.Environment.IsDevelopment()) {

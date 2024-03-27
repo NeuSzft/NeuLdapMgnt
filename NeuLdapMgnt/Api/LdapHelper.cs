@@ -12,7 +12,7 @@ namespace NeuLdapMgnt.Api;
 public sealed class LdapBindingException : LdapException;
 
 public sealed class LdapHelper(string server, int port, string user, string password) {
-    public string   DnBase { get; init; } = string.Empty;
+    public string   DnBase { get; set; } = string.Empty;
     public ILogger? Logger { get; set; }
 
     private readonly LdapDirectoryIdentifier _identifier = new(server, port);
@@ -71,5 +71,14 @@ public sealed class LdapHelper(string server, int port, string user, string pass
         foreach (PropertyInfo info in entity.GetType().GetProperties())
             if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute)
                 yield return new(attribute.Name, info.GetValue(entity)?.ToString() ?? "<!> NULL <!>");
+    }
+
+    public static LdapHelper FromEnvs(string serverEnv = "LDAP_ADDRESS", string portEnv = "LDAP_PORT", string userEnv = "LDAP_USERNAME", string passwordEnv = "LDAP_PASSWORD") {
+        return new LdapHelper(
+            Environment.GetEnvironmentVariable(serverEnv).ThrowIfNullOrEmpty(serverEnv),
+            int.Parse(Environment.GetEnvironmentVariable(portEnv).ThrowIfNullOrEmpty(portEnv)),
+            Environment.GetEnvironmentVariable(userEnv).ThrowIfNullOrEmpty(userEnv),
+            Environment.GetEnvironmentVariable(passwordEnv).ThrowIfNullOrEmpty(passwordEnv)
+        );
     }
 }

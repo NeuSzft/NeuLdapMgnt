@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+    openldap:
+        extends:
+            file: ./docker/compose-services.yml
+            service: openldap
+        environment:
+            - LDAP_ORGANISATION=Test
+            - LDAP_DOMAIN=test.local
+            - LDAP_ADMIN_PASSWORD=admin
+        networks:
+            - net-demo
+        ports:
+            - "389:389"
+        volumes:
+            - ldap-data:/var/lib/ldap
+            - ldap-config:/etc/ldap/slapd.d
+
+    ldapadmin:
+        extends:
+            file: ./docker/compose-services.yml
+            service: ldapadmin
+        depends_on:
+            - openldap
+        environment:
+            - PHPLDAPADMIN_LDAP_HOSTS=openldap
+            - PHPLDAPADMIN_HTTPS=false
+        networks:
+            - net-demo
+        ports:
+            - "8888:80"
+
+    api-build:
+        extends:
+            file: ./docker/compose-services.yml
+            service: api-build
+        networks:
+            - net-demo
+        volumes:
+            - api-app:/app
+
+    api:
+        extends:
+            file: ./docker/compose-services.yml
+            service: api
+        depends_on:
+            openldap:
+                condition: service_started
+            api-build:
+                condition: service_completed_successfully
+        environment:
+            ASPNETCORE_ENVIRONMENT: Development
+            LDAP_ADDRESS: openldap
+            LDAP_PORT: 389
+            LDAP_USERNAME: cn=admin,dc=test,dc=local
+            LDAP_PASSWORD: admin
+        networks:
+            - net-demo
+        ports:
+            - 5000:5000
+        volumes:
+            - api-app:/app:ro
+
+    webapp-build:
+        extends:
+            file: ./docker/compose-services.yml
+            service: webapp-build
+        networks:
+            - net-demo
+        volumes:
+            - webapp-app:/app
+
+    webapp:
+        extends:
+            file: ./docker/compose-services.yml
+            service: webapp
+        depends_on:
+            webapp-build:
+                condition: service_completed_successfully
+        environment:
+            ASPNETCORE_ENVIRONMENT: Development
+            API_ADDRESS: api
+            API_PORT: api
+        networks:
+            - net-demo
+        ports:
+            - 8080:80
+        volumes:
+            - webapp-app:/app:ro
+
+networks:
+    net-demo:
+
+
+volumes:
+    ldap-data:
+    ldap-config:
+    api-app:
+    webapp-app:

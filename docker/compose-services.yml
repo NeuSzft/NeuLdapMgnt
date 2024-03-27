@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+    openldap:
+        image: osixia/openldap:latest
+
+    ldapadmin:
+        image: osixia/phpldapadmin:latest
+
+    api-build:
+        build:
+            context: ..
+            dockerfile_inline: |
+                FROM mcr.microsoft.com/dotnet/sdk:8.0
+                COPY ./NeuLdapMgnt/Api /build/Api
+                COPY ./NeuLdapMgnt/Models /build/Models
+                WORKDIR /build/Api
+                ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+
+    api:
+        build:
+            context: ..
+            dockerfile_inline: |
+                FROM mcr.microsoft.com/dotnet/aspnet:8.0
+                RUN apt update
+                RUN apt install libldap-2.5-0 -y
+                WORKDIR /app
+                ENTRYPOINT [ "./NeuLdapMgnt.Api", "--urls", "http://0.0.0.0:5000" ]
+
+    webapp-build:
+        build:
+            context: ..
+            dockerfile_inline: |
+                FROM mcr.microsoft.com/dotnet/sdk:7.0
+                COPY ./NeuLdapMgnt/WebApp /build/WebApp
+                COPY ./NeuLdapMgnt/Models /build/Models
+                WORKDIR /build/WebApp/Server
+                ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+
+    webapp:
+        image: mcr.microsoft.com/dotnet/aspnet:7.0
+        working_dir: /app
+        entrypoint: ./NeuLdapMgnt.WebApp.Server --urls "http://0.0.0.0:80"
