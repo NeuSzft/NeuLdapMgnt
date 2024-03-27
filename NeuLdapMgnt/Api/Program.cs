@@ -23,11 +23,8 @@ internal static class Program {
     public static readonly string TokenIssuer = Assembly.GetExecutingAssembly().FullName!;
 
     public static void Main(string[] args) {
-        LdapHelper ldapHelper = new("localhost", 389, "cn=admin,dc=test,dc=local", "admin") { DnBase = "dc=test,dc=local" };
-        foreach (Type type in new[] { typeof(Student), typeof(Teacher) })
-            ldapHelper.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldapHelper.DnBase}", "organizationalUnit"));
-
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        LdapHelper            ldapHelper = new("localhost", 389, "cn=admin,dc=test,dc=local", "admin") { DnBase = "dc=test,dc=local" };
+        WebApplicationBuilder builder    = WebApplication.CreateBuilder(args);
 
         // Create jwt authentication scheme
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
@@ -103,6 +100,19 @@ internal static class Program {
             DateTime now = DateTime.Now;
             await next(context);
             app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {context.Request.Host} → {context.Request.Path} ({context.Response.StatusCode})");
+        });
+
+        // Add a middleware for handling LDAP connection binding errors
+        app.Use(async (HttpContext context, RequestDelegate next) => {
+            try {
+                await next(context);
+            }
+            catch (LdapBindingException) {
+                context.Response.StatusCode  = StatusCodes.Status503ServiceUnavailable;
+                context.Response.ContentType = "text/plain";
+                await context.Response.WriteAsync("Unable to connect to the LDAP server.");
+                await context.Response.CompleteAsync();
+            }
         });
 
         // Set CORS to accept any connection
