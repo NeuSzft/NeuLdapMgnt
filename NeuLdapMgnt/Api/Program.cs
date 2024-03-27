@@ -24,6 +24,8 @@ internal static class Program {
 
     public static void Main(string[] args) {
         LdapHelper            ldapHelper = LdapHelper.FromEnvs();
+        ldapHelper.DnBase = "dc=test,dc=local";
+
         WebApplicationBuilder builder    = WebApplication.CreateBuilder(args);
 
         // Create jwt authentication scheme

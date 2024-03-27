@@ -12,7 +12,7 @@ namespace NeuLdapMgnt.Api;
 public sealed class LdapBindingException : LdapException;
 
 public sealed class LdapHelper(string server, int port, string user, string password) {
-    public string   DnBase { get; init; } = string.Empty;
+    public string   DnBase { get; set; } = string.Empty;
     public ILogger? Logger { get; set; }
 
     private readonly LdapDirectoryIdentifier _identifier = new(server, port);
