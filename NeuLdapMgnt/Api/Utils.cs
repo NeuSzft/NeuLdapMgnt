@@ -38,6 +38,8 @@ internal static class Utils {
             student.Gid       = startUid;
             student.FirstName = arr[1].Trim('"');
             student.LastName  = arr[2].Trim('"');
+            student.FullName  = student.GetFullName();
+            student.Username  = $"{student.FirstName[..3]}{student.LastName[..3]}".ToLower();
             student.Class     = $"{startUid % 5 + 8}.A";
             student.Email     = arr[3].Trim('"');
             student.Password  = arr[4].Trim('"');
