@@ -6,9 +6,7 @@
 	<div class="text-end">
 		@if (IsReadonly)
 		{
-			<button type="button" class="btn btn-warning mt-2" @onclick="ToggleReadonly">
-				<i class="bi bi-pencil-square"></i> Edit
-			</button>
+			<ButtonEdit OnClick="ToggleReadonly" />
 		}
 	</div>
 
@@ -135,16 +133,10 @@
 		<div class="d-flex justify-content-end gap-2">
 			@if (CanDelete)
 			{
-				<button type="button" class="btn btn-danger" @onclick="ToggleReadonly">
-					<i class="bi bi-trash-fill"></i> Delete
-				</button>
+				<ButtonDelete OnClick="ToggleReadonly"/>
 			}
-			<button type="button" class="btn btn-secondary" @onclick="ToggleReadonly">
-				<i class="bi bi-x-lg"></i> Cancel
-			</button>
-			<button type="submit" class="btn btn-success">
-				<i class="bi bi-check-lg fs-5"></i> Save
-			</button>
+			<ButtonCancel OnClick="ToggleReadonly"/>
+			<ButtonSubmit />
 		</div>
 	}
 </EditForm>

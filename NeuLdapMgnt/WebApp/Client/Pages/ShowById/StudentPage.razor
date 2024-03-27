@@ -20,9 +20,6 @@ else
 	[Parameter]
 	public string Id { get; set; } = null!;
 
-	[Parameter]
-	public EventCallback<Student> OnStudentUpdated { get; set; }
-
 	private Student student = StudentFactory.CreateEmptyStudent().Build();
 
 	protected override void OnInitialized()
@@ -52,6 +49,4 @@ else
 			Console.WriteLine(e.Message);
 		}
 	}
-
-	private async Task HandleValidSubmit() => await OnStudentUpdated.InvokeAsync(student);
 }
