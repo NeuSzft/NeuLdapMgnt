@@ -66,7 +66,7 @@ namespace NeuLdapMgnt.WebApp.Client
 				throw new ArgumentException("Something went wrong");
 			}
 
-			_token = authHeader.Value.FirstOrDefault();
+			_token = authHeader.Value.FirstOrDefault()!.Replace("Bearer ", "");
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 		}
 
