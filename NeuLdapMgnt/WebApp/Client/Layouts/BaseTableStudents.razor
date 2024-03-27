@@ -12,9 +12,7 @@
 			<label for="searchbar">OM, Name, Class</label>
 		</div>
 		<div class="col text-end">
-			<button class="btn btn-warning col" @onclick="EditSelected" disabled="@isStudentSelected">
-				Edit selected
-			</button>
+			<ButtonEdit OnClick="EditSelected" IsDisabled="isStudentSelected" Text="Edit selected" />
 		</div>
 	</div>
 </div>
