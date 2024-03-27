@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NeuLdapMgnt.Models\NeuLdapMgnt.Models.csproj" />
+    <ProjectReference Include="..\Models\NeuLdapMgnt.Models.csproj" />
   </ItemGroup>
 
 </Project>

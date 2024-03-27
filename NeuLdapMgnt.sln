@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Api", "NeuLdapMgnt.Api\NeuLdapMgnt.Api.csproj", "{2CAD39D7-ABD8-4368-96E6-0C8A9FF4DB07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Api", "NeuLdapMgnt\Api\NeuLdapMgnt.Api.csproj", "{2CAD39D7-ABD8-4368-96E6-0C8A9FF4DB07}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.WebApp.Client", "NeuLdapMgnt.WebApp\NeuLdapMgnt.WebApp\Client\NeuLdapMgnt.WebApp.Client.csproj", "{B9983414-9688-4FEF-81CA-C032CAA5E11C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.WebApp.Client", "NeuLdapMgnt\WebApp\Client\NeuLdapMgnt.WebApp.Client.csproj", "{B9983414-9688-4FEF-81CA-C032CAA5E11C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.WebApp.Server", "NeuLdapMgnt.WebApp\NeuLdapMgnt.WebApp\Server\NeuLdapMgnt.WebApp.Server.csproj", "{0477D414-F416-4BC3-820F-688CACD7615F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.WebApp.Server", "NeuLdapMgnt\WebApp\Server\NeuLdapMgnt.WebApp.Server.csproj", "{0477D414-F416-4BC3-820F-688CACD7615F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Models", "NeuLdapMgnt.Models\NeuLdapMgnt.Models.csproj", "{E0DC0351-278B-469D-94B7-083BE239367D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Models", "NeuLdapMgnt\Models\NeuLdapMgnt.Models.csproj", "{E0DC0351-278B-469D-94B7-083BE239367D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
