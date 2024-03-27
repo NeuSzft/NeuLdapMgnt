@@ -59,6 +59,12 @@ internal static class ExtensionsUtils {
         return str;
     }
 
+    public static string ThrowIfNullOrEmpty(this string? str, string? nameOf = null) {
+        if (str is null || str.Length == 0)
+            throw new ArgumentException($"{nameOf ?? "string"} is null or empty");
+        return str;
+    }
+
     public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> collection) {
         return collection.Where(x => x is not null).Cast<T>();
     }

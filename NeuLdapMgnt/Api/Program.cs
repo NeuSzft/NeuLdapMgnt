@@ -23,7 +23,7 @@ internal static class Program {
     public static readonly string TokenIssuer = Assembly.GetExecutingAssembly().FullName!;
 
     public static void Main(string[] args) {
-        LdapHelper            ldapHelper = new("localhost", 389, "cn=admin,dc=test,dc=local", "admin") { DnBase = "dc=test,dc=local" };
+        LdapHelper            ldapHelper = LdapHelper.FromEnvs();
         WebApplicationBuilder builder    = WebApplication.CreateBuilder(args);
 
         // Create jwt authentication scheme
