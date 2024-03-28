@@ -68,9 +68,7 @@
 				<td>@student.GetFullName()</td>
 				<td>@student.Class</td>
 				<td class="text-end">
-					<button class="btn btn-primary" @onclick="() => ShowStudent(student.Id.ToString())">
-						<i class="bi bi-eye"></i>
-					</button>
+					<ButtonInspect OnClick="InspectStudent" Student="@student" />
 				</td>
 			</tr>
 		}
@@ -83,14 +81,14 @@
 
 	private List<Student> filteredStudents = new();
 	private List<Student> selectedStudents = new();
-
-	private bool isStudentSelected => !selectedStudents.Any();
-	private bool isAscending = true;
+	private Timer? searchDelayTimer;
 
 	private string sortBy = "";
-	private string? searchQuery = string.Empty;
+	private bool isAscending = true;
 
-	private Timer? searchDelayTimer;
+	private string? searchQuery = string.Empty;
+	private bool isStudentSelected => !selectedStudents.Any();
+
 
 	protected override void OnInitialized()
 	{
@@ -169,6 +167,8 @@
 	}
 
 	private void ShowStudent(string id) => NavManager.NavigateTo($"/students/{id}");
+
+	private void InspectStudent(Student student) => ShowStudent(student.Id.ToString());
 
 	private string GetSortIcon(bool asc) => asc ? "bi-sort-up" : "bi-sort-down";
 

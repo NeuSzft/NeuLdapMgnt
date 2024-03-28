@@ -1,0 +1,23 @@
+﻿<button class="btn btn-primary" @onclick="Inspect">
+    <i class="bi bi-eye"></i>
+    @Text
+</button>
+
+@code {
+    [Parameter]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<Student> OnClick { get; set; }
+
+    [Parameter]
+    public Student? Student { get; set; }
+
+    private async Task Inspect()
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(Student);
+        }
+    }
+}
