@@ -1,12 +1,12 @@
 ﻿@inherits LayoutComponentBase
 
-<EditForm Model="@studentUpdated" OnValidSubmit="HandleValidSubmit" class="d-flex flex-column gap-2">
+<EditForm Model="@studentUpdated" OnValidSubmit="HandleValidSubmit" class="d-flex flex-column gap-2 my-2">
 	<DataAnnotationsValidator />
 
 	<div class="text-end">
 		@if (IsReadonly)
 		{
-			<ButtonEdit OnClick="ToggleReadonly" />
+			<ButtonEdit OnClick="ToggleReadonly" Text="Edit"/>
 		}
 	</div>
 
@@ -133,10 +133,10 @@
 		<div class="d-flex justify-content-end gap-2">
 			@if (CanDelete)
 			{
-				<ButtonDelete OnClick="ToggleReadonly"/>
+				<ButtonDelete OnClick="ToggleReadonly" Text="Delete"/>
 			}
-			<ButtonCancel OnClick="ToggleReadonly"/>
-			<ButtonSubmit />
+			<ButtonCancel OnClick="ToggleReadonly" Text="Cancel"/>
+			<ButtonSubmit Text="Submit" />
 		</div>
 	}
 </EditForm>

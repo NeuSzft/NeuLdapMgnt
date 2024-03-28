@@ -1,10 +1,15 @@
 ﻿@page "/students/enrollment"
 
-<PageTitle>Enroll student</PageTitle>
+<PageTitle>Add student</PageTitle>
 
-<h3>Enroll student</h3>
-
-<FileUpload OnFileUploaded="OnFileUploaded" />
+	<div class="row">
+		<div class="col-12 col-md">
+			<h1 class="d-inline-block">Add student</h1>
+		</div>
+		<div class="col-12 col-xl text-end">
+			<FileUpload OnFileUploaded="OnFileUploaded" />
+		</div>
+	</div>
 
 <BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="HandleStudentUpdated" />
 
