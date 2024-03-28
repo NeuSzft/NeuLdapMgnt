@@ -20,34 +20,48 @@ internal static class Utils {
         return new(base64Key is null ? RandomNumberGenerator.GetBytes(size) : Convert.FromBase64String(base64Key));
     }
 
-    public static async Task<List<Student>> CsvToStudents(StreamReader reader, int startUid = 6000) {
+    public static async Task<(List<Student> Students, string? Error)> CsvToStudents(StreamReader reader, int startUid = 6000) {
         List<Student> students = new();
+        int           uid      = startUid;
+        int           lineNum  = 0;
 
         while (await reader.ReadLineAsync() is { } line) {
+            lineNum++;
             if (line.Length == 0)
                 continue;
 
             Student student = new();
             students.Add(student);
 
-            string[] arr = line.Split(',');
-            long.TryParse(arr[0], out var id);
+            string[] arr = line.Split([',', ';']);
 
-            student.Id        = id;
-            student.Uid       = startUid;
-            student.Gid       = startUid;
-            student.FirstName = arr[1].Trim('"');
-            student.LastName  = arr[2].Trim('"');
-            student.FullName  = student.GetFullName();
-            student.Username  = $"{student.FirstName[..3]}{student.LastName[..3]}".ToLower();
-            student.Class     = $"{startUid % 5 + 8}.A";
-            student.Email     = arr[3].Trim('"');
-            student.Password  = arr[4].Trim('"');
+            try {
+                long.TryParse(arr[0], out var id);
 
-            startUid++;
+                student.Id            = id;
+                student.Uid           = uid;
+                student.Gid           = uid;
+                student.FirstName     = arr[1].Trim('"');
+                student.LastName      = arr[2].Trim('"');
+                student.FullName      = student.GetFullName();
+                student.Username      = student.GetUsername();
+                student.Class         = "12.A";
+                student.Email         = arr[3].Trim('"');
+                student.Password      = arr[4].Trim('"');
+                student.HomeDirectory = $"/home/{student.Username}";
+
+                var errors = ModelValidator.Validate(student).Errors;
+                if (errors.Any())
+                    return ([], $"Error on line {lineNum}:\n{string.Join('\n', errors)}");
+            }
+            catch {
+                return ([], $"Error on line {lineNum}");
+            }
+
+            uid++;
         }
 
-        return students;
+        return (students, null);
     }
 }
 
