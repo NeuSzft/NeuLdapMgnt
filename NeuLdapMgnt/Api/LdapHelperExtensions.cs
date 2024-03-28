@@ -67,10 +67,12 @@ public static class LdapHelperExtensions {
     }
 
     public static LdapOperationResult TryAddEntity<T>(this LdapHelper helper, T entity, long id) where T : class {
+        Type type = typeof(T);
+
+        helper.TryRequest(new AddRequest($"ou={type.GetOuName()},{helper.DnBase}", "organizationalUnit"));
+
         if (helper.EntityExists<T>(id))
             return new(StatusCodes.Status409Conflict, "The object already exists.");
-
-        Type type = typeof(T);
 
         AddRequest request = new($"uid={id},ou={type.GetOuName()},{helper.DnBase}");
         if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
@@ -114,7 +116,7 @@ public static class LdapHelperExtensions {
         return new(deleted ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest, error);
     }
 
-    public static MultiStatusResponse TempRefill<T>(this LdapHelper helper, IEnumerable<T> items, Func<T, long> idGetter) where T : class {
+    public static MultiStatusResponse TryAddEntities<T>(this LdapHelper helper, IEnumerable<T> entities, Func<T, long> idGetter) where T : class {
         Type type = typeof(T);
 
         helper.TryRequest(new AddRequest($"ou={type.GetOuName()},{helper.DnBase}", "organizationalUnit"));
@@ -123,25 +125,22 @@ public static class LdapHelperExtensions {
         if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
             objectClassesAttribute = new("objectClass", objectClasses.Classes.Cast<object>().ToArray());
 
-        int          completed = 0;
-        List<string> errors    = new();
-
-        foreach (T entity in items) {
-            long id = idGetter(entity);
+        IEnumerable<DirectoryRequest> requests = entities.Select(x => {
+            long id = idGetter(x);
 
             AddRequest request = new($"uid={id},ou={type.GetOuName()},{helper.DnBase}");
             if (objectClassesAttribute is not null)
                 request.Attributes.Add(objectClassesAttribute);
 
-            foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttribute(entity))
+            foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttribute(x))
                 request.Attributes.Add(attribute);
 
-            if (helper.TryRequest(request, out var error) is not null)
-                completed++;
-            if (error is not null)
-                errors.Add($"{id}: {error}");
-        }
+            return request;
+        });
 
-        return new(completed, items.Count() - completed, errors);
+        var results = helper.TryRequests(requests);
+        var errors  = results.Select(x => x.Error).NotNull();
+
+        return new(results.Count - errors.Count(), errors.Count(), errors);
     }
 }

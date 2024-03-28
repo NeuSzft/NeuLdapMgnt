@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices.Protocols;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -13,7 +12,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NeuLdapMgnt.Api.Endpoints;
-using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;
 
@@ -23,10 +21,10 @@ internal static class Program {
     public static readonly string TokenIssuer = Assembly.GetExecutingAssembly().FullName!;
 
     public static void Main(string[] args) {
-        LdapHelper            ldapHelper = LdapHelper.FromEnvs();
+        LdapHelper ldapHelper = LdapHelper.FromEnvs();
         ldapHelper.DnBase = "dc=test,dc=local";
 
-        WebApplicationBuilder builder    = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
         // Create jwt authentication scheme
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
@@ -128,7 +126,6 @@ internal static class Program {
         // Map endpoints
         app.MapAuthEndpoints();
         app.MapStudentEndpoints();
-        app.MapManagementEndpoints();
 
         // Print the current security key as a base64 string
         app.Logger.LogCritical($"Key: {Convert.ToBase64String(SecurityKey.Key)}");

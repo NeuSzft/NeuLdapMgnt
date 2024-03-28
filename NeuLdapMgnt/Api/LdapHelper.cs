@@ -42,6 +42,31 @@ public sealed class LdapHelper(string server, int port, string user, string pass
         }
     }
 
+    public IReadOnlyCollection<(DirectoryResponse? Response, string? Error)> TryRequests(IEnumerable<DirectoryRequest> requests) {
+        using LdapConnection connection = new(_identifier, _credential, AuthType.Basic);
+        connection.SessionOptions.ProtocolVersion = 3;
+
+        try {
+            connection.Bind();
+        }
+        catch {
+            throw new LdapBindingException();
+        }
+
+        List<(DirectoryResponse?, string?)> results = new();
+
+        foreach (DirectoryRequest request in requests)
+            try {
+                results.Add((connection.SendRequest(request), null));
+            }
+            catch (DirectoryException e) {
+                Logger?.LogError(e.ToString());
+                results.Add((null, e.GetError()));
+            }
+
+        return results.AsReadOnly();
+    }
+
     public static readonly string AnyFilter = "(objectClass=*)";
 
     public static T ParseEntry<T>(SearchResultEntry entry) where T : class, new() {
