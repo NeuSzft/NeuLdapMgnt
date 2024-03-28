@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models
@@ -69,7 +70,11 @@ namespace NeuLdapMgnt.Models
 			string? capitalizedMiddleName = string.IsNullOrEmpty(MiddleName) ? null : textInfo.ToTitleCase(MiddleName);
 			string capitalizedLastName = textInfo.ToTitleCase(LastName);
 
-			return string.Join(" ", capitalizedFirstName, capitalizedMiddleName, capitalizedLastName);
-		}
-	}
+            return string.Join(' ', new[] { capitalizedFirstName, capitalizedMiddleName, capitalizedLastName }.Where(x => x is not null));
+        }
+
+        public string GetUsername() {
+            return $"{FirstName.PadRight(3, '_')[..3]}{LastName.PadRight(3, '_')[..3]}".ToLower();
+        }
+    }
 }
