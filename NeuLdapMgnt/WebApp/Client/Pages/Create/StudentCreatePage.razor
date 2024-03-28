@@ -38,6 +38,7 @@
 		try
 		{
 			await ApiRequests.UploadFile(file);
+			NavManager.NavigateTo("/students");
 		}
 		catch (Exception e)
 		{
