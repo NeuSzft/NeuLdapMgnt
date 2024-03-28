@@ -2,7 +2,14 @@
 
 <PageTitle>Students</PageTitle>
 
-<h1>Students</h1>
+<div class="row justify-content-between g-2">
+	<div class="col">
+		<h1>Students</h1>
+	</div>
+	<div class="col text-end">
+		<ButtonRefresh OnClick="RefreshStudents" Text="Refresh"/>
+	</div>
+</div>
 
 @if (!Lists.Students.Any())
 {
@@ -18,11 +25,19 @@ else
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
+
+		if (Lists.Students.Any()) return;
+		await RefreshStudents();
+	}
+
+	private async Task RefreshStudents()
+	{
 		try
 		{
 			Lists.Students.Clear();
 			var students = await ApiRequests.GetStudentsAsync();
 			Lists.Students = new(students);
+			StateHasChanged();
 		}
 		catch (Exception e)
 		{
