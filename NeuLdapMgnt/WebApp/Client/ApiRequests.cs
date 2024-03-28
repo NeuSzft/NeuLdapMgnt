@@ -51,6 +51,7 @@ namespace NeuLdapMgnt.WebApp.Client
 
 			AuthenticationStateChanged?.Invoke();
 		}
+
 		public void Logout()
 		{
 			_token = null;
@@ -118,11 +119,10 @@ namespace NeuLdapMgnt.WebApp.Client
 			EnsureAuthentication();
 
 			var stream = file.OpenReadStream();
-
 			var content = new StreamContent(stream);
 			content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
 
-			var response = await _httpClient.PostAsync("/management/refill", content);
+			var response = await _httpClient.PostAsync("/students/import", content);
 			response.EnsureSuccessStatusCode();
 			UpdateToken(response);
 		}
