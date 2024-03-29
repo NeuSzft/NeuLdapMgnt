@@ -17,12 +17,18 @@ namespace NeuLdapMgnt.Models
 		private string @class = string.Empty;
 
 		[Required, Range(70000000000, 79999999999)]
+        [JsonPropertyName("id")]
+        [LdapAttribute("uid")]
 		public override long Id { get; set; } = AllowedIdRange.Min;
 
 		[Required, Range(6000, 6999)]
+        [JsonRequired, JsonPropertyName("uid")]
+        [LdapAttribute("uidNumber")]
 		public override int Uid { get; set; } = AllowedUidRange.Min;
 
 		[Required, Range(6000, 6999)]
+        [JsonRequired, JsonPropertyName("gid")]
+        [LdapAttribute("gidNumber")]
 		public override int Gid { get; set; } = AllowedGidRange.Min;
 
 		[Required, RegularExpression(@"^((9\.Ny)|((9|10|11|12|13)\.[A-E])|((1\/13|2\/14)[A-B](\.RSZE)?))$", ErrorMessage = "Class does not exist")]
@@ -45,6 +51,8 @@ namespace NeuLdapMgnt.Models
 				classGroup = classSplit[1];
 			}
 		}
+
+        [JsonIgnore]
 		public string ClassYear
 		{
 			get => classYear;
@@ -56,6 +64,7 @@ namespace NeuLdapMgnt.Models
 			}
 		}
 
+        [JsonIgnore]
 		public string ClassGroup
 		{
 			get => classGroup;
