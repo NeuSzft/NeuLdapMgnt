@@ -43,7 +43,6 @@ internal static class Utils {
                 student.Gid           = uid;
                 student.FirstName     = arr[1].Trim('"');
                 student.LastName      = arr[2].Trim('"');
-                student.FullName      = student.GetFullName();
                 student.Username      = student.GetUsername();
                 student.Class         = "12.A";
                 student.Email         = arr[3].Trim('"');
