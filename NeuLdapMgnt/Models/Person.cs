@@ -10,6 +10,10 @@ namespace NeuLdapMgnt.Models
 	[LdapObjectClasses("inetOrgPerson", "posixAccount")]
 	public abstract class Person
 	{
+		private string lastName = string.Empty;
+		private string firstName = string.Empty;
+		private string? middleName;
+
 		[Required]
 		[JsonPropertyName("id")]
 		[LdapAttribute("uid")]
@@ -33,16 +37,37 @@ namespace NeuLdapMgnt.Models
 		[Required, MinLength(3, ErrorMessage = "The field First name must be a string with a minimum length of '3'.")]
 		[JsonRequired, JsonPropertyName("first_name")]
 		[LdapAttribute("givenName")]
-		public virtual string FirstName { get; set; } = string.Empty;
+		public virtual string FirstName
+		{
+			get => firstName;
+			set
+			{
+				firstName = value;
+				FullName = GetFullName();
+			}
+		}
 
 		[Required, MinLength(3, ErrorMessage = "The field Last name must be a string with a minimum length of '3'.")]
 		[JsonRequired, JsonPropertyName("last_name")]
 		[LdapAttribute("sn")]
-		public virtual string LastName { get; set; } = string.Empty;
+		public virtual string LastName
+		{
+			get => lastName; 
+			set
+			{
+				lastName = value;
+				FullName = GetFullName();
+			}
+		}
 
 		[AllowNull]
 		[JsonPropertyName("middle_name")]
-		public virtual string? MiddleName { get; set; }
+		public virtual string? MiddleName { get => middleName; set
+			{
+				middleName = value;
+				FullName = GetFullName();
+			}
+		}
 
 		[Required, EmailAddress]
 		[JsonRequired, JsonPropertyName("email")]
@@ -63,18 +88,19 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("displayName")]
 		public virtual string FullName { get; set; } = string.Empty;
 
-		public string GetFullName()
+		private string GetFullName()
 		{
 			TextInfo textInfo = new CultureInfo("hu-HU", false).TextInfo;
 			string capitalizedFirstName = textInfo.ToTitleCase(FirstName);
 			string? capitalizedMiddleName = string.IsNullOrEmpty(MiddleName) ? null : textInfo.ToTitleCase(MiddleName);
 			string capitalizedLastName = textInfo.ToTitleCase(LastName);
 
-            return string.Join(' ', new[] { capitalizedFirstName, capitalizedMiddleName, capitalizedLastName }.Where(x => x is not null));
-        }
+			return string.Join(' ', new[] { capitalizedFirstName, capitalizedMiddleName, capitalizedLastName }.Where(x => x is not null));
+		}
 
-        public string GetUsername() {
-            return $"{FirstName.PadRight(3, '_')[..3]}{LastName.PadRight(3, '_')[..3]}".ToLower();
-        }
-    }
+		public string GetUsername()
+		{
+			return $"{FirstName.PadRight(3, '_')[..3]}{LastName.PadRight(3, '_')[..3]}".ToLower();
+		}
+	}
 }

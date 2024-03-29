@@ -1,4 +1,4 @@
-﻿@page "/students/enrollment"
+﻿@page "/students/add"
 
 <PageTitle>Add student</PageTitle>
 
@@ -23,7 +23,7 @@
 
 		try
 		{
-			//await ApiRequests.AddStudentAsync(editedStudent);
+			await ApiRequests.AddStudentAsync(studentUpdated);
 			Lists.Students.Add(studentUpdated);
 			NavManager.NavigateTo("students");
 		}

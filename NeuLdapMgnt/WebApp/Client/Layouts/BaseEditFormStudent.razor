@@ -24,9 +24,9 @@
 	<div class="input-group gap-2">
 		<label class="input-group-text user-select-none col-12 rounded gap-2" for="givenName">
 			Name
-			@if (!IsReadonly && studentUpdated.GetFullName().Length > 2)
+			@if (!IsReadonly && studentUpdated.FullName.Length > 2)
 			{
-				<span>[@studentUpdated.GetFullName()]</span>
+				<span>[@studentUpdated.FullName]</span>
 
 			}
 		</label>

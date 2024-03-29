@@ -65,7 +65,7 @@
 						   @onchange="() => SelectStudent(student)" />
 				</td>
 				<td>@student.Id</td>
-				<td>@student.GetFullName()</td>
+				<td>@student.FullName</td>
 				<td>@student.Class</td>
 				<td class="text-end">
 					<ButtonInspect OnClick="InspectStudent" Student="@student" />
@@ -137,7 +137,7 @@
 		{
 			filteredStudents = Students
 				.Where(x => x.Id.ToString().StartsWith(searchQuery, StringComparison.OrdinalIgnoreCase)
-							|| x.GetFullName().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+							|| x.FullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
 							|| x.Class.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
 				.ToList();
 		}
@@ -194,8 +194,8 @@
 
 			case "Name":
 				filteredStudents = isAscending
-					? filteredStudents.OrderBy(x => x.GetFullName()).ToList()
-					: filteredStudents.OrderByDescending(x => x.GetFullName()).ToList();
+					? filteredStudents.OrderBy(x => x.FullName).ToList()
+					: filteredStudents.OrderByDescending(x => x.FullName).ToList();
 				break;
 
 			case "Class":
