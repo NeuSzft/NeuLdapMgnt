@@ -27,13 +27,29 @@ namespace NeuLdapMgnt.Models
 		[Required, RegularExpression(@"^((9\.Ny)|((9|10|11|12|13)\.[A-E])|((1\/13|2\/14)[A-B](\.RSZE)?))$", ErrorMessage = "Class does not exist")]
 		[JsonRequired, JsonPropertyName("class")]
 		[LdapAttribute("roomNumber")]
-		public string Class { get; set; } = string.Empty;
+		public string Class
+		{
+			get => @class;
+			set
+			{
+				if (string.IsNullOrEmpty(value))
+				{
+					@class = string.Empty;
+					return;
+				}
 
+				@class = value;
+				var classSplit = @class.Split('.');
+				classYear = classSplit[0];
+				classGroup = classSplit[1];
+			}
+		}
 		public string ClassYear
 		{
 			get => classYear;
 			set
 			{
+				if (string.IsNullOrEmpty(value)) return;
 				classYear = value;
 				UpdateClass();
 			}
@@ -44,6 +60,7 @@ namespace NeuLdapMgnt.Models
 			get => classGroup;
 			set
 			{
+				if (string.IsNullOrEmpty(value)) return;
 				classGroup = value;
 				UpdateClass();
 			}
@@ -59,8 +76,10 @@ namespace NeuLdapMgnt.Models
                 return int.Parse(ClassYear[2..] + '0');
             return int.Parse(ClassYear);
         }
+			if (ClassYear.Contains('/'))
+		}
 
-        public bool Equals(Student? other)
+		public bool Equals(Student? other)
 		{
 			if (other == null) return false;
 

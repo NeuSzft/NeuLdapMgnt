@@ -16,6 +16,11 @@
 @code {
 	private Student? student = StudentFactory.CreateEmptyStudent().Build();
 
+	protected override void OnInitialized()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+	}
+
 
 	private async Task HandleStudentUpdated(Student studentUpdated)
 	{
@@ -25,7 +30,7 @@
 		{
 			await ApiRequests.AddStudentAsync(studentUpdated);
 			Lists.Students.Add(studentUpdated);
-			NavManager.NavigateTo("students");
+			NavManager.NavigateTo("/students");
 		}
 		catch (Exception e)
 		{

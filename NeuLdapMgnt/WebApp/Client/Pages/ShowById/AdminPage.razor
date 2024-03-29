@@ -6,4 +6,9 @@
 @code {
 	[Parameter]
 	public Admin? Administrator { get; set; }
+
+	protected override void OnInitialized()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+	}
 }

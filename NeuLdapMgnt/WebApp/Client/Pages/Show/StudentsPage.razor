@@ -25,8 +25,6 @@ else
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
-
-		if (Lists.Students.Any()) return;
 		await RefreshStudents();
 	}
 

@@ -1,5 +1,8 @@
 ﻿<h3>Teacher</h3>
 
 @code {
-
+	protected override void OnInitialized()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+	}
 }

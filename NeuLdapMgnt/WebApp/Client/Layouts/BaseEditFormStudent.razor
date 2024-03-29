@@ -133,7 +133,7 @@
 		<div class="d-flex justify-content-end gap-2">
 			@if (CanDelete)
 			{
-				<ButtonDelete OnClick="ToggleReadonly" Text="Delete"/>
+				<ButtonDelete OnClick="DeleteStudent" Text="Delete" />
 			}
 			<ButtonCancel OnClick="ToggleReadonly" Text="Cancel"/>
 			<ButtonSubmit Text="Submit" />
@@ -141,7 +141,7 @@
 	}
 </EditForm>
 
-@code {
+	@code {
 	[Parameter]
 	public Student TheStudent { get; set; } = StudentFactory.CreateEmptyStudent().Build();
 
@@ -165,10 +165,20 @@
 
 	protected override void OnParametersSet() => StateHasChanged();
 
-	private async Task HandleValidSubmit()
+	private async Task HandleValidSubmit() => await OnSubmit.InvokeAsync(studentUpdated);
+
+	private async Task DeleteStudent()
 	{
-		Console.WriteLine("AWAITING UPDATE");
-		await OnSubmit.InvokeAsync(studentUpdated);
+		try
+		{
+			await ApiRequests.DeleteStudentAsync(studentUpdated.Id);
+			Lists.Students.Add(studentUpdated);
+			NavManager.NavigateTo("/students");
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e.Message);
+		}
 	}
 
 	private void ToggleReadonly()

@@ -80,7 +80,6 @@ namespace NeuLdapMgnt.WebApp.Client
 			UpdateToken(response);
 
 			var students = await response.Content.ReadFromJsonAsync<IEnumerable<Student>>();
-
 			return students ?? Enumerable.Empty<Student>();
 		}
 
@@ -96,16 +95,19 @@ namespace NeuLdapMgnt.WebApp.Client
 			return content!;
 		}
 
-		public async Task UpdateStudentAsync(Student student)
+		public async Task<Student> UpdateStudentAsync(long id, Student student)
 		{
 			EnsureAuthentication();
 
-			var response = await _httpClient.PutAsJsonAsync($"/students/{student.Id}", student);
+			var response = await _httpClient.PutAsJsonAsync($"/students/{id}", student);
 			response.EnsureSuccessStatusCode();
 			UpdateToken(response);
+
+			var content = await response.Content.ReadFromJsonAsync<Student>();
+			return content!;
 		}
 
-		public async Task DeleteStudentAsync(int id)
+		public async Task DeleteStudentAsync(long id)
 		{
 			EnsureAuthentication();
 
