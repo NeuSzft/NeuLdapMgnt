@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NeuLdapMgnt.Api.Endpoints;
+using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;
 
@@ -44,16 +42,6 @@ internal static class Program {
                     var headerValues = context.Request.Headers.Authorization;
                     if (headerValues.Count == 0 || headerValues.ToString()[..6].ToLower() != "bearer")
                         context.Fail("missing");
-
-                    return Task.CompletedTask;
-                },
-
-                // Send back a new token on successful authentication
-                OnTokenValidated = (TokenValidatedContext context) => {
-                    AuthenticationHeaderValue header = AuthenticationHeaderValue.Parse(context.Request.Headers.Authorization.ToString());
-                    JwtSecurityToken          token  = new JwtSecurityTokenHandler().ReadJwtToken(header.Parameter!);
-
-                    context.Response.Headers.TryAdd("New-Authorization", $"Bearer {AuthHelper.RenewToken(token)}");
 
                     return Task.CompletedTask;
                 },
@@ -108,9 +96,9 @@ internal static class Program {
                 await next(context);
             }
             catch (LdapBindingException) {
-                context.Response.StatusCode  = StatusCodes.Status503ServiceUnavailable;
-                context.Response.ContentType = "text/plain";
-                await context.Response.WriteAsync("Unable to connect to the LDAP server.");
+                var result = new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors("Unable to connect to the LDAP server.").RenewToken(context.Request);
+                context.Response.StatusCode = result.StatusCode;
+                await context.Response.WriteAsJsonAsync(result);
                 await context.Response.CompleteAsync();
             }
         });

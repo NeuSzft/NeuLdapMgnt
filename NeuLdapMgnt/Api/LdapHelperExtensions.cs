@@ -3,37 +3,10 @@ using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;
-
-public record LdapOperationResult(int Code, string? Message) {
-    public virtual IResult ToResult() {
-        return Results.Text(Message, "text/plain", Encoding.UTF8, Code);
-    }
-}
-
-public record LdapOperationResult<T>(int Code, string? Message, T? Value = default) : LdapOperationResult(Code, Message) {
-    public override IResult ToResult() {
-        if (Code is >= 200 and <= 299)
-            return Results.Json(Value, JsonSerializerOptions.Default, "application/json", Code);
-        return base.ToResult();
-    }
-}
-
-public record MultiStatusResponse(int Successful, int Failed, IEnumerable<string> Errors) {
-    public IResult ToResult() {
-        var data = new {
-            successful = Successful,
-            failed     = Failed,
-            errors     = Errors
-        };
-        return Results.Json(data, new JsonSerializerOptions { WriteIndented = true }, "application/json", StatusCodes.Status207MultiStatus);
-    }
-}
 
 public static class LdapHelperExtensions {
     public static bool EntityExists<T>(this LdapHelper helper, long id) where T : class {
@@ -55,24 +28,26 @@ public static class LdapHelperExtensions {
                 yield return entity;
     }
 
-    public static LdapOperationResult<T> TryGetEntity<T>(this LdapHelper helper, long id) where T : class, new() {
+    public static RequestResult<T> TryGetEntity<T>(this LdapHelper helper, long id) where T : class, new() {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{helper.DnBase}", LdapHelper.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = helper.TryRequest(request, out var error) as SearchResponse;
 
         if (response is null || response.Entries.Count == 0)
-            return new(StatusCodes.Status404NotFound, error);
+            return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors(error ?? "The object does not exist.");
 
         T? entity = LdapHelper.TryParseEntry<T>(response.Entries[0], out error);
-        return new(entity is null ? StatusCodes.Status400BadRequest : StatusCodes.Status200OK, error, entity);
+        if (entity is not null)
+            return new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity);
+        return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
     }
 
-    public static LdapOperationResult TryAddEntity<T>(this LdapHelper helper, T entity, long id) where T : class {
+    public static RequestResult<T> TryAddEntity<T>(this LdapHelper helper, T entity, long id) where T : class {
         Type type = typeof(T);
 
         helper.TryRequest(new AddRequest($"ou={type.GetOuName()},{helper.DnBase}", "organizationalUnit"));
 
         if (helper.EntityExists<T>(id))
-            return new(StatusCodes.Status409Conflict, "The object already exists.");
+            return new RequestResult<T>().SetStatus(StatusCodes.Status409Conflict).SetErrors("The object already exists.");
 
         AddRequest request = new($"uid={id},ou={type.GetOuName()},{helper.DnBase}");
         if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
@@ -81,17 +56,19 @@ public static class LdapHelperExtensions {
         foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttribute(entity))
             request.Attributes.Add(attribute);
 
-        bool created = helper.TryRequest(request, out var error) is not null;
-        return new(created ? StatusCodes.Status201Created : StatusCodes.Status400BadRequest, error);
+        if (helper.TryRequest(request, out var error) is not null)
+            return new RequestResult<T>().SetStatus(StatusCodes.Status201Created).SetValues(entity);
+        return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
     }
 
-    public static LdapOperationResult TryModifyEntity<T>(this LdapHelper helper, T entity, long id) where T : class {
+    public static RequestResult<T> TryModifyEntity<T>(this LdapHelper helper, T entity, long id) where T : class {
+        Type type = typeof(T);
+
         if (!helper.EntityExists<T>(id))
-            return new(StatusCodes.Status404NotFound, "The object does not exist.");
+            return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors("The object does not exist.");
 
         ModifyRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{helper.DnBase}");
 
-        Type type = entity.GetType();
         foreach (PropertyInfo info in type.GetProperties())
             if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute) {
                 DirectoryAttributeModification mod = new() {
@@ -102,21 +79,23 @@ public static class LdapHelperExtensions {
                 request.Modifications.Add(mod);
             }
 
-        bool modified = helper.TryRequest(request, out var error) is not null;
-        return new(modified ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest, error);
+        if (helper.TryRequest(request, out var error) is not null)
+            return new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity);
+        return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
     }
 
-    public static LdapOperationResult TryDeleteEntity<T>(this LdapHelper helper, long id) where T : class {
+    public static RequestResult TryDeleteEntity<T>(this LdapHelper helper, long id) where T : class {
         if (!helper.EntityExists<T>(id))
-            return new(StatusCodes.Status404NotFound, "The object does not exist.");
+            return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The object does not exist.");
 
         DeleteRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{helper.DnBase}");
 
-        bool deleted = helper.TryRequest(request, out var error) is not null;
-        return new(deleted ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest, error);
+        if (helper.TryRequest(request, out var error) is not null)
+            return new RequestResult().SetStatus(StatusCodes.Status200OK);
+        return new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
     }
 
-    public static MultiStatusResponse TryAddEntities<T>(this LdapHelper helper, IEnumerable<T> entities, Func<T, long> idGetter) where T : class {
+    public static RequestResult TryAddEntities<T>(this LdapHelper helper, IEnumerable<T> entities, Func<T, long> idGetter) where T : class {
         Type type = typeof(T);
 
         helper.TryRequest(new AddRequest($"ou={type.GetOuName()},{helper.DnBase}", "organizationalUnit"));
@@ -138,9 +117,7 @@ public static class LdapHelperExtensions {
             return request;
         });
 
-        var results = helper.TryRequests(requests);
-        var errors  = results.Select(x => x.Error).NotNull();
-
-        return new(results.Count - errors.Count(), errors.Count(), errors);
+        string[] errors = helper.TryRequests(requests).Select(x => x.Error).NotNull().ToArray();
+        return new RequestResult().SetStatus(StatusCodes.Status207MultiStatus).SetErrors(errors);
     }
 }

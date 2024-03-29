@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using NeuLdapMgnt.Models;
 using PluralizeService.Core;
@@ -89,5 +92,14 @@ internal static class ExtensionsUtils {
 
     public static string GetOuName(this Type type) {
         return PluralizationProvider.Pluralize(type.Name.ToLower());
+    }
+
+    public static R RenewToken<R>(this R result, HttpRequest request) where R : RequestResult {
+        result.SetToken(AuthHelper.RenewToken(request));
+        return result;
+    }
+
+    public static IResult ToResult<R>(this R result) where R : RequestResult {
+        return Results.Content(JsonSerializer.Serialize(result), "application/json", Encoding.UTF8, result.StatusCode);
     }
 }

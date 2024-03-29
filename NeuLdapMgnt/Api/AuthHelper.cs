@@ -1,6 +1,7 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Http;
@@ -53,5 +54,11 @@ public static class AuthHelper {
 
     public static string RenewToken(JwtSecurityToken token) {
         return CreateToken(token.Audiences.First());
+    }
+
+    public static string RenewToken(HttpRequest request) {
+        AuthenticationHeaderValue header = AuthenticationHeaderValue.Parse(request.Headers.Authorization.ToString());
+        JwtSecurityToken          token  = new JwtSecurityTokenHandler().ReadJwtToken(header.Parameter!);
+        return RenewToken(token);
     }
 }
