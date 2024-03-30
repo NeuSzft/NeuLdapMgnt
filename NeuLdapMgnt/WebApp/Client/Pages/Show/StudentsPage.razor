@@ -33,8 +33,25 @@ else
 		try
 		{
 			Lists.Students.Clear();
-			var students = await ApiRequests.GetStudentsAsync();
-			Lists.Students = new(students);
+			var response = await ApiRequests.GetStudentsAsync();
+
+			if (response is null)
+			{
+				// Add a modal to display no response error.
+				Console.WriteLine("No response from the api.");
+				return;
+			}
+
+			if (response.IsSuccess())
+			{
+				Lists.Students = new(response.Values);
+			}
+			else
+			{
+				// Add a modal to display all errors.
+				Console.WriteLine(string.Join('\n', response.Errors));
+			}
+
 			StateHasChanged();
 		}
 		catch (Exception e)

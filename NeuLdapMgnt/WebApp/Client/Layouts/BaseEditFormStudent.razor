@@ -171,8 +171,25 @@
 	{
 		try
 		{
-			await ApiRequests.DeleteStudentAsync(studentUpdated.Id);
-			NavManager.NavigateTo("/students");
+			var response = await ApiRequests.DeleteStudentAsync(TheStudent.Id);
+			if (response is null)
+			{
+				// Add a modal to display no response error.
+				Console.WriteLine("No response from the api.");
+				return;
+			}
+
+			if (response.IsSuccess())
+			{
+				// Add a modal to display successful deletion.
+				Console.WriteLine($"Successfully deleted: {TheStudent.Id}");
+				NavManager.NavigateTo("/students");
+			}
+			else
+			{
+				// Add a modal to display all errors.
+				Console.WriteLine(string.Join('\n', response.Errors));
+			}
 		}
 		catch (Exception e)
 		{
