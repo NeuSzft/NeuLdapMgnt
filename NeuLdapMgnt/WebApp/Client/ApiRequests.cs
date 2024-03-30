@@ -15,10 +15,13 @@ namespace NeuLdapMgnt.WebApp.Client
 		private string? _token = null;
 
 		public event Action? AuthenticationStateChanged;
+
+		// Property to check if a user token exists, indicating the user is authenticated
 		public bool IsAuthenticated => _token != null;
 
 		public ApiRequests()
 		{
+			// Initializes HttpClient with JSON as the default request content type
 			_httpClient = new()
 			{
 				BaseAddress = _url,
@@ -26,11 +29,13 @@ namespace NeuLdapMgnt.WebApp.Client
 			};
 		}
 
+		// Redirects to login if the user is not authenticated
 		public void EnsureAuthentication(NavigationManager navManager)
 		{
 			if (!IsAuthenticated) navManager.NavigateTo("login");
 		}
 
+		// Throws an exception if the user is not authenticated
 		private void EnsureAuthentication()
 		{
 			if (!IsAuthenticated)
@@ -39,6 +44,7 @@ namespace NeuLdapMgnt.WebApp.Client
 			}
 		}
 
+		// Performs login operation by sending credentials to the server
 		public async Task LoginAsync(string username, string password)
 		{
 			string credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(username + ":" + password));
@@ -53,12 +59,14 @@ namespace NeuLdapMgnt.WebApp.Client
 			AuthenticationStateChanged?.Invoke();
 		}
 
+		// Clears the authentication token and logging the user out
 		public void Logout()
 		{
 			_token = null;
 			AuthenticationStateChanged?.Invoke();
 		}
 
+		// Updates the authentication token based on the server response
 		private void UpdateToken(RequestResult? result)
 		{
 			if (result is null || string.IsNullOrEmpty(result.NewToken))
@@ -70,12 +78,14 @@ namespace NeuLdapMgnt.WebApp.Client
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 		}
 
+		// Sends a request to the specified URI with optional content, processing HTTP methods accordingly
 		public async Task<RequestResult<T>> SendRequestAsync<T>(HttpMethod method, string uri, object? content = null)
 		{
 			EnsureAuthentication();
 
 			HttpRequestMessage request = new HttpRequestMessage(method, uri);
 
+			// Sets the request content for POST and PUT methods
 			if (content != null && (method == HttpMethod.Post || method == HttpMethod.Put))
 			{
 				request.Content = new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json");
@@ -83,8 +93,16 @@ namespace NeuLdapMgnt.WebApp.Client
 
 			HttpResponseMessage response = await _httpClient.SendAsync(request);
 
+			// Processes the response, updating tokens as necessary and handling errors
+			return await ProcessResponse<T>(response, method);
+		}
+
+		// Helper method to process the HTTP response, handling success and error cases
+		private async Task<RequestResult<T>> ProcessResponse<T>(HttpResponseMessage response, HttpMethod method)
+		{
 			if (response.IsSuccessStatusCode)
 			{
+
 				if (method == HttpMethod.Delete)
 				{
 					var result = await response.Content.ReadFromJsonAsync<RequestResult>();
@@ -120,30 +138,35 @@ namespace NeuLdapMgnt.WebApp.Client
 			}
 		}
 
+		// Sends a GET request to retrieve all student entries
 		public async Task<RequestResult<Student>?> GetStudentsAsync()
 		{
 			var result = await SendRequestAsync<Student>(HttpMethod.Get, "/students");
 			return result ?? null;
 		}
 
+		// Sends a POST request to create a new student entry
 		public async Task<RequestResult<Student>?> AddStudentAsync(Student student)
 		{
 			var result = await SendRequestAsync<Student>(HttpMethod.Post, "/students", student);
 			return result ?? null;
 		}
 
+		// Sends a PUT request to update the student by their ID
 		public async Task<RequestResult<Student>?> UpdateStudentAsync(long id, Student student)
 		{
 			var result = await SendRequestAsync<Student>(HttpMethod.Put, $"/students/{id}", student);
 			return result ?? null;
 		}
 
+		// Sends a DELETE request to delete the student by their ID
 		public async Task<RequestResult<Student>?> DeleteStudentAsync(long id)
 		{
 			var result = await SendRequestAsync<Student>(HttpMethod.Delete, $"/students/{id}");
 			return result ?? null;
 		}
 
+		// Uploads a file to the server, specifically for importing student data via CSV
 		public async Task<RequestResult?> UploadFileAsync(IBrowserFile file)
 		{
 			EnsureAuthentication();
