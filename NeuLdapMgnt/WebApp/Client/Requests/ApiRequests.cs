@@ -6,7 +6,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 
-namespace NeuLdapMgnt.WebApp.Client
+namespace NeuLdapMgnt.WebApp.Client.Requests
 {
 	public class ApiRequests
 	{
@@ -102,7 +102,6 @@ namespace NeuLdapMgnt.WebApp.Client
 		{
 			if (response.IsSuccessStatusCode)
 			{
-
 				if (method == HttpMethod.Delete)
 				{
 					var result = await response.Content.ReadFromJsonAsync<RequestResult>();
@@ -138,34 +137,6 @@ namespace NeuLdapMgnt.WebApp.Client
 			}
 		}
 
-		// Sends a GET request to retrieve all student entries
-		public async Task<RequestResult<Student>?> GetStudentsAsync()
-		{
-			var result = await SendRequestAsync<Student>(HttpMethod.Get, "/students");
-			return result ?? null;
-		}
-
-		// Sends a POST request to create a new student entry
-		public async Task<RequestResult<Student>?> AddStudentAsync(Student student)
-		{
-			var result = await SendRequestAsync<Student>(HttpMethod.Post, "/students", student);
-			return result ?? null;
-		}
-
-		// Sends a PUT request to update the student by their ID
-		public async Task<RequestResult<Student>?> UpdateStudentAsync(long id, Student student)
-		{
-			var result = await SendRequestAsync<Student>(HttpMethod.Put, $"/students/{id}", student);
-			return result ?? null;
-		}
-
-		// Sends a DELETE request to delete the student by their ID
-		public async Task<RequestResult<Student>?> DeleteStudentAsync(long id)
-		{
-			var result = await SendRequestAsync<Student>(HttpMethod.Delete, $"/students/{id}");
-			return result ?? null;
-		}
-
 		// Uploads a file to the server, specifically for importing student data via CSV
 		public async Task<RequestResult?> UploadFileAsync(IBrowserFile file)
 		{
@@ -180,7 +151,6 @@ namespace NeuLdapMgnt.WebApp.Client
 
 			var result = await response.Content.ReadFromJsonAsync<RequestResult>();
 			UpdateToken(result);
-
 			return result ?? null;
 		}
 	}
