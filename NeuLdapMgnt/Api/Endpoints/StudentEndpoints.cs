@@ -97,7 +97,7 @@ public static class StudentEndpoints {
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapGet("/students/export", (LdapHelper ldapHelper, HttpContext context) => {
+        app.MapGet("/students/export", (LdapHelper ldapHelper) => {
                IEnumerable<Student> students = ldapHelper.GetAllEntities<Student>();
 
                StringBuilder sb = new();

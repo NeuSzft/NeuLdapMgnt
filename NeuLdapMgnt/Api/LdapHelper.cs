@@ -42,7 +42,7 @@ public sealed class LdapHelper(string server, int port, string user, string pass
         }
     }
 
-    public IReadOnlyCollection<(DirectoryResponse? Response, string? Error)> TryRequests(IEnumerable<DirectoryRequest> requests) {
+    public IReadOnlyCollection<(DirectoryResponse? Response, string? Error)> TryRequests(IEnumerable<(DirectoryRequest Requst, string? Id)> requests) {
         using LdapConnection connection = new(_identifier, _credential, AuthType.Basic);
         connection.SessionOptions.ProtocolVersion = 3;
 
@@ -55,13 +55,14 @@ public sealed class LdapHelper(string server, int port, string user, string pass
 
         List<(DirectoryResponse?, string?)> results = new();
 
-        foreach (DirectoryRequest request in requests)
+        foreach (var request in requests)
             try {
-                results.Add((connection.SendRequest(request), null));
+                results.Add((connection.SendRequest(request.Requst), null));
             }
             catch (DirectoryException e) {
-                Logger?.LogError(e.ToString());
-                results.Add((null, e.GetError()));
+                string id = request.Id ?? request.Requst.GetType().Name;
+                Logger?.LogError($"{id}: {e}");
+                results.Add((null, $"{id}: {e.GetError()}"));
             }
 
         return results.AsReadOnly();

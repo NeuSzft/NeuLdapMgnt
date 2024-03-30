@@ -104,7 +104,7 @@ public static class LdapHelperExtensions {
         if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
             objectClassesAttribute = new("objectClass", objectClasses.Classes.Cast<object>().ToArray());
 
-        IEnumerable<DirectoryRequest> requests = entities.Select(x => {
+        var requests = entities.Select(x => {
             long id = idGetter(x);
 
             AddRequest request = new($"uid={id},ou={type.GetOuName()},{helper.DnBase}");
@@ -114,7 +114,7 @@ public static class LdapHelperExtensions {
             foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttribute(x))
                 request.Attributes.Add(attribute);
 
-            return request;
+            return (request as DirectoryRequest, (string?)id.ToString());
         });
 
         string[] errors = helper.TryRequests(requests).Select(x => x.Error).NotNull().ToArray();
