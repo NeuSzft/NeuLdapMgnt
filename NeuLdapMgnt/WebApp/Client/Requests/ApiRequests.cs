@@ -83,7 +83,7 @@ namespace NeuLdapMgnt.WebApp.Client.Requests
 		{
 			EnsureAuthentication();
 
-			HttpRequestMessage request = new HttpRequestMessage(method, uri);
+			HttpRequestMessage request = new(method, uri);
 
 			// Sets the request content for POST and PUT methods
 			if (content != null && (method == HttpMethod.Post || method == HttpMethod.Put))
