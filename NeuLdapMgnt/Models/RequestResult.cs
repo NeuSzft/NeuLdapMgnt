@@ -18,7 +18,7 @@ public class RequestResult {
 
     public string GetError() => string.Join('\n', Errors);
 
-    public bool IsSuccess() => StatusCode is >= 200 and <= 299;
+    public bool IsSuccess() => StatusCode is >= 200 and <= 299 && Errors.Length == 0;
 
     public bool IsFailure() => !IsSuccess();
 }
