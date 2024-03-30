@@ -4,6 +4,7 @@ using NeuLdapMgnt.Models;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 
 namespace NeuLdapMgnt.WebApp.Client
 {
@@ -60,7 +61,6 @@ namespace NeuLdapMgnt.WebApp.Client
 
 		private void UpdateToken(RequestResult? result)
 		{
-
 			if (result is null || string.IsNullOrEmpty(result.NewToken))
 			{
 				throw new InvalidOperationException("New token is missing.");
@@ -70,57 +70,81 @@ namespace NeuLdapMgnt.WebApp.Client
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 		}
 
-		public async Task<IEnumerable<Student>> GetStudentsAsync()
+		public async Task<RequestResult<T>> SendRequestAsync<T>(HttpMethod method, string uri, object? content = null)
 		{
 			EnsureAuthentication();
 
-			var response = await _httpClient.GetAsync("/students");
-			response.EnsureSuccessStatusCode();
+			HttpRequestMessage request = new HttpRequestMessage(method, uri);
 
-			var result = await response.Content.ReadFromJsonAsync<RequestResult<Student>>();
-			UpdateToken(result);
+			if (content != null && (method == HttpMethod.Post || method == HttpMethod.Put))
+			{
+				request.Content = new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json");
+			}
 
-			return result!.Values ?? Enumerable.Empty<Student>();
+			HttpResponseMessage response = await _httpClient.SendAsync(request);
+
+			if (response.IsSuccessStatusCode)
+			{
+				if (method == HttpMethod.Delete)
+				{
+					var result = await response.Content.ReadFromJsonAsync<RequestResult>();
+					var genericResult = new RequestResult<T>();
+					if (result != null)
+					{
+						genericResult.SetStatus(result.StatusCode).SetErrors(result.Errors);
+						UpdateToken(result);
+					}
+					return genericResult;
+				}
+				else
+				{
+					var result = await response.Content.ReadFromJsonAsync<RequestResult<T>>();
+					UpdateToken(result);
+					return result ?? new RequestResult<T>().SetErrors("Error deserializing response.");
+				}
+			}
+			else
+			{
+				var errorResult = await response.Content.ReadFromJsonAsync<RequestResult<T>>();
+				if (errorResult != null)
+				{
+					UpdateToken(errorResult);
+					return errorResult;
+				}
+				else
+				{
+					return new RequestResult<T>()
+						.SetStatus((int)response.StatusCode)
+						.SetErrors($"Error: {response.ReasonPhrase}");
+				}
+			}
 		}
 
-		public async Task<Student?> AddStudentAsync(Student student)
+		public async Task<RequestResult<Student>?> GetStudentsAsync()
 		{
-			EnsureAuthentication();
-
-			var response = await _httpClient.PostAsJsonAsync("/students", student);
-			response.EnsureSuccessStatusCode();
-
-			var result = await response.Content.ReadFromJsonAsync<RequestResult<Student>>();
-			UpdateToken(result);
-
-			return result?.Values.FirstOrDefault() ?? null;
+			var result = await SendRequestAsync<Student>(HttpMethod.Get, "/students");
+			return result ?? null;
 		}
 
-		public async Task<Student?> UpdateStudentAsync(long id, Student student)
+		public async Task<RequestResult<Student>?> AddStudentAsync(Student student)
 		{
-			EnsureAuthentication();
-
-			var response = await _httpClient.PutAsJsonAsync($"/students/{id}", student);
-			response.EnsureSuccessStatusCode();
-
-			var result = await response.Content.ReadFromJsonAsync<RequestResult<Student>>();
-			UpdateToken(result);
-
-			return result?.Values.FirstOrDefault() ?? null;
+			var result = await SendRequestAsync<Student>(HttpMethod.Post, "/students", student);
+			return result ?? null;
 		}
 
-		public async Task DeleteStudentAsync(long id)
+		public async Task<RequestResult<Student>?> UpdateStudentAsync(long id, Student student)
 		{
-			EnsureAuthentication();
-
-			var response = await _httpClient.DeleteAsync($"/students/{id}");
-			response.EnsureSuccessStatusCode();
-
-			var result = await response.Content.ReadFromJsonAsync<RequestResult<Student>>();
-			UpdateToken(result);
+			var result = await SendRequestAsync<Student>(HttpMethod.Put, $"/students/{id}", student);
+			return result ?? null;
 		}
 
-		public async Task UploadFile(IBrowserFile file)
+		public async Task<RequestResult<Student>?> DeleteStudentAsync(long id)
+		{
+			var result = await SendRequestAsync<Student>(HttpMethod.Delete, $"/students/{id}");
+			return result ?? null;
+		}
+
+		public async Task<RequestResult?> UploadFileAsync(IBrowserFile file)
 		{
 			EnsureAuthentication();
 
@@ -133,6 +157,8 @@ namespace NeuLdapMgnt.WebApp.Client
 
 			var result = await response.Content.ReadFromJsonAsync<RequestResult>();
 			UpdateToken(result);
+
+			return result ?? null;
 		}
 	}
 }
