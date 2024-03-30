@@ -40,7 +40,7 @@ internal static class Program {
                 // Fail if Authorization header is missing
                 OnMessageReceived = (MessageReceivedContext context) => {
                     var headerValues = context.Request.Headers.Authorization;
-                    if (headerValues.Count == 0 || headerValues.ToString()[..6].ToLower() != "bearer")
+                    if (headerValues.Count == 0 || !headerValues.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase))
                         context.Fail("missing");
 
                     return Task.CompletedTask;
@@ -104,7 +104,7 @@ internal static class Program {
         });
 
         // Set CORS to accept any connection
-        app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().WithExposedHeaders("New-Authorization"));
+        app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
         // Add swagger middlewares when in development mode
         if (app.Environment.IsDevelopment()) {
