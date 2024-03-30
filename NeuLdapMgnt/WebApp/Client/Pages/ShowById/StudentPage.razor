@@ -49,10 +49,11 @@ else
 				Console.WriteLine($"Successfully edited: {student.Id}");
 				NavManager.NavigateTo("/students");
 			}
-			else
+
+			if (response.Errors.Any())
 			{
 				// Add a modal to display all errors.
-				Console.WriteLine(string.Join('\n', response.Errors));
+				Console.WriteLine("Errors:\n" + string.Join('\n', response.Errors));
 			}
 		}
 		catch (Exception e)

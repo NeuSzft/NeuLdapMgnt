@@ -46,10 +46,11 @@ else
 			{
 				Lists.Students = new(response.Values);
 			}
-			else
+
+			if (response.Errors.Any())
 			{
 				// Add a modal to display all errors.
-				Console.WriteLine(string.Join('\n', response.Errors));
+				Console.WriteLine("Errors:\n" + string.Join('\n', response.Errors));
 			}
 
 			StateHasChanged();
