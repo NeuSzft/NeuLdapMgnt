@@ -36,9 +36,6 @@ else
 		try
 		{
 			await ApiRequests.UpdateStudentAsync(student.Id, editedStudent);
-
-			int studentIndex = Lists.Students.IndexOf(student);
-			Lists.Students[studentIndex] = editedStudent;
 			NavManager.NavigateTo("/students");
 		}
 		catch (Exception e)

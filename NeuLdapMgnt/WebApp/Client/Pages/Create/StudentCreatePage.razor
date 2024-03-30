@@ -29,7 +29,6 @@
 		try
 		{
 			await ApiRequests.AddStudentAsync(studentUpdated);
-			Lists.Students.Add(studentUpdated);
 			NavManager.NavigateTo("/students");
 		}
 		catch (Exception e)

@@ -172,7 +172,6 @@
 		try
 		{
 			await ApiRequests.DeleteStudentAsync(studentUpdated.Id);
-			Lists.Students.Add(studentUpdated);
 			NavManager.NavigateTo("/students");
 		}
 		catch (Exception e)
