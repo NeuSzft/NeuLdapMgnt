@@ -12,7 +12,7 @@
 
 	<div class="form-floating">
 		<InputNumber class="form-control"
-					 readonly="@IsReadonly"
+					 readonly="@(CanDelete || IsReadonly)"
 					 id="student-id"
 					 min="@Student.AllowedIdRange.Min"
 					 max="@Student.AllowedIdRange.Max"
