@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,17 +10,20 @@ namespace NeuLdapMgnt.Api;
 internal static class SwaggerWrapper {
     private sealed class SecurityRequirementsOperationFilter : IOperationFilter {
         public void Apply(OpenApiOperation operation, OperationFilterContext context) {
-            operation.Security.Add(new OpenApiSecurityRequirement {
-                {
-                    new OpenApiSecurityScheme {
-                        Reference = new OpenApiReference {
-                            Type = ReferenceType.SecurityScheme,
-                            Id   = operation.OperationId == "BasicAuth" ? "Basic" : JwtBearerDefaults.AuthenticationScheme
-                        }
-                    },
-                    []
-                }
-            });
+            // Do not add security scheme if it is a testing endpoint
+            if (operation.Tags.All(x => x.Name != "Testing"))
+                operation.Security.Add(new OpenApiSecurityRequirement {
+                    {
+                        new OpenApiSecurityScheme {
+                            // If the name of the endpoint is "BasicAuth" then use Basic auth instead of JWT
+                            Reference = new OpenApiReference {
+                                Type = ReferenceType.SecurityScheme,
+                                Id   = operation.OperationId == "BasicAuth" ? "Basic" : JwtBearerDefaults.AuthenticationScheme
+                            }
+                        },
+                        []
+                    }
+                });
         }
     }
 

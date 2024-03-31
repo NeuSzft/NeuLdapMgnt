@@ -107,13 +107,16 @@ internal static class Program {
         app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
         // Add swagger middlewares when in development mode
-        if (app.Environment.IsDevelopment()) {
+        if (app.Environment.IsDevelopment())
             app.UseSwaggerWrapper();
-        }
 
         // Map endpoints
         app.MapAuthEndpoints();
         app.MapStudentEndpoints();
+
+        // Map testing endpoints when in development mode
+        if (app.Environment.IsDevelopment())
+            app.MapTestingEndpoints();
 
         // Print the current security key as a base64 string
         app.Logger.LogCritical($"Key: {Convert.ToBase64String(SecurityKey.Key)}");
