@@ -1,15 +1,26 @@
 dc = docker compose
 
-demo-options = -f compose-demo.yml
-api-test-options = -f compose-demo.yml
+options-demo = -f compose-demo.yml
+options-api-test = -f compose-api-test.yml
 
 demo:
-	$(dc) $(demo-options) build api-build webapp-build
-	$(dc) $(demo-options) restart
-	$(dc) $(demo-options) up -d
+	$(dc) $(options-demo) build api-build webapp-build
+	$(dc) $(options-demo) restart
+	$(dc) $(options-demo) up -d
 
 demo-stop:
-	$(dc) $(demo-options) stop
+	$(dc) $(options-demo) stop
 
 demo-down:
-	$(dc) $(demo-options) down
+	$(dc) $(options-demo) down
+
+api-test:
+	$(dc) $(options-api-test) build testing-api-build testing-api-test
+	$(dc) $(options-api-test) up -d
+	$(dc) $(options-api-test) logs -f testing-api-test
+	$(dc) $(options-api-test) down
+
+web-test:
+	@echo Nothing to do.
+
+tests: api-test web-test

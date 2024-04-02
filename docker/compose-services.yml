@@ -27,6 +27,16 @@ services:
                 WORKDIR /app
                 ENTRYPOINT [ "./NeuLdapMgnt.Api", "--urls", "http://0.0.0.0:5000" ]
 
+    api-test:
+        build:
+            context: ..
+            dockerfile_inline: |
+                FROM mcr.microsoft.com/dotnet/sdk:8.0
+                COPY ./NeuLdapMgnt/Api.Tests /app/Api.Tests
+                COPY ./NeuLdapMgnt/Models /app/Models
+                WORKDIR /app/Api.Tests
+                ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/tr/api-test-results.md" ]
+
     webapp-build:
         build:
             context: ..

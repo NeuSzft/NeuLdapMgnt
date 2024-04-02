@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+    testing-openldap:
+        extends:
+            file: ./docker/compose-services.yml
+            service: openldap
+        environment:
+            - LDAP_ORGANISATION=Test
+            - LDAP_DOMAIN=test.local
+            - LDAP_ADMIN_PASSWORD=admin
+        networks:
+            - net-api-test
+
+    testing-api-build:
+        extends:
+            file: ./docker/compose-services.yml
+            service: api-build
+        networks:
+            - net-api-test
+        volumes:
+            - api-app:/app
+
+    testing-api:
+        extends:
+            file: ./docker/compose-services.yml
+            service: api
+        depends_on:
+            testing-openldap:
+                condition: service_started
+            testing-api-build:
+                condition: service_completed_successfully
+        environment:
+            ASPNETCORE_ENVIRONMENT: Development
+            LDAP_ADDRESS: openldap
+            LDAP_PORT: 389
+            LDAP_USERNAME: cn=admin,dc=test,dc=local
+            LDAP_PASSWORD: admin
+        networks:
+            - net-api-test
+        volumes:
+            - api-app:/app:ro
+
+    testing-api-test:
+        extends:
+            file: ./docker/compose-services.yml
+            service: api-test
+        depends_on:
+            - testing-api
+        environment:
+            API_URL: http://testing-api:5000
+        networks:
+            - net-api-test
+        volumes:
+            - ./docs/test-results:/tr
+
+networks:
+    net-api-test:
+
+
+volumes:
+    api-app:
