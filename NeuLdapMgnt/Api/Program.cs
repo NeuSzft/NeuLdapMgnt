@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -16,7 +15,7 @@ namespace NeuLdapMgnt.Api;
 internal static class Program {
     public static readonly SymmetricSecurityKey SecurityKey = Utils.LoadOrCreateSecurityKey("SECURITY_KEY");
 
-    public static readonly string TokenIssuer = Assembly.GetExecutingAssembly().FullName!;
+    public static readonly string TokenIssuer = typeof(Program).Assembly.FullName!;
 
     public static void Main(string[] args) {
         LdapHelper ldapHelper = LdapHelper.FromEnvs();
@@ -118,8 +117,9 @@ internal static class Program {
         if (app.Environment.IsDevelopment())
             app.MapTestingEndpoints();
 
-        // Print the current security key as a base64 string
-        app.Logger.LogCritical($"Key: {Convert.ToBase64String(SecurityKey.Key)}");
+        // Print the current security key as a base64 string when in development mode
+        if (app.Environment.IsDevelopment())
+            app.Logger.LogCritical($"Key: {Convert.ToBase64String(SecurityKey.Key)}");
 
         app.Run();
     }

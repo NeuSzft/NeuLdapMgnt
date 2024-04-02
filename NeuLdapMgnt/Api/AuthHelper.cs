@@ -34,7 +34,7 @@ public static class AuthHelper {
 
         byte[] hash = SHA512.HashData(Encoding.UTF8.GetBytes(password));
         if (!hash.SequenceEqual(Base64UrlEncoder.DecodeBytes("sQnzu7wkTrgkQZF-0G1hi5AI3Qmzvv0bXgc5THBqi7mAsdd4Xll27ASbRt9fEyavWi6m0QP9B8lThf-rDKy8hg")))
-            return new(StatusCodes.Status401Unauthorized, null, null);
+            return new(StatusCodes.Status401Unauthorized, "Wrong credentials.", null);
 
         return new(StatusCodes.Status200OK, null, username);
     }
