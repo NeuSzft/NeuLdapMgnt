@@ -43,4 +43,39 @@ public class AuthTests {
 
         Assert.AreEqual(HttpStatusCode.OK, response2.StatusCode);
     }
+
+    [TestMethod]
+    public async Task TestMissingToken() {
+        var request  = new HttpRequestMessage(HttpMethod.Get, "/testing/check-token");
+        var response = await RequestHelper.Client.SendAsync(request);
+
+        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.AreEqual("Missing json web token.", await response.Content.ReadAsStringAsync());
+    }
+
+    [TestMethod]
+    public async Task TestInvalidToken() {
+        var request  = new HttpRequestMessage(HttpMethod.Get, "/testing/check-token").SetAuthHeader("Bearer", "invalidtoken");
+        var response = await RequestHelper.Client.SendAsync(request);
+
+        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.AreEqual("Invalid json web token.", await response.Content.ReadAsStringAsync());
+    }
+
+    [TestMethod]
+    public async Task TestExpiredToken() {
+        var request  = new HttpRequestMessage(HttpMethod.Get, "/testing/check-token").AuthWithExpiredJwt();
+        var response = await RequestHelper.Client.SendAsync(request);
+
+        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.IsTrue((await response.Content.ReadAsStringAsync()).Contains("expired"));
+    }
+
+    [TestMethod]
+    public async Task TestValidToken() {
+        var request  = new HttpRequestMessage(HttpMethod.Get, "/testing/check-token").AuthWithJwt();
+        var response = await RequestHelper.Client.SendAsync(request);
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+    }
 }
