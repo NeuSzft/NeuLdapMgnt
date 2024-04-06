@@ -16,6 +16,10 @@ public record AuthResult(int Code, string? Message, string? Username) {
 }
 
 public static class AuthHelper {
+    /// <summary>Tires to authenticate the user specified by the HTTP request via the Basic authentication scheme.</summary>
+    /// <param name="request">The <see cref="HttpRequest"/> that contains an Authorization header.</param>
+    /// <returns>An <see cref="AuthResult"/> containing the result of the authentication attempt.</returns>
+    /// <remarks>The authentication currently succeeds regardless of what username is specified as long as the password is "password".</remarks>
     public static AuthResult BasicAuth(HttpRequest request) {
         string username, password;
 
@@ -39,6 +43,9 @@ public static class AuthHelper {
         return new(StatusCodes.Status200OK, null, username);
     }
 
+    /// <summary>Creates a new JSON Web Token for the specified user that will expire in 10 minutes after it's creation.</summary>
+    /// <param name="username">The username that will be used as the audience of the token.</param>
+    /// <returns>The base64url encoded JSON Web Token.</returns>
     public static string CreateToken(string username) {
         JwtSecurityToken jwt = new(
             Program.TokenIssuer,
@@ -52,10 +59,16 @@ public static class AuthHelper {
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }
 
+    /// <summary>Creates a new JSON Web Token that will use the first specified audience of the previous one. This token also expires in 10 minutes after it's creation.</summary>
+    /// <param name="token">The <see cref="JwtSecurityToken"/> that needs to be renewed.</param>
+    /// <returns>The base64url encoded JSON Web Token.</returns>
     public static string RenewToken(JwtSecurityToken token) {
         return CreateToken(token.Audiences.First());
     }
 
+    /// <summary>Creates a new JSON Web Token that will use the first specified audience of the previous one. This token also expires in 10 minutes after it's creation.</summary>
+    /// <param name="request">The <see cref="HttpRequest"/> that contains the token within it's Authorization header that needs to be renewed.</param>
+    /// <returns>The base64url encoded JSON Web Token.</returns>
     public static string RenewToken(HttpRequest request) {
         AuthenticationHeaderValue header = AuthenticationHeaderValue.Parse(request.Headers.Authorization.ToString());
         JwtSecurityToken          token  = new JwtSecurityTokenHandler().ReadJwtToken(header.Parameter!);
