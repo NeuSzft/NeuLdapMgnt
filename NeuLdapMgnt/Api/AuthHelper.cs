@@ -9,13 +9,17 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace NeuLdapMgnt.Api;
 
+/// <summary>Stores the result of an authentication attempt.</summary>
 public record AuthResult(int Code, string? Message, string? Username) {
+    /// <summary>Turns the <see cref="AuthResult"/> into a HTTP result containing the Message.</summary>
+    /// <returns>An <see cref="IResult"/> with the text/plain content type and the status code set to Code.</returns>
     public virtual IResult ToResult() {
         return Results.Text(Message, "text/plain", Encoding.UTF8, Code);
     }
 }
 
 public static class AuthHelper {
+    // TODO: Authenticate via LDAP database
     /// <summary>Tires to authenticate the user specified by the HTTP request via the Basic authentication scheme.</summary>
     /// <param name="request">The <see cref="HttpRequest"/> that contains an Authorization header.</param>
     /// <returns>An <see cref="AuthResult"/> containing the result of the authentication attempt.</returns>
