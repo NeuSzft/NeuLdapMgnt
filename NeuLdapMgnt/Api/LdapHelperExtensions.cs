@@ -53,7 +53,7 @@ public static class LdapHelperExtensions {
         if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
             request.Attributes.Add(new("objectClass", objectClasses.Classes.Cast<object>().ToArray()));
 
-        foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttribute(entity))
+        foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttributes(entity))
             request.Attributes.Add(attribute);
 
         if (helper.TryRequest(request, out var error) is not null)
@@ -111,7 +111,7 @@ public static class LdapHelperExtensions {
             if (objectClassesAttribute is not null)
                 request.Attributes.Add(objectClassesAttribute);
 
-            foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttribute(x))
+            foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttributes(x))
                 request.Attributes.Add(attribute);
 
             return (request as DirectoryRequest, (string?)id.ToString());
