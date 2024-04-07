@@ -9,6 +9,11 @@ using NeuLdapMgnt.Models;
 namespace NeuLdapMgnt.Api;
 
 public static class LdapHelperExtensions {
+    /// <summary>Checks if the entity exists within the database using it's uid.</summary>
+    /// <param name="helper">The <see cref="LdapHelper"/> the method should use.</param>
+    /// <param name="id">The uid of the entity.</param>
+    /// <typeparam name="T">The type of the entity.</typeparam>
+    /// <returns>Returns <c>true</c> if the entity exists. If it does not exist or the search request fails it returns <c>false</c>.</returns>
     public static bool EntityExists<T>(this LdapHelper helper, long id) where T : class {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{helper.DnBase}", LdapHelper.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = helper.TryRequest(request) as SearchResponse;
@@ -16,6 +21,11 @@ public static class LdapHelperExtensions {
         return response?.Entries.Count == 1;
     }
 
+    /// <summary>Gets all entities of the specified type from the database.</summary>
+    /// <param name="helper">The <see cref="LdapHelper"/> the method should use.</param>
+    /// <typeparam name="T">The type of the entity.</typeparam>
+    /// <returns>An <see cref="IEnumerable{T}"/> containing the entities.</returns>
+    /// <remarks>If an entity cannot be parsed then it is ignored and not returned.</remarks>
     public static IEnumerable<T> GetAllEntities<T>(this LdapHelper helper) where T : class, new() {
         SearchRequest   request  = new($"ou={typeof(T).GetOuName()},{helper.DnBase}", LdapHelper.AnyFilter, SearchScope.Subtree, null);
         SearchResponse? response = helper.TryRequest(request) as SearchResponse;
@@ -28,6 +38,11 @@ public static class LdapHelperExtensions {
                 yield return entity;
     }
 
+    /// <summary>Tries to get the entity from the database using it's uid.</summary>
+    /// <param name="helper">The <see cref="LdapHelper"/> the method should use.</param>
+    /// <param name="id">The uid of the entity.</param>
+    /// <typeparam name="T">The type of the entity.</typeparam>
+    /// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
     public static RequestResult<T> TryGetEntity<T>(this LdapHelper helper, long id) where T : class, new() {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{helper.DnBase}", LdapHelper.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = helper.TryRequest(request, out var error) as SearchResponse;
@@ -41,6 +56,12 @@ public static class LdapHelperExtensions {
         return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
     }
 
+    /// <summary>Tries to add the entity to the database with the specified uid.</summary>
+    /// <param name="helper">The <see cref="LdapHelper"/> the method should use.</param>
+    /// <param name="id">The uid of the entity.</param>
+    /// <param name="entity">The entity to be added.</param>
+    /// <typeparam name="T">The type of the entity.</typeparam>
+    /// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
     public static RequestResult<T> TryAddEntity<T>(this LdapHelper helper, T entity, long id) where T : class {
         Type type = typeof(T);
 
@@ -61,6 +82,12 @@ public static class LdapHelperExtensions {
         return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
     }
 
+    /// <summary>Tries to modify an entity in the database with the specified uid.</summary>
+    /// <param name="helper">The <see cref="LdapHelper"/> the method should use.</param>
+    /// <param name="id">The uid of the entity to replace.</param>
+    /// <param name="entity">The entity that will replace the current one.</param>
+    /// <typeparam name="T">The type of the entity.</typeparam>
+    /// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
     public static RequestResult<T> TryModifyEntity<T>(this LdapHelper helper, T entity, long id) where T : class {
         Type type = typeof(T);
 
@@ -84,6 +111,11 @@ public static class LdapHelperExtensions {
         return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
     }
 
+    /// <summary>Tries to remove an entity from the database with the specified uid.</summary>
+    /// <param name="helper">The <see cref="LdapHelper"/> the method should use.</param>
+    /// <param name="id">The uid of the entity to remove.</param>
+    /// <typeparam name="T">The type of the entity.</typeparam>
+    /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
     public static RequestResult TryDeleteEntity<T>(this LdapHelper helper, long id) where T : class {
         if (!helper.EntityExists<T>(id))
             return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The object does not exist.");
@@ -95,6 +127,12 @@ public static class LdapHelperExtensions {
         return new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
     }
 
+    /// <summary>Tries to add the entities to the database.</summary>
+    /// <param name="helper">The <see cref="LdapHelper"/> the method should use.</param>
+    /// <param name="entities">The entities to be added.</param>
+    /// <param name="idGetter">A delegate that takes in an entity of type <typeparamref name="T"/> and returns an uid with the type of <c>long</c>.</param>
+    /// <typeparam name="T">The type of the entities.</typeparam>
+    /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
     public static RequestResult TryAddEntities<T>(this LdapHelper helper, IEnumerable<T> entities, Func<T, long> idGetter) where T : class {
         Type type = typeof(T);
 
@@ -114,7 +152,7 @@ public static class LdapHelperExtensions {
             foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttributes(x))
                 request.Attributes.Add(attribute);
 
-            return (request as DirectoryRequest, (string?)id.ToString());
+            return new UniqueDirectoryRequest(request, id.ToString());
         });
 
         string[] errors = helper.TryRequests(requests).Select(x => x.Error).NotNull().ToArray();

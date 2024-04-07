@@ -12,9 +12,22 @@ namespace NeuLdapMgnt.Api;
 /// <summary>The <see cref="LdapBindingException"/> exception is thrown when an <see cref="LdapConnection"/> of <see cref="LdapHelper"/> fails to bind to the database.</summary>
 public sealed class LdapBindingException : LdapException;
 
+/// <summary>Combines a <see cref="DirectoryRequest"/> and a <c>string</c> identifier.</summary>
+/// <param name="Request">The <see cref="DirectoryRequest"/>.</param>
+/// <param name="Identifier">The identifier of the request.</param>
+public record UniqueDirectoryRequest(DirectoryRequest Request, string Identifier);
+
+/// <summary>This class is used to return either a directory response or an error message.</summary>
+/// <param name="Response">A <c>nullable</c> <see cref="DirectoryResponse"/> that contains the response on success.</param>
+/// <param name="Error">A <c>nullable</c> <c>string</c> that contains the error message on failure.</param>
+public record LdapResult(DirectoryResponse? Response, string? Error = null);
+
 /// <summary>The <see cref="LdapHelper"/> class provides helper methods for easier interaction with a LDAP server.</summary>
 public sealed class LdapHelper {
+    /// <summary>The base distinguished name to use for the requests.</summary>
     public string   DnBase { get; set; } = string.Empty;
+
+    /// <summary>The logger the helper should use.</summary>
     public ILogger? Logger { get; set; }
 
     private readonly LdapDirectoryIdentifier _identifier;
@@ -32,14 +45,14 @@ public sealed class LdapHelper {
 
     /// <summary>Tries to send a request to the LDAP server.</summary>
     /// <param name="request">The <see cref="DirectoryRequest"/> to be sent.</param>
-    /// <returns>A nullable <see cref="DirectoryResponse"/> that either contains the the response to the request or null if there was an error with the request and there was no response.</returns>
+    /// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
     /// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
     public DirectoryResponse? TryRequest(DirectoryRequest request) => TryRequest(request, out _);
 
     /// <summary>Tries to send a request to the LDAP server.</summary>
     /// <param name="request">The <see cref="DirectoryRequest"/> to be sent.</param>
-    /// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to null.</param>
-    /// <returns>A nullable <see cref="DirectoryResponse"/> that either contains the the response to the request or null if there was an error with the request and there was no response.</returns>
+    /// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
+    /// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
     /// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
     public DirectoryResponse? TryRequest(DirectoryRequest request, out string? error) {
         using LdapConnection connection = new(_identifier, _credential, AuthType.Basic);
@@ -63,10 +76,11 @@ public sealed class LdapHelper {
         }
     }
 
-    // TODO: replace the tuples with records then complete the code comments
     /// <summary>Tries to send multiple requests to the LDAP server.</summary>
+    /// <param name="requests">The <see cref="UniqueDirectoryRequest"/>s to send.</param>
+    /// <returns>A <see cref="List{T}">List&lt;LdapResult&gt;</see> containing the <see cref="LdapResult"/>s.</returns>
     /// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
-    public IReadOnlyCollection<(DirectoryResponse? Response, string? Error)> TryRequests(IEnumerable<(DirectoryRequest Requst, string? Id)> requests) {
+    public List<LdapResult> TryRequests(IEnumerable<UniqueDirectoryRequest> requests) {
         using LdapConnection connection = new(_identifier, _credential, AuthType.Basic);
         connection.SessionOptions.ProtocolVersion = 3;
 
@@ -77,22 +91,22 @@ public sealed class LdapHelper {
             throw new LdapBindingException();
         }
 
-        List<(DirectoryResponse?, string?)> results = new();
+        List<LdapResult> results = new();
 
-        foreach (var request in requests)
+        foreach (UniqueDirectoryRequest request in requests)
             try {
-                results.Add((connection.SendRequest(request.Requst), null));
+                results.Add(new(connection.SendRequest(request.Request)));
             }
             catch (DirectoryException e) {
-                string id = request.Id ?? request.Requst.GetType().Name;
+                string id = request.Identifier;
                 Logger?.LogError($"{id}: {e}");
-                results.Add((null, $"{id}: {e.GetError()}"));
+                results.Add(new(null, $"{id}: {e.GetError()}"));
             }
 
-        return results.AsReadOnly();
+        return results;
     }
 
-    public static readonly string AnyFilter = "(objectClass=*)";
+    public const string AnyFilter = "(objectClass=*)";
 
     /// <summary>Creates a new instance of the specified type and tries to set it's properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
     /// <param name="entry">The <see cref="SearchResultEntry"/> that contains the values that are used to set object's properties.</param>
@@ -115,7 +129,7 @@ public sealed class LdapHelper {
 
     /// <summary>Tries to create a new instance of the specified type and set it's properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
     /// <param name="entry">The <see cref="SearchResultEntry"/> that contains the values that are used to set object's properties.</param>
-    /// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to null.</param>
+    /// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
     /// <typeparam name="T">The type of the object to be created.</typeparam>
     /// <returns>A new object with the type <typeparamref name="T"/>.</returns>
     public static T? TryParseEntry<T>(SearchResultEntry entry, out string? error) where T : class, new() {
