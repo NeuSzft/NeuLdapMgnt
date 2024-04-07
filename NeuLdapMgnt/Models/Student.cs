@@ -76,7 +76,7 @@ namespace NeuLdapMgnt.Models
 			}
 		}
 
-		private void UpdateClass() => Class = ClassYear.Contains('/') ? $"{ClassYear}{ClassGroup}" : $"{ClassYear}.{ClassGroup}";
+		private void UpdateClass() => @class = ClassYear.Contains('/') ? $"{ClassYear}{ClassGroup}" : $"{ClassYear}.{ClassGroup}";
 
 		public int ClassYearOrderValue()
 		{
