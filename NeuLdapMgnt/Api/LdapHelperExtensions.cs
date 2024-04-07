@@ -152,7 +152,7 @@ public static class LdapHelperExtensions {
             foreach (DirectoryAttribute attribute in LdapHelper.GetDirectoryAttributes(x))
                 request.Attributes.Add(attribute);
 
-            return (request as DirectoryRequest, (string?)id.ToString());
+            return new UniqueDirectoryRequest(request, id.ToString());
         });
 
         string[] errors = helper.TryRequests(requests).Select(x => x.Error).NotNull().ToArray();
