@@ -3,7 +3,7 @@ version: '3.8'
 services:
     openldap:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: openldap
         environment:
             - LDAP_ORGANISATION=Test
@@ -19,7 +19,7 @@ services:
 
     ldapadmin:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: ldapadmin
         depends_on:
             - openldap
@@ -33,7 +33,7 @@ services:
 
     api-build:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: api-build
         networks:
             - net-demo
@@ -42,7 +42,7 @@ services:
 
     api:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: api
         depends_on:
             openldap:
@@ -65,7 +65,7 @@ services:
 
     webapp-build:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: webapp-build
         networks:
             - net-demo
@@ -74,7 +74,7 @@ services:
 
     webapp:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: webapp
         depends_on:
             webapp-build:
@@ -82,7 +82,7 @@ services:
         environment:
             ASPNETCORE_ENVIRONMENT: Development
             API_ADDRESS: api
-            API_PORT: api
+            API_PORT: 5000
         networks:
             - net-demo
         ports:

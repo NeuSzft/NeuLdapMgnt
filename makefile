@@ -1,7 +1,7 @@
 dc = docker compose
 
-options-demo = -f compose-demo.yml
-options-api-test = -f compose-api-test.yml
+options-demo = -f ./docker/compose-demo.yml
+options-api-test = -f ./docker/compose-api-test.yml
 
 demo:
 	$(dc) $(options-demo) build api-build webapp-build

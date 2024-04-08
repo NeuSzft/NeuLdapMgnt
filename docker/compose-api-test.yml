@@ -3,7 +3,7 @@ version: '3.8'
 services:
     testing-openldap:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: openldap
         environment:
             - LDAP_ORGANISATION=Test
@@ -14,7 +14,7 @@ services:
 
     testing-api-build:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: api-build
         networks:
             - net-api-test
@@ -23,7 +23,7 @@ services:
 
     testing-api:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: api
         depends_on:
             testing-openldap:
@@ -43,7 +43,7 @@ services:
 
     testing-api-test:
         extends:
-            file: ./docker/compose-services.yml
+            file: ./compose-services.yml
             service: api-test
         depends_on:
             - testing-api
@@ -52,7 +52,7 @@ services:
         networks:
             - net-api-test
         volumes:
-            - ./docs/test-results:/tr
+            - ../docs/test-results:/tr
 
 networks:
     net-api-test:
