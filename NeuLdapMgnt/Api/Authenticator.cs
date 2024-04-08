@@ -18,7 +18,7 @@ public record AuthResult(int Code, string? Message, string? Username) {
     }
 }
 
-public static class AuthHelper {
+public static class Authenticator {
     // TODO: Authenticate via LDAP database
     /// <summary>Tires to authenticate the user specified by the HTTP request via the Basic authentication scheme.</summary>
     /// <param name="request">The <see cref="HttpRequest"/> that contains an Authorization header.</param>

@@ -9,7 +9,7 @@ namespace NeuLdapMgnt.Api.Endpoints;
 public static class TestingEndpoints {
     public static void MapTestingEndpoints(this WebApplication app) {
         app.MapGet("/testing/get-token", () =>
-               Results.Text(AuthHelper.CreateToken("testuser"))
+               Results.Text(Authenticator.CreateToken("testuser"))
            )
            .WithOpenApi()
            .WithTags("Testing")

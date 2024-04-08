@@ -9,7 +9,7 @@ using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;
 
-/// <summary>The <see cref="LdapBindingException"/> exception is thrown when an <see cref="LdapConnection"/> of <see cref="LdapHelper"/> fails to bind to the database.</summary>
+/// <summary>The <see cref="LdapBindingException"/> exception is thrown when an <see cref="LdapConnection"/> of <see cref="LdapService"/> fails to bind to the database.</summary>
 public sealed class LdapBindingException : LdapException;
 
 /// <summary>Combines a <see cref="DirectoryRequest"/> and a <c>string</c> identifier.</summary>
@@ -22,8 +22,8 @@ public record UniqueDirectoryRequest(DirectoryRequest Request, string Identifier
 /// <param name="Error">A <c>nullable</c> <c>string</c> that contains the error message on failure.</param>
 public record LdapResult(DirectoryResponse? Response, string? Error = null);
 
-/// <summary>The <see cref="LdapHelper"/> class provides helper methods for easier interaction with a LDAP server.</summary>
-public sealed class LdapHelper {
+/// <summary>The <see cref="LdapService"/> class provides helper methods for easier interaction with a LDAP server.</summary>
+public sealed class LdapService {
     /// <summary>The base distinguished name to use for the requests.</summary>
     public string   DnBase { get; set; } = string.Empty;
 
@@ -38,7 +38,7 @@ public sealed class LdapHelper {
     /// <param name="user">The username to use when connecting to the LDAP server.</param>
     /// <param name="password">The password of the user.</param>
     /// <example><code>var ldapHelper = new LdapHelper("localhost", 389, "cn=admin,dc=example,dc=local", "AdminPass");</code></example>
-    public LdapHelper(string server, int port, string user, string password) {
+    public LdapService(string server, int port, string user, string password) {
         _identifier = new(server, port);
         _credential = new(user, password);
     }
@@ -153,17 +153,17 @@ public sealed class LdapHelper {
                 yield return new(attribute.Name, info.GetValue(obj)?.ToString() ?? "<!> NULL <!>");
     }
 
-    /// <summary>Creates a new <see cref="LdapHelper"/> using the specified environment variables.</summary>
+    /// <summary>Creates a new <see cref="LdapService"/> using the specified environment variables.</summary>
     /// <param name="serverEnv">The environment variable that specifies the address of the LDAP server.</param>
     /// <param name="portEnv">The environment variable that specifies the port of the LDAP server.</param>
     /// <param name="userEnv">The environment variable that specifies the username to use when connecting to the LDAP server.</param>
     /// <param name="passwordEnv">The environment variable that specifies the password of the user.</param>
-    /// <returns>The new <see cref="LdapHelper"/>.</returns>
+    /// <returns>The new <see cref="LdapService"/>.</returns>
     /// <exception cref="ArgumentException">An environment variable is not set or is an empty string.</exception>
     /// <exception cref="FormatException">The value of <paramref name="portEnv"/> cannot be converted into an integer.</exception>
     /// <exception cref="OverflowException">The value of <paramref name="portEnv"/> would overflow an integer.</exception>
-    public static LdapHelper FromEnvs(string serverEnv = "LDAP_ADDRESS", string portEnv = "LDAP_PORT", string userEnv = "LDAP_USERNAME", string passwordEnv = "LDAP_PASSWORD") {
-        return new LdapHelper(
+    public static LdapService FromEnvs(string serverEnv = "LDAP_ADDRESS", string portEnv = "LDAP_PORT", string userEnv = "LDAP_USERNAME", string passwordEnv = "LDAP_PASSWORD") {
+        return new LdapService(
             Environment.GetEnvironmentVariable(serverEnv).ThrowIfNullOrEmpty(serverEnv),
             int.Parse(Environment.GetEnvironmentVariable(portEnv).ThrowIfNullOrEmpty(portEnv)),
             Environment.GetEnvironmentVariable(userEnv).ThrowIfNullOrEmpty(userEnv),

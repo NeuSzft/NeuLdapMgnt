@@ -11,7 +11,7 @@ namespace NeuLdapMgnt.Api.Endpoints;
 
 public static class StudentEndpoints {
     public static void MapStudentEndpoints(this WebApplication app) {
-        app.MapGet("/students", (LdapHelper ldapHelper, HttpRequest request) => {
+        app.MapGet("/students", (LdapService ldapHelper, HttpRequest request) => {
                Student[] students = ldapHelper.GetAllEntities<Student>().ToArray();
                return new RequestResult<Student>().SetValues(students).RenewToken(request).ToResult();
            })
@@ -22,7 +22,7 @@ public static class StudentEndpoints {
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapGet("/students/{id}", (LdapHelper ldapHelper, HttpRequest request, long id) => {
+        app.MapGet("/students/{id}", (LdapService ldapHelper, HttpRequest request, long id) => {
                var result = ldapHelper.TryGetEntity<Student>(id);
                return result.RenewToken(request).ToResult();
            })
@@ -35,7 +35,7 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status404NotFound)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapPost("/students", async (LdapHelper ldapHelper, HttpRequest request) => {
+        app.MapPost("/students", async (LdapService ldapHelper, HttpRequest request) => {
                var result = await ModelValidator.ValidateRequest<Student>(request);
                if (result.IsFailure())
                    return result.RenewToken(request).ToResult();
@@ -51,7 +51,7 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status409Conflict)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapPut("/students/{id}", async (LdapHelper ldapHelper, HttpRequest request, long id) => {
+        app.MapPut("/students/{id}", async (LdapService ldapHelper, HttpRequest request, long id) => {
                var result = await ModelValidator.ValidateRequest<Student>(request);
                if (result.IsFailure())
                    return result.RenewToken(request).ToResult();
@@ -67,7 +67,7 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status404NotFound)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapDelete("/students/{id}", (LdapHelper ldapHelper, HttpRequest request, long id) =>
+        app.MapDelete("/students/{id}", (LdapService ldapHelper, HttpRequest request, long id) =>
                ldapHelper.TryDeleteEntity<Student>(id).RenewToken(request).ToResult()
            )
            .WithOpenApi()
@@ -79,7 +79,7 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status404NotFound)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapPost("/students/import", async (LdapHelper ldapHelper, HttpRequest request) => {
+        app.MapPost("/students/import", async (LdapService ldapHelper, HttpRequest request) => {
                using StreamReader reader = new(request.Body);
 
                var results = await Utils.CsvToStudents(reader);
@@ -97,7 +97,7 @@ public static class StudentEndpoints {
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapGet("/students/export", (LdapHelper ldapHelper) => {
+        app.MapGet("/students/export", (LdapService ldapHelper) => {
                IEnumerable<Student> students = ldapHelper.GetAllEntities<Student>();
 
                StringBuilder sb = new();

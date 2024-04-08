@@ -68,7 +68,7 @@ internal static class Utils {
     }
 }
 
-internal static class ExtensionsUtils {
+internal static class ExtensionUtils {
     /// <summary>If the provided string is <c>null</c> or has the length of zero then it returns <paramref name="defaultStr"/>, otherwise it returns the original string.</summary>
     /// <param name="str">The original string.</param>
     /// <param name="defaultStr">The string to return if the the original string is null or empty.</param>
@@ -119,7 +119,7 @@ internal static class ExtensionsUtils {
     /// <typeparam name="R">The type of the result which must inherit from <see cref="RequestResult"/>.</typeparam>
     /// <returns>The <paramref name="result"/> with it's <c>NewToken</c> set.</returns>
     public static R RenewToken<R>(this R result, HttpRequest request) where R : RequestResult {
-        result.SetToken(AuthHelper.RenewToken(request));
+        result.SetToken(Authenticator.RenewToken(request));
         return result;
     }
 

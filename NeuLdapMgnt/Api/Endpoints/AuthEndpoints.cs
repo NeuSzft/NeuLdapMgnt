@@ -6,8 +6,8 @@ namespace NeuLdapMgnt.Api.Endpoints;
 public static class AuthEndpoints {
     public static void MapAuthEndpoints(this WebApplication app) {
         app.MapGet("/auth", (HttpRequest request) => {
-               var result = AuthHelper.BasicAuth(request);
-               return result.Username is null ? result.ToResult() : Results.Text(AuthHelper.CreateToken(result.Username));
+               var result = Authenticator.BasicAuth(request);
+               return result.Username is null ? result.ToResult() : Results.Text(Authenticator.CreateToken(result.Username));
            })
            .WithOpenApi()
            .WithName("BasicAuth")

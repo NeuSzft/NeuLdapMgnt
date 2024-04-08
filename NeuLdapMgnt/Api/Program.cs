@@ -18,8 +18,8 @@ internal static class Program {
     public static readonly string TokenIssuer = typeof(Program).Assembly.FullName!;
 
     public static void Main(string[] args) {
-        LdapHelper ldapHelper = LdapHelper.FromEnvs();
-        ldapHelper.DnBase = "dc=test,dc=local";
+        LdapService ldapService = LdapService.FromEnvs();
+        ldapService.DnBase = "dc=test,dc=local";
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -76,11 +76,11 @@ internal static class Program {
         // Add other services
         builder.Services.AddCors();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSingleton<LdapHelper>(_ => ldapHelper);
+        builder.Services.AddSingleton<LdapService>(_ => ldapService);
         builder.Services.AddSwaggerWrapperGen();
 
         WebApplication app = builder.Build();
-        ldapHelper.Logger = app.Logger;
+        ldapService.Logger = app.Logger;
 
         // Add a middleware that logs each request to the console
         app.Use(async (HttpContext context, RequestDelegate next) => {
