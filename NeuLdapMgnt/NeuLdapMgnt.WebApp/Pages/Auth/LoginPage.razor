@@ -28,7 +28,7 @@
 		try
 		{
 			await ApiRequests.LoginAsync(credentials.Username, credentials.Password);
-			NavManager.NavigateTo("/home");
+			NavManager.NavigateTo("/");
 		}
 		catch (Exception e)
 		{
