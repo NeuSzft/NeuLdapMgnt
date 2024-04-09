@@ -10,12 +10,31 @@ public static class LdapServiceGroupExtensions {
     /// <summary>Checks if the group exists within the database using it's uid.</summary>
     /// <param name="service">The <see cref="LdapService"/> the method should use.</param>
     /// <param name="name">The name of the group.</param>
-    /// <returns>Returns <c>true</c> if the group exists. If it does not exist or the search request fails it returns <c>false</c>.</returns>
+    /// <returns><c>true</c> if the group exists. If it does not exist or the search request fails it returns <c>false</c>.</returns>
     public static bool GroupExists(this LdapService service, string name) {
         SearchRequest   request  = new($"ou={name},{service.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = service.TryRequest(request) as SearchResponse;
 
         return response?.Entries.Count == 1;
+    }
+
+    /// <summary>Checks if the entity with the uid is part of the group.</summary>
+    /// <param name="service">The <see cref="LdapService"/> the method should use.</param>
+    /// <param name="name">The name of the group.</param>
+    /// <param name="id">The uid of the entity.</param>
+    /// <returns><c>true</c> if the entity is part of the group, <c>false</c> if not or the group does not exist.</returns>
+    /// <remarks>This method does not check if the entity actually exists or not.</remarks>
+    public static bool PartOfGroup(this LdapService service, string name, long id) {
+        SearchRequest   request  = new($"ou={name},{service.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
+        SearchResponse? response = service.TryRequest(request) as SearchResponse;
+
+        if (response is null || response.Entries.Count == 0)
+            return false;
+
+        foreach (string value in response.Entries[0].Attributes["uid"].GetValues(typeof(string)).Cast<string>())
+            if (long.TryParse(value, out var uid) && uid == id)
+                return true;
+        return false;
     }
 
     /// <summary>Tries to add the group to the database with the specified name.</summary>
@@ -26,7 +45,10 @@ public static class LdapServiceGroupExtensions {
         if (service.GroupExists(name))
             return new RequestResult().SetStatus(StatusCodes.Status409Conflict).SetErrors("The group already exists.");
 
-        AddRequest request = new($"ou={name},{service.DnBase}", new("organizationalUnit"), new("uidObject"));
+        AddRequest request = new($"ou={name},{service.DnBase}",
+            new("objectClass", "organizationalUnit", "uidObject"),
+            new("uid", "__DEFAULT__")
+        );
 
         if (service.TryRequest(request, out var error) is not null)
             return new RequestResult().SetStatus(StatusCodes.Status201Created);
@@ -54,8 +76,10 @@ public static class LdapServiceGroupExtensions {
     /// <param name="id">The uid of the entity to add.</param>
     /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
     public static RequestResult TryAddEntityToGroup(this LdapService service, string name, long id) {
-        if (!service.GroupExists(name))
-            return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The group does not exist.");
+        service.TryAddGroup(name);
+
+        if (service.PartOfGroup(name, id))
+            return new RequestResult().SetStatus(StatusCodes.Status409Conflict).SetErrors("Already part of group.");
 
         ModifyRequest request = new($"ou={name},{service.DnBase}");
 
@@ -67,7 +91,7 @@ public static class LdapServiceGroupExtensions {
         request.Modifications.Add(mod);
 
         if (service.TryRequest(request, out var error) is not null)
-            return new RequestResult().SetStatus(StatusCodes.Status201Created);
+            return new RequestResult().SetStatus(StatusCodes.Status200OK);
         return new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
     }
 
@@ -77,8 +101,7 @@ public static class LdapServiceGroupExtensions {
     /// <param name="ids">The uids to be added.</param>
     /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
     public static RequestResult TryAddEntitiesToGroup(this LdapService service, string name, IEnumerable<long> ids) {
-        if (!service.GroupExists(name))
-            return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The group does not exist.");
+        service.TryAddGroup(name);
 
         var requests = ids.Select(id => {
             ModifyRequest request = new($"ou={name},{service.DnBase}");
@@ -105,6 +128,9 @@ public static class LdapServiceGroupExtensions {
     public static RequestResult TryRemoveEntityFromGroup(this LdapService service, string name, long id) {
         if (!service.GroupExists(name))
             return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The group does not exist.");
+
+        if (!service.PartOfGroup(name, id))
+            return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("Not part of group.");
 
         ModifyRequest request = new($"ou={name},{service.DnBase}");
 
