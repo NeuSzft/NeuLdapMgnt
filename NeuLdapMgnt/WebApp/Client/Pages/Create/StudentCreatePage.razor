@@ -2,19 +2,22 @@
 
 <PageTitle>Add student</PageTitle>
 
-	<div class="row">
-		<div class="col-12 col-md">
-			<h1 class="d-inline-block">Add student</h1>
-		</div>
-		<div class="col-12 col-xl text-end">
-			<FileUpload OnFileUploaded="OnFileUploaded" />
-		</div>
+<div class="row">
+	<div class="col-12 col-md">
+		<h1 class="d-inline-block">Add student</h1>
 	</div>
+	<div class="col-12 col-xl text-end">
+		<FileUpload OnFileUploaded="OnFileUploaded" />
+	</div>
+</div>
 
 <BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="HandleStudentUpdated" />
 
+<ModalErrorList Title="Error" ErrorList="ErrorList" />
+
 @code {
 	private Student? student = StudentFactory.CreateEmptyStudent().Build();
+	private List<string> ErrorList = new();
 
 	protected override void OnInitialized()
 	{
@@ -55,11 +58,12 @@
 				Console.WriteLine("Successfully added students");
 				NavManager.NavigateTo("/students");
 			}
-			
+
 			if (response.Errors.Any())
 			{
 				// Add a modal to display all errors.
 				Console.WriteLine("Errors:\n" + string.Join('\n', response.Errors));
+				ErrorList = response.Errors.ToList();
 			}
 		}
 		catch (Exception e)
