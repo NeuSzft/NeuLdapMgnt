@@ -8,7 +8,7 @@ using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;
 
-public static class LdapServiceExtensions {
+public static class LdapServiceEntityExtensions {
     /// <summary>Checks if the entity exists within the database using it's uid.</summary>
     /// <param name="service">The <see cref="LdapService"/> the method should use.</param>
     /// <param name="id">The uid of the entity.</param>
