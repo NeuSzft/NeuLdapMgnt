@@ -1,81 +1,50 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-	<div class="container-fluid">
-		<a class="navbar-brand" href="home">Neu LDAP Management</a>
-		<button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-	</div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-	<nav class="flex-column">
-		@if (!isAuthenticated)
-		{
-			<div class="nav-item px-3">
-				<NavLink class="nav-link" href="login">
-					<i class="bi bi-box-arrow-in-right fs-4 mx-2"></i>
-					Login
-				</NavLink>
-			</div>
-		}
-		else
-		{
-			<div class="nav-item px-3">
-				<NavLink class="nav-link" href="/home" Match="NavLinkMatch.All">
-					<i class="bi bi-house fs-4 mx-2"></i>
-					Home
-				</NavLink>
-			</div>
-			<div class="nav-item px-3">
-				<NavLink class="nav-link" href="/students">
-					<i class="bi bi-backpack3 fs-4 mx-2"></i>
-					Students
-				</NavLink>
-				<div class="nav-group ms-4 mt-1">
-					<NavLink class="nav-link" href="/students/add">
-						<i class="bi bi-person-plus fs-4 mx-2"></i>
-						Add Student
-					</NavLink>
-				</div>
-			</div>
-			<div class="nav-item px-3">
-				<NavLink class="nav-link" href="/teachers">
-					<i class="bi bi-person-workspace fs-4 mx-2"></i>
-					Teachers
-				</NavLink>
-				<div class="nav-group ps-4 mt-1">
-					<NavLink class="nav-link" href="/teachers/add">
-						<i class="bi bi-person-plus fs-4 mx-2"></i>
-						Add Teacher
-					</NavLink>
-				</div>
-			</div>
-			<div class="nav-item px-3">
-				<NavLink class="nav-link" href="/admins">
-					<i class="bi bi-person-wheelchair fs-4 mx-2"></i>
-					Admins
-				</NavLink>
-				<div class="nav-group ps-4 mt-1">
-					<NavLink class="nav-link" href="/admins/add">
-						<i class="bi bi-person-plus fs-4 mx-2"></i>
-						Add Admin
-					</NavLink>
-				</div>
-			</div>
-			<div class="nav-item px-3">
-				<a class="nav-link" href="/login" @onclick="ApiRequests.Logout">
-					<i class="bi bi-box-arrow-in-left fs-4 mx-2"></i>
-					Logout
-				</a>
-			</div>
-		}
-	</nav>
-</div>
+﻿@if (isAuthenticated)
+{
+	<Sidebar2 IconName="IconName.Database"
+			  Title="LDAP Management"
+			  BadgeText="v0.1"
+			  DataProvider="SidebarDataProvider" />
+}
 
 @code {
+	private Sidebar sidebar = new();
+	private List<NavItem>? navItems;
+
 	private bool collapseNavMenu = true;
 	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 	private bool isAuthenticated;
+
+	private async Task<Sidebar2DataProviderResult> SidebarDataProvider(Sidebar2DataProviderRequest request)
+	{
+		if (navItems is null)
+			navItems = GetNavItems();
+
+		return await Task.FromResult(request.ApplyTo(navItems));
+	}
+
+	private List<NavItem> GetNavItems()
+	{
+		navItems = new List<NavItem>
+		{
+			new NavItem { Id = "1", Href = "/", Match = NavLinkMatch.All, IconName = IconName.HouseDoor, Text = "Home"},
+
+			new NavItem { Id = "10", Text = "Students" },
+			new NavItem { Id = "11", Href = "/students", Match = NavLinkMatch.All, IconName = IconName.Eye, Text = "View Students", ParentId="10" },
+			new NavItem { Id = "12", Href = "/students/add", Match = NavLinkMatch.All, IconName = IconName.PersonAdd, Text = "Add Student", ParentId="10" },
+
+			new NavItem { Id = "20", Text = "Teachers" },
+			new NavItem { Id = "21", Href= "/teachers", Match = NavLinkMatch.All, IconName = IconName.Eye, Text = "View Teachers", ParentId="20" },
+			new NavItem { Id = "22", Href = "/teachers/add", Match = NavLinkMatch.All, IconName = IconName.PersonAdd, Text = "Add Teacher", ParentId="20" },
+
+			new NavItem { Id = "30", Text = "Admins" },
+			new NavItem { Id = "31", Href = "/admins", Match = NavLinkMatch.All, IconName = IconName.Eye, Text = "View Admins", ParentId="30" },
+			new NavItem { Id = "32", Href = "/admins/add", Match = NavLinkMatch.All, IconName = IconName.PersonAdd, Text = "Add Admin", ParentId="30" },
+
+			new NavItem { Id = "99", Href = "/logout", IconName = IconName.DoorOpen, Text = "Logout" },
+		};
+
+		return navItems;
+	}
 
 	protected override void OnInitialized()
 	{
@@ -87,11 +56,6 @@
 	{
 		isAuthenticated = ApiRequests.IsAuthenticated;
 		StateHasChanged();
-	}
-
-	private void ToggleNavMenu()
-	{
-		collapseNavMenu = !collapseNavMenu;
 	}
 }
 
