@@ -1,0 +1,75 @@
+﻿@page "/students/add"
+
+<PageTitle>Add student</PageTitle>
+
+<div class="row">
+	<div class="col-12 col-md">
+		<h1 class="d-inline-block">Add student</h1>
+	</div>
+	<div class="col-12 col-xl text-end">
+		<FileUpload OnFileUploaded="OnFileUploaded" />
+	</div>
+</div>
+
+<BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="HandleStudentUpdated" />
+
+<ModalErrorList Title="Error" ErrorList="ErrorList" />
+
+@code {
+	private Student? student = StudentFactory.CreateEmptyStudent().Build();
+	private List<string> ErrorList = new();
+
+	protected override void OnInitialized()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+	}
+
+
+	private async Task HandleStudentUpdated(Student studentUpdated)
+	{
+		if (student!.Equals(studentUpdated)) return;
+
+		try
+		{
+			await ApiRequests.AddStudentAsync(studentUpdated);
+			NavManager.NavigateTo("/students");
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e.Message);
+		}
+	}
+
+	private async Task OnFileUploaded(IBrowserFile file)
+	{
+		try
+		{
+			var response = await ApiRequests.UploadFileAsync(file);
+			if (response is null)
+			{
+				// Add a modal to display no response error.
+				Console.WriteLine("No response from the api.");
+				return;
+			}
+
+			if (response.IsSuccess())
+			{
+				// Add a modal to display successful deletion.
+				Console.WriteLine("Successfully added students");
+				NavManager.NavigateTo("/students");
+			}
+
+			if (response.Errors.Any())
+			{
+				// Add a modal to display all errors.
+				Console.WriteLine("Errors:\n" + string.Join('\n', response.Errors));
+				ErrorList = response.Errors.ToList();
+			}
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
+	}
+}
+

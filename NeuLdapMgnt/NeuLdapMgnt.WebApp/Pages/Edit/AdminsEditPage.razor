@@ -1,6 +1,10 @@
-﻿@page "/"
+﻿@page "/admins/edit"
 
-@code{
+<PageTitle>Edit Admins</PageTitle>
+
+<h1>Edit Admins</h1>
+
+@code {
 	protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);

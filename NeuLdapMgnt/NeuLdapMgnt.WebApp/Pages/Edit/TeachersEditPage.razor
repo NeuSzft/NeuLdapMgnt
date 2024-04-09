@@ -1,9 +1,14 @@
-﻿@page "/"
+﻿@page "/teachers/edit"
 
-@code{
+<PageTitle>Edit Teachers</PageTitle>
+
+<h1>Edit Teachers</h1>
+
+@code {
 	protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 	}
 }
+
 

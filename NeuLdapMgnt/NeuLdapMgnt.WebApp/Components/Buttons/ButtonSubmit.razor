@@ -1,0 +1,12 @@
+﻿<button type="submit" class="btn btn-success" disabled="@IsDisabled">
+	<i class="bi bi-check-lg fs-5"></i>
+	@Text
+</button>
+
+@code {
+	[Parameter]
+	public string Text { get; set; } = string.Empty;
+
+	[Parameter]
+	public bool IsDisabled { get; set; }
+}

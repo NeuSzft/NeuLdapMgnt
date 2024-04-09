@@ -1,0 +1,49 @@
+﻿<div class="input-group">
+	<label class="input-group-text" for="file-upload">Upload</label>
+	@foreach (var extension in AllowedExtensions)
+	{
+		<label class="input-group-text" for="file-upload">
+			<i class="bi bi-filetype-@extension.TrimStart('.') fs-5"></i>
+		</label>
+	}
+	<InputFile id="file-upload"
+			   class="form-control form-control-lg"
+			   accept="@GetExtensions()"
+			   OnChange="HandleFileUpload" />
+</div>
+
+@if (!string.IsNullOrEmpty(ValidationMessage))
+{
+	<label class="text-danger fw-bold">@ValidationMessage</label>
+}
+
+@code {
+	[Parameter]
+	public EventCallback<IBrowserFile> OnFileUploaded { get; set; }
+
+	[Parameter]
+	public IEnumerable<string> AllowedExtensions { get; set; } = new List<string> { ".csv" };
+
+	private string ValidationMessage { get; set; } = string.Empty;
+
+	private async Task HandleFileUpload(InputFileChangeEventArgs e)
+	{
+		var file = e.File;
+		if (file != null)
+		{
+			var extension = Path.GetExtension(file.Name).ToLowerInvariant();
+
+			if (!AllowedExtensions.Any() || AllowedExtensions.Contains(extension))
+			{
+				ValidationMessage = string.Empty;
+				await OnFileUploaded.InvokeAsync(file);
+			}
+			else
+			{
+				ValidationMessage = "File extension not allowed.";
+			}
+		}
+	}
+
+	private string GetExtensions() => string.Join(",", AllowedExtensions);
+}
