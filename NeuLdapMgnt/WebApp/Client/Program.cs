@@ -10,4 +10,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddSingleton<Utils>();
 builder.Services.AddSingleton<ApiRequests>();
 
+builder.Services.AddBlazorBootstrap();
+
 await builder.Build().RunAsync();
