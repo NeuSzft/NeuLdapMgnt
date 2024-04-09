@@ -11,9 +11,18 @@
 	</div>
 </div>
 
-@if (!Lists.Students.Any())
+@if (IsLoading)
 {
 	<Loading />
+}
+else if (!Lists.Students.Any())
+{
+	<div class="d-flex justify-content-center text-center">
+		<div>
+			<h3>There are no students in the database</h3>
+			<ButtonAdd Text="Add Students" OnClick="ToAddPage"/>
+		</div>
+	</div>
 }
 else
 {
@@ -22,6 +31,8 @@ else
 
 
 @code {
+	private bool IsLoading { get; set; } = true;
+
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
@@ -32,6 +43,7 @@ else
 	{
 		try
 		{
+			IsLoading = true;
 			Lists.Students.Clear();
 			var response = await ApiRequests.GetStudentsAsync();
 
@@ -45,12 +57,14 @@ else
 			if (response.IsSuccess())
 			{
 				Lists.Students = new(response.Values);
+				IsLoading = false;
 			}
 
 			if (response.Errors.Any())
 			{
 				// Add a modal to display all errors.
 				Console.WriteLine("Errors:\n" + string.Join('\n', response.Errors));
+
 			}
 
 			StateHasChanged();
@@ -59,6 +73,11 @@ else
 		{
 			Console.WriteLine(e);
 		}
+	}
+
+	private void ToAddPage()
+	{
+		NavManager.NavigateTo("/students/add");
 	}
 }
 

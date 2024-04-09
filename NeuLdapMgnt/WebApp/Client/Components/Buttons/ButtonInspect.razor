@@ -1,4 +1,4 @@
-﻿<button class="btn btn-primary" @onclick="Inspect">
+﻿<button class="btn btn-primary" disabled="@IsDisabled" @onclick="Inspect">
     <i class="bi bi-eye"></i>
     @Text
 </button>
@@ -12,6 +12,9 @@
 
     [Parameter]
     public Student? Student { get; set; }
+
+    [Parameter]
+    public bool IsDisabled { get; set; }
 
     private async Task Inspect()
     {
