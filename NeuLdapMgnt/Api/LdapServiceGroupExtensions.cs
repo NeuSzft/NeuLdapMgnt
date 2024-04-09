@@ -31,10 +31,27 @@ public static class LdapServiceGroupExtensions {
         if (response is null || response.Entries.Count == 0)
             return false;
 
-        foreach (string value in response.Entries[0].Attributes["uid"].GetValues(typeof(string)).Cast<string>())
+        foreach (string value in response.Entries[0].Attributes["uid"].GetValues(typeof(string)))
             if (long.TryParse(value, out var uid) && uid == id)
                 return true;
         return false;
+    }
+
+    /// <summary>Gets the uids of the members of the group.</summary>
+    /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
+    /// <param name="name">The name of the group.</param>
+    /// <returns>An <see cref="IEnumerable{T}">IEnumerable&lt;long&gt;</see> containing the uids.</returns>
+    /// <remarks>If the group does not exist it returns an empty collection.</remarks>
+    public static IEnumerable<long> GetMembersOfGroup(this LdapService ldap, string name) {
+        SearchRequest   request  = new($"ou={name},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Subtree, null);
+        SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
+
+        if (response is null || response.Entries.Count == 0)
+            yield break;
+
+        foreach (string value in response.Entries[0].Attributes["uid"].GetValues(typeof(string)))
+            if (long.TryParse(value, out var uid))
+                yield return uid;
     }
 
     /// <summary>Tries to add the group to the database with the specified name.</summary>
