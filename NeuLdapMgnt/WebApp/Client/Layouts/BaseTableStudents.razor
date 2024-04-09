@@ -83,7 +83,7 @@
 	private List<Student> selectedStudents = new();
 	private Timer? searchDelayTimer;
 
-	private string sortBy = "";
+	private string sortBy = "Id";
 	private bool isAscending = true;
 
 	private string? searchQuery = string.Empty;
@@ -136,7 +136,7 @@
 		else
 		{
 			filteredStudents = Students
-				.Where(x => x.Id.ToString().StartsWith(searchQuery, StringComparison.OrdinalIgnoreCase)
+				.Where(x => x.Id.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
 							|| x.FullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
 							|| x.Class.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
 				.ToList();
