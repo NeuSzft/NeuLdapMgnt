@@ -11,8 +11,8 @@ namespace NeuLdapMgnt.Api.Endpoints;
 
 public static class StudentEndpoints {
     public static void MapStudentEndpoints(this WebApplication app) {
-        app.MapGet("/students", (LdapService ldapHelper, HttpRequest request) => {
-               Student[] students = ldapHelper.GetAllEntities<Student>().ToArray();
+        app.MapGet("/students", (LdapService ldap, HttpRequest request) => {
+               Student[] students = ldap.GetAllEntities<Student>().ToArray();
                return new RequestResult<Student>().SetValues(students).RenewToken(request).ToResult();
            })
            .WithOpenApi()
@@ -22,8 +22,8 @@ public static class StudentEndpoints {
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapGet("/students/{id}", (LdapService ldapHelper, HttpRequest request, long id) => {
-               var result = ldapHelper.TryGetEntity<Student>(id);
+        app.MapGet("/students/{id}", (LdapService ldap, HttpRequest request, long id) => {
+               var result = ldap.TryGetEntity<Student>(id);
                return result.RenewToken(request).ToResult();
            })
            .WithOpenApi()
@@ -35,11 +35,11 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status404NotFound)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapPost("/students", async (LdapService ldapHelper, HttpRequest request) => {
+        app.MapPost("/students", async (LdapService ldap, HttpRequest request) => {
                var result = await ModelValidator.ValidateRequest<Student>(request);
                if (result.IsFailure())
                    return result.RenewToken(request).ToResult();
-               return ldapHelper.TryAddEntity(result.GetValue()!, result.GetValue()!.Id).RenewToken(request).ToResult();
+               return ldap.TryAddEntity(result.GetValue()!, result.GetValue()!.Id).RenewToken(request).ToResult();
            })
            .WithOpenApi()
            .WithTags("Students")
@@ -51,11 +51,11 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status409Conflict)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapPut("/students/{id}", async (LdapService ldapHelper, HttpRequest request, long id) => {
+        app.MapPut("/students/{id}", async (LdapService ldap, HttpRequest request, long id) => {
                var result = await ModelValidator.ValidateRequest<Student>(request);
                if (result.IsFailure())
                    return result.RenewToken(request).ToResult();
-               return ldapHelper.TryModifyEntity(result.GetValue()!, id).RenewToken(request).ToResult();
+               return ldap.TryModifyEntity(result.GetValue()!, id).RenewToken(request).ToResult();
            })
            .WithOpenApi()
            .WithTags("Students")
@@ -67,8 +67,8 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status404NotFound)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapDelete("/students/{id}", (LdapService ldapHelper, HttpRequest request, long id) =>
-               ldapHelper.TryDeleteEntity<Student>(id).RenewToken(request).ToResult()
+        app.MapDelete("/students/{id}", (LdapService ldap, HttpRequest request, long id) =>
+               ldap.TryDeleteEntity<Student>(id).RenewToken(request).ToResult()
            )
            .WithOpenApi()
            .WithTags("Students")
@@ -79,14 +79,14 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status404NotFound)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapPost("/students/import", async (LdapService ldapHelper, HttpRequest request) => {
+        app.MapPost("/students/import", async (LdapService ldap, HttpRequest request) => {
                using StreamReader reader = new(request.Body);
 
                var results = await Utils.CsvToStudents(reader);
                if (results.Error is not null)
                    return Results.Text(results.Error, "text/plain", null, StatusCodes.Status400BadRequest);
 
-               return ldapHelper.TryAddEntities(results.Students, student => student.Id).RenewToken(request).ToResult();
+               return ldap.TryAddEntities(results.Students, student => student.Id).RenewToken(request).ToResult();
            })
            .WithOpenApi()
            .WithTags("Students")
@@ -97,8 +97,8 @@ public static class StudentEndpoints {
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapGet("/students/export", (LdapService ldapHelper) => {
-               IEnumerable<Student> students = ldapHelper.GetAllEntities<Student>();
+        app.MapGet("/students/export", (LdapService ldap) => {
+               IEnumerable<Student> students = ldap.GetAllEntities<Student>();
 
                StringBuilder sb = new();
                foreach (Student s in students)
