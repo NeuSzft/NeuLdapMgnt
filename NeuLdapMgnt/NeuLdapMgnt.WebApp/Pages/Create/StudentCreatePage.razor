@@ -13,8 +13,6 @@
 
 <BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="HandleStudentUpdated" />
 
-<ModalErrorList Title="Error" ErrorList="ErrorList" />
-
 @code {
 	private Student? student = StudentFactory.CreateEmptyStudent().Build();
 	private List<string> ErrorList = new();

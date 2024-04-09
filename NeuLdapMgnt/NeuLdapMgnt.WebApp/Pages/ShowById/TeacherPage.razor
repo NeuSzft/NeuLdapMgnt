@@ -1,6 +1,11 @@
-﻿<h3>Teacher</h3>
+﻿@page "/teachers/{id}"
+
+<h3>Teacher</h3>
 
 @code {
+	[Parameter]
+	public string Id { get; set; } = null!;
+
 	protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
