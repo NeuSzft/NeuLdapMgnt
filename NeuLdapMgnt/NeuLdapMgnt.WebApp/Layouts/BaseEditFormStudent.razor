@@ -6,17 +6,17 @@
 	<div class="text-end">
 		@if (IsReadonly)
 		{
-			<ButtonEdit OnClick="ToggleReadonly" Text="Edit"/>
+			<ButtonEdit OnClick="ToggleReadonly" Text="Edit" />
 		}
 	</div>
 
 	<div class="form-floating">
-		<InputNumber class="form-control"
-					 disabled="@(CanDelete || IsReadonly)"
-					 id="student-id"
-					 min="@Student.AllowedIdRange.Min"
-					 max="@Student.AllowedIdRange.Max"
-					 @bind-Value="studentUpdated!.Id" />
+		<NumberInput Disabled="@(CanDelete || IsReadonly)"
+					 @bind-Value="studentUpdated!.Id"
+					 TValue="long"
+					 Min="@Student.AllowedIdRange.Min"
+					 Max="@Student.AllowedIdRange.Max"
+					 id="student-id" />
 		<label for="student-id">OM</label>
 		<ValidationMessage For="() => studentUpdated.Id" />
 	</div>
@@ -31,27 +31,27 @@
 			}
 		</label>
 
-		<div class="form-floating col-12 col-md">
-			<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
-			<label for="given-name">First</label>
-			<ValidationMessage For="() => studentUpdated.FirstName" />
-		</div>
-
-		<div class="form-floating col-12 col-md">
-			<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
-			<label for="last-name">Last</label>
-			<ValidationMessage For="() => studentUpdated.LastName" />
-		</div>
-
-		<div class="form-floating col-12 col-md">
-			<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
-			<label for="middle-name">Middle</label>
-			<ValidationMessage For="() => studentUpdated.MiddleName" />
+		<div class="d-flex flex-column flex-md-row gap-2 w-100">
+			<div class="form-floating w-100">
+				<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
+				<label for="givenName">First</label>
+				<ValidationMessage For="() => studentUpdated.FirstName" />
+			</div>
+			<div class="form-floating w-100">
+				<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
+				<label for="lastName">Last</label>
+				<ValidationMessage For="() => studentUpdated.LastName" />
+			</div>
+			<div class="form-floating w-100">
+				<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
+				<label for="middleName">Middle</label>
+				<ValidationMessage For="() => studentUpdated.MiddleName" />
+			</div>
 		</div>
 	</div>
 
 	<div class="input-group gap-2 align-items-center">
-		<label class="input-group-text user-select-none col-12 rounded gap-2" for="class-year-select">
+		<label class="input-group-text user-select-none w-100 rounded gap-2" for="class-year-select">
 			Class
 			@if (!IsReadonly && studentUpdated.ClassYear != string.Empty)
 			{
@@ -59,25 +59,25 @@
 				<span>[@studentUpdated.Class]</span>
 			}
 		</label>
-
-		<div class="form-floating col">
-			<InputSelect class="form-select rounded" id="class-year-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassYear">
-				@foreach(string year in Student.AllowedYears)
-				{
-					<option value="@year" selected="@year.Equals(studentUpdated.ClassYear)">@year</option>
-				}
-			</InputSelect>
-			<label for="class-year-select">Year</label>
-		</div>
-
-		<div class="form-floating col">
-			<InputSelect class="form-select rounded" id="class-group-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassGroup">
-				@foreach (var group in Student.AllowedGroups)
-				{
-					<option value="@group" selected="@group.Equals(studentUpdated.ClassGroup)">@group</option>
-				}
-			</InputSelect>
-			<label for="class-group-select">Group</label>
+		<div class="d-flex flex-column flex-md-row gap-2 w-100">
+			<div class="form-floating w-100">
+				<InputSelect class="form-select rounded" id="class-year-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassYear">
+					@foreach (string year in Student.AllowedYears)
+					{
+						<option value="@year" selected="@year.Equals(studentUpdated.ClassYear)">@year</option>
+					}
+				</InputSelect>
+				<label for="class-year-select">Year</label>
+			</div>
+			<div class="form-floating w-100">
+				<InputSelect class="form-select rounded" id="class-group-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassGroup">
+					@foreach (var group in Student.AllowedGroups)
+					{
+						<option value="@group" selected="@group.Equals(studentUpdated.ClassGroup)">@group</option>
+					}
+				</InputSelect>
+				<label for="class-group-select">Group</label>
+			</div>
 		</div>
 	</div>
 	<ValidationMessage For="() => studentUpdated.Class" />
@@ -89,23 +89,23 @@
 	</div>
 
 	<div class="form-floating">
-		<InputNumber class="form-control"
-					 disabled="@IsReadonly"
-					 id="user-id"
-					 min="@Student.AllowedUidRange.Min"
-					 max="@Student.AllowedUidRange.Max"
-					 @bind-Value="studentUpdated.Uid" />
+		<NumberInput Disabled="@IsReadonly"
+					 @bind-Value="studentUpdated.Uid"
+					 TValue="int"
+					 Min="@Student.AllowedUidRange.Min"
+					 Max="@Student.AllowedUidRange.Max"
+					 id="user-id" />
 		<label for="user-id">User Id</label>
 		<ValidationMessage For="() => studentUpdated.Uid" />
 	</div>
 
 	<div class="form-floating">
-		<InputNumber class="form-control"
-					 disabled="@IsReadonly"
-					 id="group-id"
-					 min="@Student.AllowedGidRange.Min"
-					 max="@Student.AllowedGidRange.Max"
-					 @bind-Value="studentUpdated.Gid" />
+		<NumberInput Disabled="@IsReadonly"
+					 @bind-Value="studentUpdated.Gid"
+					 TValue="int"
+					 Min="@Student.AllowedGidRange.Min"
+					 Max="@Student.AllowedGidRange.Max"
+					 id="group-id" />
 		<label for="group-id">Group Id</label>
 		<ValidationMessage For="() => studentUpdated.Gid" />
 	</div>
@@ -135,11 +135,11 @@
 			{
 				<ButtonDelete OnClick="DeleteStudent" Text="Delete" />
 			}
-			<ButtonCancel OnClick="ToggleReadonly" Text="Cancel"/>
+			<ButtonCancel OnClick="ToggleReadonly" Text="Cancel" />
 			<ButtonSubmit Text="Submit" />
 		</div>
 	}
-</EditForm>
+	</EditForm>
 
 	@code {
 	[Parameter]
