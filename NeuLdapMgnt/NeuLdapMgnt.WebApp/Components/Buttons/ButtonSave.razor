@@ -1,7 +1,7 @@
-﻿<button type="button" class="btn btn-success" disabled="@IsDisabled" @onclick="HandleOnClick" data-bs-dismiss="@DataBsDismiss">
+﻿<Button Color="ButtonColor.Success" Disabled="IsDisabled" @onclick="HandleOnClick">
     <i class="bi bi-check-lg"></i>
     @Text
-</button>
+</Button>
 
 @code {
     [Parameter]
@@ -12,9 +12,6 @@
 
     [Parameter]
     public bool IsDisabled { get; set; }
-
-    [Parameter]
-    public string DataBsDismiss { get; set; } = string.Empty;
 
     private async Task HandleOnClick()
     {

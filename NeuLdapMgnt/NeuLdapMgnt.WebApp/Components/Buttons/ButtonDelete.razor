@@ -1,7 +1,7 @@
-﻿<button type="button" class="btn btn-danger" disabled="@IsDisabled" @onclick="HandleOnDelete">
+﻿<Button Color="ButtonColor.Danger" Disabled="IsDisabled" @onclick="HandleOnDelete">
 	<i class="bi bi-trash-fill"></i>
     @Text
-</button>
+</Button>
 
 @code {
     [Parameter]

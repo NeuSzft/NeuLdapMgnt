@@ -1,7 +1,7 @@
-﻿<button type="button" class="btn btn-secondary" disabled="@IsDisabled" @onclick="HandleOnCancel">
+﻿<Button Color="ButtonColor.Secondary" Disabled="IsDisabled" @onclick="HandleOnCancel">
 	<i class="bi bi-x-lg"></i>
     @Text
-</button>
+</Button>
 
 @code {
     [Parameter]
