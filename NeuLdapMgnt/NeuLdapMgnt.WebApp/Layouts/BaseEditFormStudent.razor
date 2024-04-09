@@ -12,7 +12,7 @@
 
 	<div class="form-floating">
 		<InputNumber class="form-control"
-					 readonly="@(CanDelete || IsReadonly)"
+					 disabled="@(CanDelete || IsReadonly)"
 					 id="student-id"
 					 min="@Student.AllowedIdRange.Min"
 					 max="@Student.AllowedIdRange.Max"
@@ -32,19 +32,19 @@
 		</label>
 
 		<div class="form-floating col-12 col-md">
-			<InputText class="form-control" readonly="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
+			<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
 			<label for="given-name">First</label>
 			<ValidationMessage For="() => studentUpdated.FirstName" />
 		</div>
 
 		<div class="form-floating col-12 col-md">
-			<InputText class="form-control" readonly="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
+			<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
 			<label for="last-name">Last</label>
 			<ValidationMessage For="() => studentUpdated.LastName" />
 		</div>
 
 		<div class="form-floating col-12 col-md">
-			<InputText class="form-control" readonly="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
+			<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
 			<label for="middle-name">Middle</label>
 			<ValidationMessage For="() => studentUpdated.MiddleName" />
 		</div>
@@ -61,7 +61,7 @@
 		</label>
 
 		<div class="form-floating col">
-			<InputSelect class="form-select" id="class-year-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassYear">
+			<InputSelect class="form-select rounded" id="class-year-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassYear">
 				@foreach(string year in Student.AllowedYears)
 				{
 					<option value="@year" selected="@year.Equals(studentUpdated.ClassYear)">@year</option>
@@ -71,7 +71,7 @@
 		</div>
 
 		<div class="form-floating col">
-			<InputSelect class="form-select" id="class-group-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassGroup">
+			<InputSelect class="form-select rounded" id="class-group-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassGroup">
 				@foreach (var group in Student.AllowedGroups)
 				{
 					<option value="@group" selected="@group.Equals(studentUpdated.ClassGroup)">@group</option>
@@ -83,14 +83,14 @@
 	<ValidationMessage For="() => studentUpdated.Class" />
 
 	<div class="form-floating">
-		<InputText class="form-control" readonly="@IsReadonly" id="username" @bind-Value="studentUpdated.Username" />
+		<InputText class="form-control" disabled="@IsReadonly" id="username" @bind-Value="studentUpdated.Username" />
 		<label for="username">Username</label>
 		<ValidationMessage For="() => studentUpdated.Username" />
 	</div>
 
 	<div class="form-floating">
 		<InputNumber class="form-control"
-					 readonly="@IsReadonly"
+					 disabled="@IsReadonly"
 					 id="user-id"
 					 min="@Student.AllowedUidRange.Min"
 					 max="@Student.AllowedUidRange.Max"
@@ -101,7 +101,7 @@
 
 	<div class="form-floating">
 		<InputNumber class="form-control"
-					 readonly="@IsReadonly"
+					 disabled="@IsReadonly"
 					 id="group-id"
 					 min="@Student.AllowedGidRange.Min"
 					 max="@Student.AllowedGidRange.Max"
@@ -111,19 +111,19 @@
 	</div>
 
 	<div class="form-floating">
-		<InputText class="form-control" readonly="@IsReadonly" id="email" placeholder="Student@example.com" @bind-Value="studentUpdated.Email" />
+		<InputText class="form-control" disabled="@IsReadonly" id="email" placeholder="Student@example.com" @bind-Value="studentUpdated.Email" />
 		<label for="email">Email</label>
 		<ValidationMessage For="() => studentUpdated.Email" />
 	</div>
 
 	<div class="form-floating">
-		<InputText class="form-control" readonly="@IsReadonly" id="home-directory" placeholder="/home/Student" @bind-Value="studentUpdated.HomeDirectory" />
+		<InputText class="form-control" disabled="@IsReadonly" id="home-directory" placeholder="/home/Student" @bind-Value="studentUpdated.HomeDirectory" />
 		<label for="home-directory">Directory</label>
 		<ValidationMessage For="() => studentUpdated.HomeDirectory" />
 	</div>
 
 	<div class="form-floating">
-		<InputText type="password" class="form-control" readonly="@IsReadonly" id="password" @bind-Value="studentUpdated.Password" />
+		<InputText type="password" class="form-control" disabled="@IsReadonly" id="password" @bind-Value="studentUpdated.Password" />
 		<label for="password">Password</label>
 		<ValidationMessage For="() => studentUpdated.Password" />
 	</div>
