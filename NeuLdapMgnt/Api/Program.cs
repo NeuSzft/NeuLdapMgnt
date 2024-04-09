@@ -111,7 +111,10 @@ internal static class Program {
 
         // Map endpoints
         app.MapAuthEndpoints();
+        app.MapClassEndpoints();
         app.MapStudentEndpoints();
+        app.MapInactiveUserEndpoints();
+        app.MapAdminUserEndpoints();
 
         // Map testing endpoints when in development mode
         if (app.Environment.IsDevelopment())
