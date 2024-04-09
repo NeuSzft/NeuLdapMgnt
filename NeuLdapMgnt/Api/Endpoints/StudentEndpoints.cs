@@ -112,5 +112,30 @@ public static class StudentEndpoints {
            .Produces<IFormFile>(StatusCodes.Status200OK, "text/csv")
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
+
+        app.MapPost("/students/{id}/deactivate", (LdapService ldapHelper, HttpRequest request, long id) => {
+               var result = ldapHelper.TryAddEntityToGroup("inactive", id);
+               return result.RenewToken(request).ToResult();
+           })
+           .WithOpenApi()
+           .WithTags("Students")
+           .RequireAuthorization()
+           .Produces(StatusCodes.Status200OK)
+           .Produces<RequestResult>(StatusCodes.Status400BadRequest)
+           .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
+           .Produces<RequestResult>(StatusCodes.Status409Conflict)
+           .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
+
+        app.MapPost("/students/{id}/reactivate", (LdapService ldapHelper, HttpRequest request, long id) => {
+               var result = ldapHelper.TryRemoveEntityFromGroup("inactive", id);
+               return result.RenewToken(request).ToResult();
+           })
+           .WithOpenApi()
+           .WithTags("Students")
+           .RequireAuthorization()
+           .Produces(StatusCodes.Status200OK)
+           .Produces<RequestResult>(StatusCodes.Status400BadRequest)
+           .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
+           .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
     }
 }
