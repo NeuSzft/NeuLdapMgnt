@@ -12,7 +12,7 @@ namespace NeuLdapMgnt.WebApp.Requests
 	{
 		[Inject] public NavigationManager NavManager { get; set; } = default!;
 
-		private readonly HttpClient _httpClient;
+		private HttpClient _httpClient;
 		private string? _token = null;
 
 		public event Action? AuthenticationStateChanged;
@@ -157,7 +157,12 @@ namespace NeuLdapMgnt.WebApp.Requests
 
 		public void SetBaseAddress(Uri url)
 		{
-			_httpClient.BaseAddress = url;
+			_httpClient = new()
+			{
+				BaseAddress = url,
+				DefaultRequestHeaders = { Accept = { new MediaTypeWithQualityHeaderValue("application/json") } },
+			};
+			Logout();
 		}
 
 		public Uri? GetBaseAddress()
