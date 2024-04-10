@@ -10,8 +10,9 @@ namespace NeuLdapMgnt.WebApp.Requests
 {
 	public class ApiRequests
 	{
+		[Inject] public NavigationManager NavManager { get; set; } = default!;
+
 		private readonly HttpClient _httpClient;
-		private readonly Uri _url = new("http://localhost:5000");
 		private string? _token = null;
 
 		public event Action? AuthenticationStateChanged;
@@ -19,12 +20,12 @@ namespace NeuLdapMgnt.WebApp.Requests
 		// Property to check if a user token exists, indicating the user is authenticated
 		public bool IsAuthenticated => _token != null;
 
-		public ApiRequests()
+		public ApiRequests(string baseUri)
 		{
 			// Initializes HttpClient with JSON as the default request content type
 			_httpClient = new()
 			{
-				BaseAddress = _url,
+				BaseAddress = new(baseUri),
 				DefaultRequestHeaders = { Accept = { new MediaTypeWithQualityHeaderValue("application/json") } }
 			};
 		}
@@ -152,6 +153,16 @@ namespace NeuLdapMgnt.WebApp.Requests
 			var result = await response.Content.ReadFromJsonAsync<RequestResult>();
 			UpdateToken(result);
 			return result ?? null;
+		}
+
+		public void SetBaseAddress(Uri url)
+		{
+			_httpClient.BaseAddress = url;
+		}
+
+		public Uri? GetBaseAddress()
+		{
+			return _httpClient.BaseAddress;
 		}
 	}
 }
