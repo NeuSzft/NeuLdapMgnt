@@ -44,10 +44,8 @@ services:
                 FROM mcr.microsoft.com/dotnet/sdk:7.0
                 COPY ./NeuLdapMgnt/WebApp /build/WebApp
                 COPY ./NeuLdapMgnt/Models /build/Models
-                WORKDIR /build/WebApp/Server
+                WORKDIR /build/WebApp
                 ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
 
-    webapp:
-        image: mcr.microsoft.com/dotnet/aspnet:7.0
-        working_dir: /app
-        entrypoint: ./NeuLdapMgnt.WebApp.Server --urls "http://0.0.0.0:80"
+    nginx:
+        image: nginx
