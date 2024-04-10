@@ -24,6 +24,7 @@
 	protected override void OnInitialized()
 	{
 		BaseAddress = ApiRequests.GetBaseAddress();
+		ApiRequests.SetBaseAddress(new("http://localhost:5000"));
 	}
 
 	private async Task OnDevelopmentChange()
