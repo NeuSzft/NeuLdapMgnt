@@ -11,7 +11,7 @@ namespace NeuLdapMgnt.WebApp.Requests
     public class ApiRequests
     {
         private readonly HttpClient _httpClient;
-        private readonly Uri _url = new("http://localhost:5000");
+        private readonly Uri _url = new("http://localhost:5000/api");
         private string? _token = null;
 
         public event Action? AuthenticationStateChanged;
