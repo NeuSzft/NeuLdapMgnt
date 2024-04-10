@@ -2,9 +2,8 @@
 
 <PageTitle>Add student</PageTitle>
 
-<Modal @ref="modal" title="Modal title" IsScrollable="true" ModalType="ModalType.Danger">
+<Modal @ref="modal" title="Error during import" IsScrollable="true" ModalType="ModalType.Danger">
 	<BodyTemplate>
-		<p>Error during import</p>
 		<ul class="list-group">
 			@foreach (var error in ErrorList)
 			{
@@ -97,7 +96,7 @@
 	{
 		try
 		{
-			var response = await ApiRequests.UploadFileAsync(file);
+			var response = await ApiRequests.UploadStudentFileAsync(file);
 			if (response is null)
 			{
 				ModalOption modalOption = new()
@@ -123,7 +122,6 @@
 					};
 
 				await ModalService.ShowAsync(modalOption);
-
 				NavManager.NavigateTo("/students");
 			}
 
@@ -135,7 +133,15 @@
 		}
 		catch (Exception e)
 		{
-			Console.WriteLine(e);
+			ModalOption modalOption = new()
+				{
+					Title = "Error",
+					Message = e.Message,
+					Type = ModalType.Danger,
+					ShowFooterButton = false
+				};
+
+			await ModalService.ShowAsync(modalOption);
 		}
 	}
 
