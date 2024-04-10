@@ -47,8 +47,6 @@ namespace NeuLdapMgnt.WebApp.Requests
 		// Performs login operation by sending credentials to the server
 		public async Task LoginAsync(string username, string password)
 		{
-			await Console.Out.WriteLineAsync(_httpClient.BaseAddress.ToString());
-
 			string credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(username + ":" + password));
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
 
