@@ -8,151 +8,153 @@ using System.Text.Json;
 
 namespace NeuLdapMgnt.WebApp.Requests
 {
-    public class ApiRequests
-    {
-        private readonly HttpClient _httpClient;
-        private readonly Uri _url = new("http://localhost:5000/api");
-        private string? _token = null;
+	public class ApiRequests
+	{
+		private readonly HttpClient _httpClient;
+		private readonly Uri _url = new("http://localhost:5000");
+		private string? _token = null;
 
-        public event Action? AuthenticationStateChanged;
+		public event Action? AuthenticationStateChanged;
 
-        // Property to check if a user token exists, indicating the user is authenticated
-        public bool IsAuthenticated => _token != null;
+		// Property to check if a user token exists, indicating the user is authenticated
+		public bool IsAuthenticated => _token != null;
 
-        public ApiRequests()
-        {
-            // Initializes HttpClient with JSON as the default request content type
-            _httpClient = new()
-            {
-                BaseAddress = _url,
-                DefaultRequestHeaders = { Accept = { new MediaTypeWithQualityHeaderValue("application/json") } }
-            };
-        }
+		public ApiRequests()
+		{
+			// Initializes HttpClient with JSON as the default request content type
+			_httpClient = new()
+			{
+				BaseAddress = _url,
+				DefaultRequestHeaders = { Accept = { new MediaTypeWithQualityHeaderValue("application/json") } }
+			};
+		}
 
-        // Redirects to login if the user is not authenticated
-        public void EnsureAuthentication(NavigationManager navManager)
-        {
-            if (!IsAuthenticated) navManager.NavigateTo("login");
-        }
+		// Redirects to login if the user is not authenticated
+		public void EnsureAuthentication(NavigationManager navManager)
+		{
+			if (!IsAuthenticated) navManager.NavigateTo("login");
+		}
 
-        // Throws an exception if the user is not authenticated
-        private void EnsureAuthentication()
-        {
-            if (!IsAuthenticated)
-            {
-                throw new InvalidOperationException("User is not authenticated.");
-            }
-        }
+		// Throws an exception if the user is not authenticated
+		private void EnsureAuthentication()
+		{
+			if (!IsAuthenticated)
+			{
+				throw new InvalidOperationException("User is not authenticated.");
+			}
+		}
 
-        // Performs login operation by sending credentials to the server
-        public async Task LoginAsync(string username, string password)
-        {
-            string credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(username + ":" + password));
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
+		// Performs login operation by sending credentials to the server
+		public async Task LoginAsync(string username, string password)
+		{
+			await Console.Out.WriteLineAsync(_httpClient.BaseAddress.ToString());
 
-            var response = await _httpClient.GetAsync("/auth");
-            response.EnsureSuccessStatusCode();
+			string credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(username + ":" + password));
+			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
 
-            _token = await response.Content.ReadAsStringAsync();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+			var response = await _httpClient.GetAsync("api/auth");
+			response.EnsureSuccessStatusCode();
 
-            AuthenticationStateChanged?.Invoke();
-        }
+			_token = await response.Content.ReadAsStringAsync();
+			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-        // Clears the authentication token and logging the user out
-        public void Logout()
-        {
-            _token = null;
-            AuthenticationStateChanged?.Invoke();
-        }
+			AuthenticationStateChanged?.Invoke();
+		}
 
-        // Updates the authentication token based on the server response
-        private void UpdateToken(RequestResult? result)
-        {
-            if (result is null || string.IsNullOrEmpty(result.NewToken))
-            {
-                throw new InvalidOperationException("New token is missing.");
-            }
+		// Clears the authentication token and logging the user out
+		public void Logout()
+		{
+			_token = null;
+			AuthenticationStateChanged?.Invoke();
+		}
 
-            _token = result.NewToken;
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-        }
+		// Updates the authentication token based on the server response
+		private void UpdateToken(RequestResult? result)
+		{
+			if (result is null || string.IsNullOrEmpty(result.NewToken))
+			{
+				throw new InvalidOperationException("New token is missing.");
+			}
 
-        // Sends a request to the specified URI with optional content, processing HTTP methods accordingly
-        public async Task<RequestResult<T>> SendRequestAsync<T>(HttpMethod method, string uri, object? content = null)
-        {
-            EnsureAuthentication();
+			_token = result.NewToken;
+			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+		}
 
-            HttpRequestMessage request = new(method, uri);
+		// Sends a request to the specified URI with optional content, processing HTTP methods accordingly
+		public async Task<RequestResult<T>> SendRequestAsync<T>(HttpMethod method, string uri, object? content = null)
+		{
+			EnsureAuthentication();
 
-            // Sets the request content for POST and PUT methods
-            if (content != null && (method == HttpMethod.Post || method == HttpMethod.Put))
-            {
-                request.Content = new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json");
-            }
+			HttpRequestMessage request = new(method, uri);
 
-            HttpResponseMessage response = await _httpClient.SendAsync(request);
+			// Sets the request content for POST and PUT methods
+			if (content != null && (method == HttpMethod.Post || method == HttpMethod.Put))
+			{
+				request.Content = new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json");
+			}
 
-            // Processes the response, updating tokens as necessary and handling errors
-            return await ProcessResponse<T>(response, method);
-        }
+			HttpResponseMessage response = await _httpClient.SendAsync(request);
 
-        // Helper method to process the HTTP response, handling success and error cases
-        private async Task<RequestResult<T>> ProcessResponse<T>(HttpResponseMessage response, HttpMethod method)
-        {
-            if (response.IsSuccessStatusCode)
-            {
-                if (method == HttpMethod.Delete)
-                {
-                    var result = await response.Content.ReadFromJsonAsync<RequestResult>();
-                    var genericResult = new RequestResult<T>();
-                    if (result != null)
-                    {
-                        genericResult.SetStatus(result.StatusCode).SetErrors(result.Errors);
-                        UpdateToken(result);
-                    }
-                    return genericResult;
-                }
-                else
-                {
-                    var result = await response.Content.ReadFromJsonAsync<RequestResult<T>>();
-                    UpdateToken(result);
-                    return result ?? new RequestResult<T>().SetErrors("Error deserializing response.");
-                }
-            }
-            else
-            {
-                var errorResult = await response.Content.ReadFromJsonAsync<RequestResult<T>>();
-                if (errorResult != null)
-                {
-                    UpdateToken(errorResult);
-                    return errorResult;
-                }
-                else
-                {
-                    return new RequestResult<T>()
-                        .SetStatus((int)response.StatusCode)
-                        .SetErrors($"Error: {response.ReasonPhrase}");
-                }
-            }
-        }
+			// Processes the response, updating tokens as necessary and handling errors
+			return await ProcessResponse<T>(response, method);
+		}
 
-        // Uploads a file to the server, specifically for importing student data via CSV
-        public async Task<RequestResult?> UploadFileAsync(IBrowserFile file)
-        {
-            EnsureAuthentication();
+		// Helper method to process the HTTP response, handling success and error cases
+		private async Task<RequestResult<T>> ProcessResponse<T>(HttpResponseMessage response, HttpMethod method)
+		{
+			if (response.IsSuccessStatusCode)
+			{
+				if (method == HttpMethod.Delete)
+				{
+					var result = await response.Content.ReadFromJsonAsync<RequestResult>();
+					var genericResult = new RequestResult<T>();
+					if (result != null)
+					{
+						genericResult.SetStatus(result.StatusCode).SetErrors(result.Errors);
+						UpdateToken(result);
+					}
+					return genericResult;
+				}
+				else
+				{
+					var result = await response.Content.ReadFromJsonAsync<RequestResult<T>>();
+					UpdateToken(result);
+					return result ?? new RequestResult<T>().SetErrors("Error deserializing response.");
+				}
+			}
+			else
+			{
+				var errorResult = await response.Content.ReadFromJsonAsync<RequestResult<T>>();
+				if (errorResult != null)
+				{
+					UpdateToken(errorResult);
+					return errorResult;
+				}
+				else
+				{
+					return new RequestResult<T>()
+						.SetStatus((int)response.StatusCode)
+						.SetErrors($"Error: {response.ReasonPhrase}");
+				}
+			}
+		}
 
-            var stream = file.OpenReadStream();
-            var content = new StreamContent(stream);
-            content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+		// Uploads a file to the server, specifically for importing student data via CSV
+		public async Task<RequestResult?> UploadStudentFileAsync(IBrowserFile file)
+		{
+			EnsureAuthentication();
 
-            var response = await _httpClient.PostAsync("/students/import", content);
-            response.EnsureSuccessStatusCode();
+			var stream = file.OpenReadStream();
+			var content = new StreamContent(stream);
+			content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
 
-            var result = await response.Content.ReadFromJsonAsync<RequestResult>();
-            UpdateToken(result);
-            return result ?? null;
-        }
-    }
+			var response = await _httpClient.PostAsync("api/students/import", content);
+			response.EnsureSuccessStatusCode();
+
+			var result = await response.Content.ReadFromJsonAsync<RequestResult>();
+			UpdateToken(result);
+			return result ?? null;
+		}
+	}
 }
 
