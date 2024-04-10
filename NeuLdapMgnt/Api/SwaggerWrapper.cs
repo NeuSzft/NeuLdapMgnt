@@ -57,10 +57,10 @@ internal static class SwaggerWrapper {
     }
 
     public static IApplicationBuilder UseSwaggerWrapper(this IApplicationBuilder app) {
-        app.UseSwagger(options => options.RouteTemplate = "/docs/{documentName}/endpoints.json");
+        app.UseSwagger(options => options.RouteTemplate = "/api/docs/{documentName}/endpoints.json");
         app.UseSwaggerUI(options => {
-            options.SwaggerEndpoint($"/docs/api/endpoints.json", "API Endpoints");
-            options.RoutePrefix = "docs";
+            options.SwaggerEndpoint("/api/docs/api/endpoints.json", "API Endpoints");
+            options.RoutePrefix = "api/docs";
         });
 
         return app;
