@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Api.Tests", "Ne
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Models", "NeuLdapMgnt\Models\NeuLdapMgnt.Models.csproj", "{E0DC0351-278B-469D-94B7-083BE239367D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuLdapMgnt.WebApp", "NeuLdapMgnt\NeuLdapMgnt.WebApp\NeuLdapMgnt.WebApp.csproj", "{459FF117-4555-4584-9C63-ED9E55D1CE6A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuLdapMgnt.WebApp", "NeuLdapMgnt\WebApp\NeuLdapMgnt.WebApp.csproj", "{459FF117-4555-4584-9C63-ED9E55D1CE6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
