@@ -4,7 +4,7 @@ using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api.Tests;
 
-public static class RequestHelper {
+public static class Testing {
     public static readonly HttpClient Client = new() { BaseAddress = new(Environment.GetEnvironmentVariable("API_URL")!) };
 }
 
@@ -21,12 +21,12 @@ public static class Extensions {
     }
 
     public static HttpRequestMessage AuthWithJwt(this HttpRequestMessage request) {
-        string token = RequestHelper.Client.GetStringAsync("/testing/get-token").Result;
+        string token = Testing.Client.GetStringAsync("/api/testing/get-token").Result;
         return request.SetAuthHeader("Bearer", token);
     }
 
     public static HttpRequestMessage AuthWithExpiredJwt(this HttpRequestMessage request) {
-        string token = RequestHelper.Client.GetStringAsync("/testing/get-exp-token").Result;
+        string token = Testing.Client.GetStringAsync("/api/testing/get-exp-token").Result;
         return request.SetAuthHeader("Bearer", token);
     }
 

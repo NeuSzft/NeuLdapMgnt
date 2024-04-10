@@ -8,7 +8,7 @@ namespace NeuLdapMgnt.Api.Endpoints;
 
 public static class ClassEndpoints {
     public static void MapClassEndpoints(this WebApplication app) {
-        app.MapGet("/classes", (LdapService ldap, HttpRequest request) => {
+        app.MapGet("/api/classes", (LdapService ldap, HttpRequest request) => {
                string?  value   = ldap.GetValue("classes", out var error);
                string[] classes = value?.Split(';') ?? [];
 
@@ -25,7 +25,7 @@ public static class ClassEndpoints {
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapPut("/classes", async (LdapService ldap, HttpRequest request) => {
+        app.MapPut("/api/classes", async (LdapService ldap, HttpRequest request) => {
                string[]? classes;
                try {
                    classes = await JsonSerializer.DeserializeAsync<string[]>(request.Body);
