@@ -49,8 +49,7 @@ else
 
 			if (response is null)
 			{
-				// Add a modal to display no response error.
-				Console.WriteLine("No response from the api.");
+				await ModalService.ShowAsync(ModalOptions.NoConnection());
 				return;
 			}
 
@@ -62,16 +61,14 @@ else
 
 			if (response.Errors.Any())
 			{
-				// Add a modal to display all errors.
-				Console.WriteLine("Errors:\n" + string.Join('\n', response.Errors));
-
+				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
 			}
 
 			StateHasChanged();
 		}
 		catch (Exception e)
 		{
-			Console.WriteLine(e);
+			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
 		}
 	}
 

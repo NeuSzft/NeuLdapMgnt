@@ -23,12 +23,14 @@ Welcome to your new app.
 
     private async Task OnShowModalClick()
     {
-        await modal?.ShowAsync();
+        if (modal is null) return;
+        await modal.ShowAsync();
     }
 
     private async Task OnHideModalClick()
     {
-        await modal?.HideAsync();
+        if (modal is null) return;
+        await modal.HideAsync();
     }
 
     protected override void OnInitialized()

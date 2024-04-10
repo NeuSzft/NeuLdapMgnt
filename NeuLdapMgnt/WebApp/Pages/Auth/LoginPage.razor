@@ -34,7 +34,7 @@
 		}
 		catch (Exception e)
 		{
-			Console.WriteLine(e.Message);
+			await ModalService.ShowAsync(ModalOptions.NoConnection(e.Message));
 		}
 	}
 }

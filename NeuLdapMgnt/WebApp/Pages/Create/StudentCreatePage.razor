@@ -12,7 +12,7 @@
 		</ul>
 	</BodyTemplate>
 	<FooterTemplate>
-		<Button Color="ButtonColor.Secondary" @onclick="HideModal">Ok</Button>
+		<Button Color="ButtonColor.Secondary" @onclick="HideModalClick">Ok</Button>
 	</FooterTemplate>
 </Modal>
 
@@ -47,48 +47,24 @@
 
 			if (response is null)
 			{
-				ModalOption modalOption = new()
-					{
-						Title = "Error",
-						Message = "No connection",
-						Type = ModalType.Danger,
-						ShowFooterButton = false
-					};
-
-				await ModalService.ShowAsync(modalOption);
+				await ModalService.ShowAsync(ModalOptions.NoConnection());
 				return;
 			}
 
 			if (response.IsSuccess())
 			{
-				ModalOption modalOption = new()
-					{
-						Title = "Success",
-						Message = $"{studentUpdated.Id} ({studentUpdated.FullName}) was successfully added",
-						Type = ModalType.Success,
-						ShowFooterButton = false
-					};
-
-				await ModalService.ShowAsync(modalOption);
+				await ModalService.ShowAsync(ModalOptions.Success("Success", $"{studentUpdated.Id} ({studentUpdated.FullName}) was successfully added"));
 				NavManager.NavigateTo("/students");
 			}
 
 			if (response.Errors.Any())
 			{
-				ModalOption modalOption = new()
-					{
-						Title = "Error",
-						Message = response.GetError(),
-						Type = ModalType.Danger,
-						ShowFooterButton = false
-					};
-
-				await ModalService.ShowAsync(modalOption);
+				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
 			}
 		}
 		catch (Exception e)
 		{
-			Console.WriteLine(e.Message);
+			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
 		}
 	}
 
@@ -99,54 +75,30 @@
 			var response = await ApiRequests.UploadStudentFileAsync(file);
 			if (response is null)
 			{
-				ModalOption modalOption = new()
-					{
-						Title = "Error",
-						Message = "No connection",
-						Type = ModalType.Danger,
-						ShowFooterButton = false
-					};
-
-				await ModalService.ShowAsync(modalOption);
+				await ModalService.ShowAsync(ModalOptions.NoConnection());
 				return;
 			}
 
 			if (response.IsSuccess())
 			{
-				ModalOption modalOption = new()
-					{
-						Title = "Student import",
-						Message = "Successfully imported",
-						Type = ModalType.Success,
-						ShowFooterButton = false
-					};
-
-				await ModalService.ShowAsync(modalOption);
+				await ModalService.ShowAsync(ModalOptions.Success("Success", $"Successfully imported {file.Name}"));
 				NavManager.NavigateTo("/students");
 			}
 
 			if (response.Errors.Any())
 			{
 				ErrorList = response.Errors;
-				await ShowModal();
+				await ShowModalClick();
 			}
 		}
 		catch (Exception e)
 		{
-			ModalOption modalOption = new()
-				{
-					Title = "Error",
-					Message = e.Message,
-					Type = ModalType.Danger,
-					ShowFooterButton = false
-				};
-
-			await ModalService.ShowAsync(modalOption);
+			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
 		}
 	}
 
-	private async Task ShowModal() => await modal!.ShowAsync();
+	private async Task ShowModalClick() => await modal!.ShowAsync();
 
-	private void HideModal() => NavManager.NavigateTo("/students");
+	private void HideModalClick() => NavManager.NavigateTo("/students");
 }
 

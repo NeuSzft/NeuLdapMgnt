@@ -38,27 +38,24 @@ else
 			var response = await ApiRequests.UpdateStudentAsync(student.Id, editedStudent);
 			if (response is null)
 			{
-				// Add a modal to display no response error.
-				Console.WriteLine("No response from the api.");
+				await ModalService.ShowAsync(ModalOptions.NoConnection("No response from the api."));
 				return;
 			}
 
 			if (response.IsSuccess())
 			{
-				// Add a modal to display successful edit.
-				Console.WriteLine($"Successfully edited: {student.Id}");
+				await ModalService.ShowAsync(ModalOptions.Success("Successful edit", $"({student.Id}) was successfully edited"));
 				NavManager.NavigateTo("/students");
 			}
 
 			if (response.Errors.Any())
 			{
-				// Add a modal to display all errors.
-				Console.WriteLine("Errors:\n" + string.Join('\n', response.Errors));
+				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
 			}
 		}
 		catch (Exception e)
 		{
-			Console.WriteLine(e.Message);
+			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
 		}
 	}
 }
