@@ -8,14 +8,14 @@ namespace NeuLdapMgnt.Api.Endpoints;
 
 public static class TestingEndpoints {
     public static void MapTestingEndpoints(this WebApplication app) {
-        app.MapGet("/testing/get-token", () =>
+        app.MapGet("/api/testing/get-token", () =>
                Results.Text(Authenticator.CreateToken("testuser"))
            )
            .WithOpenApi()
            .WithTags("Testing")
            .Produces<string>();
 
-        app.MapGet("/testing/get-exp-token", () => {
+        app.MapGet("/api/testing/get-exp-token", () => {
                JwtSecurityToken jwt = new(
                    Program.TokenIssuer,
                    "testuser",
@@ -30,7 +30,7 @@ public static class TestingEndpoints {
            .WithTags("Testing")
            .Produces<string>();
 
-        app.MapGet("/testing/check-token", () =>
+        app.MapGet("/api/testing/check-token", () =>
                Results.Ok()
            )
            .WithOpenApi()
