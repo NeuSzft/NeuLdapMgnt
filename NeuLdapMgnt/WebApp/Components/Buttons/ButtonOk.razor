@@ -1,0 +1,25 @@
+﻿<Button Color="Color" Disabled="IsDisabled" @onclick="HandleOnClick">
+    @Text
+</Button>
+
+@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "OK";
+
+    [Parameter]
+    public bool IsDisabled { get; set; }
+
+    [Parameter]
+    public ButtonColor Color { get; set; } = ButtonColor.Secondary;
+
+    private async Task HandleOnClick()
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
+}
