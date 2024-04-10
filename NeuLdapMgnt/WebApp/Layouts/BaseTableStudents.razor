@@ -1,5 +1,30 @@
 ﻿@inherits LayoutComponentBase
 
+<Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true">
+	<BodyTemplate>
+
+	</BodyTemplate>
+	<FooterTemplate>
+		<ButtonDelete Text="Delete" OnClick="DeleteSelected" />
+		<ButtonCancel Text="Cancel" OnClick="HideModalEdit" />
+		<ButtonSave Text="Save" />
+	</FooterTemplate>
+</Modal>
+
+<Modal @ref="modalErrors" title="Errors" ModalType="ModalType.Danger" Size="ModalSize.Regular" IsScrollable="true">
+	<BodyTemplate>
+		<ul class="list-group">
+			@foreach (var error in ErrorList)
+			{
+				<li class="list-group-item">@error</li>
+			}
+		</ul>
+	</BodyTemplate>
+	<FooterTemplate>
+		<Button Color="ButtonColor.Secondary" @onclick="HideModalErrorList">Ok</Button>
+	</FooterTemplate>
+</Modal>
+
 <div class="d-flex justify-content-between align-items-center g-2 my-2">
 	<div class="d-flex flex-grow-1 flex-md-grow-0">
 		<div class="input-group">
@@ -15,7 +40,7 @@
 		</div>
 	</div>
 	<div class="ms-2">
-		<ButtonEdit OnClick="EditSelected" IsDisabled="isStudentSelected" Text="Edit selected" />
+		<ButtonEdit OnClick="ShowModalEdit" IsDisabled="isStudentSelected" Text="Edit selected" />
 	</div>
 </div>
 
@@ -85,6 +110,10 @@
 	private List<Student> selectedStudents = new();
 	private Timer? searchDelayTimer;
 
+	private Modal modalEdit = default!;
+	private Modal modalErrors = default!;
+	private List<string> ErrorList = new();
+
 	private string sortBy = "Id";
 	private bool isAscending = true;
 
@@ -127,6 +156,55 @@
 	private void EditSelected()
 	{
 		selectedStudents.ForEach(x => Console.WriteLine(x.Id));
+	}
+
+	private async Task DeleteSelected()
+	{
+		if (!selectedStudents.Any()) return;
+
+		List<Student> deletedStudents = new();
+		try
+		{
+			foreach (var student in selectedStudents)
+			{
+				var response = await ApiRequests.DeleteStudentAsync(student.Id);
+
+				if (response is null)
+				{
+					await ModalService.ShowAsync(ModalOptions.NoConnection());
+					return;
+				}
+
+				if (!response.IsSuccess())
+				{
+					ErrorList.Add(response.GetError());
+					Console.WriteLine(response.GetError());
+				}
+				else
+				{
+					deletedStudents.Add(student);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
+		}
+
+		deletedStudents.ForEach(x => Students.Remove(x));
+		filteredStudents = Students.ToList();
+		selectedStudents.Clear();
+
+		if (ErrorList.Any())
+		{
+			await modalErrors.ShowAsync();
+		}
+		else
+		{
+			await ModalService.ShowAsync(ModalOptions.Success("Success", $"Successfully deleted ({deletedStudents.Count}) students"));
+		}
+
+		await HideModalEdit();
 	}
 
 	private void GetFilteredStudents()
@@ -201,22 +279,50 @@
 				break;
 
 			case "Class":
-                filteredStudents = isAscending
-                    ? filteredStudents
-                      .OrderBy(x => x.ClassYearOrderValue())
-                      .ThenBy(x => x.ClassGroup)
-                      .ToList()
-                    : filteredStudents
-                      .OrderByDescending(x => x.ClassYearOrderValue())
-                      .ThenByDescending(x => x.ClassGroup)
-                      .ToList();
-                break;
+				filteredStudents = isAscending
+					? filteredStudents
+							.OrderBy(x => x.ClassYearOrderValue())
+							.ThenBy(x => x.ClassGroup)
+							.ToList()
+					: filteredStudents
+							.OrderByDescending(x => x.ClassYearOrderValue())
+							.ThenByDescending(x => x.ClassGroup)
+							.ToList();
+				break;
 
 			default:
 				break;
 		}
 
 		StateHasChanged();
+	}
+
+	private async Task ShowModalEdit()
+	{
+		if (modalEdit is null) return;
+		await modalEdit.ShowAsync();
+	}
+
+	private async Task HideModalEdit()
+	{
+		if (modalEdit is null) return;
+		await modalEdit.HideAsync();
+		StateHasChanged();
+	}
+
+	private async Task ShowModalErrorList()
+	{
+		if (modalErrors is null) return;
+		await modalErrors.ShowAsync();
+	}
+
+	private async Task HideModalErrorList()
+	{
+		if (modalErrors is null) return;
+		await modalErrors.HideAsync();
+
+		if (modalEdit is null) return;
+		await modalEdit.HideAsync();
 	}
 
 	public void Dispose() => searchDelayTimer?.Dispose();
