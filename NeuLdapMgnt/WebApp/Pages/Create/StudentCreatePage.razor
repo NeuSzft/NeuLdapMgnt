@@ -49,12 +49,12 @@
 			if (response is null)
 			{
 				ModalOption modalOption = new()
-				{
-					Title = "Error",
-					Message = "No connection",
-					Type = ModalType.Danger,
-					ShowFooterButton = false
-				};
+					{
+						Title = "Error",
+						Message = "No connection",
+						Type = ModalType.Danger,
+						ShowFooterButton = false
+					};
 
 				await ModalService.ShowAsync(modalOption);
 				return;
@@ -100,8 +100,15 @@
 			var response = await ApiRequests.UploadFileAsync(file);
 			if (response is null)
 			{
-				// Add a modal to display no response error.
-				Console.WriteLine("No response from the api.");
+				ModalOption modalOption = new()
+					{
+						Title = "Error",
+						Message = "No connection",
+						Type = ModalType.Danger,
+						ShowFooterButton = false
+					};
+
+				await ModalService.ShowAsync(modalOption);
 				return;
 			}
 
