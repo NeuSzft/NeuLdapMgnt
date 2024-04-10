@@ -2,6 +2,21 @@
 
 <PageTitle>Add student</PageTitle>
 
+<Modal @ref="modal" title="Modal title" IsScrollable="true" ModalType="ModalType.Danger">
+	<BodyTemplate>
+		<p>Error during import</p>
+		<ul class="list-group">
+			@foreach (var error in ErrorList)
+			{
+				<li class="list-group-item">@error</li>
+			}
+		</ul>
+	</BodyTemplate>
+	<FooterTemplate>
+		<Button Color="ButtonColor.Secondary" @onclick="HideModal">Ok</Button>
+	</FooterTemplate>
+</Modal>
+
 <div class="row">
 	<div class="col-12 col-md">
 		<h1 class="d-inline-block">Add student</h1>
@@ -15,13 +30,13 @@
 
 @code {
 	private Student? student = StudentFactory.CreateEmptyStudent().Build();
-	private List<string> ErrorList = new();
+	private IEnumerable<string> ErrorList = null!;
+	private Modal modal = default!;
 
 	protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 	}
-
 
 	private async Task HandleStudentUpdated(Student studentUpdated)
 	{
@@ -29,8 +44,48 @@
 
 		try
 		{
-			await ApiRequests.AddStudentAsync(studentUpdated);
-			NavManager.NavigateTo("/students");
+			var response = await ApiRequests.AddStudentAsync(studentUpdated);
+
+			if (response is null)
+			{
+				ModalOption modalOption = new()
+				{
+					Title = "Error",
+					Message = "No connection",
+					Type = ModalType.Danger,
+					ShowFooterButton = false
+				};
+
+				await ModalService.ShowAsync(modalOption);
+				return;
+			}
+
+			if (response.IsSuccess())
+			{
+				ModalOption modalOption = new()
+					{
+						Title = "Success",
+						Message = $"{studentUpdated.Id} ({studentUpdated.FullName}) was successfully added",
+						Type = ModalType.Success,
+						ShowFooterButton = false
+					};
+
+				await ModalService.ShowAsync(modalOption);
+				NavManager.NavigateTo("/students");
+			}
+
+			if (response.Errors.Any())
+			{
+				ModalOption modalOption = new()
+					{
+						Title = "Error",
+						Message = response.GetError(),
+						Type = ModalType.Danger,
+						ShowFooterButton = false
+					};
+
+				await ModalService.ShowAsync(modalOption);
+			}
 		}
 		catch (Exception e)
 		{
@@ -52,16 +107,23 @@
 
 			if (response.IsSuccess())
 			{
-				// Add a modal to display successful deletion.
-				Console.WriteLine("Successfully added students");
+				ModalOption modalOption = new()
+					{
+						Title = "Student import",
+						Message = "Successfully imported",
+						Type = ModalType.Success,
+						ShowFooterButton = false
+					};
+
+				await ModalService.ShowAsync(modalOption);
+
 				NavManager.NavigateTo("/students");
 			}
 
 			if (response.Errors.Any())
 			{
-				// Add a modal to display all errors.
-				Console.WriteLine("Errors:\n" + string.Join('\n', response.Errors));
-				ErrorList = response.Errors.ToList();
+				ErrorList = response.Errors;
+				await ShowModal();
 			}
 		}
 		catch (Exception e)
@@ -69,5 +131,9 @@
 			Console.WriteLine(e);
 		}
 	}
+
+	private async Task ShowModal() => await modal!.ShowAsync();
+
+	private void HideModal() => NavManager.NavigateTo("/students");
 }
 
