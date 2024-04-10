@@ -5,7 +5,7 @@
 <EditForm Model="@credentials" OnValidSubmit="HandleLogin" class="d-flex flex-column gap-3 mt-5 mx-auto" style="max-width: 350px;">
 	<DataAnnotationsValidator />
 
-	<h3 class="text-center mt-5 mb-3">Neu LDAP Management</h3>
+	<Button Type="ButtonType.Link" Color="ButtonColor.Dark" Outline="true" Size="Size.ExtraLarge" Disabled="true"><strong>Neu LDAP Management</strong></Button>
 
 	<div class="form-group">
 		<label class="form-label" for="username">Username</label>
@@ -13,13 +13,13 @@
 		<ValidationMessage For="() => credentials.Username" />
 	</div>
 
-	<div class="form-group">
+	<div class="form-group mb-2">
 		<label class="form-label" for="password">Password</label>
 		<InputText class="form-control" id="password" @bind-Value="credentials.Password" type="password" />
 		<ValidationMessage For="() => credentials.Password" />
 	</div>
 
-	<button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
+	<Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Outline="true">Login</Button>
 </EditForm>
 
 @code {
