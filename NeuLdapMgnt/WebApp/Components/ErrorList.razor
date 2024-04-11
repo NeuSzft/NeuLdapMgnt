@@ -1,0 +1,11 @@
+﻿<ul class="list-group">
+	@foreach (var error in Errors)
+	{
+		<li class="list-group-item">@error</li>
+	}
+</ul>
+
+@code {
+	[Parameter]
+	public List<string> Errors { get; set; } = new();
+}

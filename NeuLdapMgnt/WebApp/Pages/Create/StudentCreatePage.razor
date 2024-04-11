@@ -4,12 +4,7 @@
 
 <Modal @ref="modal" title="Error during import" IsScrollable="true" ModalType="ModalType.Danger">
 	<BodyTemplate>
-		<ul class="list-group">
-			@foreach (var error in ErrorList)
-			{
-				<li class="list-group-item">@error</li>
-			}
-		</ul>
+		<ErrorList Errors="ErrorList" />
 	</BodyTemplate>
 	<FooterTemplate>
 		<Button Color="ButtonColor.Secondary" @onclick="HideModalClick">Ok</Button>
@@ -29,7 +24,7 @@
 
 @code {
 	private Student? student = StudentFactory.CreateEmptyStudent().Build();
-	private IEnumerable<string> ErrorList = null!;
+	private List<string> ErrorList = new();
 	private Modal modal = default!;
 
 	protected override void OnInitialized()
@@ -87,7 +82,7 @@
 
 			if (response.Errors.Any())
 			{
-				ErrorList = response.Errors;
+				ErrorList = response.Errors.ToList();
 				await ShowModalClick();
 			}
 		}

@@ -13,12 +13,7 @@
 
 <Modal @ref="modalErrors" title="Errors" ModalType="ModalType.Danger" Size="ModalSize.Regular" IsScrollable="true">
 	<BodyTemplate>
-		<ul class="list-group">
-			@foreach (var error in ErrorList)
-			{
-				<li class="list-group-item">@error</li>
-			}
-		</ul>
+		<ErrorList Errors="ErrorList"/>
 	</BodyTemplate>
 	<FooterTemplate>
 		<Button Color="ButtonColor.Secondary" @onclick="HideModalErrorList">Ok</Button>
