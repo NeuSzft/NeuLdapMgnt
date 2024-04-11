@@ -77,7 +77,7 @@ internal static class Program {
         builder.Services.AddCors();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSingleton<LdapService>(_ => ldapService);
-        builder.Services.AddSwaggerWrapperGen();
+        builder.Services.AddSwaggerWrapperGen("neuldapmgnt", "Neu LDAP Management API", "alpha");
 
         WebApplication app = builder.Build();
         ldapService.Logger = app.Logger;
@@ -107,7 +107,7 @@ internal static class Program {
 
         // Add swagger middlewares when in development mode
         if (app.Environment.IsDevelopment())
-            app.UseSwaggerWrapper();
+            app.UseSwaggerWrapper("neuldapmgnt");
 
         // Map endpoints
         app.MapAuthEndpoints();
