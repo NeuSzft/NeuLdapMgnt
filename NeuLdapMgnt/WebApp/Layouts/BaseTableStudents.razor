@@ -13,7 +13,7 @@
 
 <Modal @ref="modalErrors" title="Errors" ModalType="ModalType.Danger" Size="ModalSize.Regular" IsScrollable="true">
 	<BodyTemplate>
-		<ErrorList Errors="ErrorList"/>
+		<CustomList List="ErrorList"/>
 	</BodyTemplate>
 	<FooterTemplate>
 		<Button Color="ButtonColor.Secondary" @onclick="HideModalErrorList">Ok</Button>

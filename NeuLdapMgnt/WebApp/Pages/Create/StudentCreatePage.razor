@@ -4,7 +4,7 @@
 
 <Modal @ref="modal" title="Error during import" IsScrollable="true" ModalType="ModalType.Danger">
 	<BodyTemplate>
-		<ErrorList Errors="ErrorList" />
+		<CustomList List="ErrorList" />
 	</BodyTemplate>
 	<FooterTemplate>
 		<Button Color="ButtonColor.Secondary" @onclick="HideModalClick">Ok</Button>
