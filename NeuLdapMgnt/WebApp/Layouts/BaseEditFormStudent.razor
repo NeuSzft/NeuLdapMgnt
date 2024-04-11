@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
+<ConfirmDialog @ref="dialog" />
+
 <EditForm Model="@studentUpdated" OnValidSubmit="HandleValidSubmit" class="d-flex flex-column gap-2 my-2">
 	<DataAnnotationsValidator />
 
@@ -141,7 +143,7 @@
 	}
 	</EditForm>
 
-	@code {
+@code {
 	[Parameter]
 	public Student TheStudent { get; set; } = StudentFactory.CreateEmptyStudent().Build();
 
@@ -157,6 +159,8 @@
 	private Student studentOriginal = StudentFactory.CreateEmptyStudent().Build();
 	private Student studentUpdated = StudentFactory.CreateEmptyStudent().Build();
 
+	private ConfirmDialog dialog = default!;
+
 	protected override void OnInitialized()
 	{
 		studentOriginal = Utils.GetClone<Student>(TheStudent)!;
@@ -171,30 +175,33 @@
 	{
 		try
 		{
+			var parameters = new Dictionary<string, object>();
+			parameters.Add("Student", studentUpdated);
+
+			var confirmation = await dialog.ShowAsync<StudentSummaryBrief>("Are you sure you want to delete this student?", parameters);
+			if (!confirmation) return;
+
 			var response = await ApiRequests.DeleteStudentAsync(TheStudent.Id);
 			if (response is null)
 			{
-				// Add a modal to display no response error.
-				Console.WriteLine("No response from the api.");
+				await ModalService.ShowAsync(ModalOptions.NoConnection());
 				return;
 			}
 
 			if (response.IsSuccess())
 			{
-				// Add a modal to display successful deletion.
-				Console.WriteLine($"Successfully deleted: {TheStudent.Id}");
+				ToastService.Notify(new ToastMessage(ToastType.Success, $"Student deleted successfully"));
 				NavManager.NavigateTo("/students");
 			}
 
 			if (response.Errors.Any())
 			{
-				// Add a modal to display all errors.
-				Console.WriteLine("Errors:\n" + string.Join('\n', response.Errors));
+				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
 			}
 		}
 		catch (Exception e)
 		{
-			Console.WriteLine(e.Message);
+			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
 		}
 	}
 

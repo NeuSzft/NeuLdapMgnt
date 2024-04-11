@@ -29,8 +29,16 @@
 	{
 		try
 		{
-			await ApiRequests.LoginAsync(credentials.Username, credentials.Password);
-			NavManager.NavigateTo("/");
+			var response = await ApiRequests.LoginAsync(credentials.Username, credentials.Password);
+			if (response)
+			{
+				ToastService.Notify(ToastMessages.WelcomeBack(credentials.Username));
+				NavManager.NavigateTo("/");
+			}
+			else
+			{
+				ToastService.Notify(ToastMessages.InvalidCredentials());
+			}
 		}
 		catch (Exception e)
 		{

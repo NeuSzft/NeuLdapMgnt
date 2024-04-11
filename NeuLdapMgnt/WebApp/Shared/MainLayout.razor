@@ -15,6 +15,7 @@
 </div>
 
 <Modal IsServiceModal="true" />
+<Toasts class="pt-3 pe-2 mt-5" AutoHide="true" StackLength="10" Delay="3500" Placement="ToastsPlacement.TopRight" />
 
 @code
 {
@@ -31,7 +32,7 @@
 	{
 		if (IsDevelopment)
 		{
-			ApiRequests.SetBaseAddress(BaseAddress);
+			ApiRequests.SetBaseAddress(BaseAddress!);
 			await ModalService.ShowAsync(ModalOptions.Info("Deployed mode", $"Api base address set to: '{BaseAddress}'"));
 		}
 		else

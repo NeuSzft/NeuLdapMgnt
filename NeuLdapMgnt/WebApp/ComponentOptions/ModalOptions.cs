@@ -1,6 +1,6 @@
 ﻿using BlazorBootstrap;
 
-namespace NeuLdapMgnt.WebApp
+namespace NeuLdapMgnt.WebApp.ComponentOptions
 {
 	public static class ModalOptions
 	{

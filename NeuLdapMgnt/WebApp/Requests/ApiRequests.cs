@@ -46,18 +46,19 @@ namespace NeuLdapMgnt.WebApp.Requests
 		}
 
 		// Performs login operation by sending credentials to the server
-		public async Task LoginAsync(string username, string password)
+		public async Task<bool> LoginAsync(string username, string password)
 		{
 			string credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(username + ":" + password));
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
 
 			var response = await _httpClient.GetAsync("api/auth");
-			response.EnsureSuccessStatusCode();
+			if (!response.IsSuccessStatusCode) return false;
 
 			_token = await response.Content.ReadAsStringAsync();
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
 			AuthenticationStateChanged?.Invoke();
+			return true;
 		}
 
 		// Clears the authentication token and logging the user out

@@ -1,0 +1,69 @@
+﻿<div class="row">
+	<div class="col-3">
+		OM:
+	</div>
+	<div class="col">
+		@Student.Id
+	</div>
+</div>
+<div class="row">
+	<div class="col-3">
+		Name:
+	</div>
+	<div class="col">
+		@Student.FullName
+	</div>
+</div>
+<div class="row">
+	<div class="col-3">
+		Class
+	</div>
+	<div class="col">
+		@Student.Class
+	</div>
+</div>
+<div class="row">
+	<div class="col-3">
+		Username:
+	</div>
+	<div class="col">
+		@Student.Username
+	</div>
+</div>
+<div class="row">
+	<div class="col-3">
+		User Id:
+	</div>
+	<div class="col">
+		@Student.Uid
+	</div>
+</div>
+<div class="row">
+	<div class="col-3">
+		Group Id:
+	</div>
+	<div class="col">
+		@Student.Gid
+	</div>
+</div>
+<div class="row">
+	<div class="col-3">
+		Email:
+	</div>
+	<div class="col">
+		@Student.Email
+	</div>
+</div>
+<div class="row">
+	<div class="col-3">
+		Directory:
+	</div>
+	<div class="col">
+		@Student.HomeDirectory
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public Student Student { get; set; } = default!;
+}

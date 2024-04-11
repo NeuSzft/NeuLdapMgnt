@@ -1,0 +1,29 @@
+﻿<div class="row">
+	<div class="col-3">
+		OM:
+	</div>
+	<div class="col">
+		@Student.Id
+	</div>
+</div>
+<div class="row">
+	<div class="col-3">
+		Name:
+	</div>
+	<div class="col">
+		@Student.FullName
+	</div>
+</div>
+<div class="row">
+	<div class="col-3">
+		Class
+	</div>
+	<div class="col">
+		@Student.Class
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public Student Student { get; set; } = default!;
+}
