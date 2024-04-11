@@ -6,33 +6,7 @@
 
 Welcome to your new app.
 
-<Modal @ref="modal" Title="Modal title">
-    <BodyTemplate>
-        Modal body text goes here.
-    </BodyTemplate>
-    <FooterTemplate>
-        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
-        <Button Color="ButtonColor.Primary">Save changes</Button>
-    </FooterTemplate>
-</Modal>
-
-<Button Color="ButtonColor.Primary" @onclick="OnShowModalClick">Show Modal</Button>
-
 @code {
-    private Modal modal = default!;
-
-    private async Task OnShowModalClick()
-    {
-        if (modal is null) return;
-        await modal.ShowAsync();
-    }
-
-    private async Task OnHideModalClick()
-    {
-        if (modal is null) return;
-        await modal.HideAsync();
-    }
-
     protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
