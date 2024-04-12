@@ -36,6 +36,7 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 				YesButtonColor = ButtonColor.Danger,
 				NoButtonText = "Cancel",
 				NoButtonColor = ButtonColor.Success,
+				IsScrollable = true,
 				Size = size
 			};
 		}
