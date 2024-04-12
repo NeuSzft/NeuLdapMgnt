@@ -11,9 +11,9 @@
 	</div>
 </div>
 
-@if (IsLoading)
+@if (isLoading)
 {
-	<Loading />
+	<Loading Text="Loading students" />
 }
 else if (!Lists.Students.Any())
 {
@@ -29,9 +29,8 @@ else
 	<BaseTableStudents Students="Lists.GetStudents()" />
 }
 
-
 @code {
-	private bool IsLoading { get; set; } = true;
+	private bool isLoading { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -43,14 +42,14 @@ else
 	{
 		try
 		{
-			IsLoading = true;
+			isLoading = true;
 			Lists.Students.Clear();
 
 			var response = await ApiRequests.GetStudentsAsync();
 			if (response.IsSuccess())
 			{
 				Lists.Students = new(response.Values);
-				IsLoading = false;
+				isLoading = false;
 			}
 
 			if (response.Errors.Any())

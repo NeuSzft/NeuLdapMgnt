@@ -40,64 +40,70 @@
 		<ButtonEdit OnClick="ShowModalEdit" IsDisabled="isStudentSelected" Text="Edit selected" />
 	</div>
 </div>
-
-<table class="table table-striped">
-	<thead>
-		<tr>
-			<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllStudents">
-				@if (!AreAllFilteredStudentsSelected())
-				{
-					<span>Select all (@selectedStudents.Count/@filteredStudents.Count)</span>
-				}
-				else
-				{
-					<span>Deselect all (@selectedStudents.Count/@filteredStudents.Count)</span>
-				}
-			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
-				OM
-				@if (sortBy == "Id")
-				{
-					<i class="bi @GetSortIcon(isAscending)"></i>
-				}
-			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
-				Name
-				@if (sortBy == "Name")
-				{
-					<i class="bi @GetSortIcon(isAscending)"></i>
-				}
-			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Class"))">
-				Class
-				@if (sortBy == "Class")
-				{
-					<i class="bi @GetSortIcon(isAscending)"></i>
-				}
-			</th>
-			<th class="user-select-none text-end">Inspect |  Edit</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var student in filteredStudents)
-		{
+@if (isDeleting)
+{
+	<Loading Text="Deleting students" />
+}
+else
+{
+	<table class="table table-striped">
+		<thead>
 			<tr>
-				<td>
-					<input class="form-check-input m-auto"
-						   type="checkbox"
-						   checked="@selectedStudents.Contains(student)"
-						   @onchange="() => SelectStudent(student)" />
-				</td>
-				<td>@student.Id</td>
-				<td>@student.FullName</td>
-				<td>@student.Class</td>
-				<td class="text-end">
-					<ButtonInspect OnClick="InspectStudent" Student="@student" />
-				</td>
+				<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllStudents">
+					@if (!AreAllFilteredStudentsSelected())
+					{
+						<span>Select all (@selectedStudents.Count/@filteredStudents.Count)</span>
+					}
+					else
+					{
+						<span>Deselect all (@selectedStudents.Count/@filteredStudents.Count)</span>
+					}
+				</th>
+				<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
+					OM
+					@if (sortBy == "Id")
+					{
+						<i class="bi @GetSortIcon(isAscending)"></i>
+					}
+				</th>
+				<th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
+					Name
+					@if (sortBy == "Name")
+					{
+						<i class="bi @GetSortIcon(isAscending)"></i>
+					}
+				</th>
+				<th class="user-select-none" role="button" @onclick="@(() => SortTable("Class"))">
+					Class
+					@if (sortBy == "Class")
+					{
+						<i class="bi @GetSortIcon(isAscending)"></i>
+					}
+				</th>
+				<th class="user-select-none text-end">Inspect |  Edit</th>
 			</tr>
-		}
-	</tbody>
-</table>
+		</thead>
+		<tbody>
+			@foreach (var student in filteredStudents)
+			{
+				<tr>
+					<td>
+						<input class="form-check-input m-auto"
+							   type="checkbox"
+							   checked="@selectedStudents.Contains(student)"
+							   @onchange="() => SelectStudent(student)" />
+					</td>
+					<td>@student.Id</td>
+					<td>@student.FullName</td>
+					<td>@student.Class</td>
+					<td class="text-end">
+						<ButtonInspect OnClick="InspectStudent" Student="@student" />
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
 
 @code {
 	[Parameter]
@@ -112,12 +118,12 @@
 	private Modal modalErrors = default!;
 	private List<string> ErrorList = new();
 
-	private string sortBy = "Id";
-	private bool isAscending = true;
-
 	private string? searchQuery = string.Empty;
-	private bool isStudentSelected => !selectedStudents.Any();
+	private string sortBy = "Id";
 
+	private bool isAscending = true;
+	private bool isDeleting = false;
+	private bool isStudentSelected => !selectedStudents.Any();
 
 	protected override void OnInitialized()
 	{
@@ -159,7 +165,7 @@
 	private async Task DeleteSelected()
 	{
 		if (!selectedStudents.Any()) return;
-		List<Student> deletedStudents = new();
+
 		var parameters = new Dictionary<string, object>();
 		parameters.Add("List", selectedStudents.Select(x => $"{x.Id}: {x.FullName}").ToList());
 
@@ -171,6 +177,9 @@
 
 		if (!confirmation) return;
 
+		isDeleting = true;
+		await HideModalEdit();
+
 		try
 		{
 			foreach (var student in selectedStudents)
@@ -178,21 +187,20 @@
 				var response = await ApiRequests.DeleteStudentAsync(student.Id);
 				if (response.IsSuccess())
 				{
-					deletedStudents.Add(student);
-					ToastService.Notify(ToastMessages.Success($"Deleted {student.Id}"));
+					Students.Remove(student);
 				}
 				else
 				{
 					ErrorList.Add(response.GetError());
 				}
 			}
+			isDeleting = false;
 		}
 		catch (Exception e)
 		{
 			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
 		}
 
-		deletedStudents.ForEach(x => Students.Remove(x));
 		filteredStudents = Students.ToList();
 		selectedStudents.Clear();
 
@@ -200,8 +208,10 @@
 		{
 			await modalErrors.ShowAsync();
 		}
-
-		await HideModalEdit();
+		else
+		{
+			ToastService.Notify(ToastMessages.Success("Selected studenst were deleted!"));
+		}
 	}
 
 	private void GetFilteredStudents()
