@@ -24,34 +24,29 @@ public static class LdapServiceGroupExtensions {
     /// <param name="id">The uid of the entity.</param>
     /// <returns><c>true</c> if the entity is part of the group, <c>false</c> if not or the group does not exist.</returns>
     /// <remarks>This method does not check if the entity actually exists or not.</remarks>
-    public static bool PartOfGroup(this LdapService ldap, string name, long id) {
+    public static bool PartOfGroup(this LdapService ldap, string name, string id) {
         SearchRequest   request  = new($"ou={name},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
         if (response is null || response.Entries.Count == 0)
             return false;
 
-        foreach (string value in response.Entries[0].Attributes["uid"].GetValues(typeof(string)))
-            if (long.TryParse(value, out var uid) && uid == id)
-                return true;
-        return false;
+        return response.Entries[0].Attributes["uid"].GetValues(typeof(string)).Any(x => x.ToString() == id);
     }
 
     /// <summary>Gets the uids of the members of the group.</summary>
     /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
     /// <param name="name">The name of the group.</param>
-    /// <returns>An <see cref="IEnumerable{T}">IEnumerable&lt;long&gt;</see> containing the uids.</returns>
+    /// <returns>An <see cref="IEnumerable{T}">IEnumerable&lt;string&gt;</see> containing the uids.</returns>
     /// <remarks>If the group does not exist it returns an empty collection.</remarks>
-    public static IEnumerable<long> GetMembersOfGroup(this LdapService ldap, string name) {
+    public static IEnumerable<string> GetMembersOfGroup(this LdapService ldap, string name) {
         SearchRequest   request  = new($"ou={name},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Subtree, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
         if (response is null || response.Entries.Count == 0)
-            yield break;
+            return [];
 
-        foreach (string value in response.Entries[0].Attributes["uid"].GetValues(typeof(string)))
-            if (long.TryParse(value, out var uid))
-                yield return uid;
+        return response.Entries[0].Attributes["uid"].GetValues(typeof(string)).Select(x => x.ToString()).NotNull();
     }
 
     /// <summary>Tries to add the group to the database with the specified name.</summary>
@@ -92,7 +87,7 @@ public static class LdapServiceGroupExtensions {
     /// <param name="name">The name of the group.</param>
     /// <param name="id">The uid of the entity to add.</param>
     /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-    public static RequestResult TryAddEntityToGroup(this LdapService ldap, string name, long id) {
+    public static RequestResult TryAddEntityToGroup(this LdapService ldap, string name, string id) {
         ldap.TryAddGroup(name);
 
         if (ldap.PartOfGroup(name, id))
@@ -117,7 +112,7 @@ public static class LdapServiceGroupExtensions {
     /// <param name="name">The name of the group.</param>
     /// <param name="ids">The uids to be added.</param>
     /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-    public static RequestResult TryAddEntitiesToGroup(this LdapService ldap, string name, IEnumerable<long> ids) {
+    public static RequestResult TryAddEntitiesToGroup(this LdapService ldap, string name, IEnumerable<string> ids) {
         ldap.TryAddGroup(name);
 
         var requests = ids.Select(id => {
@@ -127,10 +122,10 @@ public static class LdapServiceGroupExtensions {
                 Name      = "uid",
                 Operation = DirectoryAttributeOperation.Add
             };
-            mod.Add(id.ToString());
+            mod.Add(id);
             request.Modifications.Add(mod);
 
-            return new UniqueDirectoryRequest(request, id.ToString());
+            return new UniqueDirectoryRequest(request, id);
         });
 
         string[] errors = ldap.TryRequests(requests).Select(x => x.Error).NotNull().ToArray();
@@ -142,7 +137,7 @@ public static class LdapServiceGroupExtensions {
     /// <param name="name">The name of the group.</param>
     /// <param name="id">The uid of the entity to remove.</param>
     /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-    public static RequestResult TryRemoveEntityFromGroup(this LdapService ldap, string name, long id) {
+    public static RequestResult TryRemoveEntityFromGroup(this LdapService ldap, string name, string id) {
         if (!ldap.GroupExists(name))
             return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The group does not exist.");
 
@@ -155,7 +150,7 @@ public static class LdapServiceGroupExtensions {
             Name      = "uid",
             Operation = DirectoryAttributeOperation.Delete
         };
-        mod.Add(id.ToString());
+        mod.Add(id);
         request.Modifications.Add(mod);
 
         if (ldap.TryRequest(request, out var error) is not null)
@@ -168,7 +163,7 @@ public static class LdapServiceGroupExtensions {
     /// <param name="name">The name of the group.</param>
     /// <param name="ids">The uids to be removed.</param>
     /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-    public static RequestResult TryRemoveEntitiesFromGroup(this LdapService ldap, string name, IEnumerable<long> ids) {
+    public static RequestResult TryRemoveEntitiesFromGroup(this LdapService ldap, string name, IEnumerable<string> ids) {
         if (!ldap.GroupExists(name))
             return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The group does not exist.");
 
@@ -179,10 +174,10 @@ public static class LdapServiceGroupExtensions {
                 Name      = "uid",
                 Operation = DirectoryAttributeOperation.Delete
             };
-            mod.Add(id.ToString());
+            mod.Add(id);
             request.Modifications.Add(mod);
 
-            return new UniqueDirectoryRequest(request, id.ToString());
+            return new UniqueDirectoryRequest(request, id);
         });
 
         string[] errors = ldap.TryRequests(requests).Select(x => x.Error).NotNull().ToArray();
