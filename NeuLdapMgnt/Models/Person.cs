@@ -15,11 +15,6 @@ namespace NeuLdapMgnt.Models
 		private string? middleName;
 
 		[Required]
-		[JsonPropertyName("id")]
-		[LdapAttribute("uid")]
-		public virtual long Id { get; set; }
-
-		[Required]
 		[JsonRequired, JsonPropertyName("uid")]
 		[LdapAttribute("uidNumber")]
 		public virtual int Uid { get; set; }
@@ -52,7 +47,7 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("sn")]
 		public virtual string LastName
 		{
-			get => lastName; 
+			get => lastName;
 			set
 			{
 				lastName = value;
@@ -78,6 +73,12 @@ namespace NeuLdapMgnt.Models
 		[JsonRequired, JsonPropertyName("home_directory")]
 		[LdapAttribute("homeDirectory")]
 		public virtual string HomeDirectory { get; set; } = string.Empty;
+
+        [JsonIgnore]
+        public string PlainPassword {
+            get => Password;
+            set => Password = new UserPassword(value, 16).ToString();
+        }
 
 		[Required, PasswordPropertyText, MinLength(8)]
 		[JsonRequired, JsonPropertyName("password")]

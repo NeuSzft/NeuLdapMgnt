@@ -19,7 +19,7 @@ namespace NeuLdapMgnt.Models
 		[Required, Range(70000000000, 79999999999)]
         [JsonPropertyName("id")]
         [LdapAttribute("uid")]
-		public override long Id { get; set; } = AllowedIdRange.Min;
+		public long Id { get; set; } = AllowedIdRange.Min;
 
 		[Required, Range(6000, 6999)]
         [JsonRequired, JsonPropertyName("uid")]

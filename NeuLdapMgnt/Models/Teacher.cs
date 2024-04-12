@@ -1,13 +1,14 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models
 {
 	public class Teacher : Person
 	{
-		[Required]
-		[LdapAttribute("uid")]
-		public override long Id { get; set; }
+        [Required, RegularExpression("^7[0-9]{10}$")]
+        [JsonPropertyName("id")]
+        [LdapAttribute("uid")]
+        public string Id { get; set; }
 
 		[Required, Range(4000, 5999)]
 		[LdapAttribute("uid")]

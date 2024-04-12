@@ -22,7 +22,7 @@ public static class StudentEndpoints {
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapGet("/api/students/{id}", (LdapService ldap, HttpRequest request, long id) => {
+        app.MapGet("/api/students/{id}", (LdapService ldap, HttpRequest request, string id) => {
                var result = ldap.TryGetEntity<Student>(id);
                return result.RenewToken(request).ToResult();
            })
@@ -39,7 +39,7 @@ public static class StudentEndpoints {
                var result = await ModelValidator.ValidateRequest<Student>(request);
                if (result.IsFailure())
                    return result.RenewToken(request).ToResult();
-               return ldap.TryAddEntity(result.GetValue()!, result.GetValue()!.Id).RenewToken(request).ToResult();
+               return ldap.TryAddEntity(result.GetValue()!, result.GetValue()!.Id.ToString()).RenewToken(request).ToResult();
            })
            .WithOpenApi()
            .WithTags("Students")
@@ -51,7 +51,7 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status409Conflict)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapPut("/api/students/{id}", async (LdapService ldap, HttpRequest request, long id) => {
+        app.MapPut("/api/students/{id}", async (LdapService ldap, HttpRequest request, string id) => {
                var result = await ModelValidator.ValidateRequest<Student>(request);
                if (result.IsFailure())
                    return result.RenewToken(request).ToResult();
@@ -67,7 +67,7 @@ public static class StudentEndpoints {
            .Produces<RequestResult>(StatusCodes.Status404NotFound)
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-        app.MapDelete("/api/students/{id}", (LdapService ldap, HttpRequest request, long id) =>
+        app.MapDelete("/api/students/{id}", (LdapService ldap, HttpRequest request, string id) =>
                ldap.TryDeleteEntity<Student>(id).RenewToken(request).ToResult()
            )
            .WithOpenApi()
@@ -86,7 +86,7 @@ public static class StudentEndpoints {
                if (results.Error is not null)
                    return Results.Text(results.Error, "text/plain", null, StatusCodes.Status400BadRequest);
 
-               return ldap.TryAddEntities(results.Students, student => student.Id).RenewToken(request).ToResult();
+               return ldap.TryAddEntities(results.Students, student => student.Id.ToString()).RenewToken(request).ToResult();
            })
            .WithOpenApi()
            .WithTags("Students")

@@ -14,7 +14,7 @@ public static class LdapServiceEntityExtensions {
     /// <param name="id">The uid of the entity.</param>
     /// <typeparam name="T">The type of the entity.</typeparam>
     /// <returns>Returns <c>true</c> if the entity exists. If it does not exist or the search request fails it returns <c>false</c>.</returns>
-    public static bool EntityExists<T>(this LdapService ldap, long id) where T : class {
+    public static bool EntityExists<T>(this LdapService ldap, string id) where T : class {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
@@ -43,7 +43,7 @@ public static class LdapServiceEntityExtensions {
     /// <param name="id">The uid of the entity.</param>
     /// <typeparam name="T">The type of the entity.</typeparam>
     /// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
-    public static RequestResult<T> TryGetEntity<T>(this LdapService ldap, long id) where T : class, new() {
+    public static RequestResult<T> TryGetEntity<T>(this LdapService ldap, string id) where T : class, new() {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = ldap.TryRequest(request, out var error) as SearchResponse;
 
@@ -62,7 +62,7 @@ public static class LdapServiceEntityExtensions {
     /// <param name="entity">The entity to be added.</param>
     /// <typeparam name="T">The type of the entity.</typeparam>
     /// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
-    public static RequestResult<T> TryAddEntity<T>(this LdapService ldap, T entity, long id) where T : class {
+    public static RequestResult<T> TryAddEntity<T>(this LdapService ldap, T entity, string id) where T : class {
         Type type = typeof(T);
 
         ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DnBase}", "organizationalUnit"));
@@ -88,7 +88,7 @@ public static class LdapServiceEntityExtensions {
     /// <param name="entity">The entity that will replace the current one.</param>
     /// <typeparam name="T">The type of the entity.</typeparam>
     /// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
-    public static RequestResult<T> TryModifyEntity<T>(this LdapService ldap, T entity, long id) where T : class {
+    public static RequestResult<T> TryModifyEntity<T>(this LdapService ldap, T entity, string id) where T : class {
         Type type = typeof(T);
 
         if (!ldap.EntityExists<T>(id))
@@ -116,7 +116,7 @@ public static class LdapServiceEntityExtensions {
     /// <param name="id">The uid of the entity to remove.</param>
     /// <typeparam name="T">The type of the entity.</typeparam>
     /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-    public static RequestResult TryDeleteEntity<T>(this LdapService ldap, long id) where T : class {
+    public static RequestResult TryDeleteEntity<T>(this LdapService ldap, string id) where T : class {
         if (!ldap.EntityExists<T>(id))
             return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The object does not exist.");
 
@@ -133,7 +133,7 @@ public static class LdapServiceEntityExtensions {
     /// <param name="idGetter">A delegate that takes in an entity of type <typeparamref name="T"/> and returns an uid with the type of <c>long</c>.</param>
     /// <typeparam name="T">The type of the entities.</typeparam>
     /// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-    public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, long> idGetter) where T : class {
+    public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, string> idGetter) where T : class {
         Type type = typeof(T);
 
         ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DnBase}", "organizationalUnit"));
@@ -143,7 +143,7 @@ public static class LdapServiceEntityExtensions {
             objectClassesAttribute = new("objectClass", objectClasses.Classes.Cast<object>().ToArray());
 
         var requests = entities.Select(x => {
-            long id = idGetter(x);
+            string id = idGetter(x);
 
             AddRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DnBase}");
             if (objectClassesAttribute is not null)
