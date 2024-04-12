@@ -2,10 +2,10 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
-using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;
 
@@ -19,32 +19,89 @@ public record AuthResult(int Code, string? Message, string? Username) {
 }
 
 public static class Authenticator {
-    // TODO: Authenticate via LDAP database
-    /// <summary>Tires to authenticate the user specified by the HTTP request via the Basic authentication scheme.</summary>
-    /// <param name="request">The <see cref="HttpRequest"/> that contains an Authorization header.</param>
-    /// <returns>An <see cref="AuthResult"/> containing the result of the authentication attempt.</returns>
-    /// <remarks>The authentication currently succeeds regardless of what username is specified as long as the password is "password".</remarks>
-    public static AuthResult BasicAuth(HttpRequest request) {
-        string username, password;
+    /// <summary>The name of value used to store the default admin password within the LDAP database.</summary>
+    public const string DefaultAdminPasswordValueName = "default-admin-password";
+
+    /// <summary>Tires to get the default admin password. If it is not or incorrectly set, then sets it to the default value defined by the <c>DEFAULT_ADMIN_PASSWORD</c> environment variable or "<c>adminpass</c>".</summary>
+    /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
+    /// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
+    /// <returns>The <see cref="UserPassword"/> of the default admin or <c>null</c> if an error occured.</returns>
+    /// <remarks>When the default password is set <c>Locked</c> wil be set to <c>false</c>.</remarks>
+    public static UserPassword? GetAndSetDefaultAdminPasswordIfNotSet(LdapService ldap, out string? error) {
+        string? pwd = ldap.GetValue(DefaultAdminPasswordValueName, out error);
+
+        try {
+            return new UserPassword(pwd!);
+        }
+        catch {
+            UserPassword userPassword = new(Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD").DefaultIfNullOrEmpty("adminpass"), 16);
+            return ldap.SetValue(DefaultAdminPasswordValueName, userPassword.ToString(), out error) ? userPassword : null;
+        }
+    }
+
+    /// <summary>Tires to get username and password from the Authorization header.</summary>
+    /// <param name="request">The <see cref="HttpRequest"/> that contains the Authorization header.</param>
+    /// <param name="username">When the method returns, this will contain the username or an empty string on failure.</param>
+    /// <param name="password">When the method returns, this will contain the password or an empty string on failure.</param>
+    /// <returns><c>true</c> if the username and password were successfully set based on the Authorization header, otherwise <c>false</c>.</returns>
+    public static bool TryGetCredentialsFromRequest(HttpRequest request, out string username, out string password) {
+        username = password = string.Empty;
 
         if (request.Headers.Authorization.Count == 0)
-            return new(StatusCodes.Status400BadRequest, "Missing Authorization header.", null);
+            return false;
 
         try {
             string   value       = request.Headers.Authorization.ToString().Split(' ')[1];
             string[] credentials = Encoding.UTF8.GetString(Convert.FromBase64String(value)).Split(':');
             username = credentials[0];
             password = credentials[1];
+
+            return true;
         }
         catch {
-            return new(StatusCodes.Status400BadRequest, "Invalid Authorization header.", null);
+            return false;
+        }
+    }
+
+    /// <summary>Tires to authenticate the user specified by the HTTP request via the Basic authentication scheme.</summary>
+    /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
+    /// <param name="request">The <see cref="HttpRequest"/> that contains an Authorization header.</param>
+    /// <returns>An <see cref="AuthResult"/> containing the result of the authentication attempt.</returns>
+    /// <remarks>The authentication currently succeeds regardless of what username is specified as long as the password is "password".</remarks>
+    public static AuthResult BasicAuth(LdapService ldap, HttpRequest request) {
+        if (!TryGetCredentialsFromRequest(request, out var username, out var password))
+            return new(StatusCodes.Status400BadRequest, "Missing Authorization header.", null);
+
+        if (username == Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME")) {
+            UserPassword? userPassword = GetAndSetDefaultAdminPasswordIfNotSet(ldap, out var error);
+            if (userPassword is null)
+                return new(StatusCodes.Status503ServiceUnavailable, error, null);
+
+            if (userPassword.CheckPassword(password)) {
+                if (userPassword.Locked)
+                    return new(StatusCodes.Status403Forbidden, "Account is locked.", null);
+                return new(StatusCodes.Status200OK, null, username);
+            }
+        }
+        else if (ldap.PartOfGroup("inactive", username)) {
+            return new(StatusCodes.Status403Forbidden, "User is inactive.", null);
+        }
+        else if (ldap.TryGetEntity<Teacher>(username).GetValue() is { } teacher) {
+            try {
+                UserPassword userPassword = new(teacher.Password);
+
+                if (userPassword.CheckPassword(password)) {
+                    if (userPassword.Locked)
+                        return new(StatusCodes.Status403Forbidden, "Account is locked.", null);
+                    return new(StatusCodes.Status200OK, null, username);
+                }
+            }
+            catch {
+                return new(StatusCodes.Status500InternalServerError, "Invalid credentials within LDAP database.", null);
+            }
         }
 
-        byte[] hash = SHA512.HashData(Encoding.UTF8.GetBytes(password));
-        if (!hash.SequenceEqual(Base64UrlEncoder.DecodeBytes("sQnzu7wkTrgkQZF-0G1hi5AI3Qmzvv0bXgc5THBqi7mAsdd4Xll27ASbRt9fEyavWi6m0QP9B8lThf-rDKy8hg")))
-            return new(StatusCodes.Status401Unauthorized, "Wrong credentials.", null);
-
-        return new(StatusCodes.Status200OK, null, username);
+        return new(StatusCodes.Status401Unauthorized, "Wrong credentials.", null);
     }
 
     /// <summary>Creates a new JSON Web Token for the specified user that will expire in 10 minutes after it's creation.</summary>
