@@ -2,7 +2,7 @@
 
 <ConfirmDialog @ref="dialog" />
 
-<Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true">
+<Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true" OnHidden="ToggleEditMode">
 	<BodyTemplate>
 
 	</BodyTemplate>
@@ -43,7 +43,16 @@ else
 			</div>
 		</div>
 		<div class="ms-2">
-			<ButtonEdit OnClick="ShowModalEdit" IsDisabled="@(isStudentSelected || isDeleting)" Text="Edit selected" />
+			@if (isAction)
+			{
+				<Button Color="ButtonColor.Warning" Outline="true" Disabled="isEditing">
+					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Warning" />
+				</Button>
+			}
+			else
+			{
+				<ButtonEdit OnClick="ShowModalEdit" IsDisabled="isStudentSelected" Text="Edit selected" />
+			}
 		</div>
 	</div>
 
@@ -124,6 +133,9 @@ else
 
 	private bool isAscending = true;
 	private bool isDeleting = false;
+	private bool isEditing = false;
+	private bool isAction => isDeleting || isEditing;
+
 	private bool isStudentSelected => !selectedStudents.Any();
 
 	protected override void OnInitialized()
@@ -309,13 +321,13 @@ else
 	{
 		if (modalEdit is null) return;
 		await modalEdit.ShowAsync();
+		ToggleEditMode();
 	}
 
 	private async Task HideModalEdit()
 	{
 		if (modalEdit is null) return;
 		await modalEdit.HideAsync();
-		StateHasChanged();
 	}
 
 	private async Task ShowModalErrorList()
@@ -332,6 +344,8 @@ else
 		if (modalEdit is null) return;
 		await modalEdit.HideAsync();
 	}
+
+	private void ToggleEditMode() => isEditing = !isEditing;
 
 	public void Dispose() => searchDelayTimer?.Dispose();
 }
