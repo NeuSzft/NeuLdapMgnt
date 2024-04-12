@@ -99,7 +99,7 @@ public static class LdapServiceGroupExtensions {
             Name      = "uid",
             Operation = DirectoryAttributeOperation.Add
         };
-        mod.Add(id.ToString());
+        mod.Add(id);
         request.Modifications.Add(mod);
 
         if (ldap.TryRequest(request, out var error) is not null)
