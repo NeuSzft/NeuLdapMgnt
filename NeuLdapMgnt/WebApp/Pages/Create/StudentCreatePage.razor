@@ -20,35 +20,42 @@
 	</div>
 </div>
 
-<BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="HandleStudentUpdated" />
+<BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
+<ConfirmDialog @ref="dialog" />
 
 @code {
 	private Student? student = StudentFactory.CreateEmptyStudent().Build();
 	private List<string> ErrorList = new();
 	private Modal modal = default!;
+	private ConfirmDialog dialog = default!;
 
 	protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 	}
 
-	private async Task HandleStudentUpdated(Student studentUpdated)
+	private async Task OnSubmit(Student studentUpdated)
 	{
+		if (dialog == null)
+		{
+			ToastService.Notify(ToastMessages.Error("System not initialized properly."));
+			return;
+		}
+
 		if (student!.Equals(studentUpdated)) return;
 
 		try
 		{
+			var parameters = new Dictionary<string, object>();
+			parameters.Add("Student", studentUpdated);
+
+			var confirmation = await dialog.ShowAsync<StudentSummary>("Create this student?", parameters);
+			if (!confirmation) return;
+
 			var response = await ApiRequests.AddStudentAsync(studentUpdated);
-
-			if (response is null)
-			{
-				await ModalService.ShowAsync(ModalOptions.NoConnection());
-				return;
-			}
-
 			if (response.IsSuccess())
 			{
-				await ModalService.ShowAsync(ModalOptions.Success("Success", $"{studentUpdated.Id} ({studentUpdated.FullName}) was successfully added"));
+				ToastService.Notify(ToastMessages.Success($"{studentUpdated.Id} ({studentUpdated.FullName}) was successfully added"));
 				NavManager.NavigateTo("/students");
 			}
 
@@ -57,9 +64,20 @@
 				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
 			}
 		}
+		catch (HttpRequestException httpError)
+		{
+			if (httpError.Message.Contains("Failed to fetch"))
+			{
+				ToastService.Notify(ToastMessages.NoConnection());
+			}
+			else
+			{
+				ToastService.Notify(ToastMessages.Error(httpError.Message));
+			}
+		}
 		catch (Exception e)
 		{
-			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
+			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
 	}
 
@@ -68,16 +86,9 @@
 		try
 		{
 			var response = await ApiRequests.UploadStudentFileAsync(file);
-			if (response is null)
-			{
-				await ModalService.ShowAsync(ModalOptions.NoConnection());
-				return;
-			}
-
 			if (response.IsSuccess())
 			{
-				await ModalService.ShowAsync(ModalOptions.Success("Success", $"Successfully imported {file.Name}"));
-				NavManager.NavigateTo("/students");
+				ToastService.Notify(ToastMessages.Success($"Imported successfully ({file.Name})!"));
 			}
 
 			if (response.Errors.Any())
@@ -86,14 +97,29 @@
 				await ShowModalClick();
 			}
 		}
+		catch (HttpRequestException httpError)
+		{
+			if (httpError.Message.Contains("Failed to fetch"))
+			{
+				ToastService.Notify(ToastMessages.NoConnection());
+			}
+			else
+			{
+				ToastService.Notify(ToastMessages.Error(httpError.Message));
+			}
+		}
 		catch (Exception e)
 		{
-			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
+			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
 	}
 
 	private async Task ShowModalClick() => await modal!.ShowAsync();
 
-	private void HideModalClick() => NavManager.NavigateTo("/students");
+	private async Task HideModalClick()
+	{
+		await modal!.HideAsync();
+		NavManager.NavigateTo("/students");
+	}
 }
 

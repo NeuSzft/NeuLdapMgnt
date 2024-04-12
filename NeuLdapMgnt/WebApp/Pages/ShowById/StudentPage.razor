@@ -9,7 +9,8 @@
 else
 {
 	<h3>[@student.Class] @student.FullName</h3>
-	<BaseEditFormStudent TheStudent="student" OnSubmit="HandleEditedStudent" IsReadonly="true" CanDelete="true" />
+	<BaseEditFormStudent TheStudent="student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete" />
+	<ConfirmDialog @ref="dialog" />
 }
 
 @code {
@@ -17,6 +18,7 @@ else
 	public string Id { get; set; } = null!;
 
 	private Student student = StudentFactory.CreateEmptyStudent().Build();
+	private ConfirmDialog dialog = default!;
 
 	protected override void OnInitialized()
 	{
@@ -29,22 +31,23 @@ else
 		student = searchedStudent;
 	}
 
-	private async Task HandleEditedStudent(Student editedStudent)
+	private async Task OnSubmit(Student editedStudent)
 	{
 		if (student.Equals(editedStudent)) return;
 
 		try
 		{
-			var response = await ApiRequests.UpdateStudentAsync(student.Id, editedStudent);
-			if (response is null)
-			{
-				await ModalService.ShowAsync(ModalOptions.NoConnection("No response from the api."));
-				return;
-			}
+			var parameters = new Dictionary<string, object>();
+			parameters.Add("StudentOriginal", student);
+			parameters.Add("StudentEdited", editedStudent);
 
+			var confirmation = await dialog.ShowAsync<StudentEditSummary>("Edit student?", parameters, DialogOptions.Edit());
+			if (!confirmation) return;
+
+			var response = await ApiRequests.UpdateStudentAsync(student.Id, editedStudent);
 			if (response.IsSuccess())
 			{
-				await ModalService.ShowAsync(ModalOptions.Success("Successful edit", $"({student.Id}) was successfully edited"));
+				ToastService.Notify(ToastMessages.Warning($"{student.FullName} was edited!", true));
 				NavManager.NavigateTo("/students");
 			}
 
@@ -53,9 +56,59 @@ else
 				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
 			}
 		}
+		catch (HttpRequestException httpError)
+		{
+			if (httpError.Message.Contains("Failed to fetch"))
+			{
+				ToastService.Notify(ToastMessages.NoConnection());
+			}
+			else
+			{
+				ToastService.Notify(ToastMessages.Error(httpError.Message));
+			}
+		}
 		catch (Exception e)
 		{
-			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
+			ToastService.Notify(ToastMessages.Error(e.Message));
+		}
+	}
+
+	private async Task OnDelete(Student editedStudent)
+	{
+		try
+		{
+			var parameters = new Dictionary<string, object>();
+			parameters.Add("Student", editedStudent);
+
+			var confirmation = await dialog.ShowAsync<StudentSummaryBrief>("Delete this student?", parameters, DialogOptions.Delete());
+			if (!confirmation) return;
+
+			var response = await ApiRequests.DeleteStudentAsync(editedStudent.Id);
+			if (response.IsSuccess())
+			{
+				ToastService.Notify(ToastMessages.Success($"Student deleted successfully"));
+				NavManager.NavigateTo("/students");
+			}
+
+			if (response.Errors.Any())
+			{
+				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
+			}
+		}
+		catch (HttpRequestException httpError)
+		{
+			if (httpError.Message.Contains("Failed to fetch"))
+			{
+				ToastService.Notify(ToastMessages.NoConnection());
+			}
+			else
+			{
+				ToastService.Notify(ToastMessages.Error(httpError.Message));
+			}
+		}
+		catch (Exception e)
+		{
+			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
 	}
 }

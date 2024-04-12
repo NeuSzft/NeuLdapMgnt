@@ -45,14 +45,8 @@ else
 		{
 			IsLoading = true;
 			Lists.Students.Clear();
+
 			var response = await ApiRequests.GetStudentsAsync();
-
-			if (response is null)
-			{
-				await ModalService.ShowAsync(ModalOptions.NoConnection());
-				return;
-			}
-
 			if (response.IsSuccess())
 			{
 				Lists.Students = new(response.Values);
@@ -66,9 +60,20 @@ else
 
 			StateHasChanged();
 		}
+		catch (HttpRequestException httpError)
+		{
+			if (httpError.Message.Contains("Failed to fetch"))
+			{
+				ToastService.Notify(ToastMessages.NoConnection());
+			}
+			else
+			{
+				ToastService.Notify(ToastMessages.Error(httpError.Message));
+			}
+		}
 		catch (Exception e)
 		{
-			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
+			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
 	}
 
