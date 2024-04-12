@@ -6,7 +6,7 @@
 	<div class="text-end">
 		@if (IsReadonly)
 		{
-			<ButtonEdit OnClick="ToggleReadonly" Text="Edit" />
+			<ButtonEdit OnClick="ToggleEditMode" Text="Edit" IsDisabled="isEditModeEnabled" />
 		}
 	</div>
 
@@ -27,7 +27,6 @@
 			@if (!IsReadonly && studentUpdated.FullName.Length > 2)
 			{
 				<span>[@studentUpdated.FullName]</span>
-
 			}
 		</label>
 
@@ -133,10 +132,30 @@
 		<div class="d-flex justify-content-end gap-2">
 			@if (CanDelete)
 			{
-				<ButtonDelete OnClick="HandleOnDelete" Text="Delete" />
+				@if (isDeleting)
+				{
+					<Button Color="ButtonColor.Danger" Outline="true">
+						<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Danger" />
+					</Button>
+				}
+				else
+				{
+					<ButtonDelete OnClick="HandleOnDelete" Text="Delete" />
+				}
 			}
-			<ButtonCancel OnClick="ToggleReadonly" Text="Cancel" />
-			<ButtonSubmit Text="Submit" />
+
+			<ButtonCancel OnClick="ToggleEditMode" Text="Cancel" />
+
+			@if (isSubmitting)
+			{
+				<Button Color="ButtonColor.Success" Outline="true">
+					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Success" />
+				</Button>
+			}
+			else
+			{
+				<ButtonSubmit Text="Submit" />
+			}
 		</div>
 	}
 	</EditForm>
@@ -149,7 +168,7 @@
 	public Func<Student, Task<bool>> OnSubmit { get; set; } = default!;
 
 	[Parameter]
-	public EventCallback<Student> OnDelete { get; set; }
+	public Func<Student, Task<bool>> OnDelete { get; set; } = default!;
 
 	[Parameter]
 	public bool IsReadonly { get; set; }
@@ -159,6 +178,10 @@
 
 	private Student studentOriginal = StudentFactory.CreateEmptyStudent().Build();
 	private Student studentUpdated = StudentFactory.CreateEmptyStudent().Build();
+	private bool isDeleting = false;
+	private bool isSubmitting = false;
+	private bool isAction => isDeleting || isSubmitting;
+	private bool isEditModeEnabled = false;
 
 	protected override void OnInitialized()
 	{
@@ -168,19 +191,28 @@
 
 	private async Task HandleOnSubmit()
 	{
+		isSubmitting = true;
 		bool isSubmitted = await OnSubmit.Invoke(studentUpdated);
-		if (!isSubmitted) return;
-		studentUpdated = Utils.GetClone<Student>(studentOriginal)!;
+		isSubmitting = false;
 	}
+
 
 	private async Task HandleOnDelete()
 	{
-		await OnDelete.InvokeAsync(studentUpdated);
+		isDeleting = true;
+		bool isDeleted = await OnDelete.Invoke(studentUpdated);
+		isDeleting = false;
+
+		if (!isDeleted) return;
+		NavManager.NavigateTo("/students");
 	}
 
-	private void ToggleReadonly()
+
+	private void ToggleEditMode()
 	{
 		studentUpdated = Utils.GetClone<Student>(studentOriginal)!;
+		if (isEditModeEnabled) return;
+		isEditModeEnabled = true;
 		IsReadonly = !IsReadonly;
 	}
 }

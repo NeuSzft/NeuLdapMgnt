@@ -22,30 +22,31 @@
 	</FooterTemplate>
 </Modal>
 
-<div class="d-flex justify-content-between align-items-center g-2 my-2">
-	<div class="d-flex flex-grow-1 flex-md-grow-0">
-		<div class="input-group">
-			<label class="input-group-text" for="searchbar"><i class="bi bi-funnel"></i></label>
-			<div class="form-floating flex-grow-1">
-				<input type="search"
-					   class="form-control rounded-0 rounded-end"
-					   id="searchbar"
-					   @oninput="UpdateSearchQuery"
-					   @bind-value="searchQuery" />
-				<label for="searchbar">OM, Name, Class</label>
-			</div>
-		</div>
-	</div>
-	<div class="ms-2">
-		<ButtonEdit OnClick="ShowModalEdit" IsDisabled="isStudentSelected" Text="Edit selected" />
-	</div>
-</div>
 @if (isDeleting)
 {
 	<Loading Text="Deleting students" />
 }
 else
 {
+	<div class="d-flex justify-content-between align-items-center g-2 my-2">
+		<div class="d-flex flex-grow-1 flex-md-grow-0">
+			<div class="input-group">
+				<label class="input-group-text" for="searchbar"><i class="bi bi-funnel"></i></label>
+				<div class="form-floating flex-grow-1">
+					<input type="search"
+						   class="form-control rounded-0 rounded-end"
+						   id="searchbar"
+						   @oninput="UpdateSearchQuery"
+						   @bind-value="searchQuery" />
+					<label for="searchbar">OM, Name, Class</label>
+				</div>
+			</div>
+		</div>
+		<div class="ms-2">
+			<ButtonEdit OnClick="ShowModalEdit" IsDisabled="@(isStudentSelected || isDeleting)" Text="Edit selected" />
+		</div>
+	</div>
+
 	<table class="table table-striped">
 		<thead>
 			<tr>
@@ -210,7 +211,7 @@ else
 		}
 		else
 		{
-			ToastService.Notify(ToastMessages.Success("Selected studenst were deleted!"));
+			ToastService.Notify(ToastMessages.Success("Selected students were deleted!"));
 		}
 	}
 

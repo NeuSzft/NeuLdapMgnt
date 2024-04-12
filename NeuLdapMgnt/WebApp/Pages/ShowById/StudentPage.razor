@@ -2,9 +2,9 @@
 
 <PageTitle>@student.FullName</PageTitle>
 
-@if (student is null)
+@if (isLoading)
 {
-	<Loading />
+	<Loading Text="Loading student" />
 }
 else
 {
@@ -19,21 +19,27 @@ else
 
 	private Student student = StudentFactory.CreateEmptyStudent().Build();
 	private ConfirmDialog dialog = default!;
+	private bool isLoading = false;
 
 	protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 
-		long.TryParse(Id, out long id);
-		var searchedStudent = Lists.GetStudents().FirstOrDefault(x => x.Id.Equals(id));
+		long id;
+		long.TryParse(Id, out id);
 
+		var searchedStudent = Lists.GetStudents().FirstOrDefault(x => x.Id.Equals(id));
 		if (searchedStudent is null) return;
 		student = searchedStudent;
 	}
 
 	private async Task<bool> OnSubmit(Student editedStudent)
 	{
-		if (student.Equals(editedStudent)) return false;
+		if (student.Equals(editedStudent))
+		{
+			ToastService.Notify(ToastMessages.Warning($"No changes was found!", true));
+			return false;
+		}
 
 		try
 		{
@@ -57,6 +63,8 @@ else
 				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
 				return false;
 			}
+
+			return false;
 		}
 		catch (HttpRequestException httpError)
 		{
@@ -77,7 +85,7 @@ else
 		return false;
 	}
 
-	private async Task OnDelete(Student editedStudent)
+	private async Task<bool> OnDelete(Student editedStudent)
 	{
 		try
 		{
@@ -85,19 +93,22 @@ else
 			parameters.Add("Student", editedStudent);
 
 			var confirmation = await dialog.ShowAsync<StudentSummaryBrief>("Delete this student?", parameters, DialogOptions.Delete());
-			if (!confirmation) return;
+			if (!confirmation) return false;
 
 			var response = await ApiRequests.DeleteStudentAsync(editedStudent.Id);
 			if (response.IsSuccess())
 			{
 				ToastService.Notify(ToastMessages.Success($"Student deleted successfully"));
 				NavManager.NavigateTo("/students");
+				return true;
 			}
 
 			if (response.Errors.Any())
 			{
 				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
 			}
+
+			return false;
 		}
 		catch (HttpRequestException httpError)
 		{
@@ -114,5 +125,7 @@ else
 		{
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
+
+		return false;
 	}
 }

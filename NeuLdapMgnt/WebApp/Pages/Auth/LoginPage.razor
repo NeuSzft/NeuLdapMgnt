@@ -18,18 +18,29 @@
 		<InputText class="form-control" id="password" @bind-Value="credentials.Password" type="password" />
 		<ValidationMessage For="() => credentials.Password" />
 	</div>
-
-	<Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Outline="true">Login</Button>
+	<Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Outline="true" Disabled="isLoading">
+		@if (isLoading)
+		{
+			<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Primary" />
+		}
+		else
+		{
+			<span>Login</span>
+		}
+	</Button>
 </EditForm>
 
 @code {
 	private LoginModel credentials = new();
+	private bool isLoading = false;
 
 	private async Task HandleLogin()
 	{
 		try
 		{
+			isLoading = true;
 			var response = await ApiRequests.LoginAsync(credentials.Username, credentials.Password);
+
 			if (response)
 			{
 				ToastService.Notify(ToastMessages.WelcomeBack(credentials.Username));
@@ -51,10 +62,12 @@
 				ToastService.Notify(ToastMessages.Error(httpError.Message));
 			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
+
+		isLoading = false;
 	}
 }
 

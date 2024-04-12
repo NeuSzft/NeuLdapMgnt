@@ -23,7 +23,11 @@
 	</div>
 </div>
 
-@if (isUploading)
+@if (isSubmitting)
+{
+	<Loading Text="@submitString" />
+}
+else if (isUploading)
 {
 	<Loading Text="Importing students" />
 }
@@ -40,6 +44,8 @@ else
 	private ConfirmDialog dialog = default!;
 
 	private string modalTitle => $"{errorList.Count} Error(s) during import";
+	private string submitString => $"Creating {student.FullName}";
+	private bool isSubmitting = false;
 	private bool isUploading = false;
 
 	protected override void OnInitialized()
@@ -57,9 +63,9 @@ else
 			var confirmation = await dialog.ShowAsync<StudentSummary>("Create this student?", parameters, DialogOptions.Confirm());
 			if (!confirmation) return false;
 
-			isUploading = true;
+			isSubmitting = true;
 			var response = await ApiRequests.AddStudentAsync(studentUpdated);
-			isUploading = false;
+			await Task.Delay(3000);
 
 			if (response.IsSuccess())
 			{
@@ -97,6 +103,7 @@ else
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
 
+		isSubmitting = false;
 		return false;
 	}
 
@@ -106,7 +113,6 @@ else
 		{
 			isUploading = true;
 			var response = await ApiRequests.UploadStudentFileAsync(file);
-			isUploading = false;
 
 			if (response.IsSuccess())
 			{
@@ -135,6 +141,7 @@ else
 		{
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
+		isUploading = false;
 	}
 
 	private async Task ShowModal() => await modal!.ShowAsync();
