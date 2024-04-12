@@ -25,7 +25,7 @@ public record LdapResult(DirectoryResponse? Response, string? Error = null);
 /// <summary>The <see cref="LdapService"/> class provides helper methods for easier interaction with a LDAP server.</summary>
 public sealed class LdapService {
     /// <summary>The base distinguished name to use for the requests.</summary>
-    public string   DnBase { get; set; } = string.Empty;
+    public string DnBase { get; set; } = string.Empty;
 
     /// <summary>The logger the helper should use.</summary>
     public ILogger? Logger { get; set; }
@@ -110,16 +110,20 @@ public sealed class LdapService {
 
     /// <summary>Creates a new instance of the specified type and tries to set it's properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
     /// <param name="entry">The <see cref="SearchResultEntry"/> that contains the values that are used to set object's properties.</param>
+    /// <param name="getAllAttributes">If <c>true</c> even the attributes that have <c>ReturnFormDb</c> set to <c>false</c> are returned.</param>
     /// <typeparam name="T">The type of the object to be created.</typeparam>
     /// <returns>A new object with the type <typeparamref name="T"/>.</returns>
     /// <exception cref="InvalidCastException">The value of the entry cannot be converted into the property's type.</exception>
     /// <exception cref="FormatException">The value of the entry is in an incorrect format and cannot be converted into the property's type.</exception>
     /// <exception cref="OverflowException">Converting the value of the entry into the property's type would result in an overflow.</exception>
-    public static T ParseEntry<T>(SearchResultEntry entry) where T : class, new() {
+    public static T ParseEntry<T>(SearchResultEntry entry, bool getAllAttributes = false) where T : class, new() {
         T obj = new();
 
         foreach (PropertyInfo info in typeof(T).GetProperties())
             if (info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute) {
+                if (!attribute.ReturnFormDb && !getAllAttributes)
+                    continue;
+
                 string? value = entry.Attributes[attribute.Name].GetValues(typeof(string)).FirstOrDefault() as string;
                 info.SetValue(obj, Convert.ChangeType(value, info.PropertyType));
             }
@@ -130,12 +134,13 @@ public sealed class LdapService {
     /// <summary>Tries to create a new instance of the specified type and set it's properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
     /// <param name="entry">The <see cref="SearchResultEntry"/> that contains the values that are used to set object's properties.</param>
     /// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
+    /// <param name="getAllAttributes">If <c>true</c> even the attributes that have <c>ReturnFormDb</c> set to <c>false</c> are returned.</param>
     /// <typeparam name="T">The type of the object to be created.</typeparam>
     /// <returns>A new object with the type <typeparamref name="T"/>.</returns>
-    public static T? TryParseEntry<T>(SearchResultEntry entry, out string? error) where T : class, new() {
+    public static T? TryParseEntry<T>(SearchResultEntry entry, out string? error, bool getAllAttributes = false) where T : class, new() {
         try {
             error = null;
-            return ParseEntry<T>(entry);
+            return ParseEntry<T>(entry, getAllAttributes);
         }
         catch (Exception e) {
             error = e.GetError();

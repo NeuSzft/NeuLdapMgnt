@@ -23,7 +23,7 @@ public static class LdapServiceValueExtensions {
     public static bool SetValue(this LdapService ldap, string name, string value, out string? error) {
         ldap.TryRequest(new AddRequest($"ou=values,{ldap.DnBase}", "organizationalUnit"));
 
-        if (ldap.ValueExists(name)) {
+        if (!ldap.ValueExists(name)) {
             AddRequest addRequest = new($"cn={name},ou=values,{ldap.DnBase}",
                 new("objectClass", "applicationProcess"),
                 new("description", value)

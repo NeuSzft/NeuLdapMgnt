@@ -74,15 +74,9 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("homeDirectory")]
 		public virtual string HomeDirectory { get; set; } = string.Empty;
 
-        [JsonIgnore]
-        public string PlainPassword {
-            get => Password;
-            set => Password = new UserPassword(value, 16).ToString();
-        }
-
 		[Required, PasswordPropertyText, MinLength(8)]
-		[JsonRequired, JsonPropertyName("password")]
-		[LdapAttribute("userPassword")]
+		[JsonInclude, JsonPropertyName("password")]
+		[LdapAttribute("userPassword", false)]
 		public virtual string Password { get; set; } = string.Empty;
 
 		[JsonPropertyName("full_name")]
