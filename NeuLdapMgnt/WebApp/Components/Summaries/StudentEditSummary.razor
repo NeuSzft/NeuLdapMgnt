@@ -1,0 +1,128 @@
+﻿<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2">OM:</div>
+	<div class="col-4 student-original-id">@StudentOriginal.Id</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-id">
+		@if (StudentOriginal.Id != StudentEdited.Id)
+		{
+			<strong>@StudentEdited.Id</strong>
+		}
+		else
+		{
+			@StudentEdited.Id
+		}
+	</div>
+</div>
+<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2">Name:</div>
+	<div class="col-4 student-original-fullname">@StudentOriginal.FullName</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-fullname">
+		@if (StudentOriginal.FullName != StudentEdited.FullName)
+		{
+			<strong>@StudentEdited.FullName</strong>
+		}
+		else
+		{
+			@StudentEdited.FullName
+		}
+	</div>
+</div>
+<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2">Class:</div>
+	<div class="col-4 student-original-class">@StudentOriginal.Class</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-class">
+		@if (StudentOriginal.Class != StudentEdited.Class)
+		{
+			<strong>@StudentEdited.Class</strong>
+		}
+		else
+		{
+			@StudentEdited.Class
+		}
+	</div>
+</div>
+<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2">Username:</div>
+	<div class="col-4 student-original-username">@StudentOriginal.Username</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-class">
+		@if (StudentOriginal.Username != StudentEdited.Username)
+		{
+			<strong>@StudentEdited.Username</strong>
+		}
+		else
+		{
+			@StudentEdited.Username
+		}
+	</div>
+</div>
+<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2 text-nowrap">User Id:</div>
+	<div class="col-4 student-original-uid">@StudentOriginal.Uid</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-class">
+		@if (StudentOriginal.Uid != StudentEdited.Uid)
+		{
+			<strong>@StudentEdited.Uid</strong>
+		}
+		else
+		{
+			@StudentEdited.Uid
+		}
+	</div>
+</div>
+<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2 text-nowrap">Group Id:</div>
+	<div class="col-4 student-original-gid">@StudentOriginal.Gid</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-class">
+		@if (StudentOriginal.Gid != StudentEdited.Gid)
+		{
+			<strong>@StudentEdited.Gid</strong>
+		}
+		else
+		{
+			@StudentEdited.Gid
+		}
+	</div>
+</div>
+<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2">Email:</div>
+	<div class="col-4 text-break student-original-email">@StudentOriginal.Email</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 text-break student-edited-class">
+		@if (StudentOriginal.Email != StudentEdited.Email)
+		{
+			<strong>@StudentEdited.Email</strong>
+		}
+		else
+		{
+			@StudentEdited.Email
+		}
+	</div>
+</div>
+<div class="row mb-2">
+	<div class="col-3 col-sm-2">Directory:</div>
+	<div class="col-4 student-original-home-dir">@StudentOriginal.HomeDirectory</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-class">
+		@if (StudentOriginal.HomeDirectory != StudentEdited.HomeDirectory)
+		{
+			<strong>@StudentEdited.HomeDirectory</strong>
+		}
+		else
+		{
+			@StudentEdited.HomeDirectory
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public Student StudentOriginal { get; set; } = default!;
+
+	[Parameter]
+	public Student StudentEdited { get; set; } = default!;
+}
