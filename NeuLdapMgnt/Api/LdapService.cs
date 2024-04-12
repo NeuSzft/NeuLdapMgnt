@@ -120,10 +120,7 @@ public sealed class LdapService {
         T obj = new();
 
         foreach (PropertyInfo info in typeof(T).GetProperties())
-            if (info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute) {
-                if (!attribute.ReturnFormDb && !getAllAttributes)
-                    continue;
-
+            if (info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute && (attribute.ReturnFormDb || getAllAttributes)) {
                 string? value = entry.Attributes[attribute.Name].GetValues(typeof(string)).FirstOrDefault() as string;
                 info.SetValue(obj, Convert.ChangeType(value, info.PropertyType));
             }

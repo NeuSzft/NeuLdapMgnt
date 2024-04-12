@@ -27,7 +27,7 @@ public static class LdapServiceEntityExtensions {
     /// <returns>An <see cref="IEnumerable{T}"/> containing the entities.</returns>
     /// <remarks>If an entity cannot be parsed then it is ignored and not returned.</remarks>
     public static IEnumerable<T> GetAllEntities<T>(this LdapService ldap) where T : class, new() {
-        SearchRequest   request  = new($"ou={typeof(T).GetOuName()},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Subtree, null);
+        SearchRequest   request  = new($"ou={typeof(T).GetOuName()},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.OneLevel, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
         if (response is null)
