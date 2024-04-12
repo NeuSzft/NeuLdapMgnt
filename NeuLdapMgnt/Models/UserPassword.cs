@@ -14,11 +14,16 @@ public sealed partial class UserPassword {
     /// <summary>The salt used for the hashing of the password.</summary>
     public byte[] Salt { get; private set; } = { };
 
+    /// <summary>Determines whether the user's account is locked.</summary>
+    public bool Locked { get; set; }
+
     /// <summary>Initializes a new <see cref="UserPassword"/>.</summary>
     /// <param name="password">The password to hash.</param>
     /// <param name="saltLength">The length of the salt to generate in bytes.</param>
-    public UserPassword(string password, int saltLength) {
+    /// <param name="locked">Determines whether the user's account is locked.</param>
+    public UserPassword(string password, int saltLength, bool locked = false) {
         SetPassword(password, saltLength);
+        Locked = locked;
     }
 
     /// <summary>Initializes a new <see cref="UserPassword"/> from a string in the Modular Crypt Format.</summary>
@@ -33,8 +38,9 @@ public sealed partial class UserPassword {
         if (splitMcf[1] != "6")
             throw new ArgumentException("The hashing algorithm must be SHA-512");
 
-        Salt = DecodeBytes(splitMcf[2]);
-        Hash = DecodeBytes(splitMcf[3]);
+        Locked = splitMcf[0].Contains('!');
+        Salt   = DecodeBytes(splitMcf[2]);
+        Hash   = DecodeBytes(splitMcf[3]);
     }
 
     /// <summary>Sets the password hash and salt.</summary>
@@ -56,6 +62,6 @@ public sealed partial class UserPassword {
     /// <summary>Returns the password in the Modular Crypt Format.</summary>
     /// <returns>The password formatted as "<c>$6${encodedPasswordSalt}${encodedPasswordHash}</c>".</returns>
     public override string ToString() {
-        return $"$6${EncodeBytes(Salt)}${EncodeBytes(Hash)}";
+        return $"{(Locked ? "!" : string.Empty)}$6${EncodeBytes(Salt)}${EncodeBytes(Hash)}";
     }
 }
