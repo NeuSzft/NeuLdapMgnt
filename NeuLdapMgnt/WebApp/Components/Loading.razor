@@ -1,5 +1,13 @@
-﻿<div class="d-flex justify-content-center">
-	<div class="spinner-border" role="status">
-		<label class="visually-hidden">Loading...</label>
+﻿<div class="row text-center">
+	<div class="col-12 mb-3">
+		<Spinner Type="SpinnerType.Border" />
+	</div>
+	<div class="col">
+		<strong role="status">@Text</strong>
 	</div>
 </div>
+
+@code {
+	[Parameter]
+	public string Text { get; set; } = string.Empty;
+}
