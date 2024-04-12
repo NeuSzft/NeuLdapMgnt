@@ -140,7 +140,7 @@ namespace NeuLdapMgnt.WebApp.Requests
 		}
 
 		// Uploads a file to the server, specifically for importing student data via CSV
-		public async Task<RequestResult?> UploadStudentFileAsync(IBrowserFile file)
+		public async Task<RequestResult> UploadStudentFileAsync(IBrowserFile file)
 		{
 			EnsureAuthentication();
 
@@ -153,7 +153,7 @@ namespace NeuLdapMgnt.WebApp.Requests
 
 			var result = await response.Content.ReadFromJsonAsync<RequestResult>();
 			UpdateToken(result);
-			return result ?? null;
+			return result!;
 		}
 
 		public void SetBaseAddress(Uri url)
