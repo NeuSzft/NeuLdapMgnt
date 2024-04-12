@@ -8,8 +8,8 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 		{
 			return new()
 			{
-				YesButtonText = "Yes",
-				YesButtonColor = ButtonColor.Success,
+				YesButtonText = "Edit",
+				YesButtonColor = ButtonColor.Warning,
 				NoButtonText = "Cancel",
 				NoButtonColor = ButtonColor.Secondary,
 				Size = size
