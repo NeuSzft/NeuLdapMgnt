@@ -1,4 +1,5 @@
 ﻿using BlazorBootstrap;
+using Microsoft.AspNetCore.Components;
 using System.Net;
 
 namespace NeuLdapMgnt.WebApp.ComponentOptions
@@ -22,6 +23,16 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 				Type = ToastType.Danger,
 				AutoHide = true,
 				Message = "Incorrect username or password!"
+			};
+		}
+
+		public static ToastMessage NoConnection()
+		{
+			return new()
+			{
+				Type = ToastType.Danger,
+				AutoHide = true,
+				Message = "Failed to connect to the api!"
 			};
 		}
 
@@ -75,12 +86,12 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 			};
 		}
 
-		public static ToastMessage Warning(string message)
+		public static ToastMessage Warning(string message, bool autoHide = false)
 		{
 			return new()
 			{
 				Type = ToastType.Warning,
-				AutoHide = false,
+				AutoHide = autoHide,
 				Message = message
 			};
 		}
