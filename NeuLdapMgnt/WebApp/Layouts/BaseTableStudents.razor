@@ -200,10 +200,6 @@
 		{
 			await modalErrors.ShowAsync();
 		}
-		else
-		{
-			await ModalService.ShowAsync(ModalOptions.Success("Success", $"Successfully deleted ({deletedStudents.Count}) students"));
-		}
 
 		await HideModalEdit();
 	}
