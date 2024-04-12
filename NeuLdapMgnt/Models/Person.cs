@@ -1,8 +1,9 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models
@@ -57,7 +58,10 @@ namespace NeuLdapMgnt.Models
 
 		[AllowNull]
 		[JsonPropertyName("middle_name")]
-		public virtual string? MiddleName { get => middleName; set
+		public virtual string? MiddleName
+		{
+			get => middleName;
+			set
 			{
 				middleName = value;
 				FullName = GetFullName();
@@ -85,12 +89,25 @@ namespace NeuLdapMgnt.Models
 
 		private string GetFullName()
 		{
+			StringBuilder builder = new();
 			TextInfo textInfo = new CultureInfo("hu-HU", false).TextInfo;
 			string capitalizedFirstName = textInfo.ToTitleCase(FirstName);
 			string? capitalizedMiddleName = string.IsNullOrEmpty(MiddleName) ? null : textInfo.ToTitleCase(MiddleName);
 			string capitalizedLastName = textInfo.ToTitleCase(LastName);
 
-			return string.Join(' ', new[] { capitalizedFirstName, capitalizedMiddleName, capitalizedLastName }.Where(x => x is not null));
+			if (string.IsNullOrEmpty(capitalizedMiddleName))
+			{
+				builder.Append(capitalizedFirstName + ' ');
+				builder.Append(capitalizedLastName);
+			}
+			else
+			{
+				builder.Append(capitalizedFirstName + ' ');
+				builder.Append(capitalizedMiddleName + ' ');
+				builder.Append(capitalizedLastName);
+			}
+
+			return builder.ToString();
 		}
 
 		public string GetUsername()
