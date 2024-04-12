@@ -40,9 +40,20 @@
 				ToastService.Notify(ToastMessages.InvalidCredentials());
 			}
 		}
-		catch (Exception e)
+		catch (HttpRequestException httpError)
 		{
-			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
+			if (httpError.Message.Contains("Failed to fetch"))
+			{
+				ToastService.Notify(ToastMessages.NoConnection());
+			}
+			else
+			{
+				ToastService.Notify(ToastMessages.Error(httpError.Message));
+			}
+		}
+		catch(Exception e)
+		{
+			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
 	}
 }
