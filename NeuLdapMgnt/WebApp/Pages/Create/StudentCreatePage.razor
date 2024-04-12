@@ -55,7 +55,7 @@
 			var response = await ApiRequests.AddStudentAsync(studentUpdated);
 			if (response.IsSuccess())
 			{
-				ToastService.Notify(ToastMessages.Success($"{studentUpdated.Id} ({studentUpdated.FullName}) was successfully added"));
+				ToastService.Notify(ToastMessages.Success($"{studentUpdated.Id} ({studentUpdated.FullName}) was added!"));
 				NavManager.NavigateTo("/students");
 			}
 
@@ -88,7 +88,7 @@
 			var response = await ApiRequests.UploadStudentFileAsync(file);
 			if (response.IsSuccess())
 			{
-				ToastService.Notify(ToastMessages.Success($"Imported successfully ({file.Name})!"));
+				ToastService.Notify(ToastMessages.Success($"{file.Name} imported!"));
 			}
 
 			if (response.Errors.Any())
