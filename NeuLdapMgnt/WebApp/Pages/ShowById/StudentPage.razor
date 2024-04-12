@@ -61,10 +61,7 @@ else
 			if (response.Errors.Any())
 			{
 				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
-				return false;
 			}
-
-			return false;
 		}
 		catch (HttpRequestException httpError)
 		{
@@ -107,8 +104,6 @@ else
 			{
 				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
 			}
-
-			return false;
 		}
 		catch (HttpRequestException httpError)
 		{
