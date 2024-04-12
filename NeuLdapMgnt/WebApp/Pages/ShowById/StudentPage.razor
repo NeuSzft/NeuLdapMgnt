@@ -31,9 +31,9 @@ else
 		student = searchedStudent;
 	}
 
-	private async Task OnSubmit(Student editedStudent)
+	private async Task<bool> OnSubmit(Student editedStudent)
 	{
-		if (student.Equals(editedStudent)) return;
+		if (student.Equals(editedStudent)) return false;
 
 		try
 		{
@@ -42,18 +42,20 @@ else
 			parameters.Add("StudentEdited", editedStudent);
 
 			var confirmation = await dialog.ShowAsync<StudentEditSummary>("Edit student?", parameters, DialogOptions.Edit());
-			if (!confirmation) return;
+			if (!confirmation) return false;
 
 			var response = await ApiRequests.UpdateStudentAsync(student.Id, editedStudent);
 			if (response.IsSuccess())
 			{
 				ToastService.Notify(ToastMessages.Warning($"{student.FullName} was edited!", true));
 				NavManager.NavigateTo("/students");
+				return true;
 			}
 
 			if (response.Errors.Any())
 			{
 				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
+				return false;
 			}
 		}
 		catch (HttpRequestException httpError)
@@ -71,6 +73,8 @@ else
 		{
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
+
+		return false;
 	}
 
 	private async Task OnDelete(Student editedStudent)

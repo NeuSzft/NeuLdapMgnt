@@ -146,7 +146,7 @@
 	public Student TheStudent { get; set; } = StudentFactory.CreateEmptyStudent().Build();
 
 	[Parameter]
-	public EventCallback<Student> OnSubmit { get; set; }
+	public Func<Student, Task<bool>> OnSubmit { get; set; } = default!;
 
 	[Parameter]
 	public EventCallback<Student> OnDelete { get; set; }
@@ -166,11 +166,11 @@
 		studentUpdated = Utils.GetClone<Student>(studentOriginal)!;
 	}
 
-	protected override void OnParametersSet() => StateHasChanged();
-
 	private async Task HandleOnSubmit()
 	{
-		await OnSubmit.InvokeAsync(studentUpdated);
+		bool isSubmitted = await OnSubmit.Invoke(studentUpdated);
+		if (!isSubmitted) return;
+		studentUpdated = Utils.GetClone<Student>(studentOriginal)!;
 	}
 
 	private async Task HandleOnDelete()

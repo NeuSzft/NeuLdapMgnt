@@ -2,12 +2,12 @@
 
 <PageTitle>Add student</PageTitle>
 
-<Modal @ref="modal" title="Error during import" IsScrollable="true" ModalType="ModalType.Danger">
+<Modal @ref="modal" title="@modalTitle" IsScrollable="true" ModalType="ModalType.Danger">
 	<BodyTemplate>
-		<CustomList List="ErrorList" />
+		<CustomList List="errorList" />
 	</BodyTemplate>
 	<FooterTemplate>
-		<Button Color="ButtonColor.Secondary" @onclick="HideModalClick">Ok</Button>
+		<Button Color="ButtonColor.Secondary" @onclick="HideModal">Ok</Button>
 	</FooterTemplate>
 </Modal>
 
@@ -16,52 +16,69 @@
 		<h1 class="d-inline-block">Add student</h1>
 	</div>
 	<div class="col-12 col-xl text-end">
-		<FileUpload OnFileUploaded="OnFileUploaded" />
+		@if (!isUploading)
+		{
+			<FileUpload OnFileUploaded="OnFileUploaded" />
+		}
 	</div>
 </div>
 
-<BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
-<ConfirmDialog @ref="dialog" />
+@if (isUploading)
+{
+	<Loading Text="Importing students" />
+}
+else
+{
+	<BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
+	<ConfirmDialog @ref="dialog" />
+}
 
 @code {
-	private Student? student = StudentFactory.CreateEmptyStudent().Build();
-	private List<string> ErrorList = new();
+	private Student student = StudentFactory.CreateEmptyStudent().Build();
+	private List<string> errorList = new();
 	private Modal modal = default!;
 	private ConfirmDialog dialog = default!;
+
+	private string modalTitle => $"{errorList.Count} Error(s) during import";
+	private bool isUploading = false;
 
 	protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 	}
 
-	private async Task OnSubmit(Student studentUpdated)
+	private async Task<bool> OnSubmit(Student studentUpdated)
 	{
-		if (dialog == null)
-		{
-			ToastService.Notify(ToastMessages.Error("System not initialized properly."));
-			return;
-		}
-
-		if (student!.Equals(studentUpdated)) return;
-
 		try
 		{
 			var parameters = new Dictionary<string, object>();
 			parameters.Add("Student", studentUpdated);
 
-			var confirmation = await dialog.ShowAsync<StudentSummary>("Create this student?", parameters);
-			if (!confirmation) return;
+			var confirmation = await dialog.ShowAsync<StudentSummary>("Create this student?", parameters, DialogOptions.Confirm());
+			if (!confirmation) return false;
 
+			isUploading = true;
 			var response = await ApiRequests.AddStudentAsync(studentUpdated);
+			isUploading = false;
+
 			if (response.IsSuccess())
 			{
-				ToastService.Notify(ToastMessages.Success($"{studentUpdated.Id} ({studentUpdated.FullName}) was added!"));
-				NavManager.NavigateTo("/students");
+				ToastService.Notify(ToastMessages.Success($"{studentUpdated.FullName} ({studentUpdated.Id}) was added!"));
+				student = StudentFactory.CreateEmptyStudent().Build();
+				return true;
 			}
 
 			if (response.Errors.Any())
 			{
-				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
+				if (response.GetError().Equals("The object already exists."))
+				{
+					ToastService.Notify(ToastMessages.Danger($"OM: {studentUpdated.Id} already exists."));
+				}
+				else
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+				return false;
 			}
 		}
 		catch (HttpRequestException httpError)
@@ -79,13 +96,18 @@
 		{
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
+
+		return false;
 	}
 
 	private async Task OnFileUploaded(IBrowserFile file)
 	{
 		try
 		{
+			isUploading = true;
 			var response = await ApiRequests.UploadStudentFileAsync(file);
+			isUploading = false;
+
 			if (response.IsSuccess())
 			{
 				ToastService.Notify(ToastMessages.Success($"{file.Name} imported!"));
@@ -93,9 +115,10 @@
 
 			if (response.Errors.Any())
 			{
-				ErrorList = response.Errors.ToList();
-				await ShowModalClick();
+				errorList = response.Errors.ToList();
+				await ShowModal();
 			}
+
 		}
 		catch (HttpRequestException httpError)
 		{
@@ -114,9 +137,9 @@
 		}
 	}
 
-	private async Task ShowModalClick() => await modal!.ShowAsync();
+	private async Task ShowModal() => await modal!.ShowAsync();
 
-	private async Task HideModalClick()
+	private async Task HideModal()
 	{
 		await modal!.HideAsync();
 		NavManager.NavigateTo("/students");
