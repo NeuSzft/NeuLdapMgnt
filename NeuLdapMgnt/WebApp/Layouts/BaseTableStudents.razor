@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
+<ConfirmDialog @ref="dialog" />
+
 <Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true">
 	<BodyTemplate>
 
@@ -13,7 +15,7 @@
 
 <Modal @ref="modalErrors" title="Errors" ModalType="ModalType.Danger" Size="ModalSize.Regular" IsScrollable="true">
 	<BodyTemplate>
-		<CustomList List="ErrorList"/>
+		<CustomList List="ErrorList" />
 	</BodyTemplate>
 	<FooterTemplate>
 		<Button Color="ButtonColor.Secondary" @onclick="HideModalErrorList">Ok</Button>
@@ -105,6 +107,7 @@
 	private List<Student> selectedStudents = new();
 	private Timer? searchDelayTimer;
 
+	private ConfirmDialog dialog = default!;
 	private Modal modalEdit = default!;
 	private Modal modalErrors = default!;
 	private List<string> ErrorList = new();
@@ -156,28 +159,31 @@
 	private async Task DeleteSelected()
 	{
 		if (!selectedStudents.Any()) return;
-
 		List<Student> deletedStudents = new();
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("List", selectedStudents.Select(x => $"{x.Id}: {x.FullName}").ToList());
+
+		var confirmation = await dialog.ShowAsync<CustomList>(
+			title: $"Delete ({selectedStudents.Count}) students?",
+			parameters: parameters,
+			confirmDialogOptions: DialogOptions.Delete()
+		);
+
+		if (!confirmation) return;
+
 		try
 		{
 			foreach (var student in selectedStudents)
 			{
 				var response = await ApiRequests.DeleteStudentAsync(student.Id);
-
-				if (response is null)
+				if (response.IsSuccess())
 				{
-					await ModalService.ShowAsync(ModalOptions.NoConnection());
-					return;
-				}
-
-				if (!response.IsSuccess())
-				{
-					ErrorList.Add(response.GetError());
-					Console.WriteLine(response.GetError());
+					deletedStudents.Add(student);
+					ToastService.Notify(ToastMessages.Success($"Deleted {student.Id}"));
 				}
 				else
 				{
-					deletedStudents.Add(student);
+					ErrorList.Add(response.GetError());
 				}
 			}
 		}
