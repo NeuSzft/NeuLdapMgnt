@@ -8,12 +8,12 @@ namespace NeuLdapMgnt.Api;
 
 public static class LdapServiceGroupExtensions {
     /// <summary>Checks if the group exists within the database using it's uid.</summary>
-    /// <param name="service">The <see cref="LdapService"/> the method should use.</param>
+    /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
     /// <param name="name">The name of the group.</param>
     /// <returns><c>true</c> if the group exists. If it does not exist or the search request fails it returns <c>false</c>.</returns>
-    public static bool GroupExists(this LdapService service, string name) {
-        SearchRequest   request  = new($"ou={name},{service.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
-        SearchResponse? response = service.TryRequest(request) as SearchResponse;
+    public static bool GroupExists(this LdapService ldap, string name) {
+        SearchRequest   request  = new($"ou={name},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
+        SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
         return response?.Entries.Count == 1;
     }
@@ -46,7 +46,7 @@ public static class LdapServiceGroupExtensions {
         if (response is null || response.Entries.Count == 0)
             return [];
 
-        return response.Entries[0].Attributes["uid"].GetValues(typeof(string)).Select(x => x.ToString()).NotNull();
+        return response.Entries[0].Attributes["uid"].GetValues(typeof(string)).Select(x => x.ToString()).Where(x => x != "__DEFAULT__").NotNull();
     }
 
     /// <summary>Tries to add the group to the database with the specified name.</summary>

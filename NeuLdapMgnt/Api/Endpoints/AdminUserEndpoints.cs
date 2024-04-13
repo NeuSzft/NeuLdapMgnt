@@ -9,7 +9,7 @@ namespace NeuLdapMgnt.Api.Endpoints;
 public static class AdminUserEndpoints {
     public static void MapAdminUserEndpoints(this WebApplication app) {
         app.MapGet("/api/admins", (LdapService ldap, HttpRequest request) => {
-               IEnumerable<string> uids = ldap.GetMembersOfGroup("admins");
+               IEnumerable<string> uids = ldap.GetMembersOfGroup("admin");
                return new RequestResult<IEnumerable<string>>().SetValues(uids).RenewToken(request).ToResult();
            })
            .WithOpenApi()
@@ -20,7 +20,7 @@ public static class AdminUserEndpoints {
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
         app.MapPost("/api/admins/{id}", (LdapService ldap, HttpRequest request, string id) => {
-               var result = ldap.TryAddEntityToGroup("admins", id);
+               var result = ldap.TryAddEntityToGroup("admin", id);
                return result.RenewToken(request).ToResult();
            })
            .WithOpenApi()
@@ -33,7 +33,7 @@ public static class AdminUserEndpoints {
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
         app.MapDelete("/api/admins/{id}", (LdapService ldap, HttpRequest request, string id) => {
-               var result = ldap.TryRemoveEntityFromGroup("admins", id);
+               var result = ldap.TryRemoveEntityFromGroup("admin", id);
                return result.RenewToken(request).ToResult();
            })
            .WithOpenApi()
