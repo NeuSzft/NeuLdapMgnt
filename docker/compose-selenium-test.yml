@@ -1,0 +1,77 @@
+services:
+  testing-webapp-build:
+    build:
+      context: ..
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:7.0
+        COPY ./NeuLdapMgnt/WebApp /build/WebApp
+        COPY ./NeuLdapMgnt/Models /build/Models
+        WORKDIR /build/WebApp
+        ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+    networks:
+      - net-selenium
+    volumes:
+      - webapp-selenium:/app
+
+  nginx:
+    image: nginx
+    depends_on:
+      testing-webapp-build:
+        condition: service_completed_successfully
+    networks:
+      - net-selenium
+    ports:
+      - 8080:80
+    volumes:
+      - ../docker/nginx-selenium.conf:/etc/nginx/nginx.conf:ro
+      - webapp-selenium:/app:ro
+
+  selenium-tests:
+    build:
+      context: ..
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:7.0
+        COPY ./NeuLdapMgnt/WebApp.Tests /app/WebApp.Tests
+        COPY ./NeuLdapMgnt/Models /app/Models
+        WORKDIR /app/WebApp.Tests
+        ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/app/WebApp.Tests/README.md" ]
+    depends_on:
+      selenium-hub:
+        condition: service_started
+      node-firefox:
+        condition: service_started
+      nginx:
+        condition: service_started
+    volumes:
+      - ../NeuLdapMgnt/WebApp.Tests:/app/WebApp.Tests
+    networks:
+      - net-selenium
+
+  selenium-hub:
+    image: selenium/hub:4.0.0
+    container_name: selenium-hub
+    ports:
+      - 4444:4444
+    networks:
+      - net-selenium
+
+  node-firefox:
+    image: selenium/node-firefox:4.17.0-20240123
+    shm_size: 2gb
+    depends_on:
+      selenium-hub:
+        condition: service_started
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - net-selenium
+
+networks:
+  net-selenium:
+
+volumes:
+  webapp-selenium:
