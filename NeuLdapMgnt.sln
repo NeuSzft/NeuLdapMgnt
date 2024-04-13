@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Models", "NeuLd
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.WebApp", "NeuLdapMgnt\WebApp\NeuLdapMgnt.WebApp.csproj", "{459FF117-4555-4584-9C63-ED9E55D1CE6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuLdapMgnt.WebApp.Tests", "NeuLdapMgnt\WebApp.Tests\NeuLdapMgnt.WebApp.Tests.csproj", "{DF6FD9A5-960E-4490-B523-1805101A4245}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{459FF117-4555-4584-9C63-ED9E55D1CE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{459FF117-4555-4584-9C63-ED9E55D1CE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{459FF117-4555-4584-9C63-ED9E55D1CE6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF6FD9A5-960E-4490-B523-1805101A4245}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF6FD9A5-960E-4490-B523-1805101A4245}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF6FD9A5-960E-4490-B523-1805101A4245}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF6FD9A5-960E-4490-B523-1805101A4245}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
