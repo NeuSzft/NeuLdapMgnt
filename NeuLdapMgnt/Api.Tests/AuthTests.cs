@@ -22,8 +22,8 @@ public class AuthTests {
     }
 
     [TestMethod]
-    public async Task TestWrongCredentials() {
-        var request  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("testuser", "wrongpass");
+    public async Task TestWrongAdminUsername() {
+        var request  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("wrongadmin", "adminpass");
         var response = await Testing.Client.SendAsync(request);
 
         Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -31,8 +31,17 @@ public class AuthTests {
     }
 
     [TestMethod]
-    public async Task TestCorrectCredentialsAndResultToken() {
-        var    request1  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("testuser", "password");
+    public async Task TestWrongAdminPassword() {
+        var request  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("admin", "wrongpass");
+        var response = await Testing.Client.SendAsync(request);
+
+        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.AreEqual("Wrong credentials.", await response.Content.ReadAsStringAsync());
+    }
+
+    [TestMethod]
+    public async Task TestCorrectAdminCredentialsAndResultToken() {
+        var    request1  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("admin", "adminpass");
         var    response1 = await Testing.Client.SendAsync(request1);
         string token     = await response1.Content.ReadAsStringAsync();
 

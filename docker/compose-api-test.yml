@@ -32,7 +32,7 @@ services:
                 condition: service_completed_successfully
         environment:
             ASPNETCORE_ENVIRONMENT: Development
-            LDAP_ADDRESS: openldap
+            LDAP_ADDRESS: testing-openldap
             LDAP_PORT: 389
             LDAP_USERNAME: cn=admin,dc=test,dc=local
             LDAP_PASSWORD: admin
