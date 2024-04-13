@@ -13,7 +13,7 @@ services:
     volumes:
       - webapp-selenium:/app
 
-  nginx:
+  testing-nginx:
     image: nginx
     depends_on:
       testing-webapp-build:
@@ -40,7 +40,7 @@ services:
         condition: service_started
       node-firefox:
         condition: service_started
-      nginx:
+      testing-nginx:
         condition: service_started
     volumes:
       - ../NeuLdapMgnt/WebApp.Tests:/app/WebApp.Tests
