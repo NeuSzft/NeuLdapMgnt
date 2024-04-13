@@ -106,6 +106,24 @@ public sealed class LdapService {
         return results;
     }
 
+    public List<string> EraseTreeElements(string distinguishedName) {
+        SearchRequest   searchRequest = new(distinguishedName, AnyFilter, SearchScope.OneLevel, null);
+        SearchResponse? response      = TryRequest(searchRequest, out var error) as SearchResponse;
+
+        if (response is null)
+            return [error!];
+
+        List<string> errors = new();
+
+        foreach (SearchResultEntry entry in response.Entries) {
+            errors.AddRange(EraseTreeElements(entry.DistinguishedName));
+            if (TryRequest(new DeleteRequest(entry.DistinguishedName), out error) is null)
+                errors.Add(error!);
+        }
+
+        return errors;
+    }
+
     public const string AnyFilter = "(objectClass=*)";
 
     /// <summary>Creates a new instance of the specified type and tries to set it's properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
