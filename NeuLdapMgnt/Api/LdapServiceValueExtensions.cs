@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 
 namespace NeuLdapMgnt.Api;
 
+// TODO: Add xml doc comments to this class
 public static class LdapServiceValueExtensions {
     public static bool ValueExists(this LdapService ldap, string name) {
         SearchRequest   request  = new($"cn={name},ou=values,{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
@@ -42,5 +44,20 @@ public static class LdapServiceValueExtensions {
         modRequest.Modifications.Add(mod);
 
         return ldap.TryRequest(modRequest, out error) is not null;
+    }
+
+    public static Dictionary<string, string> GetAllValues(this LdapService ldap, out string? error) {
+        SearchRequest   request  = new($"ou=values,{ldap.DnBase}", LdapService.AnyFilter, SearchScope.OneLevel, null);
+        SearchResponse? response = ldap.TryRequest(request, out error) as SearchResponse;
+
+        if (response is null)
+            return [];
+
+        Dictionary<string, string> values = new();
+
+        foreach (SearchResultEntry entry in response.Entries)
+            values.Add(entry.Attributes["cn"].GetValues(typeof(string))[0].ToString()!, entry.Attributes["description"].GetValues(typeof(string))[0].ToString()!);
+
+        return values;
     }
 }
