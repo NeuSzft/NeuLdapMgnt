@@ -11,7 +11,7 @@
 	</div>
 
 	<div class="form-floating">
-		<NumberInput Disabled="@(CanDelete || IsReadonly)"
+		<NumberInput Disabled="@(CanDelete || IsReadonly || isAction)"
 					 @bind-Value="studentUpdated!.Id"
 					 TValue="long"
 					 Min="@Student.AllowedIdRange.Min"
@@ -32,17 +32,17 @@
 
 		<div class="d-flex flex-column flex-md-row gap-2 w-100">
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
+				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
 				<label for="givenName">First</label>
 				<ValidationMessage For="() => studentUpdated.FirstName" />
 			</div>
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
+				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
 				<label for="lastName">Last</label>
 				<ValidationMessage For="() => studentUpdated.LastName" />
 			</div>
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@IsReadonly" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
+				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
 				<label for="middleName">Middle</label>
 				<ValidationMessage For="() => studentUpdated.MiddleName" />
 			</div>
@@ -60,7 +60,7 @@
 		</label>
 		<div class="d-flex flex-column flex-md-row gap-2 w-100">
 			<div class="form-floating w-100">
-				<InputSelect class="form-select rounded" id="class-year-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassYear">
+				<InputSelect class="form-select rounded" id="class-year-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.ClassYear">
 					@foreach (string year in Student.AllowedYears)
 					{
 						<option value="@year" selected="@year.Equals(studentUpdated.ClassYear)">@year</option>
@@ -69,7 +69,7 @@
 				<label for="class-year-select">Year</label>
 			</div>
 			<div class="form-floating w-100">
-				<InputSelect class="form-select rounded" id="class-group-select" disabled="@IsReadonly" @bind-Value="studentUpdated.ClassGroup">
+				<InputSelect class="form-select rounded" id="class-group-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.ClassGroup">
 					@foreach (var group in Student.AllowedGroups)
 					{
 						<option value="@group" selected="@group.Equals(studentUpdated.ClassGroup)">@group</option>
@@ -82,13 +82,13 @@
 	<ValidationMessage For="() => studentUpdated.Class" />
 
 	<div class="form-floating">
-		<InputText class="form-control" disabled="@IsReadonly" id="username" @bind-Value="studentUpdated.Username" />
+		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="username" @bind-Value="studentUpdated.Username" />
 		<label for="username">Username</label>
 		<ValidationMessage For="() => studentUpdated.Username" />
 	</div>
 
 	<div class="form-floating">
-		<NumberInput Disabled="@IsReadonly"
+		<NumberInput Disabled="@(IsReadonly || isAction)"
 					 @bind-Value="studentUpdated.Uid"
 					 TValue="int"
 					 Min="@Student.AllowedUidRange.Min"
@@ -99,7 +99,7 @@
 	</div>
 
 	<div class="form-floating">
-		<NumberInput Disabled="@IsReadonly"
+		<NumberInput Disabled="@(IsReadonly || isAction)"
 					 @bind-Value="studentUpdated.Gid"
 					 TValue="int"
 					 Min="@Student.AllowedGidRange.Min"
@@ -110,19 +110,19 @@
 	</div>
 
 	<div class="form-floating">
-		<InputText class="form-control" disabled="@IsReadonly" id="email" placeholder="Student@example.com" @bind-Value="studentUpdated.Email" />
+		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="email" placeholder="Student@example.com" @bind-Value="studentUpdated.Email" />
 		<label for="email">Email</label>
 		<ValidationMessage For="() => studentUpdated.Email" />
 	</div>
 
 	<div class="form-floating">
-		<InputText class="form-control" disabled="@IsReadonly" id="home-directory" placeholder="/home/Student" @bind-Value="studentUpdated.HomeDirectory" />
+		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="home-directory" placeholder="/home/Student" @bind-Value="studentUpdated.HomeDirectory" />
 		<label for="home-directory">Directory</label>
 		<ValidationMessage For="() => studentUpdated.HomeDirectory" />
 	</div>
 
 	<div class="form-floating">
-		<InputText type="password" class="form-control" disabled="@IsReadonly" id="password" @bind-Value="studentUpdated.Password" />
+		<InputText type="password" class="form-control" disabled="@(IsReadonly || isAction)" id="password" @bind-Value="studentUpdated.Password" />
 		<label for="password">Password</label>
 		<ValidationMessage For="() => studentUpdated.Password" />
 	</div>
@@ -134,27 +134,27 @@
 			{
 				@if (isDeleting)
 				{
-					<Button Color="ButtonColor.Danger" Outline="true">
+					<Button Color="ButtonColor.Danger" Outline="true" Disabled="true">
 						<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Danger" />
 					</Button>
 				}
 				else
 				{
-					<ButtonDelete OnClick="HandleOnDelete" Text="Delete" />
+					<ButtonDelete OnClick="HandleOnDelete" Text="Delete" IsDisabled="isAction" />
 				}
 			}
 
-			<ButtonCancel OnClick="ToggleEditMode" Text="Cancel" />
+			<ButtonCancel OnClick="ToggleEditMode" Text="Cancel" IsDisabled="isAction" />
 
 			@if (isSubmitting)
 			{
-				<Button Color="ButtonColor.Success" Outline="true">
+				<Button Color="ButtonColor.Success" Outline="true" Disabled="true">
 					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Success" />
 				</Button>
 			}
 			else
 			{
-				<ButtonSubmit Text="Submit" />
+				<ButtonSubmit Text="Submit" IsDisabled="isAction" />
 			}
 		</div>
 	}
