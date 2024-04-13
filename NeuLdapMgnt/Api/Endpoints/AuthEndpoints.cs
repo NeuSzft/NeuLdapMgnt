@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api.Endpoints;
 

@@ -45,20 +45,15 @@ public static class Authenticator {
     /// <param name="password">When the method returns, this will contain the password or an empty string on failure.</param>
     /// <returns><c>true</c> if the username and password were successfully set based on the Authorization header, otherwise <c>false</c>.</returns>
     public static bool TryGetCredentialsFromRequest(HttpRequest request, out string username, out string password) {
-        username = password = string.Empty;
-
-        if (request.Headers.Authorization.Count == 0)
-            return false;
-
         try {
             string   value       = request.Headers.Authorization.ToString().Split(' ')[1];
             string[] credentials = Encoding.UTF8.GetString(Convert.FromBase64String(value)).Split(':');
             username = credentials[0];
             password = credentials[1];
-
             return true;
         }
         catch {
+            username = password = string.Empty;
             return false;
         }
     }
@@ -69,8 +64,11 @@ public static class Authenticator {
     /// <returns>An <see cref="AuthResult"/> containing the result of the authentication attempt.</returns>
     /// <remarks>The authentication currently succeeds regardless of what username is specified as long as the password is "password".</remarks>
     public static AuthResult BasicAuth(LdapService ldap, HttpRequest request) {
-        if (!TryGetCredentialsFromRequest(request, out var username, out var password))
+        if (request.Headers.Authorization.Count == 0)
             return new(StatusCodes.Status400BadRequest, "Missing Authorization header.", null);
+
+        if (!TryGetCredentialsFromRequest(request, out var username, out var password))
+            return new(StatusCodes.Status400BadRequest, "Invalid Authorization header.", null);
 
         if (username == Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME").DefaultIfNullOrEmpty("admin")) {
             UserPassword? userPassword = GetAndSetDefaultAdminPasswordIfNotSet(ldap, out var error);
