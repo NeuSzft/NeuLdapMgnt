@@ -72,7 +72,7 @@ public static class Authenticator {
         if (!TryGetCredentialsFromRequest(request, out var username, out var password))
             return new(StatusCodes.Status400BadRequest, "Missing Authorization header.", null);
 
-        if (username == Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME")) {
+        if (username == Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME").DefaultIfNullOrEmpty("admin")) {
             UserPassword? userPassword = GetAndSetDefaultAdminPasswordIfNotSet(ldap, out var error);
             if (userPassword is null)
                 return new(StatusCodes.Status503ServiceUnavailable, error, null);

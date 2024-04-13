@@ -18,6 +18,6 @@ public static class AuthEndpoints {
            .Produces<string>(StatusCodes.Status401Unauthorized)
            .Produces<string>(StatusCodes.Status403Forbidden)
            .Produces<string>(StatusCodes.Status500InternalServerError)
-           .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
+           .Produces<string>(StatusCodes.Status503ServiceUnavailable);
     }
 }

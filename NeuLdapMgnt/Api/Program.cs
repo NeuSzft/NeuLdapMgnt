@@ -95,9 +95,17 @@ internal static class Program {
                 await next(context);
             }
             catch (LdapBindingException) {
-                var result = new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors("Unable to connect to the LDAP server.").RenewToken(context.Request);
-                context.Response.StatusCode = result.StatusCode;
-                await context.Response.WriteAsJsonAsync(result);
+                const string message = "Unable to connect to the LDAP server.";
+                context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+
+                if (context.Request.Headers.Authorization.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase)) {
+                    var result = new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(message).RenewToken(context.Request);
+                    await context.Response.WriteAsJsonAsync(result);
+                }
+                else {
+                    await context.Response.WriteAsync(message);
+                }
+
                 await context.Response.CompleteAsync();
             }
         });
