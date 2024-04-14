@@ -7,7 +7,7 @@ namespace NeuLdapMgnt.Api;
 // TODO: Add xml doc comments to this class
 public static class LdapServiceDbDumpExtensions {
     private static RequestResult EraseDatabase(this LdapService ldap) {
-        List<string> errors = ldap.EraseTreeElements(ldap.DnBase);
+        List<string> errors = ldap.EraseTreeElements(ldap.DomainComponents);
         return new RequestResult().SetStatus(errors.Count == 0 ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError).SetErrors(errors.ToArray());
     }
 

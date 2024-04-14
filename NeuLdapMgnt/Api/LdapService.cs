@@ -24,8 +24,9 @@ public record LdapResult(DirectoryResponse? Response, string? Error = null);
 
 /// <summary>The <see cref="LdapService"/> class provides helper methods for easier interaction with a LDAP server.</summary>
 public sealed class LdapService {
-    /// <summary>The base distinguished name to use for the requests.</summary>
-    public string DnBase { get; set; } = string.Empty;
+    /// <summary>The domain components to use for the requests.</summary>
+    /// <example>"<c>dc=example,dc=com</c>" for example.com</example>
+    public string DomainComponents { get; }
 
     /// <summary>The logger the helper should use.</summary>
     public ILogger? Logger { get; set; }
@@ -35,12 +36,14 @@ public sealed class LdapService {
 
     /// <param name="server">The address of the LDAP server.</param>
     /// <param name="port">The port of the LDAP server.</param>
-    /// <param name="user">The username to use when connecting to the LDAP server.</param>
+    /// <param name="domain">The LDAP domain.</param>
+    /// <param name="username">The username to use when connecting to the LDAP server.</param>
     /// <param name="password">The password of the user.</param>
-    /// <example><code>var ldapHelper = new LdapHelper("localhost", 389, "cn=admin,dc=example,dc=local", "AdminPass");</code></example>
-    public LdapService(string server, int port, string user, string password) {
-        _identifier = new(server, port);
-        _credential = new(user, password);
+    /// <example><code>var ldapHelper = new LdapHelper("localhost", 389, "example.local", "admin", "admin-password");</code></example>
+    public LdapService(string server, int port, string domain, string username, string password) {
+        DomainComponents = $"dc={domain.Replace(".", ",dc=")}";
+        _identifier      = new(server, port);
+        _credential      = new($"cn={username},{DomainComponents}", password);
     }
 
     /// <summary>Tries to send a request to the LDAP server.</summary>
@@ -106,6 +109,9 @@ public sealed class LdapService {
         return results;
     }
 
+    /// <summary>Recursively deletes all elements of the specified root element.</summary>
+    /// <param name="distinguishedName">The distinguished name of the root element.</param>
+    /// <returns>A <see cref="List{T}">List&lt;string&gt;</see> containing the errors that occured during the operations.</returns>
     public List<string> EraseTreeElements(string distinguishedName) {
         SearchRequest   searchRequest = new(distinguishedName, AnyFilter, SearchScope.OneLevel, null);
         SearchResponse? response      = TryRequest(searchRequest, out var error) as SearchResponse;
@@ -124,6 +130,7 @@ public sealed class LdapService {
         return errors;
     }
 
+    /// <summary>An LDAP filter that returns all objects.</summary>
     public const string AnyFilter = "(objectClass=*)";
 
     /// <summary>Creates a new instance of the specified type and tries to set it's properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
@@ -176,16 +183,24 @@ public sealed class LdapService {
     /// <summary>Creates a new <see cref="LdapService"/> using the specified environment variables.</summary>
     /// <param name="serverEnv">The environment variable that specifies the address of the LDAP server.</param>
     /// <param name="portEnv">The environment variable that specifies the port of the LDAP server.</param>
+    /// <param name="domainEnv">The environment variable that specifies the LDAP domain.</param>
     /// <param name="userEnv">The environment variable that specifies the username to use when connecting to the LDAP server.</param>
     /// <param name="passwordEnv">The environment variable that specifies the password of the user.</param>
     /// <returns>The new <see cref="LdapService"/>.</returns>
     /// <exception cref="ArgumentException">An environment variable is not set or is an empty string.</exception>
     /// <exception cref="FormatException">The value of <paramref name="portEnv"/> cannot be converted into an integer.</exception>
     /// <exception cref="OverflowException">The value of <paramref name="portEnv"/> would overflow an integer.</exception>
-    public static LdapService FromEnvs(string serverEnv = "LDAP_ADDRESS", string portEnv = "LDAP_PORT", string userEnv = "LDAP_USERNAME", string passwordEnv = "LDAP_PASSWORD") {
+    public static LdapService FromEnvs(
+        string serverEnv   = "LDAP_ADDRESS",
+        string portEnv     = "LDAP_PORT",
+        string domainEnv   = "LDAP_DOMAIN",
+        string userEnv     = "LDAP_USERNAME",
+        string passwordEnv = "LDAP_PASSWORD"
+    ) {
         return new LdapService(
             Environment.GetEnvironmentVariable(serverEnv).ThrowIfNullOrEmpty(serverEnv),
             int.Parse(Environment.GetEnvironmentVariable(portEnv).ThrowIfNullOrEmpty(portEnv)),
+            Environment.GetEnvironmentVariable(domainEnv).ThrowIfNullOrEmpty(userEnv),
             Environment.GetEnvironmentVariable(userEnv).ThrowIfNullOrEmpty(userEnv),
             Environment.GetEnvironmentVariable(passwordEnv).ThrowIfNullOrEmpty(passwordEnv)
         );

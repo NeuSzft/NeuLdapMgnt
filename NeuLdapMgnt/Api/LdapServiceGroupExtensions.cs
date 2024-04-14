@@ -12,7 +12,7 @@ public static class LdapServiceGroupExtensions {
     /// <param name="name">The name of the group.</param>
     /// <returns><c>true</c> if the group exists. If it does not exist or the search request fails it returns <c>false</c>.</returns>
     public static bool GroupExists(this LdapService ldap, string name) {
-        SearchRequest   request  = new($"ou={name},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
+        SearchRequest   request  = new($"ou={name},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
         return response?.Entries.Count == 1;
@@ -25,7 +25,7 @@ public static class LdapServiceGroupExtensions {
     /// <returns><c>true</c> if the entity is part of the group, <c>false</c> if not or the group does not exist.</returns>
     /// <remarks>This method does not check if the entity actually exists or not.</remarks>
     public static bool PartOfGroup(this LdapService ldap, string name, string id) {
-        SearchRequest   request  = new($"ou={name},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
+        SearchRequest   request  = new($"ou={name},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
         if (response is null || response.Entries.Count == 0)
@@ -40,7 +40,7 @@ public static class LdapServiceGroupExtensions {
     /// <returns>An <see cref="IEnumerable{T}">IEnumerable&lt;string&gt;</see> containing the uids.</returns>
     /// <remarks>If the group does not exist it returns an empty collection.</remarks>
     public static IEnumerable<string> GetMembersOfGroup(this LdapService ldap, string name) {
-        SearchRequest   request  = new($"ou={name},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Subtree, null);
+        SearchRequest   request  = new($"ou={name},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Subtree, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
         if (response is null || response.Entries.Count == 0)
@@ -57,7 +57,7 @@ public static class LdapServiceGroupExtensions {
         if (ldap.GroupExists(name))
             return new RequestResult().SetStatus(StatusCodes.Status409Conflict).SetErrors("The group already exists.");
 
-        AddRequest request = new($"ou={name},{ldap.DnBase}",
+        AddRequest request = new($"ou={name},{ldap.DomainComponents}",
             new("objectClass", "organizationalUnit", "uidObject"),
             new("uid", "__DEFAULT__")
         );
@@ -75,7 +75,7 @@ public static class LdapServiceGroupExtensions {
         if (!ldap.GroupExists(name))
             return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The group does not exist.");
 
-        DeleteRequest request = new($"ou={name},{ldap.DnBase}");
+        DeleteRequest request = new($"ou={name},{ldap.DomainComponents}");
 
         if (ldap.TryRequest(request, out var error) is not null)
             return new RequestResult().SetStatus(StatusCodes.Status200OK);
@@ -93,7 +93,7 @@ public static class LdapServiceGroupExtensions {
         if (ldap.PartOfGroup(name, id))
             return new RequestResult().SetStatus(StatusCodes.Status409Conflict).SetErrors("Already part of group.");
 
-        ModifyRequest request = new($"ou={name},{ldap.DnBase}");
+        ModifyRequest request = new($"ou={name},{ldap.DomainComponents}");
 
         DirectoryAttributeModification mod = new() {
             Name      = "uid",
@@ -116,7 +116,7 @@ public static class LdapServiceGroupExtensions {
         ldap.TryAddGroup(name);
 
         var requests = ids.Select(id => {
-            ModifyRequest request = new($"ou={name},{ldap.DnBase}");
+            ModifyRequest request = new($"ou={name},{ldap.DomainComponents}");
 
             DirectoryAttributeModification mod = new() {
                 Name      = "uid",
@@ -144,7 +144,7 @@ public static class LdapServiceGroupExtensions {
         if (!ldap.PartOfGroup(name, id))
             return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("Not part of group.");
 
-        ModifyRequest request = new($"ou={name},{ldap.DnBase}");
+        ModifyRequest request = new($"ou={name},{ldap.DomainComponents}");
 
         DirectoryAttributeModification mod = new() {
             Name      = "uid",
@@ -168,7 +168,7 @@ public static class LdapServiceGroupExtensions {
             return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The group does not exist.");
 
         var requests = ids.Select(id => {
-            ModifyRequest request = new($"ou={name},{ldap.DnBase}");
+            ModifyRequest request = new($"ou={name},{ldap.DomainComponents}");
 
             DirectoryAttributeModification mod = new() {
                 Name      = "uid",

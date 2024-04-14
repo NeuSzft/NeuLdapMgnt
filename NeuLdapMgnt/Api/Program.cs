@@ -19,7 +19,6 @@ internal static class Program {
 
     public static void Main(string[] args) {
         LdapService ldapService = LdapService.FromEnvs();
-        ldapService.DnBase = "dc=test,dc=local";
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

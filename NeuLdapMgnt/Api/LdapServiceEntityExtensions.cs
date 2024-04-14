@@ -15,7 +15,7 @@ public static class LdapServiceEntityExtensions {
     /// <typeparam name="T">The type of the entity.</typeparam>
     /// <returns>Returns <c>true</c> if the entity exists. If it does not exist or the search request fails it returns <c>false</c>.</returns>
     public static bool EntityExists<T>(this LdapService ldap, string id) where T : class {
-        SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
+        SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
         return response?.Entries.Count == 1;
@@ -27,7 +27,7 @@ public static class LdapServiceEntityExtensions {
     /// <returns>An <see cref="IEnumerable{T}"/> containing the entities.</returns>
     /// <remarks>If an entity cannot be parsed then it is ignored and not returned.</remarks>
     public static IEnumerable<T> GetAllEntities<T>(this LdapService ldap) where T : class, new() {
-        SearchRequest   request  = new($"ou={typeof(T).GetOuName()},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.OneLevel, null);
+        SearchRequest   request  = new($"ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
         if (response is null)
@@ -44,7 +44,7 @@ public static class LdapServiceEntityExtensions {
     /// <typeparam name="T">The type of the entity.</typeparam>
     /// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
     public static RequestResult<T> TryGetEntity<T>(this LdapService ldap, string id) where T : class, new() {
-        SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DnBase}", LdapService.AnyFilter, SearchScope.Base, null);
+        SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = ldap.TryRequest(request, out var error) as SearchResponse;
 
         if (response is null || response.Entries.Count == 0)
@@ -65,12 +65,12 @@ public static class LdapServiceEntityExtensions {
     public static RequestResult<T> TryAddEntity<T>(this LdapService ldap, T entity, string id) where T : class {
         Type type = typeof(T);
 
-        ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DnBase}", "organizationalUnit"));
+        ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"));
 
         if (ldap.EntityExists<T>(id))
             return new RequestResult<T>().SetStatus(StatusCodes.Status409Conflict).SetErrors("The object already exists.");
 
-        AddRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DnBase}");
+        AddRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}");
         if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
             request.Attributes.Add(new("objectClass", objectClasses.Classes.Cast<object>().ToArray()));
 
@@ -94,7 +94,7 @@ public static class LdapServiceEntityExtensions {
         if (!ldap.EntityExists<T>(id))
             return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors("The object does not exist.");
 
-        ModifyRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DnBase}");
+        ModifyRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}");
 
         foreach (PropertyInfo info in type.GetProperties())
             if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute) {
@@ -120,7 +120,7 @@ public static class LdapServiceEntityExtensions {
         if (!ldap.EntityExists<T>(id))
             return new RequestResult().SetStatus(StatusCodes.Status404NotFound).SetErrors("The object does not exist.");
 
-        DeleteRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DnBase}");
+        DeleteRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}");
 
         if (ldap.TryRequest(request, out var error) is not null)
             return new RequestResult().SetStatus(StatusCodes.Status200OK);
@@ -136,7 +136,7 @@ public static class LdapServiceEntityExtensions {
     public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, string> idGetter) where T : class {
         Type type = typeof(T);
 
-        ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DnBase}", "organizationalUnit"));
+        ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"));
 
         DirectoryAttribute? objectClassesAttribute = null;
         if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
@@ -145,7 +145,7 @@ public static class LdapServiceEntityExtensions {
         var requests = entities.Select(x => {
             string id = idGetter(x);
 
-            AddRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DnBase}");
+            AddRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}");
             if (objectClassesAttribute is not null)
                 request.Attributes.Add(objectClassesAttribute);
 
