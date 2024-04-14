@@ -34,7 +34,8 @@ services:
             ASPNETCORE_ENVIRONMENT: Development
             LDAP_ADDRESS: testing-openldap
             LDAP_PORT: 389
-            LDAP_USERNAME: cn=admin,dc=test,dc=local
+            LDAP_DOMAIN: test.local
+            LDAP_USERNAME: admin
             LDAP_PASSWORD: admin
         networks:
             - net-api-test

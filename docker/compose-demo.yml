@@ -1,102 +1,105 @@
 version: '3.8'
 
 services:
-    openldap:
+    demo-openldap:
         extends:
             file: ./compose-services.yml
             service: openldap
         environment:
-            - LDAP_ORGANISATION=Test
-            - LDAP_DOMAIN=test.local
-            - LDAP_ADMIN_PASSWORD=admin
+            LDAP_ORGANISATION: Demo
+            LDAP_DOMAIN: demo.local
+            LDAP_ADMIN_PASSWORD: admin
         networks:
-            - net-demo
+            - demo-net
         ports:
-            - "389:389"
+            - 389:389
         volumes:
-            - ldap-data:/var/lib/ldap
-            - ldap-config:/etc/ldap/slapd.d
+            - demo-ldap-data:/var/lib/ldap
+            - demo-ldap-config:/etc/ldap/slapd.d
 
-    ldapadmin:
+    demo-ldapadmin:
         extends:
             file: ./compose-services.yml
             service: ldapadmin
         depends_on:
-            - openldap
+            - demo-openldap
         environment:
-            - PHPLDAPADMIN_LDAP_HOSTS=openldap
-            - PHPLDAPADMIN_HTTPS=false
+            PHPLDAPADMIN_LDAP_HOSTS: demo-openldap
+            PHPLDAPADMIN_HTTPS: false
         networks:
-            - net-demo
+            - demo-net
         ports:
-            - "8888:80"
+            - 8888:80
 
-    api-build:
+    demo-api-build:
         extends:
             file: ./compose-services.yml
             service: api-build
         networks:
-            - net-demo
+            - demo-net
         volumes:
-            - api-app:/app
+            - demo-api-app:/app
 
-    api:
+    demo-api:
         extends:
             file: ./compose-services.yml
             service: api
         depends_on:
-            openldap:
+            demo-openldap:
                 condition: service_started
-            api-build:
+            demo-api-build:
                 condition: service_completed_successfully
         environment:
             ASPNETCORE_ENVIRONMENT: Development
-            LDAP_ADDRESS: openldap
+            LDAP_ADDRESS: demo-openldap
             LDAP_PORT: 389
-            LDAP_USERNAME: cn=admin,dc=test,dc=local
+            LDAP_DOMAIN: demo.local
+            LDAP_USERNAME: admin
             LDAP_PASSWORD: admin
             SECURITY_KEY: ITN3pnH472FGG71aC1AWFDrTn2TpgHtBuZdD/LYkD4bXe4hhAKWj8CsTfGPQJHr3qoY8/KM0zShbyreW6RapyGAL2M8JBOWLknXoC/1zJ4+9QOC7hpk4jqM13vHoJeL8JTKdYGCzx6gwZK9a4vgcsVCCc1QT6//WO7x0xdcZUsiHqp2t9PJjzLfMvK2nlaWe+aoBBPvsM4CAyWTMT8sZVHSmrjTunhVOn9cqoouHwe33a5grSf9Z9AhFtBTSH2DvlW4/DdA1kKcNeju/wZGhnE0DKNsguV6b5NcYLsRgU1NK2nrWd8yhUskOQCoDvLwnWc3Qto5l/AFnht08FSjLSQ==
             DEFAULT_ADMIN_NAME: admin
             DEFAULT_ADMIN_PASSWORD: adminpass
         networks:
-            - net-demo
+            demo-net:
+                aliases:
+                    - api
         ports:
             - 5000:5000
         volumes:
-            - api-app:/app:ro
+            - demo-api-app:/app:ro
 
-    webapp-build:
+    demo-webapp-build:
         extends:
             file: ./compose-services.yml
             service: webapp-build
         networks:
-            - net-demo
+            - demo-net
         volumes:
-            - webapp-app:/app
+            - demo-webapp-app:/app
 
-    nginx:
+    demo-nginx:
         extends:
             file: ./compose-services.yml
             service: nginx
         depends_on:
-            api-build:
+            demo-api-build:
                 condition: service_completed_successfully
-            webapp-build:
+            demo-webapp-build:
                 condition: service_completed_successfully
         networks:
-            - net-demo
+            - demo-net
         ports:
             - 8080:80
         volumes:
             - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
-            - webapp-app:/app:ro
+            - demo-webapp-app:/app:ro
 
 networks:
-    net-demo:
+    demo-net:
 
 
 volumes:
-    ldap-data:
-    ldap-config:
-    api-app:
-    webapp-app:
+    demo-ldap-data:
+    demo-ldap-config:
+    demo-api-app:
+    demo-webapp-app:
