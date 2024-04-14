@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+    prod-openldap:
+        extends:
+            file: ./compose-services.yml
+            service: openldap
+        environment:
+            LDAP_ORGANISATION: ${LDAP_ORGANIZATION}
+            LDAP_DOMAIN: ${LDAP_DOMAIN}
+            LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+        networks:
+            - prod-net
+        volumes:
+            - prod-ldap-data:/var/lib/ldap
+            - prod-ldap-config:/etc/ldap/slapd.d
+
+    prod-api-build:
+        extends:
+            file: ./compose-services.yml
+            service: api-build
+        networks:
+            - prod-net
+        volumes:
+            - prod-api-app:/app
+
+    prod-api:
+        extends:
+            file: ./compose-services.yml
+            service: api
+        depends_on:
+            prod-openldap:
+                condition: service_started
+            prod-api-build:
+                condition: service_completed_successfully
+        environment:
+            LDAP_ADDRESS: prod-openldap
+            LDAP_PORT: 389
+            LDAP_DOMAIN: ${LDAP_DOMAIN}
+            LDAP_USERNAME: admin
+            LDAP_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+            DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_USERNAME}
+            DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
+        networks:
+            prod-net:
+                aliases:
+                    - api
+        ports:
+            - ${API_PORT}:5000
+        volumes:
+            - prod-api-app:/app:ro
+
+    prod-webapp-build:
+        extends:
+            file: ./compose-services.yml
+            service: webapp-build
+        networks:
+            - prod-net
+        volumes:
+            - prod-webapp-app:/app
+
+    prod-nginx:
+        extends:
+            file: ./compose-services.yml
+            service: nginx
+        depends_on:
+            prod-api-build:
+                condition: service_completed_successfully
+            prod-webapp-build:
+                condition: service_completed_successfully
+        networks:
+            - prod-net
+        external_links:
+            - api:prod-api
+        ports:
+            - ${WEB_PORT}:80
+        volumes:
+            - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
+            - prod-webapp-app:/app:ro
+
+networks:
+    prod-net:
+
+
+volumes:
+    prod-ldap-data:
+    prod-ldap-config:
+    prod-api-app:
+    prod-webapp-app:
