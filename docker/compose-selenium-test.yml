@@ -42,8 +42,6 @@ services:
       DEFAULT_ADMIN_PASSWORD: adminpass
     networks:
       - net-selenium
-    ports:
-      - 5000:5000
     volumes:
       - api-app-selenium:/app:ro
 
