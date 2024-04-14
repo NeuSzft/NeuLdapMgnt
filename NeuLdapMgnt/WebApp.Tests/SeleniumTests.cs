@@ -14,7 +14,7 @@ namespace NeuLdapMgnt.WebApp.Tests
 	public class SeleniumTests
 	{
 		private const string SutHub = "http://selenium-hub:4444";
-		private const string SutAirlines = "http://nginx:80";
+		private const string SutAirlines = "http://nginx-selenium:80";
 		private IWebDriver _webDriver = null!;
 		private WebDriverWait _wait = null!;
 		private readonly HttpClient _httpClient = new();

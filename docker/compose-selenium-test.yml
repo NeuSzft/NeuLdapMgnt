@@ -1,22 +1,69 @@
 services:
-  testing-webapp-build:
-    build:
-      context: ..
-      dockerfile_inline: |
-        FROM mcr.microsoft.com/dotnet/sdk:7.0
-        COPY ./NeuLdapMgnt/WebApp /build/WebApp
-        COPY ./NeuLdapMgnt/Models /build/Models
-        WORKDIR /build/WebApp
-        ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+  openldap-selenium:
+    extends:
+      file: ./compose-services.yml
+      service: openldap
+    environment:
+      - LDAP_ORGANISATION=Test
+      - LDAP_DOMAIN=test.local
+      - LDAP_ADMIN_PASSWORD=admin
     networks:
       - net-selenium
     volumes:
-      - webapp-selenium:/app
+      - ldap-data-selenium:/var/lib/ldap
+      - ldap-config-selenium:/etc/ldap/slapd.d
 
-  testing-nginx:
-    image: nginx
+  api-build-selenium:
+    extends:
+      file: ./compose-services.yml
+      service: api-build
+    networks:
+      - net-selenium
+    volumes:
+      - api-app-selenium:/app
+
+  api-selenium:
+    extends:
+      file: ./compose-services.yml
+      service: api
     depends_on:
-      testing-webapp-build:
+      openldap-selenium:
+        condition: service_started
+      api-build-selenium:
+        condition: service_completed_successfully
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      LDAP_ADDRESS: openldap-selenium
+      LDAP_PORT: 389
+      LDAP_USERNAME: cn=admin,dc=test,dc=local
+      LDAP_PASSWORD: admin
+      SECURITY_KEY: ITN3pnH472FGG71aC1AWFDrTn2TpgHtBuZdD/LYkD4bXe4hhAKWj8CsTfGPQJHr3qoY8/KM0zShbyreW6RapyGAL2M8JBOWLknXoC/1zJ4+9QOC7hpk4jqM13vHoJeL8JTKdYGCzx6gwZK9a4vgcsVCCc1QT6//WO7x0xdcZUsiHqp2t9PJjzLfMvK2nlaWe+aoBBPvsM4CAyWTMT8sZVHSmrjTunhVOn9cqoouHwe33a5grSf9Z9AhFtBTSH2DvlW4/DdA1kKcNeju/wZGhnE0DKNsguV6b5NcYLsRgU1NK2nrWd8yhUskOQCoDvLwnWc3Qto5l/AFnht08FSjLSQ==
+      DEFAULT_ADMIN_NAME: admin
+      DEFAULT_ADMIN_PASSWORD: adminpass
+    networks:
+      - net-selenium
+    ports:
+      - 5000:5000
+    volumes:
+      - api-app-selenium:/app:ro
+
+  webapp-build-selenium:
+    extends:
+      file: ./compose-services.yml
+      service: webapp-build
+    networks:
+      - net-selenium
+    volumes:
+      - webapp-app-selenium:/app
+
+  nginx-selenium:
+    extends:
+      file: ./compose-services.yml
+      service: nginx
+    depends_on:
+      api-build-selenium:
+        condition: service_completed_successfully
+      webapp-build-selenium:
         condition: service_completed_successfully
     networks:
       - net-selenium
@@ -24,7 +71,7 @@ services:
       - 8080:80
     volumes:
       - ../docker/nginx-selenium.conf:/etc/nginx/nginx.conf:ro
-      - webapp-selenium:/app:ro
+      - webapp-app-selenium:/app:ro
 
   selenium-tests:
     build:
@@ -38,9 +85,9 @@ services:
     depends_on:
       selenium-hub:
         condition: service_started
-      node-firefox:
+      selenium-node-firefox:
         condition: service_started
-      testing-nginx:
+      nginx-selenium:
         condition: service_started
     volumes:
       - ../NeuLdapMgnt/WebApp.Tests:/app/WebApp.Tests
@@ -55,7 +102,7 @@ services:
     networks:
       - net-selenium
 
-  node-firefox:
+  selenium-node-firefox:
     image: selenium/node-firefox:4.17.0-20240123
     shm_size: 2gb
     depends_on:
@@ -74,4 +121,7 @@ networks:
   net-selenium:
 
 volumes:
-  webapp-selenium:
+  ldap-data-selenium:
+  ldap-config-selenium:
+  api-app-selenium:
+  webapp-app-selenium:

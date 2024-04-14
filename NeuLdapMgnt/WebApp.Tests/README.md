@@ -5,8 +5,8 @@
 <p>
 <strong>Overall Result:</strong> ✔️ Pass <br />
 <strong>Pass Rate:</strong> 100% <br />
-<strong>Run Duration:</strong> 7s 225ms <br />
-<strong>Date:</strong> 2024-04-13 16:13:44 - 2024-04-13 16:13:51 <br />
+<strong>Run Duration:</strong> 9s 293ms <br />
+<strong>Date:</strong> 2024-04-14 13:25:10 - 2024-04-14 13:25:20 <br />
 <strong>Framework:</strong> .NETCoreApp,Version=v7.0 <br />
 <strong>Total Tests:</strong> 1 <br />
 </p>
@@ -48,7 +48,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>RedirectionIsWorkingWhenUnauthorized</td>
-<td>6s 556ms</td>
+<td>8s 425ms</td>
 </tr>
 </tbody>
 </table>

@@ -22,9 +22,9 @@ api-test:
 	$(dc) $(options-api-test) down
 
 web-test:
-	$(dc) $(options-selenium-test) build testing-webapp-build selenium-tests
+	$(dc) $(options-selenium-test) build webapp-build-selenium selenium-tests
 	$(dc) $(options-selenium-test) up -d
 	$(dc) $(options-selenium-test) logs -f selenium-tests
-	$(dc) $(options-selenium-test) stop
+	$(dc) $(options-selenium-test) down
 
 tests: api-test web-test
