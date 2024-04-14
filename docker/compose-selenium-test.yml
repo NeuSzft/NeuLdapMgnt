@@ -82,6 +82,11 @@ services:
         COPY ./NeuLdapMgnt/Models /app/Models
         WORKDIR /app/WebApp.Tests
         ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/app/WebApp.Tests/README.md" ]
+    environment:
+      DEFAULT_ADMIN_NAME: admin
+      DEFAULT_ADMIN_PASSWORD: adminpass
+      DEFAULT_MANAGEMENT_URL: http://nginx-selenium:80
+      DEFAULT_SELENIUM_HUB_URL: http://selenium-hub:4444
     depends_on:
       selenium-hub:
         condition: service_started
