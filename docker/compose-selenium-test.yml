@@ -41,7 +41,9 @@ services:
       DEFAULT_ADMIN_NAME: admin
       DEFAULT_ADMIN_PASSWORD: adminpass
     networks:
-      - net-selenium
+      net-selenium:
+        aliases:
+          - api
     volumes:
       - api-app-selenium:/app:ro
 
@@ -68,7 +70,7 @@ services:
     ports:
       - 8080:80
     volumes:
-      - ../docker/nginx-selenium.conf:/etc/nginx/nginx.conf:ro
+      - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
       - webapp-app-selenium:/app:ro
 
   selenium-tests:
