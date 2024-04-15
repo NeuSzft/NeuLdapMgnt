@@ -10,16 +10,16 @@ services:
             - LDAP_DOMAIN=test.local
             - LDAP_ADMIN_PASSWORD=admin
         networks:
-            - net-api-test
+            - net-api-tests
 
     testing-api-build:
         extends:
             file: ./compose-services.yml
             service: api-build
         networks:
-            - net-api-test
+            - net-api-tests
         volumes:
-            - api-app:/app
+            - testing-api-app:/app
 
     testing-api:
         extends:
@@ -38,11 +38,11 @@ services:
             LDAP_USERNAME: admin
             LDAP_PASSWORD: admin
         networks:
-            - net-api-test
+            - net-api-tests
         volumes:
-            - api-app:/app:ro
+            - testing-api-app:/app:ro
 
-    testing-api-test:
+    testing-api-tests:
         extends:
             file: ./compose-services.yml
             service: api-test
@@ -51,13 +51,13 @@ services:
         environment:
             API_URL: http://testing-api:5000
         networks:
-            - net-api-test
+            - net-api-tests
         volumes:
             - ../docs/test-results:/tr
 
 networks:
-    net-api-test:
+    net-api-tests:
 
 
 volumes:
-    api-app:
+    testing-api-app:
