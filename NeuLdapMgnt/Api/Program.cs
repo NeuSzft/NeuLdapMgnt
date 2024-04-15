@@ -24,10 +24,8 @@ internal static class Program {
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        string?  logsDir       = Environment.GetEnvironmentVariable("LOGS_DIR");
-        ILogger? requestLogger = null;
-        if (!logsDir.IsNullOrEmpty())
-            requestLogger = new RequestLoggerProvider(logsDir!).CreateLogger(nameof(RequestLogger));
+        using RequestLoggerProvider? requestLoggerProvider = Environment.GetEnvironmentVariable("LOGS_DIR") is { Length: > 0 } logsDir ? new(logsDir) : null;
+        ILogger?                     requestLogger         = requestLoggerProvider?.CreateLogger(nameof(RequestLogger));
 
         // Create jwt authentication scheme
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
@@ -99,12 +97,14 @@ internal static class Program {
 
         // Add a middleware that logs each request to the console
         app.Use(async (HttpContext context, RequestDelegate next) => {
-            DateTime now = DateTime.Now;
-            await next(context);
-            app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {context.Request.Host} → {context.Request.Path} ({context.Response.StatusCode})");
+            DateTime    now = DateTime.Now;
+            HttpRequest req = context.Request;
 
-            context.Request.Headers.TryGetValue("Audience", out var aud);
-            requestLogger?.LogInformation($"{aud.ToString().DefaultIfNullOrEmpty("Unauthenticated User")} ({context.Request.Host}) → {context.Request.Path} ({context.Response.StatusCode})");
+            await next(context);
+            app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {req.Host} → {req.Method} {req.Path} ({context.Response.StatusCode})");
+
+            req.Headers.TryGetValue("Audience", out var aud);
+            requestLogger?.LogInformation($"{aud.ToString().DefaultIfNullOrEmpty("__NOAUTH__")}\t{req.Host}\t{req.Method}\t{req.Path}\t{context.Response.StatusCode}");
         });
 
         // Add a middleware for handling LDAP connection binding errors
