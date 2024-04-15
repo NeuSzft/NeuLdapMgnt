@@ -1,10 +1,10 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
+using NeuLdapMgnt.Models.CustomValidationAttributes;
 
 namespace NeuLdapMgnt.Models
 {
@@ -13,7 +13,7 @@ namespace NeuLdapMgnt.Models
 	{
 		private string lastName = string.Empty;
 		private string firstName = string.Empty;
-		private string? middleName;
+		private string middleName = string.Empty;
 
 		[Required(ErrorMessage = "User ID is required.")]
 		[JsonRequired, JsonPropertyName("uid")]
@@ -31,7 +31,7 @@ namespace NeuLdapMgnt.Models
 		public virtual string Username { get; set; } = string.Empty;
 
 		[Required(ErrorMessage = "First name is required.")]
-		[MinLength(3, ErrorMessage = "First name must be at least 3 characters long.")]
+		[FirstName]
 		[JsonRequired, JsonPropertyName("first_name")]
 		[LdapAttribute("givenName")]
 		public virtual string FirstName
@@ -45,7 +45,7 @@ namespace NeuLdapMgnt.Models
 		}
 
 		[Required(ErrorMessage = "Last name is required.")]
-		[MinLength(3, ErrorMessage = "Last name must be at least 3 characters long.")]
+		[LastName]
 		[JsonRequired, JsonPropertyName("last_name")]
 		[LdapAttribute("sn")]
 		public virtual string LastName
@@ -59,14 +59,14 @@ namespace NeuLdapMgnt.Models
 		}
 
 		[AllowNull]
-		[MinLength(3, ErrorMessage = "Middle name must be at least 3 characters long.")]
+		[MiddleName]
 		[JsonPropertyName("middle_name")]
-		public virtual string? MiddleName
+		public virtual string MiddleName
 		{
 			get => middleName;
 			set
 			{
-				middleName = value?.Trim();
+				middleName = value is null ? string.Empty : value.Trim();
 				FullName = GetFullName();
 			}
 		}
@@ -83,7 +83,7 @@ namespace NeuLdapMgnt.Models
 		public virtual string HomeDirectory { get; set; } = string.Empty;
 
 		[Required(ErrorMessage = "Password is required.")]
-		[MinLength(8)]
+		[Password]
 		[PasswordPropertyText]
 		[JsonInclude, JsonPropertyName("password")]
 		[LdapAttribute("userPassword", false)]
@@ -98,7 +98,7 @@ namespace NeuLdapMgnt.Models
 			StringBuilder builder = new();
 			TextInfo textInfo = new CultureInfo("hu-HU", false).TextInfo;
 			string capitalizedFirstName = textInfo.ToTitleCase(FirstName);
-			string? capitalizedMiddleName = string.IsNullOrEmpty(MiddleName) ? null : textInfo.ToTitleCase(MiddleName);
+			string capitalizedMiddleName = string.IsNullOrEmpty(MiddleName) ? string.Empty : textInfo.ToTitleCase(MiddleName);
 			string capitalizedLastName = textInfo.ToTitleCase(LastName);
 
 			if (string.IsNullOrEmpty(capitalizedMiddleName))

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using NeuLdapMgnt.Models.CustomValidationAttributes.StudentAttributes;
 
 namespace NeuLdapMgnt.Models
 {
@@ -17,23 +18,25 @@ namespace NeuLdapMgnt.Models
 		private string @class = string.Empty;
 
 		[Required(ErrorMessage = "OM is required.")]
-		[Range(70000000000, 79999999999)]
+		[StudentId]
 		[JsonPropertyName("id")]
 		[LdapAttribute("uid")]
 		public long Id { get; set; } = AllowedIdRange.Min;
 
 		[Required]
-		[Range(6000, 6999)]
+		[StudentUserId]
 		[JsonRequired, JsonPropertyName("uid")]
 		[LdapAttribute("uidNumber")]
 		public override int Uid { get; set; } = AllowedUidRange.Min;
 
-		[Required, Range(6000, 6999)]
+		[Required]
+		[StudentGroupId]
 		[JsonRequired, JsonPropertyName("gid")]
 		[LdapAttribute("gidNumber")]
 		public override int Gid { get; set; } = AllowedGidRange.Min;
 
-		[Required, RegularExpression(@"^((9\.Ny)|((9|10|11|12|13)\.[A-E])|((1\/13|2\/14)[A-B](\.RSZE)?))$", ErrorMessage = "Class does not exist")]
+		[Required(ErrorMessage = "Class is required.")]
+		[RegularExpression(@"^((9\.Ny)|((9|10|11|12|13)\.[A-E])|((1\/13|2\/14)[A-B](\.RSZE)?))$", ErrorMessage = "Class does not exist")]
 		[JsonRequired, JsonPropertyName("class")]
 		[LdapAttribute("roomNumber")]
 		public string Class
