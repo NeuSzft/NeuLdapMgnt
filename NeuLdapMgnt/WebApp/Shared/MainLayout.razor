@@ -32,13 +32,13 @@
 	{
 		if (IsDevelopment)
 		{
-			ApiRequests.SetBaseAddress(new("http://localhost:5000"));
-			await ModalService.ShowAsync(ModalOptions.Info("Development mode", "Api base address set to: 'http://localhost:5000'"));
+			ApiRequests.SetBaseAddress(BaseAddress!);
+			await ModalService.ShowAsync(ModalOptions.Info("Deployed mode", $"Api base address set to: '{BaseAddress}'"));
 		}
 		else
 		{
-			ApiRequests.SetBaseAddress(BaseAddress!);
-			await ModalService.ShowAsync(ModalOptions.Info("Deployed mode", $"Api base address set to: '{BaseAddress}'"));
+			ApiRequests.SetBaseAddress(new("http://localhost:5000"));
+			await ModalService.ShowAsync(ModalOptions.Info("Development mode", "Api base address set to: 'http://localhost:5000'"));
 		}
 		NavManager.NavigateTo("/login");
 	}

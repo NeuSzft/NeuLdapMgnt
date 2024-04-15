@@ -85,8 +85,6 @@ services:
     environment:
       DEFAULT_ADMIN_NAME: admin
       DEFAULT_ADMIN_PASSWORD: adminpass
-      DEFAULT_MANAGEMENT_URL: http://nginx-selenium:80
-      DEFAULT_SELENIUM_HUB_URL: http://selenium-hub:4444
       ASPNETCORE_ENVIRONMENT: Docker
     depends_on:
       selenium-hub:
