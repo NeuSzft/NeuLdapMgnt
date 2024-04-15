@@ -27,6 +27,7 @@ ifeq ($(wildcard ./.env),)
 	$(file >> .env,DEFAULT_ADMIN_PASSWORD = adminpass)
 	$(file >> .env,API_PORT = 5000)
 	$(file >> .env,WEB_PORT = 80)
+	$(file >> .env,API_LOGS_DIR = $(abspath $(dir .))/logs)
 	@echo Created .env file
 else
 	@echo The .env file already exists

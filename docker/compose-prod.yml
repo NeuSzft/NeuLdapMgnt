@@ -50,7 +50,7 @@ services:
             - ${API_PORT}:5000
         volumes:
             - prod-api-app:/app:ro
-            - ../logs:/logs
+            - ${API_LOGS_DIR}:/logs
 
     prod-webapp-build:
         extends:
