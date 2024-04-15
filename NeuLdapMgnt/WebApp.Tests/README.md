@@ -5,10 +5,10 @@
 <p>
 <strong>Overall Result:</strong> ✔️ Pass <br />
 <strong>Pass Rate:</strong> 100% <br />
-<strong>Run Duration:</strong> 9s 293ms <br />
-<strong>Date:</strong> 2024-04-14 13:25:10 - 2024-04-14 13:25:20 <br />
+<strong>Run Duration:</strong> 38s 655ms <br />
+<strong>Date:</strong> 2024-04-15 11:00:09 - 2024-04-15 11:00:47 <br />
 <strong>Framework:</strong> .NETCoreApp,Version=v7.0 <br />
-<strong>Total Tests:</strong> 1 <br />
+<strong>Total Tests:</strong> 3 <br />
 </p>
 
 <table>
@@ -21,7 +21,7 @@
 </thead>
 <tbody>
 <tr>
-<td>1</td>
+<td>3</td>
 <td>0</td>
 <td>0</td>
 </tr>
@@ -47,8 +47,18 @@
 </thead>
 <tr>
 <td> ✔️ Passed </td>
+<td>DefaultRedirectionToLoginPage</td>
+<td>10s 639ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
 <td>RedirectionIsWorkingWhenUnauthorized</td>
-<td>8s 425ms</td>
+<td>15s 178ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>SuccessfulLoginRedirectsToHomePage</td>
+<td>11s 941ms</td>
 </tr>
 </tbody>
 </table>

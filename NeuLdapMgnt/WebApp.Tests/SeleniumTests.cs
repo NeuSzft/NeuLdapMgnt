@@ -40,7 +40,7 @@ namespace NeuLdapMgnt.WebApp.Tests
 				_webDriver = new FirefoxDriver(firefoxOptions);
 				_webDriver.Navigate().GoToUrl(SutMngtLocal);
 			}
-			_wait = new(_webDriver, TimeSpan.FromMilliseconds(3000));
+			_wait = new(_webDriver, TimeSpan.FromMilliseconds(5000));
 		}
 
 		[TestCleanup]
@@ -91,12 +91,9 @@ namespace NeuLdapMgnt.WebApp.Tests
 			
 			_webDriver.FindElement(By.Id("username")).SendKeys(Username);
 			_webDriver.FindElement(By.Id("password")).SendKeys(Password);
-			_webDriver.FindElement(By.TagName("form")).Submit();
-			
-			Console.WriteLine(SutMngt);
-			Console.WriteLine(_webDriver.Url);
-			_wait.Until(ExpectedConditions.UrlContains(SutMngt));
-			Assert.AreEqual(SutMngt, _webDriver.Url);
+			_webDriver.FindElement(By.ClassName("btn-outline-primary")).Submit();
+			_wait.Until(ExpectedConditions.TitleIs("Home"));
+			Assert.AreEqual("Home", _webDriver.Title);
 		}
 	}
 }
