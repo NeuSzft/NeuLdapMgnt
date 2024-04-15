@@ -13,8 +13,14 @@ namespace NeuLdapMgnt.WebApp.Tests
 	[TestClass]
 	public class SeleniumTests
 	{
-		private const string SutHub = "http://selenium-hub:4444/";
-		private const string SutMngt = "http://nginx-selenium:80/";
+		private static readonly string EnvironmentMode = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Local";
+		private static readonly string SutHub = Environment.GetEnvironmentVariable("DEFAULT_SELENIUM_HUB_URL") ?? "http://selenium-hub:4444";
+		private static readonly string SutMngtDocker = Environment.GetEnvironmentVariable("DEFAULT_MANAGEMENT_URL") ??  "http://nginx-selenium:80";
+		private const string SutMngtLocal = "http://localhost:8080";
+		private string SutMngt = string.Empty;
+		private static readonly string Username = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME") ?? "admin";
+		private static readonly string Password = Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD") ?? "adminpass";
+
 		private IWebDriver _webDriver = null!;
 		private WebDriverWait _wait = null!;
 
@@ -22,8 +28,18 @@ namespace NeuLdapMgnt.WebApp.Tests
 		public void InitializeTest()
 		{
 			var firefoxOptions = new FirefoxOptions();
-			_webDriver = new RemoteWebDriver(new Uri(SutHub), firefoxOptions.ToCapabilities());
-			_webDriver.Navigate().GoToUrl(SutMngt);
+			if (EnvironmentMode.Equals("Docker"))
+			{
+				SutMngt = SutMngtDocker;
+				_webDriver = new RemoteWebDriver(new Uri(SutHub), firefoxOptions.ToCapabilities());
+				_webDriver.Navigate().GoToUrl(SutMngt);
+			}
+			else
+			{
+				SutMngt = SutMngtLocal;
+				_webDriver = new FirefoxDriver(firefoxOptions);
+				_webDriver.Navigate().GoToUrl(SutMngtLocal);
+			}
 			_wait = new(_webDriver, TimeSpan.FromMilliseconds(3000));
 		}
 
@@ -32,36 +48,55 @@ namespace NeuLdapMgnt.WebApp.Tests
 		{
 			_webDriver.Quit();
 		}
+
+		[TestMethod]
+		public void DefaultRedirectionToLoginPage()
+		{
+			_wait.Until(ExpectedConditions.UrlContains("/login"));
+			Assert.IsTrue(_webDriver.Url.Contains("/login"));
+		}
 		
 		[TestMethod]
 		public void RedirectionIsWorkingWhenUnauthorized()
 		{
-			_wait.Until(ExpectedConditions.UrlContains("login"));
-			Assert.IsTrue(_webDriver.Url.Contains("login"));
-			
-			_webDriver.Navigate().GoToUrl(SutMngt + "students");
+			_webDriver.Navigate().GoToUrl(SutMngt + "/students");
 			_wait.Until(ExpectedConditions.UrlContains("/login"));
 			Assert.IsTrue(_webDriver.Url.Contains("/login"));
 			
-			_webDriver.Navigate().GoToUrl(SutMngt + "students/add");
+			_webDriver.Navigate().GoToUrl(SutMngt + "/students/add");
 			_wait.Until(ExpectedConditions.UrlContains("/login"));
 			Assert.IsTrue(_webDriver.Url.Contains("/login"));
 			
-			_webDriver.Navigate().GoToUrl(SutMngt + "teachers");
+			_webDriver.Navigate().GoToUrl(SutMngt + "/teachers");
 			_wait.Until(ExpectedConditions.UrlContains("/login"));
 			Assert.IsTrue(_webDriver.Url.Contains("/login"));
 			
-			_webDriver.Navigate().GoToUrl(SutMngt + "teachers/add");
+			_webDriver.Navigate().GoToUrl(SutMngt + "/teachers/add");
 			_wait.Until(ExpectedConditions.UrlContains("/login"));
 			Assert.IsTrue(_webDriver.Url.Contains("/login"));
 			
-			_webDriver.Navigate().GoToUrl(SutMngt + "admins");
+			_webDriver.Navigate().GoToUrl(SutMngt + "/admins");
 			_wait.Until(ExpectedConditions.UrlContains("/login"));
 			Assert.IsTrue(_webDriver.Url.Contains("/login"));
 			
-			_webDriver.Navigate().GoToUrl(SutMngt + "admins/add");
+			_webDriver.Navigate().GoToUrl(SutMngt + "/admins/add");
 			_wait.Until(ExpectedConditions.UrlContains("/login"));
 			Assert.IsTrue(_webDriver.Url.Contains("/login"));
+		}
+		
+		[TestMethod]
+		public void SuccessfulLoginRedirectsToHomePage()
+		{
+			_wait.Until(ExpectedConditions.UrlContains("/login"));
+			
+			_webDriver.FindElement(By.Id("username")).SendKeys(Username);
+			_webDriver.FindElement(By.Id("password")).SendKeys(Password);
+			_webDriver.FindElement(By.TagName("form")).Submit();
+			
+			Console.WriteLine(SutMngt);
+			Console.WriteLine(_webDriver.Url);
+			_wait.Until(ExpectedConditions.UrlContains(SutMngt));
+			Assert.AreEqual(SutMngt, _webDriver.Url);
 		}
 	}
 }
