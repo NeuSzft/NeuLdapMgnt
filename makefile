@@ -53,6 +53,6 @@ web-test:
 	$(dc) $(options-selenium-test) build webapp-build-selenium selenium-tests api-build-selenium api-selenium
 	$(dc) $(options-selenium-test) up -d
 	$(dc) $(options-selenium-test) logs -f selenium-tests
-	$(dc) $(options-selenium-test) down
+	$(dc) $(options-selenium-test) down -v
 
 tests: | api-test web-test
