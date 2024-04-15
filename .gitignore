@@ -1,6 +1,8 @@
 bin
 obj
 
+logs
+
 .idea
 .vs
 .vscode
