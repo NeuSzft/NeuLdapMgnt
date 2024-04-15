@@ -2,8 +2,8 @@ dc = docker compose
 
 options-prod = -f ./docker/compose-prod.yml --env-file .env
 options-demo = -f ./docker/compose-demo.yml
-options-api-test = -f ./docker/compose-api-test.yml
-options-selenium-test = -f ./docker/compose-selenium-test.yml
+options-api-tests = -f ./docker/compose-api-test.yml
+options-selenium-tests = -f ./docker/compose-selenium-test.yml
 
 start: env
 	$(dc) $(options-prod) build prod-api-build prod-webapp-build
@@ -25,8 +25,8 @@ ifeq ($(wildcard ./.env),)
 	$(file >> .env,LDAP_ADMIN_PASSWORD = ldappass)
 	$(file >> .env,DEFAULT_ADMIN_USERNAME = admin)
 	$(file >> .env,DEFAULT_ADMIN_PASSWORD = adminpass)
-	$(file >> .env,API_PORT = 5000)
-	$(file >> .env,WEB_PORT = 80)
+	$(file >> .env,PORT = 80)
+	$(file >> .env,API_LOGS_DIR = $(abspath $(dir .))/logs)
 	@echo Created .env file
 else
 	@echo The .env file already exists
@@ -43,16 +43,16 @@ demo-stop:
 demo-down:
 	$(dc) $(options-demo) down
 
-api-test:
-	$(dc) $(options-api-test) build testing-api-build testing-api-test
-	$(dc) $(options-api-test) up -d
-	$(dc) $(options-api-test) logs -f testing-api-test
-	$(dc) $(options-api-test) down
+api-tests:
+	$(dc) $(options-api-tests) build testing-api-build testing-api-tests
+	$(dc) $(options-api-tests) up -d
+	$(dc) $(options-api-tests) logs -f testing-api-tests
+	$(dc) $(options-api-tests) down
 
-web-test:
-	$(dc) $(options-selenium-test) build webapp-build-selenium selenium-tests api-build-selenium api-selenium
-	$(dc) $(options-selenium-test) up -d
-	$(dc) $(options-selenium-test) logs -f selenium-tests
-	$(dc) $(options-selenium-test) down -v
+web-tests:
+	$(dc) $(options-selenium-tests) build webapp-build-selenium selenium-tests api-build-selenium api-selenium
+	$(dc) $(options-selenium-tests) up -d
+	$(dc) $(options-selenium-tests) logs -f selenium-tests
+	$(dc) $(options-selenium-tests) down -v
 
 tests: | api-test web-test
