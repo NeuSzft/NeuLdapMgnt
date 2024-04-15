@@ -84,7 +84,7 @@ public static class Authenticator {
         else if (ldap.PartOfGroup("inactive", username)) {
             return new(StatusCodes.Status403Forbidden, "User is inactive.", null);
         }
-        else if (ldap.TryGetEntity<Teacher>(username).GetValue() is { } teacher) {
+        else if (ldap.TryGetEntity<Teacher>(username, true).GetValue() is { } teacher) {
             try {
                 UserPassword userPassword = new(teacher.Password);
 
@@ -100,6 +100,16 @@ public static class Authenticator {
         }
 
         return new(StatusCodes.Status401Unauthorized, "Wrong credentials.", null);
+    }
+
+    /// <summary>Reads the JSON Web Token out from the Authorization header of a <see cref="HttpRequest"/>.</summary>
+    /// <param name="request">The <see cref="HttpRequest"/> that contains the token within it's Authorization header.</param>
+    /// <returns>The <see cref="JwtSecurityToken"/> that was read from the header.</returns>
+    /// <exception cref="FormatException">The Authorization header is in an incorrect format.</exception>
+    /// <exception cref="SecurityTokenMalformedException">The token is in an incorrect format.</exception>
+    public static JwtSecurityToken ReadJwtFromRequestHeader(HttpRequest request) {
+        AuthenticationHeaderValue header = AuthenticationHeaderValue.Parse(request.Headers.Authorization.ToString());
+        return new JwtSecurityTokenHandler().ReadJwtToken(header.Parameter!);
     }
 
     /// <summary>Creates a new JSON Web Token for the specified user that will expire in 10 minutes after it's creation.</summary>
@@ -128,9 +138,9 @@ public static class Authenticator {
     /// <summary>Creates a new JSON Web Token that will use the first specified audience of the previous one. This token also expires in 10 minutes after it's creation.</summary>
     /// <param name="request">The <see cref="HttpRequest"/> that contains the token within it's Authorization header that needs to be renewed.</param>
     /// <returns>The base64url encoded JSON Web Token.</returns>
+    /// <exception cref="FormatException">The Authorization header is in an incorrect format.</exception>
+    /// <exception cref="SecurityTokenMalformedException">The token is in an incorrect format.</exception>
     public static string RenewToken(HttpRequest request) {
-        AuthenticationHeaderValue header = AuthenticationHeaderValue.Parse(request.Headers.Authorization.ToString());
-        JwtSecurityToken          token  = new JwtSecurityTokenHandler().ReadJwtToken(header.Parameter!);
-        return RenewToken(token);
+        return RenewToken(ReadJwtFromRequestHeader(request));
     }
 }
