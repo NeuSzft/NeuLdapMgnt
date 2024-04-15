@@ -15,7 +15,7 @@ public sealed class RequestLogger(StreamWriter writer) : ILogger {
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) {
-        string message = $"[{DateTime.Now:yyyy.MM.dd - HH:mm:ss}] {logLevel,-11} - {formatter(state, exception)}";
+        string message = $"{DateTime.Now.ToLocalTime():O}\t{logLevel}\t{formatter(state, null)}";
         writer.WriteLineAsync(message).Wait();
     }
 }
@@ -29,13 +29,16 @@ public sealed class RequestLoggerProvider(string logsDir) : ILoggerProvider {
 
     public ILogger CreateLogger(string categoryName) {
         Directory.CreateDirectory(logsDir);
-        _logFileWriter = new(Path.Combine(logsDir, $"{DateTime.Now:yyyy.MM.dd-HH_mm_ss}.log"), Encoding.UTF8, new FileStreamOptions {
+
+        _logFileWriter = new(Path.Combine(logsDir, $"{DateTime.Now.ToLocalTime():yyyy.MM.dd-HH_mm_ss}.log"), Encoding.UTF8, new FileStreamOptions {
             Access  = FileAccess.Write,
             Mode    = FileMode.CreateNew,
             Options = FileOptions.Asynchronous
         }) {
             AutoFlush = true
         };
+        _logFileWriter.WriteLineAsync("# ISO-8601_Time\tLogLevel\tUser\tHost\tMethod\tRequestPath\tStatusCode");
+
         return new RequestLogger(_logFileWriter);
     }
 }
