@@ -3,7 +3,10 @@
 ### Table of Contents
 1. [Dependencies](#dependencies)
 2. [Running the Services](#running-the-services)
-3. [Running the Demo](#running-the-demo)
+3. [Environment variables](#environment-variables)
+4. [Running the Demo](#running-the-demo)
+5. [Running the API Tests](#running-the-api-tests)
+6. [Running the Selenium Tests](#running-the-selenium-tests)
 
 
 ## Dependencies
@@ -29,7 +32,7 @@ This will generate a .env that will contain the necessary environment variables.
 | LDAP_ADMIN_PASSWORD | ldappass | The password of the **admin** LDAP user |
 | DEFAULT_ADMIN_USERNAME | admin | The username of the default API admin |
 | DEFAULT_ADMIN_PASSWORD | adminpass | The default password of the default API admin |
-| WEB_PORT | 80 | The port to be used by the service |
+| PORT | 80 | The port to be used by the service |
 | API_LOGS_DIR | `$(abspath $(dir .))/logs` | The directory to put the log files into. By default this is the **logs** directory within the makefile's directory. |
 
 
@@ -75,4 +78,12 @@ make demo-stop
 ### Remove the demo containers:
 ```
 make demo-down
+```
+
+## Running the API Tests
+The results of the api test can be found within the [test-results](./docs/test-results/) directory.
+
+### Run the tests:
+```
+make api-tests
 ```
