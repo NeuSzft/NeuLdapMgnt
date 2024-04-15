@@ -50,7 +50,7 @@ internal static class Utils {
                 student.Username      = student.GetUsername();
                 student.Class         = "12.A";
                 student.Email         = arr[3].Trim('"');
-                student.Password      = arr[4].Trim('"');
+                student.Password      = new UserPassword(arr[4].Trim('"'), 16).ToString();
                 student.HomeDirectory = $"/home/{student.Username}";
 
                 var errors = ModelValidator.Validate(student).Errors;

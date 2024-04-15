@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -22,12 +24,19 @@ internal static class Program {
 
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+        string?  logsDir       = Environment.GetEnvironmentVariable("LOGS_DIR");
+        ILogger? requestLogger = null;
+        if (!logsDir.IsNullOrEmpty())
+            requestLogger = new RequestLoggerProvider(logsDir!).CreateLogger(nameof(RequestLogger));
+
         // Create jwt authentication scheme
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
             options.TokenValidationParameters = new TokenValidationParameters {
                 ValidateAudience = false,
                 ValidateIssuer   = true,
                 ValidateLifetime = true,
+
+                RequireAudience = true,
 
                 IssuerSigningKey = SecurityKey,
                 ValidIssuers     = new[] { TokenIssuer },
@@ -60,6 +69,13 @@ internal static class Program {
                         await context.Response.WriteAsync(context.ErrorDescription.DefaultIfNullOrEmpty(error));
                         await context.Response.CompleteAsync();
                     }
+                },
+
+                // Store the audience of the validated toke it the Audience header
+                OnTokenValidated = (TokenValidatedContext context) => {
+                    JwtSecurityToken token = Authenticator.ReadJwtFromRequestHeader(context.Request);
+                    context.Request.Headers.Append("Audience", token.Audiences.FirstOrDefault());
+                    return Task.CompletedTask;
                 }
             };
         });
@@ -86,6 +102,9 @@ internal static class Program {
             DateTime now = DateTime.Now;
             await next(context);
             app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {context.Request.Host} → {context.Request.Path} ({context.Response.StatusCode})");
+
+            context.Request.Headers.TryGetValue("Audience", out var aud);
+            requestLogger?.LogInformation($"{aud.ToString().DefaultIfNullOrEmpty("Unauthenticated User")} ({context.Request.Host}) → {context.Request.Path} ({context.Response.StatusCode})");
         });
 
         // Add a middleware for handling LDAP connection binding errors

@@ -23,10 +23,11 @@ public static class LdapServiceEntityExtensions {
 
     /// <summary>Gets all entities of the specified type from the database.</summary>
     /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
+    /// <param name="getAllAttributes">If <c>true</c> even the attributes that have <c>ReturnFormDb</c> set to <c>false</c> are returned.</param>
     /// <typeparam name="T">The type of the entity.</typeparam>
     /// <returns>An <see cref="IEnumerable{T}"/> containing the entities.</returns>
     /// <remarks>If an entity cannot be parsed then it is ignored and not returned.</remarks>
-    public static IEnumerable<T> GetAllEntities<T>(this LdapService ldap) where T : class, new() {
+    public static IEnumerable<T> GetAllEntities<T>(this LdapService ldap, bool getAllAttributes = false) where T : class, new() {
         SearchRequest   request  = new($"ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
@@ -34,23 +35,24 @@ public static class LdapServiceEntityExtensions {
             yield break;
 
         foreach (SearchResultEntry entry in response.Entries)
-            if (LdapService.TryParseEntry<T>(entry, out _) is { } entity)
+            if (LdapService.TryParseEntry<T>(entry, out _, getAllAttributes) is { } entity)
                 yield return entity;
     }
 
     /// <summary>Tries to get the entity from the database using it's uid.</summary>
     /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
     /// <param name="id">The uid of the entity.</param>
+    /// <param name="getAllAttributes">If <c>true</c> even the attributes that have <c>ReturnFormDb</c> set to <c>false</c> are returned.</param>
     /// <typeparam name="T">The type of the entity.</typeparam>
     /// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
-    public static RequestResult<T> TryGetEntity<T>(this LdapService ldap, string id) where T : class, new() {
+    public static RequestResult<T> TryGetEntity<T>(this LdapService ldap, string id, bool getAllAttributes = false) where T : class, new() {
         SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = ldap.TryRequest(request, out var error) as SearchResponse;
 
         if (response is null || response.Entries.Count == 0)
             return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors(error ?? "The object does not exist.");
 
-        T? entity = LdapService.TryParseEntry<T>(response.Entries[0], out error);
+        T? entity = LdapService.TryParseEntry<T>(response.Entries[0], out error, getAllAttributes);
         if (entity is not null)
             return new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity);
         return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
