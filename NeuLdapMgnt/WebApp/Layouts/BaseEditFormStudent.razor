@@ -32,18 +32,18 @@
 
 		<div class="d-flex flex-column flex-md-row gap-2 w-100">
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="First name" id="givenName" @bind-Value="studentUpdated.FirstName" />
-				<label for="givenName">First</label>
+				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="First name" id="given-name" @bind-Value="studentUpdated.FirstName" />
+				<label for="given-name">First</label>
 				<ValidationMessage For="() => studentUpdated.FirstName" />
 			</div>
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="Last name" id="lastName" @bind-Value="studentUpdated.LastName" />
-				<label for="lastName">Last</label>
+				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="Last name" id="last-name" @bind-Value="studentUpdated.LastName" />
+				<label for="last-name">Last</label>
 				<ValidationMessage For="() => studentUpdated.LastName" />
 			</div>
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="Middle name" id="middleName" @bind-Value="studentUpdated.MiddleName" />
-				<label for="middleName">Middle</label>
+				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="Middle name" id="middle-name" @bind-Value="studentUpdated.MiddleName" />
+				<label for="middle-name">Middle</label>
 				<ValidationMessage For="() => studentUpdated.MiddleName" />
 			</div>
 		</div>
