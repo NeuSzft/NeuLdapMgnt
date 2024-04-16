@@ -10,7 +10,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 			{
 				if (firstName.Length < 3)
 				{
-					return new ValidationResult("Name must be at least 3 characters long.",
+					return new ValidationResult("First name must be at least 3 characters long.",
 						new[] { validationContext.MemberName }!);
 				}
 				else
