@@ -156,7 +156,7 @@ public class SeleniumTests
         _wait.Until(ExpectedConditions.TitleIs("Login"));
         Assert.AreEqual("Login", _webDriver.Title);
     }
-    
+
     [TestMethod]
     public void NoStudentsArePresent()
     {
@@ -165,10 +165,12 @@ public class SeleniumTests
 
         NavLinks.Find(x => x.Text.Equals("View Students"))?.Click();
         _wait.Until(ExpectedConditions.TitleIs("Students"));
-        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.TagName("h3")), "There are no students in the database"));
+        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.TagName("h3")),
+            "There are no students in the database"));
+
         Assert.AreEqual("There are no students in the database", _webDriver.FindElement(By.TagName("h3")).Text);
     }
-    
+
     [TestMethod]
     public void NoStudentsArePresentAndAddStudentsButtonIsPresent()
     {
@@ -176,10 +178,12 @@ public class SeleniumTests
         ExpandNavbar();
 
         NavLinks.Find(x => x.Text.Equals("View Students"))?.Click();
-        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.ClassName("btn-primary")), "Add Students"));
+        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.ClassName("btn-primary")),
+            "Add Students"));
+
         Assert.IsTrue(_webDriver.FindElement(By.ClassName("btn-primary")).Text.Contains("Add Students"));
     }
-    
+
     [TestMethod]
     public void AfterPressingAddStudentsButtonRedirectsToAddStudent()
     {
@@ -187,7 +191,9 @@ public class SeleniumTests
         ExpandNavbar();
 
         NavLinks.Find(x => x.Text.Equals("View Students"))?.Click();
-        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.ClassName("btn-primary")), "Add Students"));
+        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.ClassName("btn-primary")),
+            "Add Students"));
+
         _webDriver.FindElement(By.ClassName("btn-primary")).Click();
         _wait.Until(ExpectedConditions.TitleIs("Add Student"));
         Assert.AreEqual("Add Student", _webDriver.Title);
@@ -200,59 +206,529 @@ public class SeleniumTests
         ExpandNavbar();
 
         NavLinks.Find(x => x.Text.Equals("View Students"))?.Click();
-        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.ClassName("btn-primary")), "Add Students"));
+        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.ClassName("btn-primary")),
+            "Add Students"));
         _webDriver.FindElement(By.ClassName("btn-primary")).Click();
         _wait.Until(ExpectedConditions.TitleIs("Add Student"));
 
         var form = _webDriver.FindElement(By.TagName("form"));
-        Assert.AreEqual(Student.AllowedIdRange.Min.ToString(), form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).GetAttribute("value"));
-        Assert.AreEqual(string.Empty, form.FindElement(By.Id("given-name")).Text);
-        Assert.AreEqual(string.Empty, form.FindElement(By.Id("last-name")).Text);
-        Assert.AreEqual(string.Empty, form.FindElement(By.Id("middle-name")).Text);
+        Assert.AreEqual(Student.OmMinValue.ToString(),
+            form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).GetAttribute("value"));
+
+        Assert.AreEqual(string.Empty, form.FindElement(By.Id("first-name")).GetAttribute("value"));
+        Assert.AreEqual(string.Empty, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+        Assert.AreEqual(string.Empty, form.FindElement(By.Id("middle-name")).GetAttribute("value"));
         Assert.AreEqual(string.Empty, form.FindElement(By.Id("class-year-select")).GetAttribute("value"));
         Assert.AreEqual(string.Empty, form.FindElement(By.Id("class-group-select")).GetAttribute("value"));
-        Assert.AreEqual(string.Empty, form.FindElement(By.Id("username")).Text);
-        Assert.AreEqual(Student.AllowedUidRange.Min.ToString(), form.FindElement(By.CssSelector("div:nth-child(6) > .form-control")).GetAttribute("value"));
-        Assert.AreEqual(Student.AllowedGidRange.Min.ToString(), form.FindElement(By.CssSelector("div:nth-child(7) > .form-control")).GetAttribute("value"));
-        Assert.AreEqual(string.Empty, form.FindElement(By.Id("email")).Text);
-        Assert.AreEqual(string.Empty, form.FindElement(By.Id("home-directory")).Text);
-        Assert.AreEqual(string.Empty, form.FindElement(By.Id("home-directory")).Text);
-        Assert.AreEqual(string.Empty, form.FindElement(By.Id("password")).Text);
+        Assert.AreEqual(Student.UidMinValue.ToString(),
+            form.FindElement(By.CssSelector("div:nth-child(5) > .form-control")).GetAttribute("value"));
+        Assert.AreEqual(Student.GidMinValue.ToString(),
+            form.FindElement(By.CssSelector("div:nth-child(6) > .form-control")).GetAttribute("value"));
+        Assert.AreEqual(string.Empty, form.FindElement(By.Id("email")).GetAttribute("value"));
+        Assert.AreEqual("/home/", form.FindElement(By.Id("home-directory")).GetAttribute("value"));
+        Assert.AreEqual(string.Empty, form.FindElement(By.Id("password")).GetAttribute("value"));
     }
-    
+
     [TestMethod]
-    public void AddStudentsEditFormIsValidatingCorrectly()
+    public void AddStudentsEditFormIsValidatingOmCorrectly()
     {
         Login();
         ExpandNavbar();
-
         NavLinks.Find(x => x.Text.Equals("View Students"))?.Click();
-        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.ClassName("btn-primary")), "Add Students"));
+        _wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.ClassName("btn-primary")),
+            "Add Students"));
+
         _webDriver.FindElement(By.ClassName("btn-primary")).Click();
         _wait.Until(ExpectedConditions.TitleIs("Add Student"));
 
         var form = _webDriver.FindElement(By.TagName("form"));
         form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).SendKeys(Keys.ArrowDown);
-        Assert.AreEqual($"The field Id must be between {Student.AllowedIdRange.Min} and {Student.AllowedIdRange.Max}.",form.FindElement(By.CssSelector("div:nth-child(2) > .validation-message")).Text);
+        Assert.AreEqual($"OM must be between {Student.OmMinValue} and {Student.OmMaxValue}.",
+            form.FindElement(By.Id("student-om-validation-message")).Text);
 
         for (int i = 0; i < 11; i++)
         {
             form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).SendKeys(Keys.Backspace);
         }
+
         form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).SendKeys("80000000000");
-        Assert.AreEqual($"OM must be between {Student.AllowedIdRange.Min} and {Student.AllowedIdRange.Max}.",form.FindElement(By.CssSelector("div:nth-child(2) > .validation-message")).Text);
-        
-        form.FindElement(By.Id("given-name")).SendKeys(Keys.Space);
-        form.Click();
-        Assert.AreEqual("First name is required.",form.FindElement(By.CssSelector("div:nth-child(3) > div > div:nth-child(1) > .validation-message")).Text);
+        Assert.AreEqual($"OM must be between {Student.OmMinValue} and {Student.OmMaxValue}.",
+            form.FindElement(By.Id("student-om-validation-message")).Text);
+    }
+
+    [TestMethod]
+    public void AddStudentsEditFormIsValidatingFullNameCorrectly()
+    {
+        Login();
+        ExpandNavbar();
+        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+
+        var form = _webDriver.FindElement(By.TagName("form"));
+        form.FindElement(By.Id("first-name")).SendKeys(Keys.Space);
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("First name is required.",
+            form.FindElement(By.Id("student-first-name-validation-message")).Text);
+
+        form.FindElement(By.Id("first-name")).SendKeys("Aa");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("First name must be at least 3 characters long.",
+            form.FindElement(By.Id("student-first-name-validation-message")).Text);
+
+        form.FindElement(By.Id("first-name")).SendKeys("Test");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-first-name-validation-message")));
 
         form.FindElement(By.Id("last-name")).SendKeys(Keys.Space);
-        form.Click();
-        Assert.AreEqual("Last name is required.",form.FindElement(By.CssSelector("div:nth-child(3) > div > div:nth-child(2) > .validation-message")).Text);
-        
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Last name is required.",
+            form.FindElement(By.Id("student-last-name-validation-message")).Text);
+
+        form.FindElement(By.Id("last-name")).SendKeys("Aa");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Last name must be at least 3 characters long.",
+            form.FindElement(By.Id("student-last-name-validation-message")).Text);
+
+        form.FindElement(By.Id("last-name")).SendKeys("Test");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-last-name-validation-message")));
+
         form.FindElement(By.Id("middle-name")).SendKeys(Keys.Space);
-        form.Click();
-        Assert.AreEqual("Middle name must be at least 3 characters long.",form.FindElement(By.CssSelector("div:nth-child(3) > div > div:nth-child(3) > .validation-message")).Text);
-        
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-middle-name-validation-message")));
+
+        form.FindElement(By.Id("middle-name")).SendKeys("Aa");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Middle name must be at least 3 characters long.",
+            form.FindElement(By.Id("student-middle-name-validation-message")).Text);
+
+        form.FindElement(By.Id("middle-name")).SendKeys("Test");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-middle-name-validation-message")));
+    }
+
+    [TestMethod]
+    public void AddStudentsEditFormIsValidatingCorrectlyWhenOnlyClassYearIsSelected()
+    {
+        Login();
+        ExpandNavbar();
+        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+        var form = _webDriver.FindElement(By.TagName("form"));
+
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='9']")).Click();
+        form.Submit();
+        Assert.AreEqual("Group is required.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='13']")).Click();
+        form.Submit();
+        Assert.AreEqual("Group is required.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='1/13']")).Click();
+        form.Submit();
+        Assert.AreEqual("Only group 'A', 'A.RSZE' or 'B', 'B.RSZE' can be selected.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='2/14']")).Click();
+        form.Submit();
+        Assert.AreEqual("Only group 'A', 'A.RSZE' or 'B', 'B.RSZE' can be selected.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+    }
+
+    [TestMethod]
+    public void AddStudentsEditFormIsValidatingCorrectlyWhenOnlyClassGroupIsSelected()
+    {
+        Login();
+        ExpandNavbar();
+        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+        var form = _webDriver.FindElement(By.TagName("form"));
+
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A']")).Click();
+        form.Submit();
+        Assert.AreEqual("Year is required.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='E']")).Click();
+        form.Submit();
+        Assert.AreEqual("Year is required.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='Ny']")).Click();
+        form.Submit();
+        Assert.AreEqual("Year is required.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A.RSZE']")).Click();
+        form.Submit();
+        Assert.AreEqual("Year is required.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='B.RSZE']")).Click();
+        form.Submit();
+        Assert.AreEqual("Year is required.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+    }
+
+    [TestMethod]
+    public void AddStudentsEditFormIsValidatingClassYearAndGroupCorrectlyWhenNotExistingClassIsSelected()
+    {
+        Login();
+        ExpandNavbar();
+        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+        var form = _webDriver.FindElement(By.TagName("form"));
+
+        // 9.A.RSZE
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='9']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A.RSZE']")).Click();
+        form.Submit();
+        Assert.AreEqual("Only year '1/13' and '2/14' can be selected for 'RSZE' group.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 9.B.RSZE
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='9']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='B.RSZE']")).Click();
+        form.Submit();
+        Assert.AreEqual("Only year '1/13' and '2/14' can be selected for 'RSZE' group.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 10.Ny
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='10']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='Ny']")).Click();
+        form.Submit();
+        Assert.AreEqual("Only year '9' can be selected for 'Ny' group.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 1/13.C
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='1/13']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='C']")).Click();
+        form.Submit();
+        Assert.AreEqual("Only group 'A', 'A.RSZE' or 'B', 'B.RSZE' can be selected.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 1/13.Ny
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='1/13']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='Ny']")).Click();
+        form.Submit();
+        Assert.AreEqual("Only year '9' can be selected for 'Ny' group.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 2/14.C
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='2/14']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='C']")).Click();
+        form.Submit();
+        Assert.AreEqual("Only group 'A', 'A.RSZE' or 'B', 'B.RSZE' can be selected.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 2/14.Ny
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='2/14']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='Ny']")).Click();
+        form.Submit();
+        Assert.AreEqual("Only year '9' can be selected for 'Ny' group.",
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+    }
+
+    [TestMethod]
+    public void AddStudentsEditFormIsValidatingClassYearAndGroupCorrectlyWhenExistingClassIsSelected()
+    {
+        Login();
+        ExpandNavbar();
+        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+        var form = _webDriver.FindElement(By.TagName("form"));
+
+        // 9.A
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='9']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 9.E
+        form = _webDriver.FindElement(By.TagName("form"));
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='9']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 9.Ny
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='9']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='Ny']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 10.A
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='10']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 10.E
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='10']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='E']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 13.A
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='13']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 13.E
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='13']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='E']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 1/13.A
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='1/13']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 1/13.B
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='1/13']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='B']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 1/13.A.RSZE
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='1/13']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A.RSZE']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 1/13.B.RSZE
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='1/13']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='B.RSZE']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 2/14.A
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='2/14']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 2/14.B
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='2/14']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='B']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 2/14.A.RSZE
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='2/14']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='A.RSZE']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+
+        // 2/14.B.RSZE
+        form.FindElement(By.Id("class-year-select")).Click();
+        form.FindElement(By.CssSelector("#class-year-select option[value='2/14']")).Click();
+        form.FindElement(By.Id("class-group-select")).Click();
+        form.FindElement(By.CssSelector("#class-group-select option[value='B.RSZE']")).Click();
+        form.Submit();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.Id("student-class-validation-message")).Text);
+    }
+
+    [TestMethod]
+    public void AddStudentsEditFormIsValidatingUserAndGroupIdCorrectly()
+    {
+        Login();
+        ExpandNavbar();
+        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+
+        var form = _webDriver.FindElement(By.TagName("form"));
+        form.FindElement(By.CssSelector("div:nth-child(5) > .form-control")).SendKeys(Keys.ArrowDown);
+        Assert.AreEqual($"User ID must be between {Student.UidMinValue} and {Student.UidMaxValue}.",
+            form.FindElement(By.CssSelector("div:nth-child(5) > .validation-message")).Text);
+
+        form.FindElement(By.CssSelector("div:nth-child(5) > .form-control")).SendKeys(Keys.ArrowUp);
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.CssSelector("div:nth-child(5) > .validation-message")));
+
+        form.FindElement(By.CssSelector("div:nth-child(5) > .form-control")).SendKeys(Keys.NumberPad0);
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual($"User ID must be between {Student.UidMinValue} and {Student.UidMaxValue}.",
+            form.FindElement(By.CssSelector("div:nth-child(5) > .validation-message")).Text);
+
+        form.FindElement(By.CssSelector("div:nth-child(6) > .form-control")).SendKeys(Keys.ArrowDown);
+        Assert.AreEqual($"Group ID must be between {Student.UidMinValue} and {Student.UidMaxValue}.",
+            form.FindElement(By.CssSelector("div:nth-child(6) > .validation-message")).Text);
+
+        form.FindElement(By.CssSelector("div:nth-child(6) > .form-control")).SendKeys(Keys.ArrowUp);
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.CssSelector("div:nth-child(6) > .validation-message")));
+
+        form.FindElement(By.CssSelector("div:nth-child(6) > .form-control")).SendKeys(Keys.NumberPad0);
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual($"Group ID must be between {Student.GidMinValue} and {Student.GidMaxValue}.",
+            form.FindElement(By.CssSelector("div:nth-child(6) > .validation-message")).Text);
+    }
+
+    [TestMethod]
+    public void AddStudentsEditFormIsValidatingEmailCorrectly()
+    {
+        Login();
+        ExpandNavbar();
+        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+
+        var form = _webDriver.FindElement(By.TagName("form"));
+        form.FindElement(By.CssSelector("div:nth-child(7) > .form-control")).SendKeys(Keys.Space);
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Email is required.",
+            form.FindElement(By.CssSelector("div:nth-child(7) > .validation-message")).Text);
+
+        form.FindElement(By.CssSelector("div:nth-child(7) > .form-control")).SendKeys("asd");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("The Email field is not a valid e-mail address.",
+            form.FindElement(By.CssSelector("div:nth-child(7) > .validation-message")).Text);
+
+        form.FindElement(By.CssSelector("div:nth-child(7) > .form-control")).SendKeys("@");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("The Email field is not a valid e-mail address.",
+            form.FindElement(By.CssSelector("div:nth-child(7) > .validation-message")).Text);
+
+        form.FindElement(By.CssSelector("div:nth-child(7) > .form-control")).SendKeys("asd");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.CssSelector("div:nth-child(7) > .validation-message")));
+    }
+
+    [TestMethod]
+    public void AddStudentsEditFormIsValidatingDirectoryCorrectly()
+    {
+        Login();
+        ExpandNavbar();
+        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+
+        var form = _webDriver.FindElement(By.TagName("form"));
+
+        form.FindElement(By.Id("home-directory")).SendKeys(Keys.Space);
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Directory must not end with '/'.",
+            form.FindElement(By.CssSelector("div:nth-child(8) > .validation-message")).Text);
+
+        form.FindElement(By.Id("home-directory")).SendKeys(Keys.Divide);
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Directory must not end with '/'.",
+            form.FindElement(By.CssSelector("div:nth-child(8) > .validation-message")).Text);
+
+        form.FindElement(By.Id("home-directory")).SendKeys(Keys.Backspace);
+        form.FindElement(By.Id("home-directory")).SendKeys("a");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.CssSelector("div:nth-child(8) > .validation-message")));
+    }
+
+    [TestMethod]
+    public void AddStudentsEditFormIsValidatingPasswordCorrectly()
+    {
+        Login();
+        ExpandNavbar();
+        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+
+        var form = _webDriver.FindElement(By.TagName("form"));
+        form.Submit();
+        form.FindElement(By.Id("password"));
+        Assert.AreEqual("Password is required.",
+            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+
+        form.FindElement(By.Id("password")).SendKeys("a");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Password must be at least 8 characters long.",
+            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+
+        for (int i = 0; i < 7; i++)
+        {
+            form.FindElement(By.Id("password")).SendKeys("a");
+        }
+
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Password must contain at least one uppercase letter.",
+            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+
+        form.FindElement(By.Id("password")).SendKeys("A");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Password must contain at least one number.",
+            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+
+        form.FindElement(By.Id("password")).SendKeys("0");
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.AreEqual("Password must contain at least one special character.",
+            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+
+        form.FindElement(By.Id("password")).SendKeys(Keys.Add);
+        _webDriver.FindElement(By.TagName("h1")).Click();
+        Assert.ThrowsException<NoSuchElementException>(() =>
+            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
     }
 }

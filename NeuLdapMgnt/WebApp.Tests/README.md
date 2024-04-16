@@ -3,12 +3,12 @@
 ### Run Summary
 
 <p>
-<strong>Overall Result:</strong> ❌ Fail <br />
-<strong>Pass Rate:</strong> 88.89% <br />
-<strong>Run Duration:</strong> 35s 442ms <br />
-<strong>Date:</strong> 2024-04-15 20:52:54 - 2024-04-15 20:53:29 <br />
+<strong>Overall Result:</strong> ✔️ Pass <br />
+<strong>Pass Rate:</strong> 100% <br />
+<strong>Run Duration:</strong> 1m 25s  <br />
+<strong>Date:</strong> 2024-04-16 16:11:44 - 2024-04-16 16:13:09 <br />
 <strong>Framework:</strong> .NETCoreApp,Version=v7.0 <br />
-<strong>Total Tests:</strong> 9 <br />
+<strong>Total Tests:</strong> 18 <br />
 </p>
 
 <table>
@@ -21,20 +21,20 @@
 </thead>
 <tbody>
 <tr>
-<td>8</td>
-<td>1</td>
+<td>18</td>
+<td>0</td>
 <td>0</td>
 </tr>
 <tr>
-<td>88.89%</td>
-<td>11.11%</td>
+<td>100%</td>
+<td>0%</td>
 <td>0%</td>
 </tr>
 </tbody>
 </table>
 
 ### Result Sets
-#### NeuLdapMgnt.WebApp.Tests.dll - 88.89%
+#### NeuLdapMgnt.WebApp.Tests.dll - 100%
 <details>
 <summary>Full Results</summary>
 <table>
@@ -48,57 +48,92 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>DefaultRedirectionToLoginPage</td>
-<td>1s 359ms</td>
+<td>1s 302ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>RedirectionIsWorkingWhenUnauthorized</td>
-<td>6s 794ms</td>
+<td>6s 804ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>SuccessfulLoginRedirectsToHomePage</td>
-<td>2s 99ms</td>
+<td>1s 680ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>NavbarLinksAreWorking</td>
-<td>5s 67ms</td>
+<td>4s 539ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>NoStudentsArePresent</td>
-<td>2s 564ms</td>
+<td>2s 135ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>NoStudentsArePresentAndAddStudentsButtonIsPresent</td>
-<td>2s 509ms</td>
+<td>2s 87ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AfterPressingAddStudentsButtonRedirectsToAddStudent</td>
-<td>2s 820ms</td>
+<td>2s 402ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormHasLoadedDefaultValues</td>
-<td>3s 32ms</td>
+<td>2s 561ms</td>
 </tr>
 <tr>
-<td> ❌ Failed </td>
-<td>AddStudentsEditFormIsValidatingCorrectly<blockquote><details>
-<summary>Error</summary>
-<strong>Message:</strong>
-<pre><code>Assert.AreEqual failed. Expected:<The field Id must be between 70000000000 and 79999999999.>. Actual:<OM must be between 70000000000 and 79999999999.>. </code></pre>
-<strong>Stack Trace:</strong>
-<pre><code>   at NeuLdapMgnt.WebApp.Tests.SeleniumTests.AddStudentsEditFormIsValidatingCorrectly() in /app/WebApp.Tests/SeleniumTests.cs:line 236
-   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
-   at System.Reflection.MethodInvoker.Invoke(Object obj, IntPtr* args, BindingFlags invokeAttr)
-</code></pre>
-</details></blockquote>
-</td>
-<td>2s 925ms</td>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingOmCorrectly</td>
+<td>2s 643ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingFullNameCorrectly</td>
+<td>4s 562ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingCorrectlyWhenOnlyClassYearIsSelected</td>
+<td>4s 582ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingCorrectlyWhenOnlyClassGroupIsSelected</td>
+<td>4s 596ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingClassYearAndGroupCorrectlyWhenNotExistingClassIsSelected</td>
+<td>8s 710ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingClassYearAndGroupCorrectlyWhenExistingClassIsSelected</td>
+<td>16s 149ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingUserAndGroupIdCorrectly</td>
+<td>2s 821ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingEmailCorrectly</td>
+<td>3s 226ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingDirectoryCorrectly</td>
+<td>2s 974ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>AddStudentsEditFormIsValidatingPasswordCorrectly</td>
+<td>3s 923ms</td>
 </tr>
 </tbody>
 </table>
