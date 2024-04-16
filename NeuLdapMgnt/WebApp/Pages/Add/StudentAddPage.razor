@@ -103,7 +103,7 @@ else
 		}
 		catch (Exception e)
 		{
-			ToastService.Notify(ToastMessages.Error());
+			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
 
 		isSubmitting = false;
