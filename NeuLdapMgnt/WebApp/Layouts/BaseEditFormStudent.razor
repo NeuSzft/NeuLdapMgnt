@@ -14,11 +14,11 @@
 		<NumberInput Disabled="@(CanDelete || IsReadonly || isAction)"
 					 @bind-Value="studentUpdated!.Id"
 					 TValue="long"
-					 Min="@Student.AllowedIdRange.Min"
-					 Max="@Student.AllowedIdRange.Max"
+					 Min="@Student.OmMinValue"
+					 Max="@Student.OmMaxValue"
 					 id="student-id" />
 		<label for="student-id">OM</label>
-		<ValidationMessage For="() => studentUpdated.Id" />
+		<ValidationMessage For="() => studentUpdated.Id" id="student-om-validation-message" />
 	</div>
 
 	<div class="input-group gap-2">
@@ -32,19 +32,19 @@
 
 		<div class="d-flex flex-column flex-md-row gap-2 w-100">
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="First name" id="given-name" @bind-Value="studentUpdated.FirstName" />
-				<label for="given-name">First</label>
-				<ValidationMessage For="() => studentUpdated.FirstName" />
+				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="first-name" @bind-Value="studentUpdated.FirstName" />
+				<label for="first-name">First</label>
+				<ValidationMessage For="() => studentUpdated.FirstName" id="student-first-name-validation-message" />
 			</div>
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="Last name" id="last-name" @bind-Value="studentUpdated.LastName" />
+				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="last-name" @bind-Value="studentUpdated.LastName" />
 				<label for="last-name">Last</label>
-				<ValidationMessage For="() => studentUpdated.LastName" />
+				<ValidationMessage For="() => studentUpdated.LastName" id="student-last-name-validation-message" />
 			</div>
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" placeholder="Middle name" id="middle-name" @bind-Value="studentUpdated.MiddleName" />
+				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="middle-name" @bind-Value="studentUpdated.MiddleName" />
 				<label for="middle-name">Middle</label>
-				<ValidationMessage For="() => studentUpdated.MiddleName" />
+				<ValidationMessage For="() => studentUpdated.MiddleName" id="student-middle-name-validation-message" />
 			</div>
 		</div>
 	</div>
@@ -61,7 +61,7 @@
 		<div class="d-flex flex-column flex-md-row gap-2 w-100">
 			<div class="form-floating w-100">
 				<InputSelect class="form-select rounded" id="class-year-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.ClassYear">
-					@foreach (string year in Student.AllowedYears)
+					@foreach (string year in Student.ClassYears)
 					{
 						<option value="@year" selected="@year.Equals(studentUpdated.ClassYear)">@year</option>
 					}
@@ -70,7 +70,7 @@
 			</div>
 			<div class="form-floating w-100">
 				<InputSelect class="form-select rounded" id="class-group-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.ClassGroup">
-					@foreach (var group in Student.AllowedGroups)
+					@foreach (var group in Student.ClassGroups)
 					{
 						<option value="@group" selected="@group.Equals(studentUpdated.ClassGroup)">@group</option>
 					}
@@ -79,52 +79,46 @@
 			</div>
 		</div>
 	</div>
-	<ValidationMessage For="() => studentUpdated.Class" />
-
-	<div class="form-floating">
-		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="username" @bind-Value="studentUpdated.Username" />
-		<label for="username">Username</label>
-		<ValidationMessage For="() => studentUpdated.Username" />
-	</div>
+	<ValidationMessage For="() => studentUpdated.Class" id="student-class-validation-message" />
 
 	<div class="form-floating">
 		<NumberInput Disabled="@(IsReadonly || isAction)"
 					 @bind-Value="studentUpdated.Uid"
 					 TValue="int"
-					 Min="@Student.AllowedUidRange.Min"
-					 Max="@Student.AllowedUidRange.Max"
+					 Min="@Student.UidMinValue"
+					 Max="@Student.UidMaxValue"
 					 id="user-id" />
-		<label for="user-id">User Id</label>
-		<ValidationMessage For="() => studentUpdated.Uid" />
+		<label for="user-id">User ID</label>
+		<ValidationMessage For="() => studentUpdated.Uid" id="student-uid-validation-message" />
 	</div>
 
 	<div class="form-floating">
 		<NumberInput Disabled="@(IsReadonly || isAction)"
 					 @bind-Value="studentUpdated.Gid"
 					 TValue="int"
-					 Min="@Student.AllowedGidRange.Min"
-					 Max="@Student.AllowedGidRange.Max"
+					 Min="@Student.GidMinValue"
+					 Max="@Student.GidMaxValue"
 					 id="group-id" />
-		<label for="group-id">Group Id</label>
-		<ValidationMessage For="() => studentUpdated.Gid" />
+		<label for="group-id">Group ID</label>
+		<ValidationMessage For="() => studentUpdated.Gid" id="student-gid-validation-message" />
 	</div>
 
 	<div class="form-floating">
-		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="email" placeholder="Student@example.com" @bind-Value="studentUpdated.Email" />
+		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="email" @bind-Value="studentUpdated.Email" />
 		<label for="email">Email</label>
-		<ValidationMessage For="() => studentUpdated.Email" />
+		<ValidationMessage For="() => studentUpdated.Email" id="student-email-validation-message" />
 	</div>
 
 	<div class="form-floating">
-		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="home-directory" placeholder="/home/Student" @bind-Value="studentUpdated.HomeDirectory" />
+		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="home-directory" @bind-Value="studentUpdated.HomeDirectory" />
 		<label for="home-directory">Directory</label>
-		<ValidationMessage For="() => studentUpdated.HomeDirectory" />
+		<ValidationMessage For="() => studentUpdated.HomeDirectory" id="student-home-dir-validation-message" />
 	</div>
 
 	<div class="form-floating">
 		<InputText type="password" class="form-control" disabled="@(IsReadonly || isAction)" id="password" @bind-Value="studentUpdated.Password" />
 		<label for="password">Password</label>
-		<ValidationMessage For="() => studentUpdated.Password" />
+		<ValidationMessage For="() => studentUpdated.Password" id="student-password-validation-message" />
 	</div>
 
 	@if (!IsReadonly)
@@ -211,7 +205,7 @@
 	private void ToggleEditMode()
 	{
 		studentUpdated = Utils.GetClone<Student>(studentOriginal)!;
-		if (isEditModeEnabled) return;
+		if (isEditModeEnabled || IsReadonly == false) return;
 		isEditModeEnabled = true;
 		IsReadonly = !IsReadonly;
 	}
