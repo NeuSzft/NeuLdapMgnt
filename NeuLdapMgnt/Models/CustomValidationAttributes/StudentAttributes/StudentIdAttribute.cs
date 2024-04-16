@@ -4,13 +4,22 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.StudentAttributes
 {
 	public class StudentIdAttribute : ValidationAttribute
 	{
+		private readonly long _min;
+		private readonly long _max;
+
+		public StudentIdAttribute(long min, long max)
+		{
+			_min = min;
+			_max = max;
+		}
+
 		protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 		{
 			if (value is long id)
 			{
-				if (id is < 70000000000 or > 79999999999)
+				if (id < _min || id > _max)
 				{
-					return new ValidationResult($"OM must be between {70000000000} and {79999999999}.",
+					return new ValidationResult($"OM must be between {_min} and {_max}.",
 						new[] { validationContext.MemberName }!);
 				}
 				else

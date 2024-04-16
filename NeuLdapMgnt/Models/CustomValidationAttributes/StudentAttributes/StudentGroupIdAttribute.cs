@@ -4,13 +4,22 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.StudentAttributes
 {
 	public class StudentGroupIdAttribute : ValidationAttribute
 	{
+		private readonly int _min;
+		private readonly int _max;
+
+		public StudentGroupIdAttribute(int min, int max)
+		{
+			_min = min;
+			_max = max;
+		}
+
 		protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 		{
 			if (value is int gid)
 			{
-				if (gid is < 6000 or > 9999)
+				if (gid < _min || gid > _max)
 				{
-					return new ValidationResult($"Group ID must be between {6000} and {9999}.",
+					return new ValidationResult($"Group ID must be between {_min} and {_max}.",
 						new[] { validationContext.MemberName }!);
 				}
 				else
