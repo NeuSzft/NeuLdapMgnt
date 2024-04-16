@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using NeuLdapMgnt.Models.CustomValidationAttributes;
@@ -14,6 +15,7 @@ namespace NeuLdapMgnt.Models
 		private string lastName = string.Empty;
 		private string firstName = string.Empty;
 		private string middleName = string.Empty;
+		private string homeDirectory = string.Empty;
 
 		[Required(ErrorMessage = "User ID is required.")]
 		[JsonRequired, JsonPropertyName("uid")]
@@ -41,6 +43,8 @@ namespace NeuLdapMgnt.Models
 			{
 				firstName = value.Trim();
 				FullName = GetFullName();
+				Username = GetUsername();
+				HomeDirectory = GetHomeDirectory();
 			}
 		}
 
@@ -55,6 +59,8 @@ namespace NeuLdapMgnt.Models
 			{
 				lastName = value.Trim();
 				FullName = GetFullName();
+				Username = GetUsername();
+				HomeDirectory = GetHomeDirectory();
 			}
 		}
 
@@ -78,10 +84,22 @@ namespace NeuLdapMgnt.Models
 		public virtual string Email { get; set; } = string.Empty;
 
 		[Required(ErrorMessage = "Directory is required.")]
+		[Directory]
 		[JsonRequired, JsonPropertyName("home_directory")]
 		[LdapAttribute("homeDirectory")]
-		public virtual string HomeDirectory { get; set; } = string.Empty;
-
+		public virtual string HomeDirectory
+		{
+			get => homeDirectory;
+			set
+			{
+				if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
+				{
+					homeDirectory = "/home/";
+					return;
+				}
+				homeDirectory = value.Replace(" ", "");
+			}
+		}
 		[Required(ErrorMessage = "Password is required.")]
 		[Password]
 		[PasswordPropertyText]
@@ -118,7 +136,12 @@ namespace NeuLdapMgnt.Models
 
 		public string GetUsername()
 		{
-			return $"{FirstName.PadRight(3, '_')[..3]}{LastName.PadRight(3, '_')[..3]}".ToLower();
+			return $"{LastName.PadRight(3, '_')[..3]}{FirstName.PadRight(3, '_')[..3]}".ToLower();
+		}
+
+		private string GetHomeDirectory()
+		{
+			return string.IsNullOrEmpty(Username) ? "/home/" : $"/home/{GetUsername()}";
 		}
 	}
 }

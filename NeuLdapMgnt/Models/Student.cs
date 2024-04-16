@@ -1,42 +1,47 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using NeuLdapMgnt.Models.CustomValidationAttributes;
 using NeuLdapMgnt.Models.CustomValidationAttributes.StudentAttributes;
 
 namespace NeuLdapMgnt.Models
 {
 	public sealed class Student : Person, IEquatable<Student>
 	{
-		public static readonly (long Min, long Max) AllowedIdRange = new(70000000000, 79999999999);
-		public static readonly (int Min, int Max) AllowedUidRange = new(6000, 6999);
-		public static readonly (int Min, int Max) AllowedGidRange = new(6000, 6999);
-		public static readonly string[] AllowedYears = { "9", "10", "11", "12", "13", "1/13", "2/14" };
-		public static readonly string[] AllowedGroups = { "A", "B", "C", "D", "E", "Ny", "A.RSZE", "B.RSZE" };
+		public static readonly string[] ClassYears = { "9", "10", "11", "12", "13", "1/13", "2/14" };
+		public static readonly string[] ClassGroups = { "A", "B", "C", "D", "E", "Ny", "A.RSZE", "B.RSZE" };
+
+		public const long OmMinValue = 70000000000;
+		public const long OmMaxValue = 79999999999;
+		public const int UidMinValue = 6000;
+		public const int UidMaxValue = 6999;
+		public const int GidMinValue = 6000;
+		public const int GidMaxValue = 6999;
 
 		private string classYear = string.Empty;
 		private string classGroup = string.Empty;
 		private string @class = string.Empty;
 
 		[Required(ErrorMessage = "OM is required.")]
-		[StudentId]
+		[StudentId(OmMinValue, OmMaxValue)]
 		[JsonPropertyName("id")]
 		[LdapAttribute("uid")]
-		public long Id { get; set; } = AllowedIdRange.Min;
+		public long Id { get; set; } = OmMinValue;
 
 		[Required]
-		[StudentUserId]
+		[StudentUserId(UidMinValue, UidMaxValue)]
 		[JsonRequired, JsonPropertyName("uid")]
 		[LdapAttribute("uidNumber")]
-		public override int Uid { get; set; } = AllowedUidRange.Min;
+		public override int Uid { get; set; } = UidMinValue;
 
 		[Required]
-		[StudentGroupId]
+		[StudentGroupId(GidMinValue, GidMaxValue)]
 		[JsonRequired, JsonPropertyName("gid")]
 		[LdapAttribute("gidNumber")]
-		public override int Gid { get; set; } = AllowedGidRange.Min;
+		public override int Gid { get; set; } = GidMinValue;
 
 		[Required(ErrorMessage = "Class is required.")]
-		[RegularExpression(@"^((9\.Ny)|((9|10|11|12|13)\.[A-E])|((1\/13|2\/14)[A-B](\.RSZE)?))$", ErrorMessage = "Class does not exist")]
+		[Class]
 		[JsonRequired, JsonPropertyName("class")]
 		[LdapAttribute("roomNumber")]
 		public string Class

@@ -6,6 +6,11 @@ namespace NeuLdapMgnt.Models;
 
 public class Teacher : Person
 {
+	public const int UidMinValue = 6999;
+	public const int UidMaxValue = 6000;
+	public const int GidMinValue = 6999;
+	public const int GidMaxValue = 6000;
+
 	[Required]
 	[TeacherId]
 	[JsonPropertyName("id")]
@@ -13,14 +18,14 @@ public class Teacher : Person
 	public string Id { get; set; } = string.Empty;
 
 	[Required]
-	[TeacherUserId]
+	[TeacherUserId(UidMinValue, UidMaxValue)]
 	[JsonRequired, JsonPropertyName("uid")]
 	[LdapAttribute("uidNumber")]
-	public override int Uid { get; set; } = 4000;
+	public override int Uid { get; set; } = UidMinValue;
 
 	[Required]
-	[TeacherGroupId]
+	[TeacherGroupId(GidMinValue, GidMaxValue)]
 	[JsonRequired, JsonPropertyName("gid")]
 	[LdapAttribute("gidNumber")]
-	public override int Gid { get; set; } = 4000;
+	public override int Gid { get; set; } = GidMinValue;
 }
