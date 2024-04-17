@@ -56,3 +56,4 @@ web-tests:
 	$(dc) $(options-selenium-tests) down -v
 
 tests: | api-test web-test
+tests: | api-tests web-tests
