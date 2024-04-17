@@ -1,0 +1,83 @@
+﻿@using System.Text.Json
+@inherits LayoutComponentBase
+@inject IJSRuntime JsRuntime
+
+<div class="d-flex flex-column gap-2 my-2">
+	<form class="gap-2 p-4 border rounded">
+		<div class="mb-3">
+			<h3>Export the database into a JSON dump file</h3>
+		</div>
+		<div class="mb-3">
+			<Button @onclick="ExportDatabase" class="btn btn-primary">Export</Button>
+		</div>
+		@if (_exportedJson.Length > 0) {
+			<div class="mb-3">
+				<InputTextArea @bind-Value="_exportedJson" class="form-control" rows="12" style="resize: none" readonly/>
+			</div>
+			<div class="mb-3">
+				<Button @onclick="Download" class="btn btn-primary">Download</Button>
+			</div>
+		}
+	</form>
+
+	<form class="gap-2 p-4 border rounded">
+		<div class="mb-3">
+			<h3>Import a JSON dump file into the database</h3>
+		</div>
+		<div class="mb-3">
+			<InputFile OnChange="@OnFileImported" class="form-control"/>
+		</div>
+		<div class="row mb-3 align-items-center">
+			<div class="col-auto">
+				<Button @onclick="ImportDatabase" class="btn btn-primary" disabled="@(_importedJson.Length == 0)">Import <span class="bi bi-filetype-json"></span></Button>
+			</div>
+			<div class="col">
+				<div class="form-check">
+					<InputCheckbox @bind-Value="_eraseBeforeImport" id="erase-before-import" class="form-check-input" disabled="@(_importedJson.Length == 0)"/>
+					<label class="form-check-label" for="erase-before-import">Erase database before importing?</label>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+@code {
+	private DateTime _lastExportTime;
+
+	private string _exportedJson = string.Empty;
+
+	private string _importedJson = string.Empty;
+
+	private bool _eraseBeforeImport;
+
+	private async Task OnFileImported(InputFileChangeEventArgs e) {
+		await using Stream stream = e.File.OpenReadStream();
+		using StreamReader reader = new(stream);
+		_importedJson = await reader.ReadToEndAsync();
+	}
+
+	private async Task ExportDatabase() {
+		RequestResult<LdapDbDump> result = await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Get, "/api/database/export");
+		if (result.IsSuccess()) {
+			_lastExportTime = DateTime.Now;
+			_exportedJson = JsonSerializer.Serialize(result.Values.FirstOrDefault(), new JsonSerializerOptions { WriteIndented = true });
+		}
+		else
+			ToastService.Notify(ToastMessages.Error(result.GetError()));
+	}
+
+	private async Task ImportDatabase() {
+		try {
+			LdapDbDump? dump = JsonSerializer.Deserialize<LdapDbDump>(_importedJson);
+			await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Get, _eraseBeforeImport ? "/api/database/erase-and-import" : "/api/database/import", dump);
+		}
+		catch (Exception e) {
+			ToastService.Notify(ToastMessages.Error(e.Message));
+		}
+	}
+
+	private async Task Download() {
+		await JsRuntime.InvokeVoidAsync("downloadJsonFile", $"database-{_lastExportTime:yyyy.MM.dd-HH_mm_ss}.json", _exportedJson);
+	}
+
+}

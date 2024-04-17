@@ -1,0 +1,21 @@
+@page "/database/import-export"
+
+<PageTitle>Database Import/Export</PageTitle>
+
+<FormImportExportDb/>
+
+@code {
+
+	protected override void OnInitialized() {
+		// TODO: Uncomment this
+		// ApiRequests.EnsureAuthentication(NavManager);
+	}
+
+	// TODO: Remove this later
+	protected override async Task OnAfterRenderAsync(bool firstRender) {
+		if (firstRender)
+			await ApiRequests.LoginAsync("admin", "adminpass");
+		await base.OnAfterRenderAsync(firstRender);
+	}
+
+}
