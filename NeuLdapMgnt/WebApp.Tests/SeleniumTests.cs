@@ -19,8 +19,12 @@ public class SeleniumTests
     private static readonly string Password =
         Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD") ?? "adminpass";
 
-    private const string SutHub = "http://selenium-hub:4444";
-    private const string SutMngtDocker = "http://nginx-selenium:80";
+    private static readonly string SutHub = 
+        Environment.GetEnvironmentVariable("SELENIUM_HUB_URL") ?? "http://selenium-hub:4444";
+    
+    private static readonly string SutMngtDocker =  
+        Environment.GetEnvironmentVariable("WEBAPP_URL") ?? "http://selenium-nginx:80";
+
     private const string SutMngtLocal = "http://localhost:8080";
     private static string _sutMngt = string.Empty;
     private static IWebDriver _webDriver = default!;

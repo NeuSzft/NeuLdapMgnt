@@ -1,5 +1,5 @@
 services:
-  openldap-selenium:
+  selenium-openldap:
     extends:
       file: ./compose-services.yml
       service: openldap
@@ -13,7 +13,7 @@ services:
       - ldap-data-selenium:/var/lib/ldap
       - ldap-config-selenium:/etc/ldap/slapd.d
 
-  api-build-selenium:
+  selenium-api-build:
     extends:
       file: ./compose-services.yml
       service: api-build
@@ -22,18 +22,18 @@ services:
     volumes:
       - api-app-selenium:/app
 
-  api-selenium:
+  selenium-api:
     extends:
       file: ./compose-services.yml
       service: api
     depends_on:
-      openldap-selenium:
+      selenium-openldap:
         condition: service_started
-      api-build-selenium:
+      selenium-api-build:
         condition: service_completed_successfully
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      LDAP_ADDRESS: openldap-selenium
+      LDAP_ADDRESS: selenium-openldap
       LDAP_PORT: 389
       LDAP_DOMAIN: test.local
       LDAP_USERNAME: admin
@@ -47,7 +47,7 @@ services:
     volumes:
       - api-app-selenium:/app:ro
 
-  webapp-build-selenium:
+  selenium-webapp-build:
     extends:
       file: ./compose-services.yml
       service: webapp-build
@@ -56,19 +56,17 @@ services:
     volumes:
       - webapp-app-selenium:/app
 
-  nginx-selenium:
+  selenium-nginx:
     extends:
       file: ./compose-services.yml
       service: nginx
     depends_on:
-      api-build-selenium:
+      selenium-api-build:
         condition: service_completed_successfully
-      webapp-build-selenium:
+      selenium-webapp-build:
         condition: service_completed_successfully
     networks:
       - net-selenium
-    ports:
-      - 8080:80
     volumes:
       - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
       - webapp-app-selenium:/app:ro
@@ -86,12 +84,14 @@ services:
       DEFAULT_ADMIN_NAME: admin
       DEFAULT_ADMIN_PASSWORD: adminpass
       ASPNETCORE_ENVIRONMENT: Docker
+      SELENIUM_HUB_URL: http://selenium-hub:4444
+      WEBAPP_URL: http://selenium-nginx:80
     depends_on:
       selenium-hub:
         condition: service_started
       selenium-node-firefox:
         condition: service_started
-      nginx-selenium:
+      selenium-nginx:
         condition: service_started
     volumes:
       - ../NeuLdapMgnt/WebApp.Tests:/app/WebApp.Tests
@@ -101,8 +101,6 @@ services:
   selenium-hub:
     image: selenium/hub:4.0.0
     container_name: selenium-hub
-    ports:
-      - 4444:4444
     networks:
       - net-selenium
 
