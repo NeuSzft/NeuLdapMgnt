@@ -77,8 +77,7 @@ namespace NeuLdapMgnt.Models
 			}
 		}
 
-		[Required(ErrorMessage = "Email is required.")]
-		[EmailAddress]
+		[Email]
 		[JsonRequired, JsonPropertyName("email")]
 		[LdapAttribute("mail")]
 		public virtual string Email { get; set; } = string.Empty;
