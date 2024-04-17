@@ -95,3 +95,11 @@ The results of the selenium test can be found within the [Webapp.Test](./NeuLdap
 ```
 make web-tests
 ```
+
+## Running the Unit Tests
+The results of the selenium test can be found within the [Models.Test](./NeuLdapMgnt/Models.Tests/) directory.
+
+### Run the tests:
+```
+make unit-tests
+```
