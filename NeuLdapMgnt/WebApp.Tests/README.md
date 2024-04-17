@@ -5,8 +5,8 @@
 <p>
 <strong>Overall Result:</strong> ✔️ Pass <br />
 <strong>Pass Rate:</strong> 100% <br />
-<strong>Run Duration:</strong> 1m 25s  <br />
-<strong>Date:</strong> 2024-04-16 16:11:44 - 2024-04-16 16:13:09 <br />
+<strong>Run Duration:</strong> 1m 27s  <br />
+<strong>Date:</strong> 2024-04-17 10:34:20 - 2024-04-17 10:35:47 <br />
 <strong>Framework:</strong> .NETCoreApp,Version=v7.0 <br />
 <strong>Total Tests:</strong> 18 <br />
 </p>
@@ -48,92 +48,92 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>DefaultRedirectionToLoginPage</td>
-<td>1s 302ms</td>
+<td>1s 503ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>RedirectionIsWorkingWhenUnauthorized</td>
-<td>6s 804ms</td>
+<td>6s 952ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>SuccessfulLoginRedirectsToHomePage</td>
-<td>1s 680ms</td>
+<td>1s 597ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>NavbarLinksAreWorking</td>
-<td>4s 539ms</td>
+<td>4s 742ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>NoStudentsArePresent</td>
-<td>2s 135ms</td>
+<td>2s 175ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>NoStudentsArePresentAndAddStudentsButtonIsPresent</td>
-<td>2s 87ms</td>
+<td>2s 549ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AfterPressingAddStudentsButtonRedirectsToAddStudent</td>
-<td>2s 402ms</td>
+<td>2s 875ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormHasLoadedDefaultValues</td>
-<td>2s 561ms</td>
+<td>3s 4ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingOmCorrectly</td>
-<td>2s 643ms</td>
+<td>2s 710ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingFullNameCorrectly</td>
-<td>4s 562ms</td>
+<td>5s 25ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingCorrectlyWhenOnlyClassYearIsSelected</td>
-<td>4s 582ms</td>
+<td>4s 650ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingCorrectlyWhenOnlyClassGroupIsSelected</td>
-<td>4s 596ms</td>
+<td>5s 147ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingClassYearAndGroupCorrectlyWhenNotExistingClassIsSelected</td>
-<td>8s 710ms</td>
+<td>9s 276ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingClassYearAndGroupCorrectlyWhenExistingClassIsSelected</td>
-<td>16s 149ms</td>
+<td>16s 597ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingUserAndGroupIdCorrectly</td>
-<td>2s 821ms</td>
+<td>3s 168ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingEmailCorrectly</td>
-<td>3s 226ms</td>
+<td>3s 645ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingDirectoryCorrectly</td>
-<td>2s 974ms</td>
+<td>3s 407ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingPasswordCorrectly</td>
-<td>3s 923ms</td>
+<td>3s 924ms</td>
 </tr>
 </tbody>
 </table>

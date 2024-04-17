@@ -26,7 +26,7 @@ public class SeleniumTests
     private static IWebDriver _webDriver = default!;
     private static WebDriverWait _wait = default!;
 
-    private List<IWebElement> NavLinks
+    private static List<IWebElement> NavLinks
         => _webDriver.FindElements(By.ClassName("nav-link")).ToList();
 
     [ClassInitialize]
@@ -58,7 +58,7 @@ public class SeleniumTests
         _webDriver.Navigate().GoToUrl(_sutMngt);
     }
 
-    private void Login()
+    private static void Login()
     {
         _wait.Until(ExpectedConditions.UrlContains("/login"));
         _webDriver.FindElement(By.Id("username")).SendKeys(Username);
@@ -67,7 +67,7 @@ public class SeleniumTests
         _wait.Until(ExpectedConditions.TitleIs("Home"));
     }
 
-    private void ExpandNavbar()
+    private static void ExpandNavbar()
     {
         var navItems = _webDriver
             .FindElements(By.ClassName("nav-item"))

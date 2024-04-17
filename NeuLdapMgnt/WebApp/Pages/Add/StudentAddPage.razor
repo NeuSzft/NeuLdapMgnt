@@ -33,7 +33,7 @@ else if (isUploading)
 }
 else
 {
-	<BaseEditFormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
+	<FormEditStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
 	<ConfirmDialog @ref="dialog" />
 }
 
@@ -60,7 +60,7 @@ else
 			var parameters = new Dictionary<string, object>();
 			parameters.Add("Student", studentUpdated);
 
-			var confirmation = await dialog.ShowAsync<StudentSummary>("Create this student?", parameters, DialogOptions.Confirm());
+			var confirmation = await dialog.ShowAsync<SummaryStudentBrief>("Create this student?", parameters, DialogOptions.Confirm());
 			if (!confirmation) return false;
 
 			isSubmitting = true;
