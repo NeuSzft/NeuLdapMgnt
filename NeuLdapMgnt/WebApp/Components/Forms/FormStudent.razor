@@ -82,40 +82,6 @@
 	<ValidationMessage For="() => studentUpdated.Class" id="student-class-validation-message" />
 
 	<div class="form-floating">
-		<NumberInput Disabled="@(IsReadonly || isAction)"
-					 @bind-Value="studentUpdated.Uid"
-					 TValue="int"
-					 Min="@Student.UidMinValue"
-					 Max="@Student.UidMaxValue"
-					 id="user-id" />
-		<label for="user-id">User ID</label>
-		<ValidationMessage For="() => studentUpdated.Uid" id="student-uid-validation-message" />
-	</div>
-
-	<div class="form-floating">
-		<NumberInput Disabled="@(IsReadonly || isAction)"
-					 @bind-Value="studentUpdated.Gid"
-					 TValue="int"
-					 Min="@Student.GidMinValue"
-					 Max="@Student.GidMaxValue"
-					 id="group-id" />
-		<label for="group-id">Group ID</label>
-		<ValidationMessage For="() => studentUpdated.Gid" id="student-gid-validation-message" />
-	</div>
-
-	<div class="form-floating">
-		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="email" @bind-Value="studentUpdated.Email" />
-		<label for="email">Email</label>
-		<ValidationMessage For="() => studentUpdated.Email" id="student-email-validation-message" />
-	</div>
-
-	<div class="form-floating">
-		<InputText class="form-control" disabled="@(IsReadonly || isAction)" id="home-directory" @bind-Value="studentUpdated.HomeDirectory" />
-		<label for="home-directory">Directory</label>
-		<ValidationMessage For="() => studentUpdated.HomeDirectory" id="student-home-dir-validation-message" />
-	</div>
-
-	<div class="form-floating">
 		<InputText type="password" class="form-control" disabled="@(IsReadonly || isAction)" id="password" @bind-Value="studentUpdated.Password" />
 		<label for="password">Password</label>
 		<ValidationMessage For="() => studentUpdated.Password" id="student-password-validation-message" />

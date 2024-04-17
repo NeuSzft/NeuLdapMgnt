@@ -9,7 +9,7 @@
 else
 {
 	<h3>[@student.Class] @student.FullName</h3>
-	<FormEditStudent TheStudent="student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete" />
+	<FormStudent TheStudent="student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete" />
 	<ConfirmDialog @ref="dialog" />
 }
 
@@ -89,7 +89,7 @@ else
 			var parameters = new Dictionary<string, object>();
 			parameters.Add("Student", editedStudent);
 
-			var confirmation = await dialog.ShowAsync<SummaryStudentBrief>("Delete this student?", parameters, DialogOptions.Delete());
+			var confirmation = await dialog.ShowAsync<SummaryStudentEdit>("Delete this student?", parameters, DialogOptions.Delete());
 			if (!confirmation) return false;
 
 			var response = await ApiRequests.DeleteStudentAsync(editedStudent.Id);

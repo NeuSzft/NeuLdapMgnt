@@ -224,12 +224,6 @@ public class SeleniumTests
         Assert.AreEqual(string.Empty, form.FindElement(By.Id("middle-name")).GetAttribute("value"));
         Assert.AreEqual(string.Empty, form.FindElement(By.Id("class-year-select")).GetAttribute("value"));
         Assert.AreEqual(string.Empty, form.FindElement(By.Id("class-group-select")).GetAttribute("value"));
-        Assert.AreEqual(Student.UidMinValue.ToString(),
-            form.FindElement(By.CssSelector("div:nth-child(5) > .form-control")).GetAttribute("value"));
-        Assert.AreEqual(Student.GidMinValue.ToString(),
-            form.FindElement(By.CssSelector("div:nth-child(6) > .form-control")).GetAttribute("value"));
-        Assert.AreEqual(string.Empty, form.FindElement(By.Id("email")).GetAttribute("value"));
-        Assert.AreEqual("/home/", form.FindElement(By.Id("home-directory")).GetAttribute("value"));
         Assert.AreEqual(string.Empty, form.FindElement(By.Id("password")).GetAttribute("value"));
     }
 
@@ -604,96 +598,6 @@ public class SeleniumTests
     }
 
     [TestMethod]
-    public void AddStudentsEditFormIsValidatingUserAndGroupIdCorrectly()
-    {
-        Login();
-        ExpandNavbar();
-        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
-
-        var form = _webDriver.FindElement(By.TagName("form"));
-        form.FindElement(By.CssSelector("div:nth-child(5) > .form-control")).SendKeys(Keys.ArrowDown);
-        Assert.AreEqual($"User ID must be between {Student.UidMinValue} and {Student.UidMaxValue}.",
-            form.FindElement(By.CssSelector("div:nth-child(5) > .validation-message")).Text);
-
-        form.FindElement(By.CssSelector("div:nth-child(5) > .form-control")).SendKeys(Keys.ArrowUp);
-        Assert.ThrowsException<NoSuchElementException>(() =>
-            form.FindElement(By.CssSelector("div:nth-child(5) > .validation-message")));
-
-        form.FindElement(By.CssSelector("div:nth-child(5) > .form-control")).SendKeys(Keys.NumberPad0);
-        _webDriver.FindElement(By.TagName("h1")).Click();
-        Assert.AreEqual($"User ID must be between {Student.UidMinValue} and {Student.UidMaxValue}.",
-            form.FindElement(By.CssSelector("div:nth-child(5) > .validation-message")).Text);
-
-        form.FindElement(By.CssSelector("div:nth-child(6) > .form-control")).SendKeys(Keys.ArrowDown);
-        Assert.AreEqual($"Group ID must be between {Student.UidMinValue} and {Student.UidMaxValue}.",
-            form.FindElement(By.CssSelector("div:nth-child(6) > .validation-message")).Text);
-
-        form.FindElement(By.CssSelector("div:nth-child(6) > .form-control")).SendKeys(Keys.ArrowUp);
-        Assert.ThrowsException<NoSuchElementException>(() =>
-            form.FindElement(By.CssSelector("div:nth-child(6) > .validation-message")));
-
-        form.FindElement(By.CssSelector("div:nth-child(6) > .form-control")).SendKeys(Keys.NumberPad0);
-        _webDriver.FindElement(By.TagName("h1")).Click();
-        Assert.AreEqual($"Group ID must be between {Student.GidMinValue} and {Student.GidMaxValue}.",
-            form.FindElement(By.CssSelector("div:nth-child(6) > .validation-message")).Text);
-    }
-
-    [TestMethod]
-    public void AddStudentsEditFormIsValidatingEmailCorrectly()
-    {
-        Login();
-        ExpandNavbar();
-        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
-
-        var form = _webDriver.FindElement(By.TagName("form"));
-        form.FindElement(By.CssSelector("div:nth-child(7) > .form-control")).SendKeys(Keys.Space);
-        _webDriver.FindElement(By.TagName("h1")).Click();
-        Assert.AreEqual("Email is required.",
-            form.FindElement(By.CssSelector("div:nth-child(7) > .validation-message")).Text);
-
-        form.FindElement(By.CssSelector("div:nth-child(7) > .form-control")).SendKeys("asd");
-        _webDriver.FindElement(By.TagName("h1")).Click();
-        Assert.AreEqual("The Email field is not a valid e-mail address.",
-            form.FindElement(By.CssSelector("div:nth-child(7) > .validation-message")).Text);
-
-        form.FindElement(By.CssSelector("div:nth-child(7) > .form-control")).SendKeys("@");
-        _webDriver.FindElement(By.TagName("h1")).Click();
-        Assert.AreEqual("The Email field is not a valid e-mail address.",
-            form.FindElement(By.CssSelector("div:nth-child(7) > .validation-message")).Text);
-
-        form.FindElement(By.CssSelector("div:nth-child(7) > .form-control")).SendKeys("asd");
-        _webDriver.FindElement(By.TagName("h1")).Click();
-        Assert.ThrowsException<NoSuchElementException>(() =>
-            form.FindElement(By.CssSelector("div:nth-child(7) > .validation-message")));
-    }
-
-    [TestMethod]
-    public void AddStudentsEditFormIsValidatingDirectoryCorrectly()
-    {
-        Login();
-        ExpandNavbar();
-        NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
-
-        var form = _webDriver.FindElement(By.TagName("form"));
-
-        form.FindElement(By.Id("home-directory")).SendKeys(Keys.Space);
-        _webDriver.FindElement(By.TagName("h1")).Click();
-        Assert.AreEqual("Directory must not end with '/'.",
-            form.FindElement(By.CssSelector("div:nth-child(8) > .validation-message")).Text);
-
-        form.FindElement(By.Id("home-directory")).SendKeys(Keys.Divide);
-        _webDriver.FindElement(By.TagName("h1")).Click();
-        Assert.AreEqual("Directory must not end with '/'.",
-            form.FindElement(By.CssSelector("div:nth-child(8) > .validation-message")).Text);
-
-        form.FindElement(By.Id("home-directory")).SendKeys(Keys.Backspace);
-        form.FindElement(By.Id("home-directory")).SendKeys("a");
-        _webDriver.FindElement(By.TagName("h1")).Click();
-        Assert.ThrowsException<NoSuchElementException>(() =>
-            form.FindElement(By.CssSelector("div:nth-child(8) > .validation-message")));
-    }
-
-    [TestMethod]
     public void AddStudentsEditFormIsValidatingPasswordCorrectly()
     {
         Login();
@@ -704,12 +608,12 @@ public class SeleniumTests
         form.Submit();
         form.FindElement(By.Id("password"));
         Assert.AreEqual("Password is required.",
-            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+            form.FindElement(By.Id("student-password-validation-message")).Text);
 
         form.FindElement(By.Id("password")).SendKeys("a");
         _webDriver.FindElement(By.TagName("h1")).Click();
         Assert.AreEqual("Password must be at least 8 characters long.",
-            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+            form.FindElement(By.Id("student-password-validation-message")).Text);
 
         for (int i = 0; i < 7; i++)
         {
@@ -718,21 +622,21 @@ public class SeleniumTests
 
         _webDriver.FindElement(By.TagName("h1")).Click();
         Assert.AreEqual("Password must contain at least one uppercase letter.",
-            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+            form.FindElement(By.Id("student-password-validation-message")).Text);
 
         form.FindElement(By.Id("password")).SendKeys("A");
         _webDriver.FindElement(By.TagName("h1")).Click();
         Assert.AreEqual("Password must contain at least one number.",
-            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+            form.FindElement(By.Id("student-password-validation-message")).Text);
 
         form.FindElement(By.Id("password")).SendKeys("0");
         _webDriver.FindElement(By.TagName("h1")).Click();
         Assert.AreEqual("Password must contain at least one special character.",
-            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+            form.FindElement(By.Id("student-password-validation-message")).Text);
 
         form.FindElement(By.Id("password")).SendKeys(Keys.Add);
         _webDriver.FindElement(By.TagName("h1")).Click();
         Assert.ThrowsException<NoSuchElementException>(() =>
-            form.FindElement(By.CssSelector("div:nth-child(10) > .validation-message")).Text);
+            form.FindElement(By.Id("student-password-validation-message")).Text);
     }
 }

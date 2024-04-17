@@ -6,9 +6,7 @@
 	<BodyTemplate>
 		<CustomList List="errorList" />
 	</BodyTemplate>
-	<FooterTemplate>
-		<Button Color="ButtonColor.Secondary" @onclick="HideModal">Ok</Button>
-	</FooterTemplate>
+	<FooterTemplate></FooterTemplate>
 </Modal>
 
 <div class="row">
@@ -33,7 +31,7 @@ else if (isUploading)
 }
 else
 {
-	<FormEditStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
+	<FormStudent TheStudent="student" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
 	<ConfirmDialog @ref="dialog" />
 }
 
@@ -60,7 +58,7 @@ else
 			var parameters = new Dictionary<string, object>();
 			parameters.Add("Student", studentUpdated);
 
-			var confirmation = await dialog.ShowAsync<SummaryStudentBrief>("Create this student?", parameters, DialogOptions.Confirm());
+			var confirmation = await dialog.ShowAsync<SummaryStudent>("Create this student?", parameters, DialogOptions.Confirm());
 			if (!confirmation) return false;
 
 			isSubmitting = true;
