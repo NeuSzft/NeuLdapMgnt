@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  unit-tests:
+    build:
+      context: ..
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:7.0
+        COPY ./NeuLdapMgnt/Models.Tests /app/Models.Tests
+        COPY ./NeuLdapMgnt/Models /app/Models
+        WORKDIR /app/Models.Tests
+        ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/app/Models.Tests/README.md" ]
+    volumes:
+      - ../NeuLdapMgnt/Models.Tests:/app/Models.Tests
