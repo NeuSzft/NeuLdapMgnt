@@ -81,7 +81,7 @@ make demo-down
 ```
 
 ## Running the API Tests
-The results of the api test can be found within the [test-results](./docs/test-results/) directory.
+The results of the api tests can be found within the [test-results](./docs/test-results/) directory.
 
 ### Run the tests:
 ```
@@ -89,7 +89,7 @@ make api-tests
 ```
 
 ## Running the Selenium Tests
-The results of the selenium test can be found within the [Webapp.Test](./NeuLdapMgnt/Webapp.Tests/) directory.
+The results of the selenium tests can be found within the [Webapp.Test](./NeuLdapMgnt/Webapp.Tests/) directory.
 
 ### Run the tests:
 ```
@@ -97,7 +97,7 @@ make web-tests
 ```
 
 ## Running the Unit Tests
-The results of the selenium test can be found within the [Models.Test](./NeuLdapMgnt/Models.Tests/) directory.
+The results of unit tests can be found within the [Models.Test](./NeuLdapMgnt/Models.Tests/) directory.
 
 ### Run the tests:
 ```
