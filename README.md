@@ -87,3 +87,11 @@ The results of the api test can be found within the [test-results](./docs/test-r
 ```
 make api-tests
 ```
+
+## Running the Selenium Tests
+The results of the selenium test can be found within the [Webapp.Test](./NeuLdapMgnt/Webapp.Tests/) directory.
+
+### Run the tests:
+```
+make web-tests
+```
