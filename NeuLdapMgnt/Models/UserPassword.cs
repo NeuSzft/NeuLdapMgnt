@@ -5,42 +5,32 @@ using System.Text;
 
 namespace NeuLdapMgnt.Models;
 
-/// <summary>Stores the SHA-512 hash and salt of a user's password and provides methods for converting it to and from Modular Crypt Format.</summary>
-/// <remarks>The format used is "<c>$6${encodedPasswordSalt}${encodedPasswordHash}</c>".</remarks>
-public sealed partial class UserPassword {
-    /// <summary>The SHA-512 hash of the password.</summary>
+/// <summary>Stores the SHA512 hash and salt of a user's password.</summary>
+public sealed class UserPassword {
+    /// <summary>The SHA512 hash of the password.</summary>
     public byte[] Hash { get; private set; } = { };
 
     /// <summary>The salt used for the hashing of the password.</summary>
     public byte[] Salt { get; private set; } = { };
 
-    /// <summary>Determines whether the user's account is locked.</summary>
-    public bool Locked { get; set; }
-
     /// <summary>Initializes a new <see cref="UserPassword"/>.</summary>
     /// <param name="password">The password to hash.</param>
     /// <param name="saltLength">The length of the salt to generate in bytes.</param>
     /// <param name="locked">Determines whether the user's account is locked.</param>
-    public UserPassword(string password, int saltLength, bool locked = false) {
+    public UserPassword(string password, int saltLength) {
         SetPassword(password, saltLength);
-        Locked = locked;
     }
 
-    /// <summary>Initializes a new <see cref="UserPassword"/> from a string in the Modular Crypt Format.</summary>
-    /// <param name="mcf">The password string in the "<c>$6${encodedPasswordSalt}${encodedPasswordHash}</c>" format.</param>
-    /// <exception cref="FormatException"><paramref name="mcf"/> is in an incorrect format.</exception>
-    /// <exception cref="ArgumentException">The hashing algorithm specified in <see cref="mcf"/> is not SHA-512.</exception>
-    public UserPassword(string mcf) {
-        string[] splitMcf = mcf.Split('$');
+    /// <summary>Initializes a new <see cref="UserPassword"/> from a LDAP password hashed with SSHA512.</summary>
+    /// <param name="ldapPassword">The password string in the <c>{SSHA512}</c> format.</param>
+    /// <exception cref="FormatException"><paramref name="ldapPassword"/> is in an incorrect format.</exception>
+    public UserPassword(string ldapPassword) {
+        if (!ldapPassword.StartsWith("{SSHA512}"))
+            throw new FormatException("The password string is not in the SSHA512 format");
 
-        if (splitMcf.Length != 4)
-            throw new FormatException("The string is in an incorrect format");
-        if (splitMcf[1] != "6")
-            throw new ArgumentException("The hashing algorithm must be SHA-512");
-
-        Locked = splitMcf[0].Contains('!');
-        Salt   = DecodeBytes(splitMcf[2]);
-        Hash   = DecodeBytes(splitMcf[3]);
+        byte[] bytes = Convert.FromBase64String(ldapPassword[9..]);
+        Hash = bytes[..64];
+        Salt = bytes[64..];
     }
 
     /// <summary>Sets the password hash and salt.</summary>
@@ -59,9 +49,9 @@ public sealed partial class UserPassword {
         return hash.SequenceEqual(Hash);
     }
 
-    /// <summary>Returns the password in the Modular Crypt Format.</summary>
-    /// <returns>The password formatted as "<c>$6${encodedPasswordSalt}${encodedPasswordHash}</c>".</returns>
+    /// <summary>Converts the password hash and salt into a string.</summary>
+    /// <returns>The password formatted to <c>{SSHA512}</c> .</returns>
     public override string ToString() {
-        return $"{(Locked ? "!" : string.Empty)}$6${EncodeBytes(Salt)}${EncodeBytes(Hash)}";
+        return "{SSHA512}" + Convert.ToBase64String(Hash.Concat(Salt).ToArray());
     }
 }

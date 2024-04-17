@@ -51,15 +51,10 @@ public static class AdminUserEndpoints {
                if (!bool.TryParse(value, out var enable))
                    return new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors($"'{value}' is not a valid boolean.").RenewToken(request).ToResult();
 
-               UserPassword? userPassword = Authenticator.GetAndSetDefaultAdminPasswordIfNotSet(ldap, out var error);
-               if (error is not null || userPassword is null)
-                   return new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(error ?? "Unknown error.").RenewToken(request).ToResult();
-
-               userPassword.Locked = !enable;
-               ldap.SetValue(Authenticator.DefaultAdminPasswordValueName, userPassword.ToString(), out error);
-
+               ldap.SetValue(Authenticator.DefaultAdminEnabledValueName, enable.ToString(), out var error);
                if (error is not null)
                    return new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(error).RenewToken(request).ToResult();
+
                return new RequestResult().RenewToken(request).ToResult();
            })
            .WithOpenApi()
@@ -78,13 +73,11 @@ public static class AdminUserEndpoints {
                if (password.Length < 8)
                    return new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors("Password must be at least 8 characters long.").RenewToken(request).ToResult();
 
-               bool locked = ldap.GetValue(Authenticator.DefaultAdminPasswordValueName, out _)?.StartsWith('!') ?? false;
-               password = new UserPassword(password, 16, locked).ToString();
-
-               ldap.SetValue(Authenticator.DefaultAdminPasswordValueName, password, out var error);
-
+               UserPassword userPassword = new(password, 16);
+               ldap.SetValue(Authenticator.DefaultAdminPasswordValueName, userPassword.ToString(), out var error);
                if (error is not null)
                    return new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(error).RenewToken(request).ToResult();
+
                return new RequestResult().RenewToken(request).ToResult();
            })
            .WithOpenApi()

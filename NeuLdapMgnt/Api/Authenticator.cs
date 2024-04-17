@@ -19,6 +19,9 @@ public record AuthResult(int Code, string? Message, string? Username) {
 }
 
 public static class Authenticator {
+    /// <summary>The name of value used to store the default admin enabled within the LDAP database.</summary>
+    public const string DefaultAdminEnabledValueName = "default-admin-enabled";
+
     /// <summary>The name of value used to store the default admin password within the LDAP database.</summary>
     public const string DefaultAdminPasswordValueName = "default-admin-password";
 
@@ -26,8 +29,8 @@ public static class Authenticator {
     /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
     /// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
     /// <returns>The <see cref="UserPassword"/> of the default admin or <c>null</c> if an error occured.</returns>
-    /// <remarks>When the default password is set <c>Locked</c> wil be set to <c>false</c>.</remarks>
-    public static UserPassword? GetAndSetDefaultAdminPasswordIfNotSet(LdapService ldap, out string? error) {
+    /// <remarks>When the default password is set, the default admin is also enabled.</remarks>
+    private static UserPassword? GetDefaultAdminPasswordAndCrateAdminWhenMissing(LdapService ldap, out string? error) {
         string? pwd = ldap.GetValue(DefaultAdminPasswordValueName, out error);
 
         try {
@@ -35,7 +38,22 @@ public static class Authenticator {
         }
         catch {
             UserPassword userPassword = new(Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD").DefaultIfNullOrEmpty("adminpass"), 16);
+            ldap.SetValue(DefaultAdminEnabledValueName, true.ToString(), out _);
             return ldap.SetValue(DefaultAdminPasswordValueName, userPassword.ToString(), out error) ? userPassword : null;
+        }
+    }
+
+    /// <summary>Checks whether the default admin is enabled or not.</summary>
+    /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
+    /// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
+    /// <returns><c>true</c> if the value belonging to the <c>DefaultAdminEnabledValueName</c> key is also <c>true</c>, otherwise <c>false</c>.</returns>
+    private static bool IsDefaultAdminEnabled(LdapService ldap, out string? error) {
+        try {
+            return bool.Parse(ldap.GetValue(DefaultAdminEnabledValueName, out error)!);
+        }
+        catch (Exception e) {
+            error = e.ToString();
+            return false;
         }
     }
 
@@ -71,15 +89,15 @@ public static class Authenticator {
             return new(StatusCodes.Status400BadRequest, "Invalid Authorization header.", null);
 
         if (username == Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME").DefaultIfNullOrEmpty("admin")) {
-            UserPassword? userPassword = GetAndSetDefaultAdminPasswordIfNotSet(ldap, out var error);
+            UserPassword? userPassword = GetDefaultAdminPasswordAndCrateAdminWhenMissing(ldap, out var error);
             if (userPassword is null)
                 return new(StatusCodes.Status503ServiceUnavailable, error, null);
 
-            if (userPassword.CheckPassword(password)) {
-                if (userPassword.Locked)
-                    return new(StatusCodes.Status403Forbidden, "Account is locked.", null);
+            if (!IsDefaultAdminEnabled(ldap, out error))
+                return new(StatusCodes.Status403Forbidden, error ?? "The default admin is not enabled.", null);
+
+            if (userPassword.CheckPassword(password))
                 return new(StatusCodes.Status200OK, null, username);
-            }
         }
         else if (ldap.PartOfGroup("inactive", username)) {
             return new(StatusCodes.Status403Forbidden, "User is inactive.", null);
@@ -88,11 +106,8 @@ public static class Authenticator {
             try {
                 UserPassword userPassword = new(teacher.Password);
 
-                if (userPassword.CheckPassword(password)) {
-                    if (userPassword.Locked)
-                        return new(StatusCodes.Status403Forbidden, "Account is locked.", null);
+                if (userPassword.CheckPassword(password))
                     return new(StatusCodes.Status200OK, null, username);
-                }
             }
             catch {
                 return new(StatusCodes.Status500InternalServerError, "Invalid credentials within LDAP database.", null);
