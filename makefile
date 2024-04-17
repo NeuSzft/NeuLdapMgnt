@@ -50,10 +50,9 @@ api-tests:
 	$(dc) $(options-api-tests) down
 
 web-tests:
-	$(dc) $(options-selenium-tests) build webapp-build-selenium selenium-tests api-build-selenium api-selenium
+	$(dc) $(options-selenium-tests) build selenium-webapp-build selenium-tests selenium-api-build selenium-api
 	$(dc) $(options-selenium-tests) up -d
 	$(dc) $(options-selenium-tests) logs -f selenium-tests
 	$(dc) $(options-selenium-tests) down -v
 
-tests: | api-test web-test
 tests: | api-tests web-tests
