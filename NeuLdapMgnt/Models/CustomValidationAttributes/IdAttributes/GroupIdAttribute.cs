@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NeuLdapMgnt.Models.CustomValidationAttributes.TeacherAttributes
+namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 {
-	public class TeacherGroupIdAttribute : ValidationAttribute
+	public class GroupIdAttribute : ValidationAttribute
 	{
 		private readonly int _min;
 		private readonly int _max;
 
-		public TeacherGroupIdAttribute(int min, int max)
+		public GroupIdAttribute(int min, int max)
 		{
 			_min = min;
 			_max = max;

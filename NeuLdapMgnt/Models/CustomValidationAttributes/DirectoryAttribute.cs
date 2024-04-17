@@ -9,7 +9,6 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 		{
 			if (value is string directory)
 			{
-				directory = directory.Trim();
 				if (!directory.StartsWith("/home/", StringComparison.OrdinalIgnoreCase))
 				{
 					return new ValidationResult("Directory must start with '/home/'.",
@@ -28,7 +27,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 				}
 			}
 
-			return new ValidationResult("Class: Invalid data type", new[] { validationContext.MemberName }!);
+			return new ValidationResult("Directory: Invalid data type", new[] { validationContext.MemberName }!);
 		}
 	}
 }

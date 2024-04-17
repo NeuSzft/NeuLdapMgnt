@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NeuLdapMgnt.Models.CustomValidationAttributes.AdminAttributes
+namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 {
-	public class AdminIdAttribute : ValidationAttribute
+	public class IdAdminAttribute : ValidationAttribute
 	{
 		protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 		{

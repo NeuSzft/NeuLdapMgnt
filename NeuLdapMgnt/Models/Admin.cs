@@ -4,12 +4,12 @@ using NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes;
 
 namespace NeuLdapMgnt.Models;
 
-public class Teacher : Person
+public class Admin : Person
 {
-	public const int UidMinValue = 4000;
-	public const int UidMaxValue = 5999;
-	public const int GidMinValue = 4000;
-	public const int GidMaxValue = 5999;
+	public const int UidMinValue = 1000;
+	public const int UidMaxValue = 1999;
+	public const int GidMinValue = 1000;
+	public const int GidMaxValue = 1999;
 
 	[Required]
 	[IdTeacher]

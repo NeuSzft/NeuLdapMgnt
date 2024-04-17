@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NeuLdapMgnt.Models.CustomValidationAttributes
+namespace NeuLdapMgnt.Models.CustomValidationAttributes.NameAttributes
 {
 	public class MiddleNameAttribute : ValidationAttribute
 	{

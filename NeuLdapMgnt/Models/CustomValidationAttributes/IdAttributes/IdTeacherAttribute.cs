@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NeuLdapMgnt.Models.CustomValidationAttributes.TeacherAttributes
+namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 {
-	public class TeacherIdAttribute : ValidationAttribute
+	public class IdTeacherAttribute : ValidationAttribute
 	{
 		protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 		{
@@ -11,6 +11,11 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.TeacherAttributes
 				if (!id.Contains('.'))
 				{
 					return new ValidationResult($"ID must contain '.'",
+						new[] { validationContext.MemberName }!);
+				}
+				else if (id.Contains(".."))
+				{
+					return new ValidationResult($"ID invalid.",
 						new[] { validationContext.MemberName }!);
 				}
 				else if (id.Split('.')[0].Length < 3)

@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NeuLdapMgnt.Models.CustomValidationAttributes.StudentAttributes
+namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 {
-	public class StudentIdAttribute : ValidationAttribute
+	public class IdStudentAttribute : ValidationAttribute
 	{
 		private readonly long _min;
 		private readonly long _max;
 
-		public StudentIdAttribute(long min, long max)
+		public IdStudentAttribute(long min, long max)
 		{
 			_min = min;
 			_max = max;
@@ -28,7 +28,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.StudentAttributes
 				}
 			}
 
-			return new ValidationResult("ID: Invalid data type", new[] { validationContext.MemberName }!);
+			return new ValidationResult("OM: Invalid data type", new[] { validationContext.MemberName }!);
 		}
 	}
 }

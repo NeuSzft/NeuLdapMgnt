@@ -9,7 +9,6 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 		{
 			if (value is string email)
 			{
-				email = email.Replace(" ", "");
 				if (string.IsNullOrEmpty(email))
 				{
 					return ValidationResult.Success;

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using NeuLdapMgnt.Models.CustomValidationAttributes;
-using NeuLdapMgnt.Models.CustomValidationAttributes.StudentAttributes;
+using NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes;
 
 namespace NeuLdapMgnt.Models
 {
@@ -23,19 +23,19 @@ namespace NeuLdapMgnt.Models
 		private string @class = string.Empty;
 
 		[Required(ErrorMessage = "OM is required.")]
-		[StudentId(OmMinValue, OmMaxValue)]
+		[IdStudent(OmMinValue, OmMaxValue)]
 		[JsonPropertyName("id")]
 		[LdapAttribute("uid")]
 		public long Id { get; set; } = OmMinValue;
 
 		[Required]
-		[StudentUserId(UidMinValue, UidMaxValue)]
+		[UserId(UidMinValue, UidMaxValue)]
 		[JsonRequired, JsonPropertyName("uid")]
 		[LdapAttribute("uidNumber")]
 		public override int Uid { get; set; } = UidMinValue;
 
 		[Required]
-		[StudentGroupId(GidMinValue, GidMaxValue)]
+		[GroupId(GidMinValue, GidMaxValue)]
 		[JsonRequired, JsonPropertyName("gid")]
 		[LdapAttribute("gidNumber")]
 		public override int Gid { get; set; } = GidMinValue;
