@@ -30,13 +30,15 @@ namespace NeuLdapMgnt.Api
 		{
 			string query;
 
-			if (string.IsNullOrEmpty(entry.Username) || string.IsNullOrEmpty(entry.FullName))
+			if (string.IsNullOrEmpty(entry.Username)
+				|| string.IsNullOrEmpty(entry.FullName)
+				|| entry.Username == Authenticator.GetDefaultAdminName())
 			{
 				query = """
 					INSERT INTO "entries"
 					("time", "log_level", "username", "host", "method", "request_path", "status_code")
 					VALUES
-					(@Time, @LogLevel, @Username, @Host, @Method, @RequestPath, @StatusCode);
+					(@Time, @LogLevel, null, @Host, @Method, @RequestPath, @StatusCode);
 				""";
 			}
 			else
