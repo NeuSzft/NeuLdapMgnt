@@ -1,13 +1,11 @@
-version: '3.8'
+version: "3.8"
 
 services:
     demo-postgres:
         image: postgres:latest
         environment:
             POSTGRES_DB: neu_ldap_mgnt_logs
-            POSTGRES_USER: demo
             POSTGRES_PASSWORD: admin
-            POSTGRES_HOST_AUTH_METHOD: trust
         volumes:
             - demo-postgres-data:/var/lib/postgresql/data
         networks:
@@ -61,6 +59,8 @@ services:
         depends_on:
             demo-openldap:
                 condition: service_started
+            demo-postgres:
+                condition: service_started
             demo-api-build:
                 condition: service_completed_successfully
         environment:
@@ -73,6 +73,9 @@ services:
             SECURITY_KEY: ITN3pnH472FGG71aC1AWFDrTn2TpgHtBuZdD/LYkD4bXe4hhAKWj8CsTfGPQJHr3qoY8/KM0zShbyreW6RapyGAL2M8JBOWLknXoC/1zJ4+9QOC7hpk4jqM13vHoJeL8JTKdYGCzx6gwZK9a4vgcsVCCc1QT6//WO7x0xdcZUsiHqp2t9PJjzLfMvK2nlaWe+aoBBPvsM4CAyWTMT8sZVHSmrjTunhVOn9cqoouHwe33a5grSf9Z9AhFtBTSH2DvlW4/DdA1kKcNeju/wZGhnE0DKNsguV6b5NcYLsRgU1NK2nrWd8yhUskOQCoDvLwnWc3Qto5l/AFnht08FSjLSQ==
             DEFAULT_ADMIN_NAME: admin
             DEFAULT_ADMIN_PASSWORD: adminpass
+            POSTGRES_HOST: demo-postgres
+            POSTGRES_DB: neu_ldap_mgnt_logs
+            POSTGRES_PASSWORD: admin
             LOGS_DIR: /logs
         networks:
             demo-net:
