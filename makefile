@@ -60,6 +60,6 @@ unit-tests:
 	$(dc) $(options-unit-tests) build unit-tests
 	$(dc) $(options-unit-tests) up -d
 	$(dc) $(options-unit-tests) logs -f unit-tests
-	$(dc) $(options-unit-tests) stop
+	$(dc) $(options-unit-tests) down
 
 tests: | api-tests web-tests
