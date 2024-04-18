@@ -80,6 +80,25 @@ namespace NeuLdapMgnt.WebApp.Requests
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 		}
 
+		/// <summary>Sends a request to the specified URI with the string content in it's body, when the <paramref name="method"/> is either <c>POST</c> or <c>PUT</c>.</summary>
+		public async Task<RequestResult> SendStringAsync(HttpMethod method, string uri, string? content) {
+			EnsureAuthentication();
+
+			HttpRequestMessage request = new(method, uri);
+
+			// Sets the request content for POST and PUT methods
+			if (content != null && (method == HttpMethod.Post || method == HttpMethod.Put))
+				request.Content = new StringContent(content);
+
+			HttpResponseMessage response = await _httpClient.SendAsync(request);
+
+			// Processes the response, updating tokens as necessary and handling errors
+			RequestResult? result = await response.Content.ReadFromJsonAsync<RequestResult>();
+			if (result is not null)
+				UpdateToken(result);
+			return result ?? new RequestResult().SetStatus(204).SetErrors("Invalid response from server.");
+		}
+
 		// Sends a request to the specified URI with optional content, processing HTTP methods accordingly
 		public async Task<RequestResult<T>> SendRequestAsync<T>(HttpMethod method, string uri, object? content = null)
 		{

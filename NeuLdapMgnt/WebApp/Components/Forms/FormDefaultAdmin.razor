@@ -1,0 +1,99 @@
+﻿@using System.ComponentModel
+@using System.ComponentModel.DataAnnotations
+@inherits LayoutComponentBase
+
+<EditForm EditContext="_editContext" OnValidSubmit="Confirm" class="d-flex flex-column gap-2 my-2">
+	<DataAnnotationsValidator/>
+
+	<h3>Default Admin Settings</h3>
+
+	<div class="d-flex align-items-center">
+		<div class="form-check form-switch ">
+			<InputCheckbox @bind-Value="_adminEnabled" id="default-admin-enabled-switch" class="form-check-input" style="width: 3em; height: 1.5em; margin-right:0.5em; margin-bottom: 0.05em"/>
+		</div>
+		<label for="default-admin-enabled-switch" class="form-check-label align-middle">Enable default admin</label>
+	</div>
+
+	<div class="form-floating">
+		<InstantInputText @bind-Value="_adminPasswords.Password" type=@(_showPasswords ? "text" : "password") id="default-admin-password-input" class="form-control"/>
+		<label for="default-admin-password-input">Password</label>
+		<ValidationMessage For="() => _adminPasswords.Password"/>
+	</div>
+
+	<div class="form-floating">
+		<InstantInputText @bind-Value="_adminPasswords.ConfirmPassword" type=@(_showPasswords ? "text" : "password") id="default-admin-password-confirm-input" class="form-control"/>
+		<label for="default-admin-password-confirm-input">Confirm Password</label>
+		<ValidationMessage For="() => _adminPasswords.ConfirmPassword"/>
+	</div>
+
+	<div class="form-check">
+		<InputCheckbox @bind-Value="_showPasswords" class="form-check-input" id="show-password-checkbox"/>
+		<label class="form-check-label" for="show-password-checkbox">Show passwords</label>
+	</div>
+
+	<div class="d-flex justify-content-start gap-2">
+		<ButtonSubmit Text="Confirm Changes"/>
+		<ButtonCancel Text="Revert" OnClick="@Revert"/>
+	</div>
+</EditForm>
+
+@code {
+
+	private class AdminPasswords {
+		[Required(ErrorMessage = "Password is required.")]
+		[Password]
+		[PasswordPropertyText]
+		public string Password { get; set; } = string.Empty;
+
+		[Compare("Password", ErrorMessage = "Passwords do not match.")]
+		public string ConfirmPassword { get; set; } = string.Empty;
+	}
+
+	private bool _adminEnabledOriginal;
+
+	private bool _adminEnabled;
+
+	private bool _showPasswords;
+
+	private AdminPasswords _adminPasswords = new();
+
+	private EditContext _editContext = new(0);
+
+	private void ResetEditContext() => _editContext = new(_adminPasswords);
+
+	private async Task Confirm() {
+		RequestResult enabledResult = await ApiRequests.SendStringAsync(HttpMethod.Put, "/api/defaultadmin/enabled", _adminEnabled.ToString());
+		if (enabledResult.IsFailure()) {
+			ToastService.Notify(ToastMessages.Error(enabledResult.GetError()));
+			return;
+		}
+
+		RequestResult passwordResult = await ApiRequests.SendStringAsync(HttpMethod.Put, "/api/defaultadmin/password", _adminPasswords.Password);
+		if (passwordResult.IsFailure()) {
+			ToastService.Notify(ToastMessages.Error(passwordResult.GetError()));
+			return;
+		}
+
+		ToastService.Notify(ToastMessages.Success("Successfully modified the Default Admin settings."));
+	}
+
+	private void Revert() {
+		_adminEnabled = _adminEnabledOriginal;
+		_adminPasswords.ConfirmPassword = _adminPasswords.Password = string.Empty;
+		ResetEditContext();
+		ToastService.Notify(ToastMessages.Secondary("Reverted all changes."));
+	}
+
+	protected override async Task OnInitializedAsync() {
+		ResetEditContext();
+
+		RequestResult<bool> result = await ApiRequests.SendRequestAsync<bool>(HttpMethod.Get, "/api/defaultadmin/enabled");
+		if (result.IsSuccess())
+			_adminEnabledOriginal = _adminEnabled = result.GetValue();
+		else
+			ToastService.Notify(ToastMessages.Error(result.GetError()));
+
+		await base.OnInitializedAsync();
+	}
+
+}
