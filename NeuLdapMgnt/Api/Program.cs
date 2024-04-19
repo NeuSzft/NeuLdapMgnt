@@ -14,27 +14,23 @@ using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;
 
-internal static class Program
-{
+internal static class Program {
 	public static readonly SymmetricSecurityKey SecurityKey = Utils.LoadOrCreateSecurityKey("SECURITY_KEY");
 
 	public static readonly string TokenIssuer = typeof(Program).Assembly.FullName!;
 
-	public static void Main(string[] args)
-	{
-		LdapService ldapService = LdapService.FromEnvs();
+	public static void Main(string[] args) {
+		LdapService     ldapService     = LdapService.FromEnvs();
 		PostgresService postgresService = PostgresService.FromEnvs();
 
 		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 		using RequestLoggerProvider? requestLoggerProvider = Environment.GetEnvironmentVariable("LOGS_DIR") is { Length: > 0 } logsDir ? new(logsDir) : null;
-		ILogger? requestLogger = requestLoggerProvider?.CreateLogger(nameof(RequestLogger));
+		ILogger?                     requestLogger         = requestLoggerProvider?.CreateLogger(nameof(RequestLogger));
 
 		// Create jwt authentication scheme
-		builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-		{
-			options.TokenValidationParameters = new TokenValidationParameters
-			{
+		builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
+			options.TokenValidationParameters = new TokenValidationParameters {
 				ValidateAudience = false,
 				ValidateIssuer = true,
 				ValidateLifetime = true,
@@ -46,11 +42,9 @@ internal static class Program
 				ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha512 }
 			};
 
-			options.Events = new JwtBearerEvents
-			{
+			options.Events = new JwtBearerEvents {
 				// Fail if Authorization header is missing
-				OnMessageReceived = (MessageReceivedContext context) =>
-				{
+				OnMessageReceived = (MessageReceivedContext context) => {
 					var headerValues = context.Request.Headers.Authorization;
 					if (headerValues.Count == 0 || !headerValues.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase))
 						context.Fail("missing");
@@ -59,19 +53,16 @@ internal static class Program
 				},
 
 				// Return 401 from middleware if authentication fails
-				OnChallenge = async (JwtBearerChallengeContext context) =>
-				{
+				OnChallenge = async (JwtBearerChallengeContext context) => {
 					context.HandleResponse();
 
-					string? error = context.AuthenticateFailure switch
-					{
+					string? error = context.AuthenticateFailure switch {
 						{ Message: "missing" } => "Missing json web token.",
-						not null => "Invalid json web token.",
-						_ => null
+						not null               => "Invalid json web token.",
+						_                      => null
 					};
 
-					if (error is not null)
-					{
+					if (error is not null) {
 						context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 						context.Response.ContentType = "text/plain";
 						await context.Response.WriteAsync(context.ErrorDescription.DefaultIfNullOrEmpty(error));
@@ -80,8 +71,7 @@ internal static class Program
 				},
 
 				// Store the audience of the validated toke it the Audience header
-				OnTokenValidated = (TokenValidatedContext context) =>
-				{
+				OnTokenValidated = (TokenValidatedContext context) => {
 					JwtSecurityToken token = Authenticator.ReadJwtFromRequestHeader(context.Request);
 					context.Request.Headers.Append("Audience", token.Audiences.FirstOrDefault());
 					return Task.CompletedTask;
@@ -90,10 +80,8 @@ internal static class Program
 		});
 
 		// Add authorization policy that uses the previously created authentication scheme
-		builder.Services.AddAuthorization(options =>
-		{
-			options.AddPolicy(JwtBearerDefaults.AuthenticationScheme + "Policy", policy =>
-			{
+		builder.Services.AddAuthorization(options => {
+			options.AddPolicy(JwtBearerDefaults.AuthenticationScheme + "Policy", policy => {
 				policy.RequireAuthenticatedUser();
 				policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
 			});
@@ -110,9 +98,8 @@ internal static class Program
 		ldapService.Logger = app.Logger;
 
 		// Add a middleware that logs each request to the console
-		app.Use(async (HttpContext context, RequestDelegate next) =>
-		{
-			DateTime now = DateTime.Now;
+		app.Use(async (HttpContext context, RequestDelegate next) => {
+			DateTime    now = DateTime.UtcNow;
 			HttpRequest req = context.Request;
 
 			await next(context);
@@ -122,48 +109,41 @@ internal static class Program
 			var user = aud.ToString().DefaultIfNullOrEmpty("__NOAUTH__");
 
 			requestLogger?.LogInformation($"{user}\t{req.Host}\t{req.Method}\t{req.Path}\t{context.Response.StatusCode}");
-			postgresService.CreateLogEntry(new()
-			{
+			postgresService.CreateLogEntry(new() {
 				Time = now,
 				LogLevel = LogLevel.Information.ToString(),
 				Username = aud.ToString(),
 				FullName = ldapService.TryGetDisplayNameOfEntity(user, typeof(Teacher)),
 				Host = req.Host.ToString(),
-				Method = req.Method.ToString(),
+				Method = req.Method,
 				RequestPath = req.Path,
 				StatusCode = context.Response.StatusCode
 			});
 		});
 
 		// Add a middleware for handling LDAP connection binding errors
-		app.Use(async (HttpContext context, RequestDelegate next) =>
-		{
-			try
-			{
+		app.Use(async (HttpContext context, RequestDelegate next) => {
+			try {
 				await next(context);
 			}
-			catch (LdapBindingException)
-			{
+			catch (LdapBindingException) {
 				const string message = "Unable to connect to the LDAP server.";
 				context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
 
-				if (context.Request.Headers.Authorization.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase))
-				{
+				if (context.Request.Headers.Authorization.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase)) {
 					var result = new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(message).RenewToken(context.Request);
 					await context.Response.WriteAsJsonAsync(result);
 				}
-				else
-				{
+				else {
 					await context.Response.WriteAsync(message);
 				}
 
 				await context.Response.CompleteAsync();
-				postgresService.CreateLogEntry(new()
-				{
-					Time = DateTime.Now,
+				postgresService.CreateLogEntry(new() {
+					Time = DateTime.UtcNow,
 					LogLevel = LogLevel.Critical.ToString(),
 					Host = context.Response.HttpContext.Request.Host.ToString(),
-					Method = context.Response.HttpContext.Request.Method.ToString(),
+					Method = context.Response.HttpContext.Request.Method,
 					RequestPath = context.Response.HttpContext.Request.Path.ToString(),
 					StatusCode = context.Response.StatusCode
 				});
@@ -185,6 +165,7 @@ internal static class Program
 		app.MapInactiveUserEndpoints();
 		app.MapAdminUserEndpoints();
 		app.MapDbManagementEndpoints();
+		app.MapLogEndpoints();
 
 		// Map testing endpoints when in development mode
 		if (app.Environment.IsDevelopment())
