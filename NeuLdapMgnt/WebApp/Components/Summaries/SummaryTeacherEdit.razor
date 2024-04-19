@@ -1,0 +1,68 @@
+﻿<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2">OM:</div>
+	<div class="col-4 student-original-id">@TeacherOriginal.Id</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-id">
+		@if (TeacherOriginal.Id != TeacherEdited.Id)
+		{
+			<strong>@TeacherEdited.Id</strong>
+		}
+		else
+		{
+			@TeacherEdited.Id
+		}
+	</div>
+</div>
+<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2">Name:</div>
+	<div class="col-4 student-original-fullname">@TeacherOriginal.FullName</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-fullname">
+		@if (TeacherOriginal.FullName != TeacherEdited.FullName)
+		{
+			<strong>@TeacherEdited.FullName</strong>
+		}
+		else
+		{
+			@TeacherEdited.FullName
+		}
+	</div>
+</div>
+<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2">Class:</div>
+	<div class="col-4 student-original-class">@TeacherOriginal.Class</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-class">
+		@if (TeacherOriginal.Class != TeacherEdited.Class)
+		{
+			<strong>@TeacherEdited.Class</strong>
+		}
+		else
+		{
+			@TeacherEdited.Class
+		}
+	</div>
+</div>
+<div class="row mb-2 border-bottom">
+	<div class="col-3 col-sm-2">Email:</div>
+	<div class="col-4 student-original-email text-break">@TeacherOriginal.Email</div>
+	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+	<div class="col-4 student-edited-email text-break">
+		@if (TeacherOriginal.Email != TeacherEdited.Email)
+		{
+			<strong>@TeacherEdited.Email</strong>
+		}
+		else
+		{
+			@TeacherEdited.Email
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public Teacher TeacherOriginal { get; set; } = default!;
+
+	[Parameter]
+	public Teacher TeacherEdited { get; set; } = default!;
+}

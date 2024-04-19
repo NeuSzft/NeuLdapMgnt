@@ -2,14 +2,97 @@
 
 <PageTitle>Teachers</PageTitle>
 
-<h1>Teachers</h1>
+<div class="row justify-content-between g-2">
+	<div class="col">
+		<h1>Teachers</h1>
+	</div>
+	<div class="col text-end">
+		<ButtonRefresh OnClick="RefreshTeachers" Text="Refresh" />
+	</div>
+</div>
 
-<TableTeachers Teachers="Lists.GetTeachers()" />
+@if (isLoading)
+{
+	<Loading Text="Loading teachers" />
+}
+else if (!DatabaseLocal.Teachers.Any())
+{
+	<div class="d-flex justify-content-center text-center">
+		<div>
+			<h3 class="my-4">There are no students in the database</h3>
+			<ButtonAdd Text="Add Teachers" OnClick="ToAddPage" />
+		</div>
+	</div>
+}
+else
+{
+	<TableTeachers Teachers="DatabaseLocal.Teachers" />
+}
 
 @code {
-	protected override void OnInitialized()
+	private bool isLoading { get; set; }
+
+	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
+		await RefreshTeachers();
+	}
+
+	private async Task RefreshTeachers()
+	{
+		try
+		{
+			isLoading = true;
+			DatabaseLocal.Teachers.Clear();
+			DatabaseLocal.Admins.Clear();
+
+			var responseTeachers = await ApiRequests.GetTeachersAsync();
+			if (responseTeachers.IsSuccess())
+			{
+				DatabaseLocal.Teachers = new(responseTeachers.Values);
+			}
+
+			if (responseTeachers.Errors.Any())
+			{
+				ToastService.Notify(ToastMessages.Error(responseTeachers.GetError()));
+			}
+
+			var responseAdmins = await ApiRequests.GetAdminsAsync();
+			if (responseAdmins.IsSuccess())
+			{
+				DatabaseLocal.Admins = new(responseAdmins.Values[0]);
+			}
+
+			if (responseAdmins.Errors.Any())
+			{
+				ToastService.Notify(ToastMessages.Error(responseAdmins.GetError()));
+			}
+
+
+			StateHasChanged();
+		}
+		catch (HttpRequestException httpError)
+		{
+			if (httpError.StatusCode is HttpStatusCode.BadRequest)
+			{
+				ToastService.Notify(ToastMessages.NoConnection());
+			}
+			else
+			{
+				ToastService.Notify(ToastMessages.Error(httpError.Message));
+			}
+		}
+		catch (Exception e)
+		{
+			ToastService.Notify(ToastMessages.Error(e.Message));
+			throw e;
+		}
+		isLoading = false;
+	}
+
+	private void ToAddPage()
+	{
+		NavManager.NavigateTo("/students/add");
 	}
 }
 

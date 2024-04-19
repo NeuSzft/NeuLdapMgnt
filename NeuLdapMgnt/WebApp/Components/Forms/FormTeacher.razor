@@ -1,0 +1,183 @@
+﻿@inherits LayoutComponentBase
+
+<EditForm Model="@teacherUpdated" OnValidSubmit="HandleOnSubmit" class="d-flex flex-column gap-2 my-2">
+	<DataAnnotationsValidator />
+
+	<div class="text-end">
+		@if (IsReadonly)
+		{
+			<ButtonEdit OnClick="ToggleEditMode" Text="Edit" IsDisabled="isEditModeEnabled" />
+		}
+	</div>
+
+	<div class="form-floating">
+		<InstantInputText class="form-control"
+						  type="text"
+						  disabled="@(CanDelete || IsReadonly || isAction)"
+						  @bind-Value="teacherUpdated!.Id"
+						  id="teacher-id" />
+		<label for="teacher-id">ID</label>
+		<ValidationMessage For="() => teacherUpdated.Id" id="teacher-id-validation-message" />
+	</div>
+
+	<div class="input-group gap-2">
+		<label class="input-group-text user-select-none col-12 rounded gap-2" for="first-name">
+			Name
+			@if (!IsReadonly && teacherUpdated.FullName.Length > 2)
+			{
+				<span>[@teacherUpdated.FullName]</span>
+			}
+		</label>
+
+		<div class="d-flex flex-column flex-md-row gap-2 w-100">
+			<div class="form-floating w-100">
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="first-name" @bind-Value="teacherUpdated.FirstName" />
+				<label for="first-name">First</label>
+				<ValidationMessage For="() => teacherUpdated.FirstName" id="teacher-first-name-validation-message" />
+			</div>
+			<div class="form-floating w-100">
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="last-name" @bind-Value="teacherUpdated.LastName" />
+				<label for="last-name">Last</label>
+				<ValidationMessage For="() => teacherUpdated.LastName" id="teacher-last-name-validation-message" />
+			</div>
+			<div class="form-floating w-100">
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="middle-name" @bind-Value="teacherUpdated.MiddleName" />
+				<label for="middle-name">Middle</label>
+				<ValidationMessage For="() => teacherUpdated.MiddleName" id="teacher-middle-name-validation-message" />
+			</div>
+		</div>
+	</div>
+
+	<div class="input-group gap-2 align-items-center">
+		<label class="input-group-text user-select-none w-100 rounded gap-2" for="class-year-select">
+			Class
+			@if (!IsReadonly && teacherUpdated.ClassYear != string.Empty)
+			{
+				<br />
+				<span>[@teacherUpdated.Class]</span>
+			}
+		</label>
+		<div class="d-flex flex-column flex-md-row gap-2 w-100">
+			<div class="form-floating w-100">
+				<InputSelect class="form-select rounded" id="class-year-select" disabled="@(IsReadonly || isAction)" @bind-Value="teacherUpdated.ClassYear">
+					@foreach (string year in Teacher.ClassYears)
+					{
+						<option value="@year" selected="@year.Equals(teacherUpdated.ClassYear)">@year</option>
+					}
+				</InputSelect>
+				<label for="class-year-select">Year</label>
+			</div>
+			<div class="form-floating w-100">
+				<InputSelect class="form-select rounded" id="class-group-select" disabled="@(IsReadonly || isAction)" @bind-Value="teacherUpdated.ClassGroup">
+					@foreach (var group in Teacher.ClassGroups)
+					{
+						<option value="@group" selected="@group.Equals(teacherUpdated.ClassGroup)">@group</option>
+					}
+				</InputSelect>
+				<label for="class-group-select">Group</label>
+			</div>
+		</div>
+	</div>
+	<ValidationMessage For="() => teacherUpdated.Class" id="teacher-class-validation-message" />
+
+	<div class="form-floating">
+		<InstantInputText class="form-control" disabled="@(IsReadonly || isAction)" id="teacher-email" @bind-Value="teacherUpdated.Email" />
+		<label for="teacher-email">Email</label>
+		<ValidationMessage For="() => teacherUpdated.Email" id="teacher-email-validation-message" />
+	</div>
+
+	<div class="form-floating">
+		<InstantInputText type="password" class="form-control" disabled="@(IsReadonly || isAction)" id="password" @bind-Value="teacherUpdated.Password" />
+		<label for="password">Password</label>
+		<ValidationMessage For="() => teacherUpdated.Password" id="teacher-password-validation-message" />
+	</div>
+
+	@if (!IsReadonly)
+	{
+		<div class="d-flex justify-content-end gap-2">
+			@if (CanDelete)
+			{
+				@if (isDeleting)
+				{
+					<Button Color="ButtonColor.Danger" Outline="true" Disabled="true">
+						<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Danger" />
+					</Button>
+				}
+				else
+				{
+					<ButtonDelete OnClick="HandleOnDelete" Text="Delete" IsDisabled="isAction" />
+				}
+			}
+
+			<ButtonCancel OnClick="ToggleEditMode" Text="Revert" IsDisabled="isAction" />
+
+			@if (isSubmitting)
+			{
+				<Button Color="ButtonColor.Success" Outline="true" Disabled="true">
+					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Success" />
+				</Button>
+			}
+			else
+			{
+				<ButtonSubmit Text="Submit" IsDisabled="isAction" />
+			}
+		</div>
+	}
+	</EditForm>
+
+	@code {
+	[Parameter]
+	public Teacher Teacher { get; set; } = new();
+
+	[Parameter]
+	public Func<Teacher, Task<bool>> OnSubmit { get; set; } = default!;
+
+	[Parameter]
+	public Func<Teacher, Task<bool>> OnDelete { get; set; } = default!;
+
+	[Parameter]
+	public bool IsReadonly { get; set; }
+
+	[Parameter]
+	public bool CanDelete { get; set; }
+
+	private Teacher teacherOriginal = new();
+	private Teacher teacherUpdated = new();
+	private bool isDeleting = false;
+	private bool isSubmitting = false;
+	private bool isAction => isDeleting || isSubmitting;
+	private bool isEditModeEnabled = false;
+
+	protected override void OnInitialized()
+	{
+		teacherOriginal = Utils.GetClone<Teacher>(Teacher)!;
+		teacherUpdated = Utils.GetClone<Teacher>(teacherOriginal)!;
+	}
+
+	private async Task HandleOnSubmit()
+	{
+		isSubmitting = true;
+		bool isSubmitted = await OnSubmit.Invoke(teacherUpdated);
+		isSubmitting = false;
+	}
+
+
+	private async Task HandleOnDelete()
+	{
+		isDeleting = true;
+		bool isDeleted = await OnDelete.Invoke(teacherUpdated);
+		isDeleting = false;
+
+		if (!isDeleted) return;
+		NavManager.NavigateTo("/students");
+	}
+
+
+	private void ToggleEditMode()
+	{
+		teacherUpdated = Utils.GetClone<Teacher>(teacherOriginal)!;
+		if (isEditModeEnabled || IsReadonly == false) return;
+		isEditModeEnabled = true;
+		IsReadonly = !IsReadonly;
+	}
+}

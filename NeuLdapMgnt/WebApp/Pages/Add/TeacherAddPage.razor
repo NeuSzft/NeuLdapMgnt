@@ -2,9 +2,92 @@
 
 <PageTitle>Add Teacher</PageTitle>
 
+<Modal @ref="modal" title="@modalTitle" IsScrollable="true" ModalType="ModalType.Danger">
+	<BodyTemplate>
+		<CustomList List="errorList" />
+	</BodyTemplate>
+	<FooterTemplate></FooterTemplate>
+</Modal>
+
+<h1>Add Teacher</h1>
+
+@if (isSubmitting)
+{
+	<Loading Text="@submitString" />
+}
+else
+{
+	<FormTeacher Teacher="teacher" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
+	<ConfirmDialog @ref="dialog" />
+}
+
 @code {
+	private Teacher teacher = new();
+	private List<string> errorList = new();
+	private Modal modal = default!;
+	private ConfirmDialog dialog = default!;
+
+	private string modalTitle => $"Error";
+	private string submitString => $"Creating {teacher.FullName}";
+	private bool isSubmitting = false;
+
 	protected override void OnInitialized()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 	}
+
+	private async Task<bool> OnSubmit(Teacher teacherUpdated)
+	{
+		try
+		{
+			var parameters = new Dictionary<string, object>();
+			parameters.Add("Teacher", teacherUpdated);
+
+			var confirmation = await dialog.ShowAsync<SummaryTeacher>("Create this student?", parameters, DialogOptions.Confirm());
+			if (!confirmation) return false;
+
+			isSubmitting = true;
+			var response = await ApiRequests.AddTeacherAsync(teacherUpdated);
+
+			if (response.IsSuccess())
+			{
+				ToastService.Notify(ToastMessages.Success($"{teacherUpdated.FullName} ({teacherUpdated.Id}) was added!"));
+				teacher = new();
+				return true;
+			}
+
+			if (response.Errors.Any())
+			{
+				if (response.Errors.Length > 1)
+				{
+					errorList = response.Errors.ToList();
+					await ShowModal();
+				}
+				else if (response.GetError().Equals("The object already exists."))
+				{
+					ToastService.Notify(ToastMessages.Danger($"OM: {teacherUpdated.Id} already exists."));
+				}
+				else
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+		}
+		catch (HttpRequestException httpError)
+		{
+			string errorMessage = Utils.GetErrorMessage(httpError);
+			ToastService.Notify(ToastMessages.Error(errorMessage));
+		}
+		catch (Exception e)
+		{
+			ToastService.Notify(ToastMessages.Error(e.Message));
+		}
+
+		isSubmitting = false;
+		return false;
+	}
+
+	private async Task ShowModal() => await modal!.ShowAsync();
+
+	private async Task HideModal() => await modal!.HideAsync();
 }

@@ -1,22 +1,13 @@
 ﻿@inherits LayoutComponentBase
 
-<table class="table table-striped">
+<!--SWITCH TO SHOW INACTIVE OR ACTIVE TABLE-->
+
+<table class="table table-striped table-hover">
 	<thead>
 		<tr>
 			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
 				Id
 				@if (sortBy == "Id")
-				{
-					<i class="bi @GetSortIcon(isAscending)"></i>
-				}
-				else
-				{
-					<i class="bi bi-chevron-expand"></i>
-				}
-			</th>
-			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Username"))">
-				Username
-				@if (sortBy == "Username")
 				{
 					<i class="bi @GetSortIcon(isAscending)"></i>
 				}
@@ -36,6 +27,29 @@
 					<i class="bi bi-chevron-expand"></i>
 				}
 			</th>
+			
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Username"))">
+				Username
+				@if (sortBy == "Username")
+				{
+					<i class="bi @GetSortIcon(isAscending)"></i>
+				}
+				else
+				{
+					<i class="bi bi-chevron-expand"></i>
+				}
+			</th>
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("IsAdmin"))">
+				Admin?
+				@if (sortBy == "IsAdmin")
+				{
+					<i class="bi @GetSortIcon(isAscending)"></i>
+				}
+				else
+				{
+					<i class="bi bi-chevron-expand"></i>
+				}
+			</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -43,8 +57,9 @@
 		{
 			<tr>
 				<td>@teacher.Id</td>
-				<td>@teacher.Username</td>
 				<td>@teacher.FullName</td>
+				<td>@teacher.Username</td>
+				<td><input type="checkbox" disabled /></td>
 			</tr>
 		}
 	</tbody>
@@ -53,9 +68,8 @@
 @code {
 	[Parameter]
 	public List<Teacher> Teachers { get; set; } = new();
-
-	private string sortBy = "";
-	private bool isAscending = true;
+	private string sortBy = string.Empty;
+	private bool isAscending = false;
 
 	private void SortTable(string propertyName)
 	{
@@ -106,6 +120,6 @@
 		}
 	}
 
-	private string GetSortIcon(bool asc) => asc ? "bi-chevron-up" : "bi-chevron-down";
+	private string GetSortIcon(bool asc) => asc ? "bi-sort-up" : "bi-sort-down";
 }
 
