@@ -69,7 +69,7 @@
 	private async Task ImportDatabase() {
 		try {
 			LdapDbDump? dump = JsonSerializer.Deserialize<LdapDbDump>(_importedJson);
-			await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Get, _eraseBeforeImport ? "/api/database/erase-and-import" : "/api/database/import", dump);
+			await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Put, _eraseBeforeImport ? "/api/database/erase-and-import" : "/api/database/import", dump);
 		}
 		catch (Exception e) {
 			ToastService.Notify(ToastMessages.Error(e.Message));

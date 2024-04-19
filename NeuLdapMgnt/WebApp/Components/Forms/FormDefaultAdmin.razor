@@ -7,7 +7,11 @@
 
 	<h3>Default Admin Settings</h3>
 
-	<div class="d-flex align-items-center">
+	<div class="alert alert-warning" role="alert">
+		The default admin is only meant to be used for creating some initial admin accounts and should be disabled later.
+	</div>
+
+	<div class="d-flex align-items-center mb-3">
 		<div class="form-check form-switch ">
 			<InputCheckbox @bind-Value="_adminEnabled" id="default-admin-enabled-switch" class="form-check-input" style="width: 3em; height: 1.5em; margin-right:0.5em; margin-bottom: 0.05em"/>
 		</div>
@@ -31,7 +35,7 @@
 		<label class="form-check-label" for="show-password-checkbox">Show passwords</label>
 	</div>
 
-	<div class="d-flex justify-content-start gap-2">
+	<div class="d-flex justify-content-start gap-2 mt-4">
 		<ButtonSubmit Text="Confirm Changes"/>
 		<ButtonCancel Text="Revert" OnClick="@Revert"/>
 	</div>
