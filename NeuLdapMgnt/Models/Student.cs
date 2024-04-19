@@ -14,9 +14,9 @@ namespace NeuLdapMgnt.Models
 		public const long OmMinValue = 70000000000;
 		public const long OmMaxValue = 79999999999;
 		public const int UidMinValue = 6000;
-		public const int UidMaxValue = 6999;
+		public const int UidMaxValue = 9999;
 		public const int GidMinValue = 6000;
-		public const int GidMaxValue = 6999;
+		public const int GidMaxValue = 9999;
 
 		private string classYear = string.Empty;
 		private string classGroup = string.Empty;
