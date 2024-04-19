@@ -4,7 +4,7 @@
 
 <Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true" OnHidden="ToggleEditMode">
 	<BodyTemplate>
-
+		<span class="fw-bold mb-2">This action can not be reverted!</span>
 	</BodyTemplate>
 	<FooterTemplate>
 		<ButtonDelete Text="Delete" OnClick="DeleteSelected" />
@@ -184,7 +184,7 @@ else
 		parameters.Add("List", selectedStudents.Select(x => $"({x.Class}) {x.FullName}").ToList());
 
 		var confirmation = await dialog.ShowAsync<CustomList>(
-			title: $"Delete ({selectedStudents.Count}) students?",
+			title: $"Are you sure you want to delete ({selectedStudents.Count + 1000}) students?",
 			parameters: parameters,
 			confirmDialogOptions: DialogOptions.Delete()
 		);
@@ -208,7 +208,6 @@ else
 					ErrorList.Add(response.GetError());
 				}
 			}
-			isDeleting = false;
 		}
 		catch (Exception e)
 		{
@@ -217,6 +216,7 @@ else
 
 		filteredStudents = Students.ToList();
 		selectedStudents.Clear();
+		searchQuery = string.Empty;
 
 		if (ErrorList.Any())
 		{
@@ -226,6 +226,8 @@ else
 		{
 			ToastService.Notify(ToastMessages.Success("Selected students were deleted!"));
 		}
+
+		isDeleting = false;
 	}
 
 	private void GetFilteredStudents()
