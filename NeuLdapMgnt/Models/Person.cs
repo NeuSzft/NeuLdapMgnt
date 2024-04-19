@@ -187,7 +187,7 @@ namespace NeuLdapMgnt.Models
 
 		public string GetUsername()
 		{
-			return $"{LastName.PadRight(3, '_')[..3]}{FirstName.PadRight(3, '_')[..3]}".ToLower();
+			return $"{FirstName.PadRight(3, '_')[..3]}{LastName.PadRight(3, '_')[..3]}".ToLower();
 		}
 
 		public int ClassYearOrderValue()
