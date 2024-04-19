@@ -124,6 +124,7 @@ else
 			if (response.Errors.Any())
 			{
 				errorList = response.Errors.ToList();
+				ToastService.Notify(ToastMessages.Info($"{file.Name} import was finished!"));
 				await ShowModal();
 			}
 		}
@@ -142,6 +143,7 @@ else
 		{
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
+
 		isUploading = false;
 	}
 

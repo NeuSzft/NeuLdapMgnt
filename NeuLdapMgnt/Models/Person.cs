@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json.Serialization;
 using NeuLdapMgnt.Models.CustomValidationAttributes;
@@ -15,28 +15,34 @@ namespace NeuLdapMgnt.Models
 		private string lastName = string.Empty;
 		private string firstName = string.Empty;
 		private string middleName = string.Empty;
+		private string classYear = string.Empty;
+		private string classGroup = string.Empty;
+		private string @class = string.Empty;
 		private string homeDirectory = string.Empty;
+
+		public static readonly string[] ClassYears = { "9", "10", "11", "12", "13", "1/13", "2/14" };
+		public static readonly string[] ClassGroups = { "A", "B", "C", "D", "E", "Ny", "A.RSZE", "B.RSZE" };
 
 		[Required(ErrorMessage = "User ID is required.")]
 		[JsonRequired, JsonPropertyName("uid")]
 		[LdapAttribute("uidNumber")]
-		public virtual int Uid { get; set; }
+		public abstract int Uid { get; set; }
 
 		[Required(ErrorMessage = "Group ID is required.")]
 		[JsonRequired, JsonPropertyName("gid")]
 		[LdapAttribute("gidNumber")]
-		public virtual int Gid { get; set; }
+		public abstract int Gid { get; set; }
 
 		[Required(ErrorMessage = "Username is required.")]
 		[JsonRequired, JsonPropertyName("username")]
 		[LdapAttribute("cn")]
-		public virtual string Username { get; set; } = string.Empty;
+		public string Username { get; set; } = string.Empty;
 
 		[Required(ErrorMessage = "First name is required.")]
 		[FirstName]
 		[JsonRequired, JsonPropertyName("first_name")]
 		[LdapAttribute("givenName")]
-		public virtual string FirstName
+		public string FirstName
 		{
 			get => firstName;
 			set
@@ -52,7 +58,7 @@ namespace NeuLdapMgnt.Models
 		[LastName]
 		[JsonRequired, JsonPropertyName("last_name")]
 		[LdapAttribute("sn")]
-		public virtual string LastName
+		public string LastName
 		{
 			get => lastName;
 			set
@@ -67,7 +73,7 @@ namespace NeuLdapMgnt.Models
 		[AllowNull]
 		[MiddleName]
 		[JsonPropertyName("middle_name")]
-		public virtual string MiddleName
+		public string MiddleName
 		{
 			get => middleName;
 			set
@@ -77,16 +83,62 @@ namespace NeuLdapMgnt.Models
 			}
 		}
 
+		[Required(ErrorMessage = "Class is required.")]
+		[Class]
+		[JsonRequired, JsonPropertyName("class")]
+		[LdapAttribute("roomNumber")]
+		public string Class
+		{
+			get => @class;
+			set
+			{
+				if (string.IsNullOrEmpty(value))
+				{
+					@class = string.Empty;
+					return;
+				}
+
+				@class = value;
+				var classSplit = @class.Split('.');
+				classYear = classSplit[0];
+				classGroup = classSplit[1];
+			}
+		}
+
+		[JsonIgnore]
+		public string ClassYear
+		{
+			get => classYear;
+			set
+			{
+				if (string.IsNullOrEmpty(value)) return;
+				classYear = value;
+				UpdateClass();
+			}
+		}
+
+		[JsonIgnore]
+		public string ClassGroup
+		{
+			get => classGroup;
+			set
+			{
+				if (string.IsNullOrEmpty(value)) return;
+				classGroup = value;
+				UpdateClass();
+			}
+		}
+
 		[Email]
 		[JsonRequired, JsonPropertyName("email")]
 		[LdapAttribute("mail")]
-		public virtual string Email { get; set; } = string.Empty;
+		public string Email { get; set; } = string.Empty;
 
 		[Required(ErrorMessage = "Directory is required.")]
 		[Directory]
 		[JsonRequired, JsonPropertyName("home_directory")]
 		[LdapAttribute("homeDirectory")]
-		public virtual string HomeDirectory
+		public string HomeDirectory
 		{
 			get => homeDirectory;
 			set
@@ -108,7 +160,7 @@ namespace NeuLdapMgnt.Models
 
 		[JsonPropertyName("full_name")]
 		[LdapAttribute("displayName")]
-		public virtual string FullName { get; set; } = string.Empty;
+		public string FullName { get; set; } = string.Empty;
 
 		private string GetFullName()
 		{
@@ -136,6 +188,25 @@ namespace NeuLdapMgnt.Models
 		public string GetUsername()
 		{
 			return $"{LastName.PadRight(3, '_')[..3]}{FirstName.PadRight(3, '_')[..3]}".ToLower();
+		}
+
+		public int ClassYearOrderValue()
+		{
+			if (ClassGroup == "Ny")
+			{
+				return 0;
+			}
+
+			if (ClassYear.Contains('/'))
+			{
+				return int.Parse(ClassYear[2..] + '0');
+			}
+
+			return int.Parse(ClassYear);
+		}
+		private void UpdateClass()
+		{
+			@class = ClassYear.Contains('/') ? $"{ClassYear}{ClassGroup}" : $"{ClassYear}.{ClassGroup}";
 		}
 
 		private string GetHomeDirectory()

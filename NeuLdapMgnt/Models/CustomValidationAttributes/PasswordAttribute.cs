@@ -14,14 +14,9 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 
 			if (value is string password)
 			{
-				if(string.IsNullOrEmpty(password))
+				if (string.IsNullOrEmpty(password))
 				{
 					return ValidationResult.Success;
-				}
-				if (password.Length < 8)
-				{
-					return new ValidationResult("Password must be at least 8 characters long.",
-						new[] { validationContext.MemberName }!);
 				}
 				else if (!password.Any(char.IsLower))
 				{
@@ -41,6 +36,11 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 				else if (!password.Any(ch => !char.IsLetterOrDigit(ch)))
 				{
 					return new ValidationResult("Password must contain at least one special character.",
+						new[] { validationContext.MemberName }!);
+				}
+				else if (password.Length < 8)
+				{
+					return new ValidationResult("Password must be at least 8 characters long.",
 						new[] { validationContext.MemberName }!);
 				}
 				else
