@@ -12,7 +12,7 @@ namespace NeuLdapMgnt.WebApp.Requests
 	{
 		[Inject] public NavigationManager NavManager { get; set; } = default!;
 
-		private HttpClient _httpClient;
+		private readonly HttpClient _httpClient;
 		private string? _token = null;
 
 		public event Action? AuthenticationStateChanged;
@@ -81,7 +81,8 @@ namespace NeuLdapMgnt.WebApp.Requests
 		}
 
 		/// <summary>Sends a request to the specified URI with the string content in it's body, when the <paramref name="method"/> is either <c>POST</c> or <c>PUT</c>.</summary>
-		public async Task<RequestResult> SendStringAsync(HttpMethod method, string uri, string? content) {
+		public async Task<RequestResult> SendStringAsync(HttpMethod method, string uri, string? content)
+		{
 			EnsureAuthentication();
 
 			HttpRequestMessage request = new(method, uri);
@@ -173,21 +174,6 @@ namespace NeuLdapMgnt.WebApp.Requests
 			var result = await response.Content.ReadFromJsonAsync<RequestResult>();
 			UpdateToken(result);
 			return result!;
-		}
-
-		public void SetBaseAddress(Uri url)
-		{
-			_httpClient = new()
-			{
-				BaseAddress = url,
-				DefaultRequestHeaders = { Accept = { new MediaTypeWithQualityHeaderValue("application/json") } },
-			};
-			Logout();
-		}
-
-		public Uri? GetBaseAddress()
-		{
-			return _httpClient.BaseAddress;
 		}
 	}
 }
