@@ -8,7 +8,6 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddBlazorBootstrap();
-builder.Services.AddSingleton<Utils>();
 
 if (builder.HostEnvironment.IsDevelopment())
 {

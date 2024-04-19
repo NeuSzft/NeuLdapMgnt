@@ -78,7 +78,7 @@ else
 					errorList = response.Errors.ToList();
 					await ShowModal();
 				}
-				else if (response.GetError().Equals("The object already exists."))
+				else if (response.GetError().Equals("the object already exists.", StringComparison.OrdinalIgnoreCase))
 				{
 					ToastService.Notify(ToastMessages.Danger($"OM: {studentUpdated.Id} already exists."));
 				}
@@ -90,14 +90,7 @@ else
 		}
 		catch (HttpRequestException httpError)
 		{
-			if (httpError.Message.Contains("Failed to fetch"))
-			{
-				ToastService.Notify(ToastMessages.NoConnection());
-			}
-			else
-			{
-				ToastService.Notify(ToastMessages.Error(httpError.Message));
-			}
+			string errorMessage = Utils.GetErrorMessage(httpError);
 		}
 		catch (Exception e)
 		{
@@ -130,14 +123,8 @@ else
 		}
 		catch (HttpRequestException httpError)
 		{
-			if (httpError.Message.Contains("Failed to fetch"))
-			{
-				ToastService.Notify(ToastMessages.NoConnection());
-			}
-			else
-			{
-				ToastService.Notify(ToastMessages.Error(httpError.Message));
-			}
+			string errorMessage = Utils.GetErrorMessage(httpError);
+			ToastService.Notify(ToastMessages.Error(errorMessage));
 		}
 		catch (Exception e)
 		{
