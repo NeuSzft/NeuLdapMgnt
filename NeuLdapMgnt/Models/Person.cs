@@ -99,11 +99,11 @@ namespace NeuLdapMgnt.Models
 				homeDirectory = value.Replace(" ", "");
 			}
 		}
-		
+
 		[Password]
 		[PasswordPropertyText]
 		[JsonInclude, JsonPropertyName("password")]
-		[LdapAttribute("userPassword", false)]
+		[LdapAttribute("userPassword", true)]
 		public virtual string? Password { get; set; } = string.Empty;
 
 		[JsonPropertyName("full_name")]

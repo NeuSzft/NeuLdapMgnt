@@ -23,11 +23,11 @@ public static class LdapServiceEntityExtensions {
 
 	/// <summary>Gets all entities of the specified type from the database.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
-	/// <param name="getAllAttributes">If <c>true</c> even the attributes that have <c>ReturnFormDb</c> set to <c>false</c> are returned.</param>
+	/// <param name="getHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are returned.</param>
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>An <see cref="IEnumerable{T}"/> containing the entities.</returns>
 	/// <remarks>If an entity cannot be parsed then it is ignored and not returned.</remarks>
-	public static IEnumerable<T> GetAllEntities<T>(this LdapService ldap, bool getAllAttributes = false) where T : class, new() {
+	public static IEnumerable<T> GetAllEntities<T>(this LdapService ldap, bool getHiddenAttributes = false) where T : class, new() {
 		SearchRequest   request  = new($"ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, null);
 		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
@@ -35,24 +35,24 @@ public static class LdapServiceEntityExtensions {
 			yield break;
 
 		foreach (SearchResultEntry entry in response.Entries)
-			if (LdapService.TryParseEntry<T>(entry, out _, getAllAttributes) is { } entity)
+			if (LdapService.TryParseEntry<T>(entry, out _, getHiddenAttributes) is { } entity)
 				yield return entity;
 	}
 
 	/// <summary>Tries to get the entity from the database using it's uid.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="id">The uid of the entity.</param>
-	/// <param name="getAllAttributes">If <c>true</c> even the attributes that have <c>ReturnFormDb</c> set to <c>false</c> are returned.</param>
+	/// <param name="getHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are returned.</param>
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
-	public static RequestResult<T> TryGetEntity<T>(this LdapService ldap, string id, bool getAllAttributes = false) where T : class, new() {
+	public static RequestResult<T> TryGetEntity<T>(this LdapService ldap, string id, bool getHiddenAttributes = false) where T : class, new() {
 		SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
 		SearchResponse? response = ldap.TryRequest(request, out var error) as SearchResponse;
 
 		if (response is null || response.Entries.Count == 0)
 			return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors(error ?? "The object does not exist.");
 
-		T? entity = LdapService.TryParseEntry<T>(response.Entries[0], out error, getAllAttributes);
+		T? entity = LdapService.TryParseEntry<T>(response.Entries[0], out error, getHiddenAttributes);
 		if (entity is not null)
 			return new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity);
 		return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
@@ -60,11 +60,12 @@ public static class LdapServiceEntityExtensions {
 
 	/// <summary>Tries to add the entity to the database with the specified uid.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
-	/// <param name="id">The uid of the entity.</param>
 	/// <param name="entity">The entity to be added.</param>
+	/// <param name="id">The uid of the entity.</param>
+	/// <param name="setHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are set.</param>
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
-	public static RequestResult<T> TryAddEntity<T>(this LdapService ldap, T entity, string id) where T : class {
+	public static RequestResult<T> TryAddEntity<T>(this LdapService ldap, T entity, string id, bool setHiddenAttributes = false) where T : class {
 		Type type = typeof(T);
 
 		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"));
@@ -76,7 +77,7 @@ public static class LdapServiceEntityExtensions {
 		if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
 			request.Attributes.Add(new("objectClass", objectClasses.Classes.Cast<object>().ToArray()));
 
-		foreach (DirectoryAttribute attribute in LdapService.GetDirectoryAttributes(entity))
+		foreach (DirectoryAttribute attribute in LdapService.GetDirectoryAttributes(entity, setHiddenAttributes))
 			request.Attributes.Add(attribute);
 
 		if (ldap.TryRequest(request, out var error) is not null)
@@ -86,11 +87,12 @@ public static class LdapServiceEntityExtensions {
 
 	/// <summary>Tries to modify an entity in the database with the specified uid.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
-	/// <param name="id">The uid of the entity to replace.</param>
 	/// <param name="entity">The entity that will replace the current one.</param>
+	/// <param name="id">The uid of the entity to replace.</param>
+	/// <param name="setHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are set.</param>
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
-	public static RequestResult<T> TryModifyEntity<T>(this LdapService ldap, T entity, string id) where T : class {
+	public static RequestResult<T> TryModifyEntity<T>(this LdapService ldap, T entity, string id, bool setHiddenAttributes = false) where T : class {
 		Type type = typeof(T);
 
 		if (!ldap.EntityExists<T>(id))
@@ -99,7 +101,7 @@ public static class LdapServiceEntityExtensions {
 		ModifyRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}");
 
 		foreach (PropertyInfo info in type.GetProperties())
-			if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute) {
+			if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute && (!attribute.Hidden || setHiddenAttributes)) {
 				DirectoryAttributeModification mod = new() {
 					Name = attribute.Name,
 					Operation = DirectoryAttributeOperation.Replace,
@@ -133,9 +135,10 @@ public static class LdapServiceEntityExtensions {
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="entities">The entities to be added.</param>
 	/// <param name="idGetter">A delegate that takes in an entity of type <typeparamref name="T"/> and returns an uid with the type of <c>long</c>.</param>
+	/// <param name="setHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are set.</param>
 	/// <typeparam name="T">The type of the entities.</typeparam>
 	/// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-	public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, string> idGetter) where T : class {
+	public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, string> idGetter, bool setHiddenAttributes = false) where T : class {
 		Type type = typeof(T);
 
 		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"));
@@ -151,7 +154,7 @@ public static class LdapServiceEntityExtensions {
 			if (objectClassesAttribute is not null)
 				request.Attributes.Add(objectClassesAttribute);
 
-			foreach (DirectoryAttribute attribute in LdapService.GetDirectoryAttributes(x))
+			foreach (DirectoryAttribute attribute in LdapService.GetDirectoryAttributes(x, setHiddenAttributes))
 				request.Attributes.Add(attribute);
 
 			return new UniqueDirectoryRequest(request, id.ToString());

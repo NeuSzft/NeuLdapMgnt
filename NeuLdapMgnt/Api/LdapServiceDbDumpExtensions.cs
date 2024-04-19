@@ -27,8 +27,8 @@ public static class LdapServiceDbDumpExtensions {
 
 		List<string> errors = new();
 
-		errors.AddRange(ldap.TryAddEntities(dump.Students, student => student.Id.ToString()).Errors);
-		errors.AddRange(ldap.TryAddEntities(dump.Teachers, teacher => teacher.Id).Errors);
+		errors.AddRange(ldap.TryAddEntities(dump.Students, student => student.Id.ToString(), true).Errors);
+		errors.AddRange(ldap.TryAddEntities(dump.Teachers, teacher => teacher.Id, true).Errors);
 		errors.AddRange(ldap.TryAddEntitiesToGroup("inactive", dump.Inactives).Errors);
 		errors.AddRange(ldap.TryAddEntitiesToGroup("admin", dump.Admins).Errors);
 
