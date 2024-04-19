@@ -36,7 +36,7 @@ else
 }
 
 @code {
-	private Student student = StudentFactory.CreateEmptyStudent().Build();
+	private Student student = new();
 	private List<string> errorList = new();
 	private Modal modal = default!;
 	private ConfirmDialog dialog = default!;
@@ -67,7 +67,7 @@ else
 			if (response.IsSuccess())
 			{
 				ToastService.Notify(ToastMessages.Success($"{studentUpdated.FullName} ({studentUpdated.Id}) was added!"));
-				student = StudentFactory.CreateEmptyStudent().Build();
+				student = new();
 				return true;
 			}
 

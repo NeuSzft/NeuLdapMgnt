@@ -128,7 +128,7 @@
 
 @code {
 	[Parameter]
-	public Student TheStudent { get; set; } = StudentFactory.CreateEmptyStudent().Build();
+	public Student Student { get; set; } = new();
 
 	[Parameter]
 	public Func<Student, Task<bool>> OnSubmit { get; set; } = default!;
@@ -142,8 +142,8 @@
 	[Parameter]
 	public bool CanDelete { get; set; }
 
-	private Student studentOriginal = StudentFactory.CreateEmptyStudent().Build();
-	private Student studentUpdated = StudentFactory.CreateEmptyStudent().Build();
+	private Student studentOriginal = new();
+	private Student studentUpdated = new();
 	private bool isDeleting = false;
 	private bool isSubmitting = false;
 	private bool isAction => isDeleting || isSubmitting;
@@ -151,7 +151,7 @@
 
 	protected override void OnInitialized()
 	{
-		studentOriginal = Utils.GetClone<Student>(TheStudent)!;
+		studentOriginal = Utils.GetClone<Student>(Student)!;
 		studentUpdated = Utils.GetClone<Student>(studentOriginal)!;
 	}
 

@@ -17,7 +17,7 @@ else
 	[Parameter]
 	public string Id { get; set; } = null!;
 
-	private Student student = StudentFactory.CreateEmptyStudent().Build();
+	private Student student = new();
 	private ConfirmDialog dialog = default!;
 	private bool isLoading = false;
 
