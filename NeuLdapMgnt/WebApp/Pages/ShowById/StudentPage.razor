@@ -37,7 +37,7 @@ else
 	{
 		if (student.Equals(editedStudent))
 		{
-			ToastService.Notify(ToastMessages.Warning($"No changes was found!", true));
+			ToastService.Notify(ToastMessages.Secondary($"No changes was found!"));
 			return false;
 		}
 

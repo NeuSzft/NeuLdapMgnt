@@ -10,7 +10,7 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 		{
 			return new()
 			{
-				Type = ToastType.Light,
+				Type = ToastType.Secondary,
 				AutoHide = true,
 				Message = $"Welcome back {name}!"
 			};

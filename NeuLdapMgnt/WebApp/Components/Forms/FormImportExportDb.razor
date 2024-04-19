@@ -1,5 +1,4 @@
-﻿@using System.Text.Json
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @inject IJSRuntime JsRuntime
 
 <div class="d-flex flex-column gap-2 my-2">
@@ -25,17 +24,26 @@
 			<h3>Import a JSON dump file into the database</h3>
 		</div>
 		<div class="mb-3">
-			<InputFile OnChange="@OnFileImported" class="form-control"/>
+			<FileUpload OnFileUploaded="OnFileImported" AllowedExtensions="allowedExtension"/>
 		</div>
-		<div class="row mb-3 align-items-center">
-			<div class="col-auto">
-				<Button @onclick="ImportDatabase" class="btn btn-primary" disabled="@(_importedJson.Length == 0)">Import <span class="bi bi-filetype-json"></span></Button>
-			</div>
-			<div class="col">
+		<div class="row align-items-center">
+			<div class="col-12 mb-3">
 				<div class="form-check">
 					<InputCheckbox @bind-Value="_eraseBeforeImport" id="erase-before-import" class="form-check-input" disabled="@(_importedJson.Length == 0)"/>
 					<label class="form-check-label" for="erase-before-import">Erase database before importing?</label>
 				</div>
+			</div>
+			<div class="col">
+				@if (isUploading)
+				{
+					<Button Color="ButtonColor.Primary" Outline="true" Disabled="true">
+						<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Primary" />
+					</Button>
+				}
+				else
+				{
+					<ButtonOk Color="ButtonColor.Primary" OnClick="ImportDatabase" IsDisabled="@(_importedJson.Length == 0)" Text="Upload" />
+				}
 			</div>
 		</div>
 	</form>
@@ -50,8 +58,12 @@
 
 	private bool _eraseBeforeImport;
 
-	private async Task OnFileImported(InputFileChangeEventArgs e) {
-		await using Stream stream = e.File.OpenReadStream();
+	private string[] allowedExtension = new[] { ".json" };
+
+	private bool isUploading = false;
+
+	private async Task OnFileImported(IBrowserFile file) {
+		await using Stream stream = file.OpenReadStream();
 		using StreamReader reader = new(stream);
 		_importedJson = await reader.ReadToEndAsync();
 	}
@@ -69,15 +81,16 @@
 	private async Task ImportDatabase() {
 		try {
 			LdapDbDump? dump = JsonSerializer.Deserialize<LdapDbDump>(_importedJson);
+			isUploading = true;
 			await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Put, _eraseBeforeImport ? "/api/database/erase-and-import" : "/api/database/import", dump);
 		}
 		catch (Exception e) {
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
+		isUploading = false;
 	}
 
 	private async Task Download() {
 		await JsRuntime.InvokeVoidAsync("downloadJsonFile", $"database-{_lastExportTime:yyyy.MM.dd-HH_mm_ss}.json", _exportedJson);
 	}
-
 }
