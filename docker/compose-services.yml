@@ -1,51 +1,80 @@
 version: '3.8'
 
 services:
-    openldap:
-        image: osixia/openldap:latest
+  openldap:
+    image: osixia/openldap:latest
+    environment:
+      LDAP_ORGANISATION: Neu
+      LDAP_DOMAIN: neu.local
+      LDAP_ADMIN_PASSWORD: admin
 
-    ldapadmin:
-        image: osixia/phpldapadmin:latest
+  ldapadmin:
+    image: osixia/phpldapadmin:latest
+    environment:
+      PHPLDAPADMIN_HTTPS: false=value
 
-    api-build:
-        build:
-            context: ..
-            dockerfile_inline: |
-                FROM mcr.microsoft.com/dotnet/sdk:8.0
-                COPY ./NeuLdapMgnt/Api /build/Api
-                COPY ./NeuLdapMgnt/Models /build/Models
-                WORKDIR /build/Api
-                ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: api-logs
+      POSTGRES_PASSWORD: postgres
 
-    api:
-        build:
-            context: ..
-            dockerfile_inline: |
-                FROM mcr.microsoft.com/dotnet/aspnet:8.0
-                RUN apt update
-                RUN apt install libldap-2.5-0 -y
-                WORKDIR /app
-                ENTRYPOINT [ "./NeuLdapMgnt.Api", "--urls", "http://0.0.0.0:5000" ]
+  api-build:
+    build:
+      context: ..
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:8.0
+        COPY ./NeuLdapMgnt/Api /build/Api
+        COPY ./NeuLdapMgnt/Models /build/Models
+        RUN rm -rf /build/Api/bin
+        RUN rm -rf /build/Api/obj
+        RUN rm -rf /build/Models/bin
+        RUN rm -rf /build/Models/obj
+        WORKDIR /build/Api
+        ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
 
-    api-test:
-        build:
-            context: ..
-            dockerfile_inline: |
-                FROM mcr.microsoft.com/dotnet/sdk:8.0
-                COPY ./NeuLdapMgnt/Api.Tests /app/Api.Tests
-                COPY ./NeuLdapMgnt/Models /app/Models
-                WORKDIR /app/Api.Tests
-                ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/tr/api-test-results.md" ]
+  api:
+    build:
+      context: ..
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/aspnet:8.0
+        RUN apt update
+        RUN apt install libldap-2.5-0 -y
+        WORKDIR /app
+        ENTRYPOINT [ "./NeuLdapMgnt.Api", "--urls", "http://0.0.0.0:5000" ]
+    environment:
+      LDAP_PORT: 389
+      LDAP_DOMAIN: neu.local
+      LDAP_USERNAME: admin
+      LDAP_PASSWORD: admin
+      POSTGRES_DB: api-logs
+      POSTGRES_PASSWORD: postgres
+      DEFAULT_ADMIN_NAME: admin
+      DEFAULT_ADMIN_PASSWORD: adminpass
 
-    webapp-build:
-        build:
-            context: ..
-            dockerfile_inline: |
-                FROM mcr.microsoft.com/dotnet/sdk:7.0
-                COPY ./NeuLdapMgnt/WebApp /build/WebApp
-                COPY ./NeuLdapMgnt/Models /build/Models
-                WORKDIR /build/WebApp
-                ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+  api-test:
+    build:
+      context: ..
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:8.0
+        COPY ./NeuLdapMgnt/Api.Tests /app/Api.Tests
+        COPY ./NeuLdapMgnt/Models /app/Models
+        WORKDIR /app/Api.Tests
+        ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/tr/api-test-results.md" ]
 
-    nginx:
-        image: nginx
+  webapp-build:
+    build:
+      context: ..
+      dockerfile_inline: |
+        FROM mcr.microsoft.com/dotnet/sdk:7.0
+        COPY ./NeuLdapMgnt/WebApp /build/WebApp
+        COPY ./NeuLdapMgnt/Models /build/Models
+        RUN rm -rf /build/WebApp/bin
+        RUN rm -rf /build/WebApp/obj
+        RUN rm -rf /build/Models/bin
+        RUN rm -rf /build/Models/obj
+        WORKDIR /build/WebApp
+        ENTRYPOINT [ "dotnet", "publish", "--nologo", "-o", "/app" ]
+
+  nginx:
+    image: nginx

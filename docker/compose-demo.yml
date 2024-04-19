@@ -1,124 +1,110 @@
 version: "3.8"
 
 services:
-    demo-postgres:
-        image: postgres:latest
-        environment:
-            POSTGRES_DB: neu_ldap_mgnt_logs
-            POSTGRES_PASSWORD: admin
-        volumes:
-            - demo-postgres-data:/var/lib/postgresql/data
-        networks:
-            - demo-net
-        ports:
-            - 5432:5432
+  demo-postgres:
+    extends:
+      file: ./compose-services.yml
+      service: postgres
+    volumes:
+      - demo-postgres-data:/var/lib/postgresql/data
+    networks:
+      - demo-net
+    ports:
+      - 5432:5432
 
-    demo-openldap:
-        extends:
-            file: ./compose-services.yml
-            service: openldap
-        environment:
-            LDAP_ORGANISATION: Demo
-            LDAP_DOMAIN: demo.local
-            LDAP_ADMIN_PASSWORD: admin
-        networks:
-            - demo-net
-        ports:
-            - 389:389
-        volumes:
-            - demo-ldap-data:/var/lib/ldap
-            - demo-ldap-config:/etc/ldap/slapd.d
+  demo-openldap:
+    extends:
+      file: ./compose-services.yml
+      service: openldap
+    networks:
+      - demo-net
+    ports:
+      - 389:389
+    volumes:
+      - demo-ldap-data:/var/lib/ldap
+      - demo-ldap-config:/etc/ldap/slapd.d
 
-    demo-ldapadmin:
-        extends:
-            file: ./compose-services.yml
-            service: ldapadmin
-        depends_on:
-            - demo-openldap
-        environment:
-            PHPLDAPADMIN_LDAP_HOSTS: demo-openldap
-            PHPLDAPADMIN_HTTPS: false
-        networks:
-            - demo-net
-        ports:
-            - 8888:80
+  demo-ldapadmin:
+    extends:
+      file: ./compose-services.yml
+      service: ldapadmin
+    depends_on:
+      - demo-openldap
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: demo-openldap
+    networks:
+      - demo-net
+    ports:
+      - 8888:80
 
-    demo-api-build:
-        extends:
-            file: ./compose-services.yml
-            service: api-build
-        networks:
-            - demo-net
-        volumes:
-            - demo-api-app:/app
+  demo-api-build:
+    extends:
+      file: ./compose-services.yml
+      service: api-build
+    networks:
+      - demo-net
+    volumes:
+      - demo-api-app:/app
 
-    demo-api:
-        extends:
-            file: ./compose-services.yml
-            service: api
-        depends_on:
-            demo-openldap:
-                condition: service_started
-            demo-postgres:
-                condition: service_started
-            demo-api-build:
-                condition: service_completed_successfully
-        environment:
-            ASPNETCORE_ENVIRONMENT: Development
-            LDAP_ADDRESS: demo-openldap
-            LDAP_PORT: 389
-            LDAP_DOMAIN: demo.local
-            LDAP_USERNAME: admin
-            LDAP_PASSWORD: admin
-            SECURITY_KEY: ITN3pnH472FGG71aC1AWFDrTn2TpgHtBuZdD/LYkD4bXe4hhAKWj8CsTfGPQJHr3qoY8/KM0zShbyreW6RapyGAL2M8JBOWLknXoC/1zJ4+9QOC7hpk4jqM13vHoJeL8JTKdYGCzx6gwZK9a4vgcsVCCc1QT6//WO7x0xdcZUsiHqp2t9PJjzLfMvK2nlaWe+aoBBPvsM4CAyWTMT8sZVHSmrjTunhVOn9cqoouHwe33a5grSf9Z9AhFtBTSH2DvlW4/DdA1kKcNeju/wZGhnE0DKNsguV6b5NcYLsRgU1NK2nrWd8yhUskOQCoDvLwnWc3Qto5l/AFnht08FSjLSQ==
-            DEFAULT_ADMIN_NAME: admin
-            DEFAULT_ADMIN_PASSWORD: adminpass
-            POSTGRES_HOST: demo-postgres
-            POSTGRES_DB: neu_ldap_mgnt_logs
-            POSTGRES_PASSWORD: admin
-            LOGS_DIR: /logs
-        networks:
-            demo-net:
-                aliases:
-                    - api
-        ports:
-            - 5000:5000
-        volumes:
-            - demo-api-app:/app:ro
-            - ../logs:/logs
+  demo-api:
+    extends:
+      file: ./compose-services.yml
+      service: api
+    depends_on:
+      demo-openldap:
+        condition: service_started
+      demo-postgres:
+        condition: service_started
+      demo-api-build:
+        condition: service_completed_successfully
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      LDAP_ADDRESS: demo-openldap
+      POSTGRES_HOST: demo-postgres
+      LOGS_DIR: /logs
+      SECURITY_KEY: ITN3pnH472FGG71aC1AWFDrTn2TpgHtBuZdD/LYkD4bXe4hhAKWj8CsTfGPQJHr3qoY8/KM0zShbyreW6RapyGAL2M8JBOWLknXoC/1zJ4+9QOC7hpk4jqM13vHoJeL8JTKdYGCzx6gwZK9a4vgcsVCCc1QT6//WO7x0xdcZUsiHqp2t9PJjzLfMvK2nlaWe+aoBBPvsM4CAyWTMT8sZVHSmrjTunhVOn9cqoouHwe33a5grSf9Z9AhFtBTSH2DvlW4/DdA1kKcNeju/wZGhnE0DKNsguV6b5NcYLsRgU1NK2nrWd8yhUskOQCoDvLwnWc3Qto5l/AFnht08FSjLSQ==
+    networks:
+      demo-net:
+        aliases:
+          - api
+    ports:
+      - 5000:5000
+    volumes:
+      - demo-api-app:/app:ro
 
-    demo-webapp-build:
-        extends:
-            file: ./compose-services.yml
-            service: webapp-build
-        networks:
-            - demo-net
-        volumes:
-            - demo-webapp-app:/app
+  demo-webapp-build:
+    extends:
+      file: ./compose-services.yml
+      service: webapp-build
+    networks:
+      - demo-net
+    volumes:
+      - demo-webapp-app:/app
 
-    demo-nginx:
-        extends:
-            file: ./compose-services.yml
-            service: nginx
-        depends_on:
-            demo-api-build:
-                condition: service_completed_successfully
-            demo-webapp-build:
-                condition: service_completed_successfully
-        networks:
-            - demo-net
-        ports:
-            - 8080:80
-        volumes:
-            - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
-            - demo-webapp-app:/app:ro
+  demo-nginx:
+    extends:
+      file: ./compose-services.yml
+      service: nginx
+    depends_on:
+      demo-api-build:
+        condition: service_completed_successfully
+      demo-webapp-build:
+        condition: service_completed_successfully
+    networks:
+      - demo-net
+    ports:
+      - 8080:80
+    volumes:
+      - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - demo-webapp-app:/app:ro
 
 networks:
-    demo-net:
+  demo-net:
+
 
 volumes:
-    demo-ldap-data:
-    demo-ldap-config:
-    demo-api-app:
-    demo-webapp-app:
-    demo-postgres-data:
+  demo-ldap-data:
+  demo-ldap-config:
+  demo-postgres-data:
+  demo-api-app:
+  demo-webapp-app:

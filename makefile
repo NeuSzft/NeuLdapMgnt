@@ -24,10 +24,13 @@ ifeq ($(wildcard ./.env),)
 	$(file >> .env,LDAP_ORGANIZATION = Neu)
 	$(file >> .env,LDAP_DOMAIN = neu.local)
 	$(file >> .env,LDAP_ADMIN_PASSWORD = ldappass)
+	$(file >> .env,)
+	$(file >> .env,POSTGRES_USER_PASSWORD = postgres)
+	$(file >> .env,)
 	$(file >> .env,DEFAULT_ADMIN_USERNAME = admin)
 	$(file >> .env,DEFAULT_ADMIN_PASSWORD = adminpass)
+	$(file >> .env,)
 	$(file >> .env,PORT = 80)
-	$(file >> .env,API_LOGS_DIR = $(abspath $(dir .))/logs)
 	@echo Created .env file
 else
 	@echo The .env file already exists
