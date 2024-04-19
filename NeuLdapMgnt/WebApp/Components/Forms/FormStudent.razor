@@ -32,17 +32,17 @@
 
 		<div class="d-flex flex-column flex-md-row gap-2 w-100">
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="first-name" @bind-Value="studentUpdated.FirstName" />
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="first-name" @bind-Value="studentUpdated.FirstName" />
 				<label for="first-name">First</label>
 				<ValidationMessage For="() => studentUpdated.FirstName" id="student-first-name-validation-message" />
 			</div>
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="last-name" @bind-Value="studentUpdated.LastName" />
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="last-name" @bind-Value="studentUpdated.LastName" />
 				<label for="last-name">Last</label>
 				<ValidationMessage For="() => studentUpdated.LastName" id="student-last-name-validation-message" />
 			</div>
 			<div class="form-floating w-100">
-				<InputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="middle-name" @bind-Value="studentUpdated.MiddleName" />
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="middle-name" @bind-Value="studentUpdated.MiddleName" />
 				<label for="middle-name">Middle</label>
 				<ValidationMessage For="() => studentUpdated.MiddleName" id="student-middle-name-validation-message" />
 			</div>
@@ -82,7 +82,13 @@
 	<ValidationMessage For="() => studentUpdated.Class" id="student-class-validation-message" />
 
 	<div class="form-floating">
-		<InputText type="password" class="form-control" disabled="@(IsReadonly || isAction)" id="password" @bind-Value="studentUpdated.Password" />
+		<InstantInputText class="form-control" disabled="@(IsReadonly || isAction)" id="student-email" @bind-Value="studentUpdated.Email" />
+		<label for="student-email">Email</label>
+		<ValidationMessage For="() => studentUpdated.Email" id="student-email-validation-message" />
+	</div>
+
+	<div class="form-floating">
+		<InstantInputText type="password" class="form-control" disabled="@(IsReadonly || isAction)" id="password" @bind-Value="studentUpdated.Password" />
 		<label for="password">Password</label>
 		<ValidationMessage For="() => studentUpdated.Password" id="student-password-validation-message" />
 	</div>

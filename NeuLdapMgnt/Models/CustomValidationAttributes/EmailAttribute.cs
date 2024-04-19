@@ -13,7 +13,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 				{
 					return ValidationResult.Success;
 				}
-				else if (!email.Contains('@'))
+				else if (!email.Contains('@') || email.EndsWith('@'))
 				{
 					return new ValidationResult("Email is not a valid email address.",
 						new[] { validationContext.MemberName }!);
@@ -29,7 +29,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 				}
 			}
 
-			return new ValidationResult("Class: Invalid data type", new[] { validationContext.MemberName }!);
+			return new ValidationResult("Email: Invalid data type", new[] { validationContext.MemberName }!);
 		}
 	}
 }

@@ -60,7 +60,7 @@ else
 
 			if (response.Errors.Any())
 			{
-				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
+				ToastService.Notify(ToastMessages.Error(response.GetError()));
 			}
 		}
 		catch (HttpRequestException httpError)
@@ -102,7 +102,7 @@ else
 
 			if (response.Errors.Any())
 			{
-				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
+				ToastService.Notify(ToastMessages.Error(response.GetError()));
 			}
 		}
 		catch (HttpRequestException httpError)
