@@ -9,7 +9,7 @@
 else
 {
 	<h3>[@student.Class] @student.FullName</h3>
-	<FormStudent TheStudent="student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete" />
+	<FormStudent Student="student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete" />
 	<ConfirmDialog @ref="dialog" />
 }
 
@@ -28,7 +28,7 @@ else
 		long id;
 		long.TryParse(Id, out id);
 
-		var searchedStudent = Lists.GetStudents().FirstOrDefault(x => x.Id.Equals(id));
+		var searchedStudent = DatabaseLocal.Students.FirstOrDefault(x => x.Id.Equals(id));
 		if (searchedStudent is null) return;
 		student = searchedStudent;
 	}

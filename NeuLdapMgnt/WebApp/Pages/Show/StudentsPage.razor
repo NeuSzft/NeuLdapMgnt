@@ -15,7 +15,7 @@
 {
 	<Loading Text="Loading students" />
 }
-else if (!Lists.Students.Any())
+else if (!DatabaseLocal.Students.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
@@ -26,7 +26,7 @@ else if (!Lists.Students.Any())
 }
 else
 {
-	<TableStudents Students="Lists.GetStudents()" />
+	<TableStudents Students="DatabaseLocal.Students" />
 }
 
 @code {
@@ -43,13 +43,12 @@ else
 		try
 		{
 			isLoading = true;
-			Lists.Students.Clear();
+			DatabaseLocal.Students.Clear();
 
 			var response = await ApiRequests.GetStudentsAsync();
 			if (response.IsSuccess())
 			{
-				Lists.Students = new(response.Values);
-				isLoading = false;
+				DatabaseLocal.Students = new(response.Values);
 			}
 
 			if (response.Errors.Any())
@@ -68,6 +67,7 @@ else
 		{
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
+		isLoading = false;
 	}
 
 	private void ToAddPage()
