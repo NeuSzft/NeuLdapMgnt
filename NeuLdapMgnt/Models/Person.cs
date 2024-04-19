@@ -99,12 +99,12 @@ namespace NeuLdapMgnt.Models
 				homeDirectory = value.Replace(" ", "");
 			}
 		}
-		[Required(ErrorMessage = "Password is required.")]
+		
 		[Password]
 		[PasswordPropertyText]
 		[JsonInclude, JsonPropertyName("password")]
 		[LdapAttribute("userPassword", false)]
-		public virtual string Password { get; set; } = string.Empty;
+		public virtual string? Password { get; set; } = string.Empty;
 
 		[JsonPropertyName("full_name")]
 		[LdapAttribute("displayName")]

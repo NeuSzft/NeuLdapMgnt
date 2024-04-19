@@ -7,8 +7,17 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 	{
 		protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 		{
+			if (value is null)
+			{
+				return ValidationResult.Success;
+			}
+
 			if (value is string password)
 			{
+				if(string.IsNullOrEmpty(password))
+				{
+					return ValidationResult.Success;
+				}
 				if (password.Length < 8)
 				{
 					return new ValidationResult("Password must be at least 8 characters long.",
