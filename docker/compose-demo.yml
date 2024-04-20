@@ -51,12 +51,12 @@ services:
       file: ./compose-services.yml
       service: api
     depends_on:
+      demo-api-build:
+        condition: service_completed_successfully
       demo-openldap:
         condition: service_started
       demo-postgres:
-        condition: service_started
-      demo-api-build:
-        condition: service_completed_successfully
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       LDAP_ADDRESS: demo-openldap
