@@ -46,8 +46,8 @@ public static class LdapServiceDbDumpExtensions {
 	/// <returns>A <see cref="RequestResult{T}">RequestResult&lt;LdapDbDump&gt;</see> containing the outcome of the operation.</returns>
 	public static RequestResult<LdapDbDump> ExportDatabase(this LdapService ldap) {
 		LdapDbDump dump = new() {
-			Students = ldap.GetAllEntities<Student>(true),
-			Teachers = ldap.GetAllEntities<Teacher>(true),
+			Students = ldap.GetAllEntities<Student>(true).Values,
+			Teachers = ldap.GetAllEntities<Teacher>(true).Values,
 			Inactives = ldap.GetMembersOfGroup("inactive"),
 			Admins = ldap.GetMembersOfGroup("admin"),
 			Values = ldap.GetAllValues(out var error)

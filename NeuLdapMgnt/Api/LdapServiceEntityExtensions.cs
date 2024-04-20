@@ -25,18 +25,27 @@ public static class LdapServiceEntityExtensions {
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="getHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are returned.</param>
 	/// <typeparam name="T">The type of the entity.</typeparam>
-	/// <returns>An <see cref="IEnumerable{T}"/> containing the entities.</returns>
-	/// <remarks>If an entity cannot be parsed then it is ignored and not returned.</remarks>
-	public static IEnumerable<T> GetAllEntities<T>(this LdapService ldap, bool getHiddenAttributes = false) where T : class, new() {
-		SearchRequest   request  = new($"ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, null);
+	/// <returns>A <see cref="RequestResult{T}"/> containing the entities.</returns>
+	public static RequestResult<T> GetAllEntities<T>(this LdapService ldap, bool getHiddenAttributes = false) where T : class, new() {
+		Type type = typeof(T);
+
+		SearchRequest   request  = new($"ou={type.GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, null);
 		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
 		if (response is null)
-			yield break;
+			return new RequestResult<T>().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors($"Failed to fetch entities of type {type.Name}.");
 
-		foreach (SearchResultEntry entry in response.Entries)
-			if (LdapService.TryParseEntry<T>(entry, out _, getHiddenAttributes) is { } entity)
-				yield return entity;
+		List<T>      entities = new();
+		List<string> errors   = new();
+
+		foreach (SearchResultEntry entry in response.Entries) {
+			if (LdapService.TryParseEntry<T>(entry, out var error, getHiddenAttributes) is { } entity)
+				entities.Add(entity);
+			if (error is not null)
+				errors.Add(error);
+		}
+
+		return new RequestResult<T>().SetStatus(StatusCodes.Status207MultiStatus).SetValues(entities.ToArray()).SetErrors(errors.ToArray());
 	}
 
 	/// <summary>Tries to get the entity from the database using it's uid.</summary>
