@@ -12,13 +12,13 @@ namespace NeuLdapMgnt.Models
 	[LdapObjectClasses("inetOrgPerson", "posixAccount")]
 	public abstract class Person
 	{
-		private string lastName = string.Empty;
-		private string firstName = string.Empty;
-		private string middleName = string.Empty;
-		private string classYear = string.Empty;
-		private string classGroup = string.Empty;
-		private string @class = string.Empty;
-		private string homeDirectory = string.Empty;
+		private string _lastName = string.Empty;
+		private string _firstName = string.Empty;
+		private string _middleName = string.Empty;
+		private string _homeDirectory = string.Empty;
+		protected string @class = string.Empty;
+		private string _classYear = string.Empty;
+		private string _classGroup = string.Empty;
 
 		public static readonly string[] ClassYears = { "9", "10", "11", "12", "13", "1/13", "2/14" };
 		public static readonly string[] ClassGroups = { "A", "B", "C", "D", "E", "Ny", "A.RSZE", "B.RSZE" };
@@ -44,10 +44,10 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("givenName")]
 		public string FirstName
 		{
-			get => firstName;
+			get => _firstName;
 			set
 			{
-				firstName = value.Trim();
+				_firstName = value.Trim();
 				FullName = GetFullName();
 				Username = GetUsername();
 				HomeDirectory = GetHomeDirectory();
@@ -60,10 +60,10 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("sn")]
 		public string LastName
 		{
-			get => lastName;
+			get => _lastName;
 			set
 			{
-				lastName = value.Trim();
+				_lastName = value.Trim();
 				FullName = GetFullName();
 				Username = GetUsername();
 				HomeDirectory = GetHomeDirectory();
@@ -75,19 +75,18 @@ namespace NeuLdapMgnt.Models
 		[JsonPropertyName("middle_name")]
 		public string MiddleName
 		{
-			get => middleName;
+			get => _middleName;
 			set
 			{
-				middleName = value is null ? string.Empty : value.Trim();
+				_middleName = value is null ? string.Empty : value.Trim();
 				FullName = GetFullName();
 			}
 		}
 
-		[Required(ErrorMessage = "Class is required.")]
 		[Class]
 		[JsonRequired, JsonPropertyName("class")]
 		[LdapAttribute("roomNumber")]
-		public string Class
+		public virtual string Class
 		{
 			get => @class;
 			set
@@ -100,19 +99,19 @@ namespace NeuLdapMgnt.Models
 
 				@class = value;
 				var classSplit = @class.Split('.');
-				classYear = classSplit[0];
-				classGroup = classSplit[1];
+				_classYear = classSplit[0];
+				_classGroup = classSplit[1];
 			}
 		}
 
 		[JsonIgnore]
 		public string ClassYear
 		{
-			get => classYear;
+			get => _classYear;
 			set
 			{
 				if (string.IsNullOrEmpty(value)) return;
-				classYear = value;
+				_classYear = value;
 				UpdateClass();
 			}
 		}
@@ -120,11 +119,11 @@ namespace NeuLdapMgnt.Models
 		[JsonIgnore]
 		public string ClassGroup
 		{
-			get => classGroup;
+			get => _classGroup;
 			set
 			{
 				if (string.IsNullOrEmpty(value)) return;
-				classGroup = value;
+				_classGroup = value;
 				UpdateClass();
 			}
 		}
@@ -140,15 +139,15 @@ namespace NeuLdapMgnt.Models
 		[LdapAttribute("homeDirectory")]
 		public string HomeDirectory
 		{
-			get => homeDirectory;
+			get => _homeDirectory;
 			set
 			{
 				if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
 				{
-					homeDirectory = "/home/";
+					_homeDirectory = "/home/";
 					return;
 				}
-				homeDirectory = value.Replace(" ", "");
+				_homeDirectory = value.Replace(" ", "");
 			}
 		}
 

@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes;
+using NeuLdapMgnt.Models.CustomValidationAttributes;
 
 namespace NeuLdapMgnt.Models
 {
@@ -31,6 +32,16 @@ namespace NeuLdapMgnt.Models
 		[JsonRequired, JsonPropertyName("gid")]
 		[LdapAttribute("gidNumber")]
 		public override int Gid { get; set; } = GidMinValue;
+
+		[Required(ErrorMessage = "Class is required for students.")]
+		[Class]
+		[JsonRequired, JsonPropertyName("class")]
+		[LdapAttribute("roomNumber")]
+		public override string Class
+		{
+			get => base.Class;
+			set => base.Class = value;
+		}
 
 		public bool Equals(Student? other)
 		{

@@ -5,10 +5,10 @@
 <p>
 <strong>Overall Result:</strong> ✔️ Pass <br />
 <strong>Pass Rate:</strong> 100% <br />
-<strong>Run Duration:</strong> 945ms <br />
-<strong>Date:</strong> 2024-04-17 15:00:19 - 2024-04-17 15:00:20 <br />
+<strong>Run Duration:</strong> 1s 100ms <br />
+<strong>Date:</strong> 2024-04-20 12:58:23 - 2024-04-20 12:58:25 <br />
 <strong>Framework:</strong> .NETCoreApp,Version=v7.0 <br />
-<strong>Total Tests:</strong> 63 <br />
+<strong>Total Tests:</strong> 66 <br />
 </p>
 
 <table>
@@ -21,7 +21,7 @@
 </thead>
 <tbody>
 <tr>
-<td>63</td>
+<td>66</td>
 <td>0</td>
 <td>0</td>
 </tr>
@@ -48,7 +48,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>StudentIdAttributeValidOmSuccess</td>
-<td>7ms</td>
+<td>9ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -68,6 +68,11 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherIdAttributeInvalidFormatFails</td>
+<td>< 1ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>TeacherIdAttributeIncludesNonDotCharFails</td>
 <td>< 1ms</td>
 </tr>
 <tr>
@@ -223,7 +228,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>EmailAttributeValidEmailSuccess</td>
-<td>< 1ms</td>
+<td>1ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -253,7 +258,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>DirectoryAttributeInvalidEndFails</td>
-<td>< 1ms</td>
+<td>1ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -323,6 +328,16 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>PasswordAttributeWithInvalidDataTypeFails</td>
+<td>< 1ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>ClassAttributeEmptySuccess</td>
+<td>< 1ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>ClassAttributeNullSuccess</td>
 <td>< 1ms</td>
 </tr>
 <tr>

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 {
@@ -8,6 +9,12 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 		{
 			if (value is string id)
 			{
+				if (id.Any(x => !char.IsLetterOrDigit(x) && x != '.'))
+				{
+					return new ValidationResult("ID must contain only alphanumeric characters or '.'",
+						new[] { validationContext.MemberName }!);
+				}
+
 				if (!id.Contains('.'))
 				{
 					return new ValidationResult($"ID must contain '.'",

@@ -8,9 +8,18 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 	{
 		protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 		{
+			if (value is null)
+			{
+				return ValidationResult.Success;
+			}
+
 			if (value is string @class)
 			{
-				if (@class.EndsWith(".", StringComparison.OrdinalIgnoreCase))
+				if (string.IsNullOrEmpty(@class))
+				{
+					return ValidationResult.Success;
+				}
+				else if (@class.EndsWith(".", StringComparison.OrdinalIgnoreCase))
 				{
 					return new ValidationResult("Group is required.",
 						new[] { validationContext.MemberName }!);
