@@ -75,6 +75,10 @@ else
 					{
 						<i class="bi @GetSortIcon(isAscending)"></i>
 					}
+					else
+					{
+						<i class="bi bi-chevron-expand"></i>
+					}
 				</th>
 				<th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
 					Name
@@ -82,12 +86,20 @@ else
 					{
 						<i class="bi @GetSortIcon(isAscending)"></i>
 					}
+					else
+					{
+						<i class="bi bi-chevron-expand"></i>
+					}
 				</th>
 				<th class="user-select-none" role="button" @onclick="@(() => SortTable("Class"))">
 					Class
 					@if (sortBy == "Class")
 					{
 						<i class="bi @GetSortIcon(isAscending)"></i>
+					}
+					else
+					{
+						<i class="bi bi-chevron-expand"></i>
 					}
 				</th>
 				<th class="user-select-none text-end">Inspect |  Edit</th>
