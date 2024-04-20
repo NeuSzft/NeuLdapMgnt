@@ -1,0 +1,13 @@
+﻿@page "/database/logs"
+
+<PageTitle>Request Logs</PageTitle>
+
+<TableLogs/>
+
+@code {
+
+	protected override void OnInitialized() {
+		ApiRequests.EnsureAuthentication(NavManager);
+	}
+
+}
