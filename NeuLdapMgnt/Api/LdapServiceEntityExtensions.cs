@@ -196,4 +196,28 @@ public static class LdapServiceEntityExtensions {
 
 		return null;
 	}
+	
+	/// <summary>Tries to get the password hash and salt of an entity.</summary>
+	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
+	/// <param name="id">The uid of the entity to find.</param>
+	/// <param name="typesToTry">The model types to search trough.</param>
+	/// <returns>The <c>userPassword</c> attribute of the entity or <c>null</c> if not found.</returns>
+	public static string? TryGetPasswordOfEntity(this LdapService ldap, string id, params Type[] typesToTry) {
+		if (id == Authenticator.GetDefaultAdminName())
+			return ldap.GetValue(Authenticator.DefaultAdminPasswordValueName, out _);
+
+		foreach (Type type in typesToTry) {
+			SearchRequest   request  = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, "userPassword");
+			SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
+
+			try {
+				return response!.Entries[0].Attributes["userPassword"][0].ToString();
+			}
+			catch {
+				continue;
+			}
+		}
+
+		return null;
+	}
 }
