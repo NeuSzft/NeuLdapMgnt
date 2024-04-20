@@ -17,7 +17,7 @@ public static class LogEndpoints {
 				   ? DateTimeOffset.FromUnixTimeSeconds(toSecs)
 				   : DateTimeOffset.UtcNow;
 
-			   return new RequestResult<LogEntry>().SetValues(pg.GetLogEntries(from.DateTime, to.DateTime).ToArray()).RenewToken(request);
+			   return new RequestResult<LogEntry>().SetValues(pg.GetLogEntries(from.DateTime, to.DateTime).ToArray()).RenewToken(request).ToResult();
 		   })
 		   .WithOpenApi()
 		   .WithTags("Logs")
