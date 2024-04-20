@@ -61,18 +61,20 @@
 		<div class="d-flex flex-column flex-md-row gap-2 w-100">
 			<div class="form-floating w-100">
 				<InputSelect class="form-select rounded" id="class-year-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.ClassYear">
+					<option value="">Select Year</option>
 					@foreach (string year in Student.ClassYears)
 					{
-						<option value="@year" selected="@year.Equals(studentUpdated.ClassYear)">@year</option>
+						<option value="@year">@year</option>
 					}
 				</InputSelect>
 				<label for="class-year-select">Year</label>
 			</div>
 			<div class="form-floating w-100">
 				<InputSelect class="form-select rounded" id="class-group-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.ClassGroup">
+					<option value="">Select Group</option>
 					@foreach (var group in Student.ClassGroups)
 					{
-						<option value="@group" selected="@group.Equals(studentUpdated.ClassGroup)">@group</option>
+						<option value="@group">@group</option>
 					}
 				</InputSelect>
 				<label for="class-group-select">Group</label>
