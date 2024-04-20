@@ -1,24 +1,19 @@
-﻿using Dapper;
-using Npgsql;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Dapper;
 using NeuLdapMgnt.Models;
-using System.Net;
+using Npgsql;
 
-namespace NeuLdapMgnt.Api
-{
-	public sealed class PostgresService
-	{
+namespace NeuLdapMgnt.Api {
+	public sealed class PostgresService {
 		private readonly NpgsqlConnection _connection;
 
-		public PostgresService(string host, string db, string password)
-		{
+		public PostgresService(string host, string db, string password) {
 			_connection = new($"Host={host};Database={db};Username=postgres;Password={password}");
 			CreateDefaultTables();
 		}
 
-		public static PostgresService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD")
-		{
+		public static PostgresService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD") {
 			return new(
 				Environment.GetEnvironmentVariable(hostEnv).ThrowIfNullOrEmpty(),
 				Environment.GetEnvironmentVariable(dbEnv).ThrowIfNullOrEmpty(),
@@ -26,14 +21,12 @@ namespace NeuLdapMgnt.Api
 			);
 		}
 
-		public void CreateLogEntry(LogEntry entry)
-		{
+		public void CreateLogEntry(LogEntry entry) {
 			string query;
 
 			if (string.IsNullOrEmpty(entry.Username)
-				|| string.IsNullOrEmpty(entry.FullName)
-				|| entry.Username == Authenticator.GetDefaultAdminName())
-			{
+			 || string.IsNullOrEmpty(entry.FullName)
+			 || entry.Username == Authenticator.GetDefaultAdminName()) {
 				query = """
 					INSERT INTO "entries"
 					("time", "log_level", "username", "host", "method", "request_path", "status_code")
@@ -41,8 +34,7 @@ namespace NeuLdapMgnt.Api
 					(@Time, @LogLevel, null, @Host, @Method, @RequestPath, @StatusCode);
 				""";
 			}
-			else
-			{
+			else {
 				query = """
 					INSERT INTO "users"
 					("username", "full_name")
@@ -58,8 +50,7 @@ namespace NeuLdapMgnt.Api
 			}
 
 			_connection.Open();
-			_connection.Execute(query, new
-			{
+			_connection.Execute(query, new {
 				entry.Time,
 				entry.LogLevel,
 				entry.Username,
@@ -73,26 +64,22 @@ namespace NeuLdapMgnt.Api
 			_connection.Close();
 		}
 
-		public IEnumerable<LogEntry> GetLogEntries()
-		{
+		public IEnumerable<LogEntry> GetLogEntries(DateTime start, DateTime end) {
 			string query = """
-				SELECT *
-				FROM "entries"
-			""";
-
-			_connection.Open();
-			var entries = _connection.Query<LogEntry>(query);
-			_connection.Close();
-			return entries;
-		}
-
-		public IEnumerable<LogEntry> GetLogEntriesBetween(DateTime start, DateTime end)
-		{
-			string query = """
-				SELECT *
-				FROM "entries"
-				WHERE "time" BETWEEN @Start AND @End;
-			""";
+				SELECT
+				    entries.id AS "Id",
+					entries.time AS "Time",
+					entries.log_level AS "LogLevel",
+					entries.username AS "UserName",
+					users.full_name AS "FullName",
+					entries.host AS "Host",
+					entries.method AS "Method",
+					entries.request_path AS "RequestPath",
+					entries.status_code AS "StatusCode"
+				FROM entries
+				LEFT JOIN users ON entries.username = users.username
+				WHERE time BETWEEN @Start AND @End;
+				""";
 
 			_connection.Open();
 			var entries = _connection.Query<LogEntry>(query, new { Start = start, End = end });
@@ -100,25 +87,25 @@ namespace NeuLdapMgnt.Api
 			return entries;
 		}
 
-		private void CreateDefaultTables()
-		{
+		private void CreateDefaultTables() {
 			string query = """
-				CREATE TABLE IF NOT EXISTS "users" (
-					"username" VARCHAR(255) PRIMARY KEY,
-					"full_name" VARCHAR(255)
+				CREATE TABLE IF NOT EXISTS users(
+				    username VARCHAR(255) PRIMARY KEY,
+					full_name VARCHAR(255)
 				);
 
-				CREATE TABLE IF NOT EXISTS "entries" (
-					"id" BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-					"time" TIMESTAMP NOT NULL,
-					"log_level" VARCHAR(11) NOT NULL,
-					"username" VARCHAR(255) REFERENCES "users"("username"),
-					"host" VARCHAR(255) NOT NULL,
-					"method" VARCHAR(7) NOT NULL,
-					"request_path" VARCHAR(255) NOT NULL,
-					"status_code" INT NOT NULL
+				CREATE TABLE IF NOT EXISTS entries(
+					id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+					time TIMESTAMP NOT NULL,
+					log_level VARCHAR(11) NOT NULL,
+					username VARCHAR(255) REFERENCES users(username),
+					host VARCHAR(255) NOT NULL,
+					method VARCHAR(7) NOT NULL,
+					request_path VARCHAR(255) NOT NULL,
+					status_code INT NOT NULL
 				);
-			""";
+				""";
+
 			_connection.Open();
 			_connection.Query(query);
 			_connection.Close();
