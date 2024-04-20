@@ -1,41 +1,45 @@
 ﻿using System;
 using System.Numerics;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace NeuLdapMgnt.Models
-{
-	public class LogEntry
-	{
-		[JsonPropertyName("id")]
-		public BigInteger Id { get; set; }
+namespace NeuLdapMgnt.Models;
 
-		[JsonPropertyName("time")]
-		public required DateTime Time { get; set; }
+public class LogEntryIdConverter : JsonConverter<BigInteger> {
+	public override BigInteger Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => reader.GetString() is { } value ? BigInteger.Parse(value) : 0;
 
-		[JsonPropertyName("log_level")]
-		public required string LogLevel { get; set; }
+	public override void Write(Utf8JsonWriter writer, BigInteger value, JsonSerializerOptions options) => writer.WriteStringValue(value.ToString());
+}
 
-		[JsonPropertyName("username")]
-		public string? Username { get; set; }
+public class LogEntry {
+	[JsonRequired, JsonPropertyName("id"), JsonConverter(typeof(LogEntryIdConverter))]
+	public BigInteger Id { get; init; }
 
-		[JsonPropertyName("full_name")]
-		public string? FullName { get; set; }
+	[JsonRequired, JsonPropertyName("time")]
+	public required DateTime Time { get; init; }
 
-		[JsonPropertyName("host")]
-		public required string Host { get; set; }
+	[JsonRequired, JsonPropertyName("log_level")]
+	public required string LogLevel { get; init; }
 
-		[JsonPropertyName("method")]
-		public required string Method { get; set; }
+	[JsonInclude, JsonPropertyName("username")]
+	public string? Username { get; init; }
 
-		[JsonPropertyName("request_path")]
-		public required string RequestPath { get; set; }
+	[JsonInclude, JsonPropertyName("full_name")]
+	public string? FullName { get; init; }
 
-		[JsonPropertyName("status_code")]
-		public required int StatusCode { get; set; }
+	[JsonRequired, JsonPropertyName("host")]
+	public required string Host { get; init; }
 
-		public override string ToString()
-		{
-			return $"[{Time:yyyy.MM.dd - HH:mm:ss}] {Host} → {Method} {RequestPath} ({StatusCode})";
-		}
+	[JsonRequired, JsonPropertyName("method")]
+	public required string Method { get; init; }
+
+	[JsonRequired, JsonPropertyName("request_path")]
+	public required string RequestPath { get; init; }
+
+	[JsonRequired, JsonPropertyName("status_code")]
+	public required int StatusCode { get; init; }
+
+	public override string ToString() {
+		return $"[{Time:yyyy.MM.dd - HH:mm:ss}] {Host} → {Method} {RequestPath} ({StatusCode})";
 	}
 }
