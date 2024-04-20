@@ -19,7 +19,7 @@ else if (!DatabaseLocal.Teachers.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
-			<h3 class="my-4">There are no students in the database</h3>
+			<h3 class="my-4">There are no teachers in the database</h3>
 			<ButtonAdd Text="Add Teachers" OnClick="ToAddPage" />
 		</div>
 	</div>
@@ -92,7 +92,7 @@ else
 
 	private void ToAddPage()
 	{
-		NavManager.NavigateTo("/students/add");
+		NavManager.NavigateTo("/teachers/add");
 	}
 }
 

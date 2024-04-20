@@ -48,37 +48,48 @@
 		</div>
 	</div>
 
-	<div class="input-group gap-2 align-items-center">
-		<label class="input-group-text user-select-none w-100 rounded gap-2" for="class-year-select">
-			Class
-			@if (!IsReadonly && teacherUpdated.ClassYear != string.Empty)
-			{
-				<br />
-				<span>[@teacherUpdated.Class]</span>
-			}
-		</label>
-		<div class="d-flex flex-column flex-md-row gap-2 w-100">
-			<div class="form-floating w-100">
-				<InputSelect class="form-select rounded" id="class-year-select" disabled="@(IsReadonly || isAction)" @bind-Value="teacherUpdated.ClassYear">
-					@foreach (string year in Teacher.ClassYears)
-					{
-						<option value="@year" selected="@year.Equals(teacherUpdated.ClassYear)">@year</option>
-					}
-				</InputSelect>
-				<label for="class-year-select">Year</label>
-			</div>
-			<div class="form-floating w-100">
-				<InputSelect class="form-select rounded" id="class-group-select" disabled="@(IsReadonly || isAction)" @bind-Value="teacherUpdated.ClassGroup">
-					@foreach (var group in Teacher.ClassGroups)
-					{
-						<option value="@group" selected="@group.Equals(teacherUpdated.ClassGroup)">@group</option>
-					}
-				</InputSelect>
-				<label for="class-group-select">Group</label>
+	@if (IsHomeroomTeacher)
+	{
+		<div class="input-group gap-2 align-items-center">
+			<label class="input-group-text user-select-none w-100 rounded gap-2" for="class-year-select">
+				Class
+				@if (!IsReadonly && teacherUpdated.ClassYear != string.Empty)
+				{
+					<br />
+					<span>[@teacherUpdated.Class]</span>
+				}
+			</label>
+			<div class="d-flex flex-column flex-md-row gap-2 w-100">
+				<div class="form-floating w-100">
+					<InputSelect class="form-select rounded" id="class-year-select" disabled="@(IsReadonly || isAction)" @bind-Value="teacherUpdated.ClassYear">
+						@if (IsHomeroomTeacher)
+						{
+							<option value="">Select Year</option>
+						}
+						@foreach (string year in Teacher.ClassYears)
+						{
+							<option value="@year">@year</option>
+						}
+					</InputSelect>
+					<label for="class-year-select">Year</label>
+				</div>
+				<div class="form-floating w-100">
+					<InputSelect class="form-select rounded" id="class-group-select" disabled="@(IsReadonly || isAction)" @bind-Value="teacherUpdated.ClassGroup">
+						@if (IsHomeroomTeacher)
+						{
+							<option value="">Select Group</option>
+						}
+						@foreach (var group in Teacher.ClassGroups)
+						{
+						<option value="@group">@group</option>
+						}
+					</InputSelect>
+					<label for="class-group-select">Group</label>
+				</div>
 			</div>
 		</div>
-	</div>
-	<ValidationMessage For="() => teacherUpdated.Class" id="teacher-class-validation-message" />
+		<ValidationMessage For="() => teacherUpdated.Class" id="teacher-class-validation-message" />
+	}
 
 	<div class="form-floating">
 		<InstantInputText class="form-control" disabled="@(IsReadonly || isAction)" id="teacher-email" @bind-Value="teacherUpdated.Email" />
@@ -125,9 +136,12 @@
 	}
 	</EditForm>
 
-	@code {
+@code {
 	[Parameter]
 	public Teacher Teacher { get; set; } = new();
+
+	[Parameter]
+	public bool IsHomeroomTeacher { get; set; }
 
 	[Parameter]
 	public Func<Teacher, Task<bool>> OnSubmit { get; set; } = default!;
@@ -156,6 +170,14 @@
 
 	private async Task HandleOnSubmit()
 	{
+		if (IsHomeroomTeacher)
+		{
+			ToastService.Notify(ToastMessages.Warning("Class is not selected!", true));
+			ToastService.Notify(ToastMessages.Info("Class is not selected!"));
+			ToastService.Notify(ToastMessages.Danger("Class is not selected!"));
+			return;
+		}
+
 		isSubmitting = true;
 		bool isSubmitted = await OnSubmit.Invoke(teacherUpdated);
 		isSubmitting = false;

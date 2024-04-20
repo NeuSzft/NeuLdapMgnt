@@ -28,36 +28,42 @@
 		}
 	</div>
 </div>
-<div class="row mb-2 border-bottom">
-	<div class="col-3 col-sm-2">Class:</div>
-	<div class="col-4 student-original-class">@TeacherOriginal.Class</div>
-	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
-	<div class="col-4 student-edited-class">
-		@if (TeacherOriginal.Class != TeacherEdited.Class)
-		{
-			<strong>@TeacherEdited.Class</strong>
-		}
-		else
-		{
-			@TeacherEdited.Class
-		}
+@if (!string.IsNullOrEmpty(TeacherEdited.Class))
+{
+	<div class="row mb-2 border-bottom">
+		<div class="col-3 col-sm-2">Class:</div>
+		<div class="col-4 student-original-class">@TeacherOriginal.Class</div>
+		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+		<div class="col-4 student-edited-class">
+			@if (TeacherOriginal.Class != TeacherEdited.Class)
+			{
+				<strong>@TeacherEdited.Class</strong>
+			}
+			else
+			{
+				@TeacherEdited.Class
+			}
+		</div>
 	</div>
-</div>
-<div class="row mb-2 border-bottom">
-	<div class="col-3 col-sm-2">Email:</div>
-	<div class="col-4 student-original-email text-break">@TeacherOriginal.Email</div>
-	<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
-	<div class="col-4 student-edited-email text-break">
-		@if (TeacherOriginal.Email != TeacherEdited.Email)
-		{
-			<strong>@TeacherEdited.Email</strong>
-		}
-		else
-		{
-			@TeacherEdited.Email
-		}
+}
+@if (!string.IsNullOrEmpty(TeacherEdited.Email))
+{
+	<div class="row mb-2 border-bottom">
+		<div class="col-3 col-sm-2">Email:</div>
+		<div class="col-4 student-original-email text-break">@TeacherOriginal.Email</div>
+		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+		<div class="col-4 student-edited-email text-break">
+			@if (TeacherOriginal.Email != TeacherEdited.Email)
+			{
+				<strong>@TeacherEdited.Email</strong>
+			}
+			else
+			{
+				@TeacherEdited.Email
+			}
+		</div>
 	</div>
-</div>
+}
 
 @code {
 	[Parameter]

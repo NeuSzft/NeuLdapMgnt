@@ -1,8 +1,8 @@
-﻿@page "/teachers/add"
+﻿@page "/teachers/homeroom-teacher/add"
 
-<PageTitle>Add Teacher</PageTitle>
+<PageTitle>Add Homeroom Teacher</PageTitle>
 
-<h1>Add Teacher</h1>
+<h1>Add Homeroom Teacher</h1>
 
 @if (isSubmitting)
 {
@@ -10,16 +10,16 @@
 }
 else
 {
-	<FormTeacher Teacher="teacher" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
+	<FormTeacher Teacher="teacherHomeroom" IsHomeroomTeacher="true" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
 	<ConfirmDialog @ref="dialog" />
 }
 
 @code {
-	private Teacher teacher = new();
+	private Teacher teacherHomeroom = new();
 	private ConfirmDialog dialog = default!;
 
 	private string modalTitle => $"Error";
-	private string submitString => $"Creating {teacher.FullName}";
+	private string submitString => $"Creating {teacherHomeroom.FullName}";
 	private bool isSubmitting = false;
 
 	protected override void OnInitialized()
@@ -43,7 +43,7 @@ else
 			if (response.IsSuccess())
 			{
 				ToastService.Notify(ToastMessages.Success($"{teacherUpdated.FullName} ({teacherUpdated.Id}) was added!"));
-				teacher = new();
+				teacherHomeroom = new();
 				return true;
 			}
 
