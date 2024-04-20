@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models
@@ -7,7 +7,7 @@ namespace NeuLdapMgnt.Models
 	public class LogEntry
 	{
 		[JsonPropertyName("id")]
-		public long Id { get; set; }
+		public BigInteger Id { get; set; }
 
 		[JsonPropertyName("time")]
 		public required DateTime Time { get; set; }

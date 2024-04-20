@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using NeuLdapMgnt.Models;
@@ -17,12 +17,12 @@ public static class LogEndpoints {
 				   ? DateTimeOffset.FromUnixTimeSeconds(toSecs)
 				   : DateTimeOffset.UtcNow;
 
-			   return new RequestResult<IEnumerable<LogEntry>>().SetValues(pg.GetLogEntries(from.DateTime, to.DateTime)).RenewToken(request);
+			   return new RequestResult<LogEntry>().SetValues(pg.GetLogEntries(from.DateTime, to.DateTime).ToArray()).RenewToken(request);
 		   })
 		   .WithOpenApi()
 		   .WithTags("Logs")
 		   .RequireAuthorization()
-		   .Produces<RequestResult<IEnumerable<LogEntry>>>()
+		   .Produces<RequestResult<LogEntry>>()
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
 		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 	}
