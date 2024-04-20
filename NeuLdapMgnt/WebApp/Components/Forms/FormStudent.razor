@@ -84,7 +84,7 @@
 	<ValidationMessage For="() => studentUpdated.Class" id="student-class-validation-message" />
 
 	<div class="form-floating">
-		<InstantInputText type="email" class="form-control" disabled="@(IsReadonly || isAction)" id="student-email" @bind-Value="studentUpdated.Email" />
+		<InstantInputText class="form-control" disabled="@(IsReadonly || isAction)" id="student-email" @bind-Value="studentUpdated.Email" />
 		<label for="student-email">Email</label>
 		<ValidationMessage For="() => studentUpdated.Email" id="student-email-validation-message" />
 	</div>

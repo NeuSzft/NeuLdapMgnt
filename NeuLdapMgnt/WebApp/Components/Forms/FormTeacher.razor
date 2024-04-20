@@ -170,10 +170,8 @@
 
 	private async Task HandleOnSubmit()
 	{
-		if (IsHomeroomTeacher)
+		if (IsHomeroomTeacher && string.IsNullOrEmpty(teacherUpdated.Class))
 		{
-			ToastService.Notify(ToastMessages.Warning("Class is not selected!", true));
-			ToastService.Notify(ToastMessages.Info("Class is not selected!"));
 			ToastService.Notify(ToastMessages.Danger("Class is not selected!"));
 			return;
 		}
