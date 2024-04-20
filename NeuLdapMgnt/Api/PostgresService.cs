@@ -24,9 +24,6 @@ namespace NeuLdapMgnt.Api {
 		public void CreateLogEntry(LogEntry entry) {
 			string query;
 
-			if (entry.Username == Authenticator.GetDefaultAdminName())
-				entry.FullName = "DEFAULT ADMIN";
-
 			if (string.IsNullOrEmpty(entry.Username) || string.IsNullOrEmpty(entry.FullName)) {
 				query = """
 					INSERT INTO "entries"

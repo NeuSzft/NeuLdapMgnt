@@ -97,6 +97,7 @@ internal static class Program {
 		WebApplication app = builder.Build();
 		ldapService.Logger = app.Logger;
 
+		// TODO: Remove unnecessary console logging
 		// Add a middleware that logs each request to the console
 		app.Use(async (HttpContext context, RequestDelegate next) => {
 			DateTime    now = DateTime.UtcNow;
@@ -113,8 +114,8 @@ internal static class Program {
 				Time = now,
 				LogLevel = LogLevel.Information.ToString(),
 				Username = aud.ToString(),
-				FullName = ldapService.TryGetDisplayNameOfEntity(user, typeof(Teacher)),
-				Host = req.Host.ToString(),
+				FullName = aud == Authenticator.GetDefaultAdminName() ? "DEFAULT ADMIN" : ldapService.TryGetDisplayNameOfEntity(user, typeof(Teacher)),
+				Host = context.TryGetClientAddress() ?? "unknown",
 				Method = req.Method,
 				RequestPath = req.Path,
 				StatusCode = context.Response.StatusCode
@@ -142,7 +143,7 @@ internal static class Program {
 				postgresService.CreateLogEntry(new() {
 					Time = DateTime.UtcNow,
 					LogLevel = LogLevel.Critical.ToString(),
-					Host = context.Response.HttpContext.Request.Host.ToString(),
+					Host = context.TryGetClientAddress() ?? "unknown",
 					Method = context.Response.HttpContext.Request.Method,
 					RequestPath = context.Response.HttpContext.Request.Path.ToString(),
 					StatusCode = context.Response.StatusCode
