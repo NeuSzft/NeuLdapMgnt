@@ -45,9 +45,16 @@ public static class DbDumpExtensions {
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <returns>A <see cref="RequestResult{T}">RequestResult&lt;LdapDbDump&gt;</see> containing the outcome of the operation.</returns>
 	public static RequestResult<LdapDbDump> ExportDatabase(this LdapService ldap) {
+		var studentResults = ldap.GetAllEntities<Student>(true);
+		var teacherResults = ldap.GetAllEntities<Teacher>(true);
+
+		List<string> errors = new();
+		errors.AddRange(studentResults.Errors);
+		errors.AddRange(teacherResults.Errors);
+
 		LdapDbDump dump = new() {
-			Students = ldap.GetAllEntities<Student>(true).Values,
-			Teachers = ldap.GetAllEntities<Teacher>(true).Values,
+			Students = studentResults.Values,
+			Teachers = teacherResults.Values,
 			Inactives = ldap.GetMembersOfGroup("inactive"),
 			Admins = ldap.GetMembersOfGroup("admin"),
 			Values = ldap.GetAllValues(out var error)
@@ -55,8 +62,8 @@ public static class DbDumpExtensions {
 
 		var response = new RequestResult<LdapDbDump>().SetStatus(StatusCodes.Status207MultiStatus).SetValues(dump);
 		if (error is not null)
-			response.SetErrors(error);
+			errors.Add(error);
 
-		return response;
+		return response.SetErrors(errors.ToArray());
 	}
 }
