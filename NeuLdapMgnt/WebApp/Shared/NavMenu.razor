@@ -39,9 +39,9 @@
             new NavItem { Id = "32", Href = "/admins/add", Match = NavLinkMatch.All, IconName = IconName.PersonAdd, Text = "Add Admin", ParentId = "30" },
 
             new NavItem { Id = "40", Text = "Database" },
-            new NavItem { Id = "41", Text = "Import/Export", ParentId = "40", Href = "/database/import-export", Match = NavLinkMatch.All, IconName = IconName.Database },
-            new NavItem { Id = "42", Text = "Default Admin", ParentId = "40", Href = "/database/default-admin", Match = NavLinkMatch.All, IconName = IconName.PersonGear },
-            new NavItem { Id = "43", Text = "Request Logs", ParentId = "40", Href = "/database/logs", Match = NavLinkMatch.All, IconName = IconName.ListColumnsReverse },
+            new NavItem { Id = "41", ParentId = "40", Text = "Import/Export", Href = "/db/import-export", Match = NavLinkMatch.All, IconName = IconName.DatabaseGear },
+            new NavItem { Id = "42", ParentId = "40", Text = "Default Admin", Href = "/db/default-admin", Match = NavLinkMatch.All, IconName = IconName.PersonGear },
+            new NavItem { Id = "43", ParentId = "40", Text = "Request Logs", Href = "/db/request-logs", Match = NavLinkMatch.All, IconName = IconName.ListColumnsReverse },
 
             new NavItem { Id = "99", Href = "/logout", IconName = IconName.DoorOpen, Text = "Logout" },
         };
