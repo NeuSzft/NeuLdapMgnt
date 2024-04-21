@@ -22,7 +22,7 @@ internal static class Program {
 
 	public static void Main(string[] args) {
 		LdapService     ldapService     = LdapService.FromEnvs();
-		PostgresService postgresService = PostgresService.FromEnvs();
+		PostgresService postgresService = PostgresService.FromEnvs().SetIgnoredRoutes("/api/docs");
 
 		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

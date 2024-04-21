@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dapper;
 using NeuLdapMgnt.Models;
 using Npgsql;
@@ -7,6 +8,8 @@ using Npgsql;
 namespace NeuLdapMgnt.Api {
 	public sealed class PostgresService {
 		private readonly NpgsqlConnection _connection;
+
+		private IEnumerable<string> _ignoredRoutes = [];
 
 		public PostgresService(string host, string db, string password) {
 			_connection = new($"Host={host};Database={db};Username=postgres;Password={password}");
@@ -21,19 +24,23 @@ namespace NeuLdapMgnt.Api {
 			);
 		}
 
-		public void CreateLogEntry(LogEntry entry) {
-			string query;
+		public PostgresService SetIgnoredRoutes(params string[] ignoredRoutes) {
+			_ignoredRoutes = ignoredRoutes;
+			return this;
+		}
 
-			if (string.IsNullOrEmpty(entry.Username) || string.IsNullOrEmpty(entry.FullName)) {
-				query = """
+		public void CreateLogEntry(LogEntry entry) {
+			if (_ignoredRoutes.Any(entry.RequestPath.StartsWith))
+				return;
+
+			string query = string.IsNullOrEmpty(entry.Username) || string.IsNullOrEmpty(entry.FullName)
+				? """
 					INSERT INTO "entries"
 					("time", "log_level", "username", "host", "method", "request_path", "status_code")
 					VALUES
 					(@Time, @LogLevel, null, @Host, @Method, @RequestPath, @StatusCode);
-				""";
-			}
-			else {
-				query = """
+				"""
+				: """
 					INSERT INTO "users"
 					("username", "full_name")
 					VALUES
@@ -45,7 +52,6 @@ namespace NeuLdapMgnt.Api {
 					VALUES
 					(@Time, @LogLevel, @Username, @Host, @Method, @RequestPath, @StatusCode);
 				""";
-			}
 
 			_connection.Open();
 			_connection.Execute(query, new {
