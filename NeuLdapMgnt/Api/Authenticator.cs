@@ -11,10 +11,13 @@ using NeuLdapMgnt.Models;
 namespace NeuLdapMgnt.Api;
 
 /// <summary>Stores the result of an authentication attempt.</summary>
+/// <param name="Code">The status code to set for the response.</param>
+/// <param name="Message">The message to send in the response body.</param>
+/// <param name="Username">The username of the authenticated user which should be <c>null</c> on a failed attempt.</param>
 public record AuthResult(int Code, string? Message, string? Username) {
 	/// <summary>Turns the <see cref="AuthResult"/> into a HTTP result containing the Message.</summary>
 	/// <returns>An <see cref="IResult"/> with the text/plain content type and the status code set to Code.</returns>
-	public virtual IResult ToResult() {
+	public IResult ToResult() {
 		return Results.Text(Message, "text/plain", Encoding.UTF8, Code);
 	}
 }
