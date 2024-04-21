@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using NeuLdapMgnt.Api.LdapServiceExtensions;
 using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api.Endpoints;

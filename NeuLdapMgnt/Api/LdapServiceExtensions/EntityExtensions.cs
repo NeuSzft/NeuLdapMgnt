@@ -6,9 +6,9 @@ using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using NeuLdapMgnt.Models;
 
-namespace NeuLdapMgnt.Api;
+namespace NeuLdapMgnt.Api.LdapServiceExtensions;
 
-public static class LdapServiceEntityExtensions {
+public static class EntityExtensions {
 	/// <summary>Checks if the entity exists within the database using it's uid.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="id">The uid of the entity.</param>

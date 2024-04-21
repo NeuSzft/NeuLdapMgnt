@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NeuLdapMgnt.Api.Endpoints;
+using NeuLdapMgnt.Api.LdapServiceExtensions;
 using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;

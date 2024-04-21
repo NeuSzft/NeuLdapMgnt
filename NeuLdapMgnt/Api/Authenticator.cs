@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using NeuLdapMgnt.Api.LdapServiceExtensions;
 using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.Api;

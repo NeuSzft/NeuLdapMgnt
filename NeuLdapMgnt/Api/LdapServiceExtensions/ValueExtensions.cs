@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 
-namespace NeuLdapMgnt.Api;
+namespace NeuLdapMgnt.Api.LdapServiceExtensions;
 
 // TODO: Add xml doc comments to this class
-public static class LdapServiceValueExtensions {
+public static class ValueExtensions {
     public static bool ValueExists(this LdapService ldap, string name) {
         SearchRequest   request  = new($"cn={name},ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
         SearchResponse? response = ldap.TryRequest(request) as SearchResponse;

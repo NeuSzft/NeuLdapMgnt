@@ -4,9 +4,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using NeuLdapMgnt.Models;
 
-namespace NeuLdapMgnt.Api;
+namespace NeuLdapMgnt.Api.LdapServiceExtensions;
 
-public static class LdapServiceGroupExtensions {
+public static class GroupExtensions {
     /// <summary>Checks if the group exists within the database using it's uid.</summary>
     /// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
     /// <param name="name">The name of the group.</param>

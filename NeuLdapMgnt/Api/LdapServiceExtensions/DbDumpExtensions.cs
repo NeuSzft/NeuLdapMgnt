@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using NeuLdapMgnt.Models;
 
-namespace NeuLdapMgnt.Api;
+namespace NeuLdapMgnt.Api.LdapServiceExtensions;
 
-public static class LdapServiceDbDumpExtensions {
+public static class DbDumpExtensions {
 	/// <summary>Erases the entire LDAP database.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
