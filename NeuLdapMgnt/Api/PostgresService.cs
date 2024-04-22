@@ -7,12 +7,12 @@ using Npgsql;
 
 namespace NeuLdapMgnt.Api {
 	public sealed class PostgresService {
-		private readonly NpgsqlConnection _connection;
+		private readonly string _connectionString;
 
 		private IEnumerable<string> _ignoredRoutes = [];
 
 		public PostgresService(string host, string db, string password) {
-			_connection = new($"Host={host};Database={db};Username=postgres;Password={password}");
+			_connectionString = $"Host={host};Database={db};Username=postgres;Password={password}";
 			CreateDefaultTables();
 		}
 
@@ -22,6 +22,12 @@ namespace NeuLdapMgnt.Api {
 				Environment.GetEnvironmentVariable(dbEnv).ThrowIfNullOrEmpty(),
 				Environment.GetEnvironmentVariable(passwordEnv).ThrowIfNullOrEmpty()
 			);
+		}
+
+		private NpgsqlConnection OpenConnection() {
+			NpgsqlConnection connection = new(_connectionString);
+			connection.Open();
+			return connection;
 		}
 
 		public PostgresService SetIgnoredRoutes(params string[] ignoredRoutes) {
@@ -53,8 +59,8 @@ namespace NeuLdapMgnt.Api {
 					(@Time, @LogLevel, @Username, @Host, @Method, @RequestPath, @StatusCode);
 				""";
 
-			_connection.Open();
-			_connection.Execute(query, new {
+			using NpgsqlConnection connection = OpenConnection();
+			connection.Execute(query, new {
 				entry.Time,
 				entry.LogLevel,
 				entry.Username,
@@ -64,8 +70,6 @@ namespace NeuLdapMgnt.Api {
 				entry.RequestPath,
 				entry.StatusCode
 			});
-			Console.WriteLine(entry);
-			_connection.Close();
 		}
 
 		public IEnumerable<LogEntry> GetLogEntries(DateTime start, DateTime end) {
@@ -85,10 +89,8 @@ namespace NeuLdapMgnt.Api {
 				WHERE time BETWEEN @Start AND @End;
 				""";
 
-			_connection.Open();
-			var entries = _connection.Query<LogEntry>(query, new { Start = start, End = end });
-			_connection.Close();
-			return entries;
+			using NpgsqlConnection connection = OpenConnection();
+			return connection.Query<LogEntry>(query, new { Start = start, End = end });
 		}
 
 		private void CreateDefaultTables() {
@@ -110,9 +112,8 @@ namespace NeuLdapMgnt.Api {
 				);
 				""";
 
-			_connection.Open();
-			_connection.Query(query);
-			_connection.Close();
+			using NpgsqlConnection connection = OpenConnection();
+			connection.Query(query);
 		}
 	}
 }
