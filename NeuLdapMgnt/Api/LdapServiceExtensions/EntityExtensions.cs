@@ -21,6 +21,18 @@ public static class EntityExtensions {
 		return response?.Entries.Count == 1;
 	}
 
+	/// <summary>Returns the attributes of the entity that are present within the database using it's uid.</summary>
+	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
+	/// <param name="id">The uid of the entity.</param>
+	/// <typeparam name="T">The type of the entity.</typeparam>
+	/// <returns>Returns the LDAP attributes of the entity that are present within the database or an empty collection if it is not found.</returns>
+	public static IEnumerable<string> TryGetPresentEntityAttributes<T>(this LdapService ldap, string id) where T : class {
+		SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
+		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
+
+		return response?.Entries.Count > 0 ? response.Entries[0].Attributes.Values.Cast<DirectoryAttribute>().Select(x => x.Name) : [];
+	}
+
 	/// <summary>Gets all entities of the specified type from the database.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="getHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are returned.</param>
@@ -109,6 +121,8 @@ public static class EntityExtensions {
 		if (!ldap.EntityExists<T>(id))
 			return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors("The object does not exist.");
 
+		IEnumerable<string> presentAttributes = ldap.TryGetPresentEntityAttributes<T>(id);
+
 		ModifyRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}");
 
 		foreach (PropertyInfo info in type.GetProperties())
@@ -121,7 +135,7 @@ public static class EntityExtensions {
 					mod.Add(value.ToString());
 					request.Modifications.Add(mod);
 				}
-				else {
+				else if (presentAttributes.Contains(attribute.Name)) {
 					request.Modifications.Add(new() {
 						Name = attribute.Name,
 						Operation = DirectoryAttributeOperation.Delete
