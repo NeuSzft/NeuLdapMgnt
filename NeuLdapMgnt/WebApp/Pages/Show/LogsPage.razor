@@ -2,12 +2,74 @@
 
 <PageTitle>Request Logs</PageTitle>
 
-<TableLogs/>
+<div class="w-100">
+	<fieldset class="form-group">
+		<div class="row mb-1">
+			<div class="col-12 col-lg-1">
+				<legend class="col-form-label mb-1">Between</legend>
+			</div>
+			<div class="col-12 col-lg-6 mb-1">
+				<DateInput TValue="DateOnly" @bind-Value="@_fromDate"/>
+			</div>
+			<div class="col-12 col-lg-5 mb-1">
+				<TimeInput TValue="TimeOnly" @bind-Value="@_fromTime"/>
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset class="form-group">
+		<div class="row mb-1">
+			<div class="col-12 col-lg-1">
+				<legend class="col-form-label mb-1">And</legend>
+			</div>
+			<div class="col-12 col-lg-6 mb-1">
+				<DateInput TValue="DateOnly" @bind-Value="@_toDate"/>
+			</div>
+			<div class="col-12 col-lg-5 mb-1">
+				<TimeInput TValue="TimeOnly" @bind-Value="@_toTime"/>
+			</div>
+		</div>
+	</fieldset>
+
+	<div class="d-flex flex-row flex-wrap justify-content-between my-4">
+		<ButtonRefresh OnClick="@Fetch" Text="Fetch Logs"/>
+		<div class="align-self-center text-end">
+			<a href="/api/docs" target="_blank">View API endpoint docs</a>
+		</div>
+	</div>
+</div>
+
+<TableLogs Entries=@_entries/>
 
 @code {
 
-	protected override void OnInitialized() {
+	DateOnly              _fromDate = DateOnly.FromDateTime(DateTime.Now.AddHours(-12));
+	TimeOnly              _fromTime = TimeOnly.FromDateTime(DateTime.Now.AddHours(-12));
+	DateOnly              _toDate   = DateOnly.FromDateTime(DateTime.Now);
+	TimeOnly              _toTime   = TimeOnly.FromDateTime(DateTime.Now);
+	IEnumerable<LogEntry> _entries  = Array.Empty<LogEntry>();
+
+	protected override async Task OnInitializedAsync() {
 		ApiRequests.EnsureAuthentication(NavManager);
+		await Fetch();
+	}
+
+	private async Task Fetch() {
+		long from = new DateTimeOffset(_fromDate.ToDateTime(_fromTime, DateTimeKind.Local)).ToUniversalTime().ToUnixTimeSeconds();
+		long to   = new DateTimeOffset(_toDate.ToDateTime(_toTime, DateTimeKind.Local)).ToUniversalTime().ToUnixTimeSeconds();
+
+		try {
+			var result = await ApiRequests.SendRequestAsync<LogEntry>(
+				HttpMethod.Get,
+				$"/api/logs?from={from}&to={to}"
+			);
+
+			_entries = result.Values;
+		}
+		catch (Exception e) {
+			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+			ToastService.Notify(ToastMessages.Error(message));
+		}
 	}
 
 }
