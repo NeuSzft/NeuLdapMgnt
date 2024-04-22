@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using NeuLdapMgnt.Api.LdapServiceExtensions;
 using NeuLdapMgnt.Models;
+using NeuLdapMgnt.Models.CustomValidationAttributes;
 
 namespace NeuLdapMgnt.Api.Endpoints;
 
@@ -97,11 +98,16 @@ public static class StudentEndpoints {
 			   using StreamReader reader   = new(request.Body);
 			   string             password = await reader.ReadToEndAsync();
 
-			   var getResponse = ldap.TryGetEntity<Student>(id, true);
-			   if (getResponse.IsFailure())
-				   return getResponse.RenewToken(request).ToResult();
 
-			   Student student = getResponse.GetValue()!;
+			   var validation = ModelValidator.ValidateValue(password, new PasswordAttribute());
+			   if (validation.IsFailure())
+				   return validation.RenewToken(request).ToResult();
+
+			   var response = ldap.TryGetEntity<Student>(id, true);
+			   if (response.IsFailure())
+				   return response.RenewToken(request).ToResult();
+
+			   Student student = response.GetValue()!;
 			   student.Password = new UserPassword(password, 16).ToString();
 
 			   return ldap.TryModifyEntity(student, id, true).RenewToken(request).ToResult();

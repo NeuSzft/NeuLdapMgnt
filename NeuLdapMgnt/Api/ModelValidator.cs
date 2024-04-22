@@ -12,6 +12,18 @@ namespace NeuLdapMgnt.Api;
 
 /// <summary>A helper for validating models with <see cref="ValidationAttribute"/>s.</summary>
 public static class ModelValidator {
+	/// <summary>Tries to validate the <paramref name="value"/> against the validation <paramref name="attributes"/>.</summary>
+	/// <param name="value">The value to validate.</param>
+	/// <param name="attributes">The <see cref="ValidationAttribute"/>s to use.</param>
+	/// <typeparam name="T">The type of the model.</typeparam>
+	/// <returns>A <see cref="RequestResult{T}"/> containing the result of the validation.</returns>
+	public static RequestResult<T> ValidateValue<T>(T value, params ValidationAttribute[] attributes) where T : class {
+		List<ValidationResult> results = new();
+		if (Validator.TryValidateValue(value, new ValidationContext(new { value }), results, attributes))
+			return new RequestResult<T>().SetStatus(StatusCodes.Status201Created).SetValues(value);
+		return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(results.Select(x => x.ErrorMessage).NotNull().ToArray());
+	}
+
 	/// <summary>Validates the <see cref="ValidationAttribute"/>s of a model.</summary>
 	/// <param name="obj">The object to validate.</param>
 	/// <typeparam name="T">The type of the model.</typeparam>
