@@ -92,5 +92,28 @@ public static class StudentEndpoints {
 		   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
 		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
+
+		app.MapPut("/api/students/{id}/password", async (LdapService ldap, HttpRequest request, string id) => {
+			   using StreamReader reader   = new(request.Body);
+			   string             password = await reader.ReadToEndAsync();
+
+			   var getResponse = ldap.TryGetEntity<Student>(id, true);
+			   if (getResponse.IsFailure())
+				   return getResponse.RenewToken(request).ToResult();
+
+			   Student student = getResponse.GetValue()!;
+			   student.Password = new UserPassword(password, 16).ToString();
+
+			   return ldap.TryModifyEntity(student, id, true).RenewToken(request).ToResult();
+		   })
+		   .WithOpenApi()
+		   .WithTags("Students")
+		   .RequireAuthorization()
+		   .Accepts<string>("text/plain")
+		   .Produces(StatusCodes.Status200OK)
+		   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
+		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
+		   .Produces<RequestResult>(StatusCodes.Status404NotFound)
+		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 	}
 }
