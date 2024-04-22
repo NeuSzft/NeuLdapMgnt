@@ -48,16 +48,18 @@ public sealed class LdapService {
 
 	/// <summary>Tries to send a request to the LDAP server.</summary>
 	/// <param name="request">The <see cref="DirectoryRequest"/> to be sent.</param>
+	/// <param name="logErrors">Specifies whether the exceptions should be logged. The default is <c>true</c>.</param>
 	/// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
 	/// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
-	public DirectoryResponse? TryRequest(DirectoryRequest request) => TryRequest(request, out _);
+	public DirectoryResponse? TryRequest(DirectoryRequest request, bool logErrors = true) => TryRequest(request, out _, logErrors);
 
 	/// <summary>Tries to send a request to the LDAP server.</summary>
 	/// <param name="request">The <see cref="DirectoryRequest"/> to be sent.</param>
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
+	/// <param name="logErrors">Specifies whether the exceptions should be logged. The default is <c>true</c>.</param>
 	/// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
 	/// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
-	public DirectoryResponse? TryRequest(DirectoryRequest request, out string? error) {
+	public DirectoryResponse? TryRequest(DirectoryRequest request, out string? error, bool logErrors = true) {
 		using LdapConnection connection = new(_identifier, _credential, AuthType.Basic);
 		connection.SessionOptions.ProtocolVersion = 3;
 
@@ -74,16 +76,18 @@ public sealed class LdapService {
 		}
 		catch (DirectoryException e) {
 			error = e.GetError();
-			Logger?.LogError(e.ToString());
+			if (logErrors)
+				Logger?.LogError(e.ToString());
 			return null;
 		}
 	}
 
 	/// <summary>Tries to send multiple requests to the LDAP server.</summary>
 	/// <param name="requests">The <see cref="UniqueDirectoryRequest"/>s to send.</param>
+	/// <param name="logErrors">Specifies whether the exceptions should be logged. The default is <c>true</c>.</param>
 	/// <returns>A <see cref="List{T}">List&lt;LdapResult&gt;</see> containing the <see cref="LdapResult"/>s.</returns>
 	/// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
-	public List<LdapResult> TryRequests(IEnumerable<UniqueDirectoryRequest> requests) {
+	public List<LdapResult> TryRequests(IEnumerable<UniqueDirectoryRequest> requests, bool logErrors = true) {
 		using LdapConnection connection = new(_identifier, _credential, AuthType.Basic);
 		connection.SessionOptions.ProtocolVersion = 3;
 
@@ -102,7 +106,8 @@ public sealed class LdapService {
 			}
 			catch (DirectoryException e) {
 				string id = request.Identifier;
-				Logger?.LogError($"{id}: {e}");
+				if (logErrors)
+					Logger?.LogError($"{id}: {e}");
 				results.Add(new(null, $"{id}: {e.GetError()}"));
 			}
 

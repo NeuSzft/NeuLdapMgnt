@@ -41,7 +41,7 @@ public static class EntityExtensions {
 	public static RequestResult<T> GetAllEntities<T>(this LdapService ldap, bool getHiddenAttributes = false) where T : class, new() {
 		Type type = typeof(T);
 
-		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"));
+		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"), false);
 
 		SearchRequest   request  = new($"ou={type.GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, null);
 		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
@@ -91,7 +91,7 @@ public static class EntityExtensions {
 	public static RequestResult<T> TryAddEntity<T>(this LdapService ldap, T entity, string id, bool setHiddenAttributes = false) where T : class {
 		Type type = typeof(T);
 
-		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"));
+		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"), false);
 
 		if (ldap.EntityExists<T>(id))
 			return new RequestResult<T>().SetStatus(StatusCodes.Status409Conflict).SetErrors("The object already exists.");
@@ -174,7 +174,7 @@ public static class EntityExtensions {
 	public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, string> idGetter, bool setHiddenAttributes = false) where T : class {
 		Type type = typeof(T);
 
-		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"));
+		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"), false);
 
 		DirectoryAttribute? objectClassesAttribute = null;
 		if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
