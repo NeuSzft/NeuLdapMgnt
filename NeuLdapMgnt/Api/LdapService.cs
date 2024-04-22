@@ -145,7 +145,11 @@ public sealed class LdapService {
 		T obj = new();
 
 		foreach (PropertyInfo info in typeof(T).GetProperties())
-			if (info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute && (!attribute.Hidden || getHiddenAttributes)) {
+			if (
+				info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute
+				&& (!attribute.Hidden || getHiddenAttributes)
+				&& entry.Attributes.Contains(attribute.Name)
+			) {
 				string? value = entry.Attributes[attribute.Name].GetValues(typeof(string)).FirstOrDefault() as string;
 				info.SetValue(obj, Convert.ChangeType(value, info.PropertyType));
 			}
@@ -177,8 +181,12 @@ public sealed class LdapService {
 	/// <remarks>If the property is not set then The <see cref="DirectoryAttribute"/> will contain the value of <c>"&lt;!&gt; NULL &lt;!&gt;"</c></remarks>
 	public static IEnumerable<DirectoryAttribute> GetDirectoryAttributes(object obj, bool getHiddenAttributes = false) {
 		foreach (PropertyInfo info in obj.GetType().GetProperties())
-			if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute && (!attribute.Hidden || getHiddenAttributes))
-				yield return new(attribute.Name, info.GetValue(obj)?.ToString() ?? "<!> NULL <!>");
+			if (
+				info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute
+				&& (!attribute.Hidden || getHiddenAttributes)
+				&& info.GetValue(obj) is { } value
+			)
+				yield return new(attribute.Name, value.ToString());
 	}
 
 	/// <summary>Creates a new <see cref="LdapService"/> using the specified environment variables.</summary>

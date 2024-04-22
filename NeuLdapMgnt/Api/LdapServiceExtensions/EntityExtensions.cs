@@ -29,6 +29,8 @@ public static class EntityExtensions {
 	public static RequestResult<T> GetAllEntities<T>(this LdapService ldap, bool getHiddenAttributes = false) where T : class, new() {
 		Type type = typeof(T);
 
+		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"));
+
 		SearchRequest   request  = new($"ou={type.GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, null);
 		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
@@ -111,12 +113,20 @@ public static class EntityExtensions {
 
 		foreach (PropertyInfo info in type.GetProperties())
 			if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute && (!attribute.Hidden || setHiddenAttributes)) {
-				DirectoryAttributeModification mod = new() {
-					Name = attribute.Name,
-					Operation = DirectoryAttributeOperation.Replace,
-				};
-				mod.Add(info.GetValue(entity)?.ToString());
-				request.Modifications.Add(mod);
+				if (info.GetValue(entity) is { } value) {
+					DirectoryAttributeModification mod = new() {
+						Name = attribute.Name,
+						Operation = DirectoryAttributeOperation.Replace
+					};
+					mod.Add(value.ToString());
+					request.Modifications.Add(mod);
+				}
+				else {
+					request.Modifications.Add(new() {
+						Name = attribute.Name,
+						Operation = DirectoryAttributeOperation.Delete
+					});
+				}
 			}
 
 		if (ldap.TryRequest(request, out var error) is not null)
@@ -196,7 +206,7 @@ public static class EntityExtensions {
 
 		return null;
 	}
-	
+
 	/// <summary>Tries to get the password hash and salt of an entity.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="id">The uid of the entity to find.</param>
