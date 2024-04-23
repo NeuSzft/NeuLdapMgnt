@@ -30,7 +30,7 @@ else
 }
 
 @code {
-	private bool isLoading { get; set; }
+	private bool isLoading;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -53,19 +53,15 @@ else
 
 			if (response.Errors.Any())
 			{
-				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
+				ToastService.Notify(ToastMessages.Error(response.GetError()));
 			}
 
 			StateHasChanged();
 		}
-		catch (HttpRequestException httpError)
-		{
-			string errorMessage = Utils.GetErrorMessage(httpError);
-			ToastService.Notify(ToastMessages.Error(errorMessage));
-		}
 		catch (Exception e)
 		{
-			ToastService.Notify(ToastMessages.Error(e.Message));
+			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+			ToastService.Notify(ToastMessages.Error(message));
 		}
 		isLoading = false;
 	}
