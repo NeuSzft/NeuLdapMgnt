@@ -39,15 +39,23 @@
 	</div>
 </div>
 
-<TableLogs Entries=@_entries/>
+@if (_isLoading)
+{
+	<Loading Text="Fetching logs" />
+}
+else
+{
+	<TableLogs Entries=@_entries/>
+}
 
 @code {
 
-	DateOnly              _fromDate = DateOnly.FromDateTime(DateTime.Now.AddHours(-12));
-	TimeOnly              _fromTime = TimeOnly.FromDateTime(DateTime.Now.AddHours(-12));
-	DateOnly              _toDate   = DateOnly.FromDateTime(DateTime.Now);
-	TimeOnly              _toTime   = TimeOnly.FromDateTime(DateTime.Now);
-	IEnumerable<LogEntry> _entries  = Array.Empty<LogEntry>();
+	DateOnly              _fromDate  = DateOnly.FromDateTime(DateTime.Now.AddHours(-12));
+	TimeOnly              _fromTime  = TimeOnly.FromDateTime(DateTime.Now.AddHours(-12));
+	DateOnly              _toDate    = DateOnly.FromDateTime(DateTime.Now);
+	TimeOnly              _toTime    = TimeOnly.FromDateTime(DateTime.Now);
+	IEnumerable<LogEntry> _entries   = Array.Empty<LogEntry>();
+	bool				  _isLoading = false;
 
 	protected override async Task OnInitializedAsync() {
 		ApiRequests.EnsureAuthentication(NavManager);
@@ -59,6 +67,7 @@
 		long to   = new DateTimeOffset(_toDate.ToDateTime(_toTime, DateTimeKind.Local)).ToUniversalTime().ToUnixTimeSeconds();
 
 		try {
+			_isLoading = true;
 			var result = await ApiRequests.GetLogsAsync(from, to);
 			_entries = result.Values;
 		}
@@ -66,6 +75,7 @@
 			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
 			ToastService.Notify(ToastMessages.Error(message));
 		}
+		_isLoading = false;
 	}
 
 }
