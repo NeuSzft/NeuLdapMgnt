@@ -1,0 +1,189 @@
+﻿@page "/db/classes"
+
+<PageTitle>Classes</PageTitle>
+
+<Modal @ref="modalAdd" Title="Add new class" ModalType="ModalType.Light" Size="ModalSize.Small" OnHidden="() => newClass = string.Empty">
+	<BodyTemplate>
+		<div class="form-floating">
+			<InputText class="form-control rounded" id="class-input" @bind-Value="newClass" />
+			<label for="class-input">Class</label>
+		</div>
+	</BodyTemplate>
+	<FooterTemplate>
+		<ButtonSave Text="Add" OnClick="SubmitClasses" />
+	</FooterTemplate>
+</Modal>
+
+<Modal @ref="modalRemove" Title="Remove class" ModalType="ModalType.Danger" Size="ModalSize.Small">
+	<BodyTemplate>
+		<div class="form-floating">
+			<InputSelect class="form-select rounded" id="class-year-select" @bind-Value="removeClass">
+				<option value="" disabled>Select Class</option>
+				@foreach (string cls in DatabaseLocal.Classes)
+				{
+					<option value="@cls">@cls</option>
+				}
+			</InputSelect>
+			<label for="class-select">Class to remove</label>
+		</div>
+	</BodyTemplate>
+	<FooterTemplate>
+		<ButtonDelete Text="Remove" OnClick="RemoveClasses" />
+	</FooterTemplate>
+</Modal>
+
+
+<div class="row d-flex align-items-center mb-3">
+	<div class="col-1">
+		<h1>Classes</h1>
+	</div>
+	<div class="col d-flex justify-content-end text-nowrap gap-2">
+		<Button Color="ButtonColor.Primary" Outline="true" @onclick="ShowModalAdd">
+			<i class="bi bi-plus-lg"></i> Add
+		</Button>
+		<Button Color="ButtonColor.Danger" Outline="true" @onclick="ShowModalRemove">
+			<i class="bi bi-trash"></i> Remove
+		</Button>
+	</div>
+</div>
+
+@if (isLoading)
+{
+	<Loading Text="Loading classes" />
+}
+else
+{
+	@if (DatabaseLocal.Classes.Any())
+	{
+		<CustomList List="DatabaseLocal.Classes" />
+	}
+	else
+	{
+		<div class="d-flex justify-content-center text-center">
+			<div>
+				<h3 class="my-4">There are no classes in the database</h3>
+			</div>
+		</div>
+	}
+}
+
+@code {
+	private bool isLoading;
+	private string newClass = string.Empty;
+	private string removeClass = string.Empty;
+	private List<string> newClasses = new();
+	private Modal modalAdd = default!;
+	private Modal modalRemove = default!;
+
+	protected override async Task OnInitializedAsync()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+		await FetchClasses();
+	}
+
+	private async Task FetchClasses()
+	{
+		try
+		{
+			isLoading = true;
+			DatabaseLocal.Classes.Clear();
+
+			var response = await ApiRequests.GetClassesAsync();
+			if (response.IsSuccess())
+			{
+				DatabaseLocal.Classes = response.Values.SelectMany(x => x).OrderBy(x => x).ToList();
+			}
+			if (response.Errors.Any())
+			{
+				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
+			}
+		}
+		catch (Exception e)
+		{
+			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+			ToastService.Notify(ToastMessages.Error(message));
+		}
+		isLoading = false;
+	}
+
+	private async Task SubmitClasses()
+	{
+		newClass = newClass.ToLower();
+		if (string.IsNullOrEmpty(newClass))
+		{
+			ToastService.Notify(ToastMessages.Danger("Please fill in the class."));
+			return;
+		}
+
+		if (DatabaseLocal.Classes.Any(x => x.Equals(newClass, StringComparison.OrdinalIgnoreCase)))
+		{
+			ToastService.Notify(ToastMessages.Danger("This class already exists."));
+			return;
+		}
+
+		try
+		{
+			newClasses = DatabaseLocal.Classes.ToList();
+			newClasses.Add(newClass);
+			var response = await ApiRequests.AddClassesAsync(newClasses);
+
+			if (response.IsSuccess())
+			{
+				ToastService.Notify(ToastMessages.Success($"{newClass} class was added!"));
+			}
+
+			if (response.Errors.Any())
+			{
+				ToastService.Notify(ToastMessages.Error(response.GetError()));
+			}
+
+			newClass = string.Empty;
+			await FetchClasses();
+		}
+		catch (Exception e)
+		{
+			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+			ToastService.Notify(ToastMessages.Error(message));
+		}
+	}
+
+	private async Task RemoveClasses()
+	{
+		if (string.IsNullOrEmpty(removeClass))
+		{
+			ToastService.Notify(ToastMessages.Danger("Please select a class to remove."));
+			return;
+		}
+		try
+		{
+			DatabaseLocal.Classes.Remove(removeClass);
+			var response = await ApiRequests.AddClassesAsync(DatabaseLocal.Classes);
+
+			if (response.IsSuccess())
+			{
+				ToastService.Notify(ToastMessages.Success($"{removeClass} class was removed!"));
+			}
+
+			if (response.Errors.Any())
+			{
+				ToastService.Notify(ToastMessages.Error(response.GetError()));
+			}
+
+			removeClass = string.Empty;
+			await FetchClasses();
+			await HideModalRemove();
+		}
+		catch (Exception e)
+		{
+			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+			ToastService.Notify(ToastMessages.Error(message));
+			throw e;
+		}
+	}
+
+	private async Task ShowModalAdd() => await modalAdd!.ShowAsync();
+	private async Task HideModalAdd() => await modalAdd!.HideAsync();
+
+	private async Task ShowModalRemove() => await modalRemove!.ShowAsync();
+	private async Task HideModalRemove() => await modalRemove!.HideAsync();
+}

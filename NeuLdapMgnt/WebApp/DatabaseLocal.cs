@@ -10,5 +10,7 @@ namespace NeuLdapMgnt.WebApp
 		public static List<Teacher> Teachers { get; set; } = new();
 
 		public static List<string> Admins { get; set; } = new();
+
+		public static List<string> Classes { get; set; } = new();
 	}
 }
