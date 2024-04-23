@@ -317,12 +317,10 @@ else
             case "Class":
                 filteredStudents = isAscending
                     ? filteredStudents
-                            .OrderBy(x => x.ClassYearOrderValue())
-                            .ThenBy(x => x.ClassGroup)
+                            .OrderBy(x => x)
                             .ToList()
                     : filteredStudents
-                            .OrderByDescending(x => x.ClassYearOrderValue())
-                            .ThenByDescending(x => x.ClassGroup)
+                            .OrderByDescending(x => x)
                             .ToList();
                 break;
 

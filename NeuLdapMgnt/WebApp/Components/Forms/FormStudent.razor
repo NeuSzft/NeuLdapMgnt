@@ -14,8 +14,8 @@
 		<NumberInput Disabled="@(CanDelete || IsReadonly || isAction)"
 					 @bind-Value="studentUpdated!.Id"
 					 TValue="long"
-					 Min="@Student.OmMinValue"
-					 Max="@Student.OmMaxValue"
+					 Min="@Student.IdMinValue"
+					 Max="@Student.IdMaxValue"
 					 id="student-id" />
 		<label for="student-id">OM</label>
 		<ValidationMessage For="() => studentUpdated.Id" id="student-om-validation-message" />
@@ -49,9 +49,9 @@
 		</div>
 	</div>
 
-	<div class="form-floating w-100">
+	<div class="form-floating">
 		<InputSelect class="form-select rounded" id="class-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.Class">
-			<option value="-">Select class</option>
+			<option value="@string.Empty" disabled>Select class</option>
 			@foreach (var cls in DatabaseLocal.Classes)
 			{
 				<option value="@cls">@cls</option>

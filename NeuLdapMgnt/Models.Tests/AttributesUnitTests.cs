@@ -19,28 +19,28 @@ public class AttributesUnitTests
 	[TestMethod]
 	public void StudentIdAttributeValidOmSuccess()
 	{
-		var attribute = new IdStudentAttribute(Student.OmMinValue, Student.OmMaxValue);
+		var attribute = new IdStudentAttribute(Student.IdMinValue, Student.IdMaxValue);
 		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Student.OmMinValue, _validationContext));
-
-
-		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Student.OmMaxValue, _validationContext));
+			attribute.GetValidationResult(Student.IdMinValue, _validationContext));
 
 
 		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Student.OmMinValue + 1, _validationContext));
+			attribute.GetValidationResult(Student.IdMaxValue, _validationContext));
 
 
 		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Student.OmMaxValue - 1, _validationContext));
+			attribute.GetValidationResult(Student.IdMinValue + 1, _validationContext));
+
+
+		Assert.AreEqual(ValidationResult.Success,
+			attribute.GetValidationResult(Student.IdMaxValue - 1, _validationContext));
 	}
 
 	// ID tests
 	[TestMethod]
 	public void StudentIdAttributeWithInvalidDataTypeFails()
 	{
-		var attribute = new IdStudentAttribute(Student.OmMinValue, Student.OmMaxValue);
+		var attribute = new IdStudentAttribute(Student.IdMinValue, Student.IdMaxValue);
 		Assert.AreEqual("OM: Invalid data type",
 			attribute.GetValidationResult("string", _validationContext)!.ErrorMessage);
 	}
@@ -48,12 +48,12 @@ public class AttributesUnitTests
 	[TestMethod]
 	public void StudentIdAttributeInvalidOmFails()
 	{
-		var attribute = new IdStudentAttribute(Student.OmMinValue, Student.OmMaxValue);
-		Assert.AreEqual($"OM must be between {Student.OmMinValue} and {Student.OmMaxValue}.",
-			attribute.GetValidationResult(Student.OmMinValue - 1, _validationContext)!.ErrorMessage);
+		var attribute = new IdStudentAttribute(Student.IdMinValue, Student.IdMaxValue);
+		Assert.AreEqual($"OM must be between {Student.IdMinValue} and {Student.IdMaxValue}.",
+			attribute.GetValidationResult(Student.IdMinValue - 1, _validationContext)!.ErrorMessage);
 
-		Assert.AreEqual($"OM must be between {Student.OmMinValue} and {Student.OmMaxValue}.",
-			attribute.GetValidationResult(Student.OmMaxValue + 1, _validationContext)!.ErrorMessage);
+		Assert.AreEqual($"OM must be between {Student.IdMinValue} and {Student.IdMaxValue}.",
+			attribute.GetValidationResult(Student.IdMaxValue + 1, _validationContext)!.ErrorMessage);
 	}
 
 	[TestMethod]
@@ -573,22 +573,19 @@ public class AttributesUnitTests
 
 	// Class tests
 	[TestMethod]
-	public void ClassAttributeEmptySuccess()
+	public void ClassAttributeDashSuccess()
 	{
 		var attribute = new ClassAttribute();
 		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult("", _validationContext));
-
-		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(string.Empty, _validationContext));
+			attribute.GetValidationResult("-", _validationContext));
 	}
 
 	[TestMethod]
-	public void ClassAttributeNullSuccess()
+	public void ClassAttributeNullFails()
 	{
 		var attribute = new ClassAttribute();
-		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(null, _validationContext));
+		Assert.AreEqual("Class: Invalid data type",
+			attribute.GetValidationResult(null, _validationContext)!.ErrorMessage);
 	}
 
 	[TestMethod]

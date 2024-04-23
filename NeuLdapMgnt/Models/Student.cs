@@ -8,18 +8,18 @@ namespace NeuLdapMgnt.Models
 {
 	public sealed class Student : Person, IEquatable<Student>
 	{
-		public const long OmMinValue = 70000000000;
-		public const long OmMaxValue = 79999999999;
+		public const long IdMinValue = 70000000000;
+		public const long IdMaxValue = 79999999999;
 		public const int UidMinValue = 6000;
 		public const int UidMaxValue = 9999;
 		public const int GidMinValue = 6000;
 		public const int GidMaxValue = 9999;
 
 		[Required(ErrorMessage = "OM is required.")]
-		[IdStudent(OmMinValue, OmMaxValue)]
+		[IdStudent(IdMinValue, IdMaxValue)]
 		[JsonPropertyName("id")]
 		[LdapAttribute("uid")]
-		public long Id { get; set; } = OmMinValue;
+		public long Id { get; set; } = IdMinValue;
 
 		[Required]
 		[UserId(UidMinValue, UidMaxValue)]
@@ -37,11 +37,7 @@ namespace NeuLdapMgnt.Models
 		[Class]
 		[JsonRequired, JsonPropertyName("class")]
 		[LdapAttribute("roomNumber")]
-		public override string Class
-		{
-			get => base.Class;
-			set => base.Class = value;
-		}
+		public string Class { get; set; } = string.Empty;
 
 		public bool Equals(Student? other)
 		{

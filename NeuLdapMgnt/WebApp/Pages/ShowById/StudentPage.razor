@@ -23,6 +23,7 @@ else
 
 	protected override async Task OnInitializedAsync()
 	{
+		isLoading = true;
 		ApiRequests.EnsureAuthentication(NavManager);
 
 		long id;
@@ -33,6 +34,7 @@ else
 		student = searchedStudent;
 
 		await FetchClasses();
+		isLoading = false;
 	}
 
 	private async Task<bool> OnSubmit(Student editedStudent)

@@ -16,12 +16,6 @@ namespace NeuLdapMgnt.Models
 		private string _firstName = string.Empty;
 		private string _middleName = string.Empty;
 		private string _homeDirectory = string.Empty;
-		protected string @class = string.Empty;
-		private string _classYear = string.Empty;
-		private string _classGroup = string.Empty;
-
-		public static readonly string[] ClassYears = { "9", "10", "11", "12", "13", "1/13", "2/14" };
-		public static readonly string[] ClassGroups = { "A", "B", "C", "D", "E", "Ny", "A.RSZE", "B.RSZE" };
 
 		[Required(ErrorMessage = "User ID is required.")]
 		[JsonRequired, JsonPropertyName("uid")]
@@ -80,51 +74,6 @@ namespace NeuLdapMgnt.Models
 			{
 				_middleName = value is null ? string.Empty : value.Trim();
 				FullName = GetFullName();
-			}
-		}
-
-		[Class]
-		[JsonRequired, JsonPropertyName("class")]
-		[LdapAttribute("roomNumber")]
-		public virtual string Class
-		{
-			get => @class;
-			set
-			{
-				if (string.IsNullOrEmpty(value))
-				{
-					@class = string.Empty;
-					return;
-				}
-
-				@class = value;
-				var classSplit = @class.Split('.');
-				_classYear = classSplit[0];
-				_classGroup = classSplit[1];
-			}
-		}
-
-		[JsonIgnore]
-		public string ClassYear
-		{
-			get => _classYear;
-			set
-			{
-				if (string.IsNullOrEmpty(value)) return;
-				_classYear = value;
-				UpdateClass();
-			}
-		}
-
-		[JsonIgnore]
-		public string ClassGroup
-		{
-			get => _classGroup;
-			set
-			{
-				if (string.IsNullOrEmpty(value)) return;
-				_classGroup = value;
-				UpdateClass();
 			}
 		}
 
@@ -187,25 +136,6 @@ namespace NeuLdapMgnt.Models
 		public string GetUsername()
 		{
 			return $"{FirstName.PadRight(3, '_')[..3]}{LastName.PadRight(3, '_')[..3]}".ToLower();
-		}
-
-		public int ClassYearOrderValue()
-		{
-			if (ClassGroup == "Ny")
-			{
-				return 0;
-			}
-
-			if (ClassYear.Contains('/'))
-			{
-				return int.Parse(ClassYear[2..] + '0');
-			}
-
-			return int.Parse(ClassYear);
-		}
-		private void UpdateClass()
-		{
-			@class = ClassYear.Contains('/') ? $"{ClassYear}{ClassGroup}" : $"{ClassYear}.{ClassGroup}";
 		}
 
 		private string GetHomeDirectory()
