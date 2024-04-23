@@ -6,7 +6,7 @@
 	<fieldset class="form-group">
 		<div class="row mb-1">
 			<div class="col-12 col-lg-1">
-				<legend class="col-form-label mb-1">Between</legend>
+				<label class="col-form-label mb-1">Between</label>
 			</div>
 			<div class="col-12 col-lg-6 mb-1">
 				<DateInput TValue="DateOnly" @bind-Value="@_fromDate"/>
@@ -20,7 +20,7 @@
 	<fieldset class="form-group">
 		<div class="row mb-1">
 			<div class="col-12 col-lg-1">
-				<legend class="col-form-label mb-1">And</legend>
+				<label class="col-form-label mb-1">And</label>
 			</div>
 			<div class="col-12 col-lg-6 mb-1">
 				<DateInput TValue="DateOnly" @bind-Value="@_toDate"/>
@@ -59,11 +59,7 @@
 		long to   = new DateTimeOffset(_toDate.ToDateTime(_toTime, DateTimeKind.Local)).ToUniversalTime().ToUnixTimeSeconds();
 
 		try {
-			var result = await ApiRequests.SendRequestAsync<LogEntry>(
-				HttpMethod.Get,
-				$"/api/logs?from={from}&to={to}"
-			);
-
+			var result = await ApiRequests.GetLogsAsync(from, to);
 			_entries = result.Values;
 		}
 		catch (Exception e) {
