@@ -177,7 +177,6 @@ else
 		{
 			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
 			ToastService.Notify(ToastMessages.Error(message));
-			throw e;
 		}
 	}
 
