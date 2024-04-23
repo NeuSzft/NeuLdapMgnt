@@ -46,9 +46,33 @@ else
 	private bool isSubmitting = false;
 	private bool isUploading = false;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
+		await FetchClasses();
+	}
+
+	private async Task FetchClasses()
+	{
+		try
+		{
+			DatabaseLocal.Classes.Clear();
+
+			var response = await ApiRequests.GetClassesAsync();
+			if (response.IsSuccess())
+			{
+				DatabaseLocal.Classes = response.Values.SelectMany(x => x).OrderBy(x => x).ToList();
+			}
+			if (response.Errors.Any())
+			{
+				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
+			}
+		}
+		catch (Exception e)
+		{
+			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+			ToastService.Notify(ToastMessages.Error(message));
+		}
 	}
 
 	private async Task<bool> OnSubmit(Student studentUpdated)

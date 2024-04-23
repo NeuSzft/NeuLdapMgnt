@@ -49,39 +49,17 @@
 		</div>
 	</div>
 
-	<div class="input-group gap-2 align-items-center">
-		<label class="input-group-text user-select-none w-100 rounded gap-2" for="class-year-select">
-			Class
-			@if (!IsReadonly && studentUpdated.ClassYear != string.Empty)
+	<div class="form-floating w-100">
+		<InputSelect class="form-select rounded" id="class-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.Class">
+			<option value="-">Select class</option>
+			@foreach (var cls in DatabaseLocal.Classes)
 			{
-				<br />
-				<span>[@studentUpdated.Class]</span>
+				<option value="@cls">@cls</option>
 			}
-		</label>
-		<div class="d-flex flex-column flex-md-row gap-2 w-100">
-			<div class="form-floating w-100">
-				<InputSelect class="form-select rounded" id="class-year-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.ClassYear">
-					<option value="">Select Year</option>
-					@foreach (string year in Student.ClassYears)
-					{
-						<option value="@year">@year</option>
-					}
-				</InputSelect>
-				<label for="class-year-select">Year</label>
-			</div>
-			<div class="form-floating w-100">
-				<InputSelect class="form-select rounded" id="class-group-select" disabled="@(IsReadonly || isAction)" @bind-Value="studentUpdated.ClassGroup">
-					<option value="">Select Group</option>
-					@foreach (var group in Student.ClassGroups)
-					{
-						<option value="@group">@group</option>
-					}
-				</InputSelect>
-				<label for="class-group-select">Group</label>
-			</div>
-		</div>
+		</InputSelect>
+		<label for="class-select">Class</label>
+		<ValidationMessage For="() => studentUpdated.Class" id="student-class-validation-message" />
 	</div>
-	<ValidationMessage For="() => studentUpdated.Class" id="student-class-validation-message" />
 
 	<div class="form-floating">
 		<InstantInputText class="form-control" disabled="@(IsReadonly || isAction)" id="student-email" @bind-Value="studentUpdated.Email" />
@@ -128,7 +106,7 @@
 	}
 	</EditForm>
 
-@code {
+	@code {
 	[Parameter]
 	public Student Student { get; set; } = new();
 
@@ -164,7 +142,6 @@
 		isSubmitting = false;
 	}
 
-
 	private async Task HandleOnDelete()
 	{
 		isDeleting = true;
@@ -174,7 +151,6 @@
 		if (!isDeleted) return;
 		NavManager.NavigateTo("/students");
 	}
-
 
 	private void ToggleEditMode()
 	{

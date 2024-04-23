@@ -2,6 +2,8 @@
 
 <PageTitle>Classes</PageTitle>
 
+<ConfirmDialog @ref="dialog" />
+
 <Modal @ref="modalAdd" Title="Add new class" ModalType="ModalType.Light" Size="ModalSize.Small" OnHidden="() => newClass = string.Empty">
 	<BodyTemplate>
 		<div class="form-floating">
@@ -14,21 +16,22 @@
 	</FooterTemplate>
 </Modal>
 
-<Modal @ref="modalRemove" Title="Remove class" ModalType="ModalType.Danger" Size="ModalSize.Small">
+<Modal @ref="modalRemove" Title="Delete class" ModalType="ModalType.Danger" Size="ModalSize.Small">
 	<BodyTemplate>
 		<div class="form-floating">
 			<InputSelect class="form-select rounded" id="class-year-select" @bind-Value="removeClass">
-				<option value="" disabled>Select Class</option>
+				<option value=""></option>
 				@foreach (string cls in DatabaseLocal.Classes)
 				{
 					<option value="@cls">@cls</option>
 				}
 			</InputSelect>
-			<label for="class-select">Class to remove</label>
+			<label for="class-select">Class to delete</label>
 		</div>
 	</BodyTemplate>
 	<FooterTemplate>
-		<ButtonDelete Text="Remove" OnClick="RemoveClasses" />
+		<ButtonCancel Text="Cancel" OnClick="HideModalRemove" />
+		<ButtonDelete Text="Delete" OnClick="RemoveClasses" />
 	</FooterTemplate>
 </Modal>
 
@@ -42,7 +45,7 @@
 			<i class="bi bi-plus-lg"></i> Add
 		</Button>
 		<Button Color="ButtonColor.Danger" Outline="true" @onclick="ShowModalRemove">
-			<i class="bi bi-trash"></i> Remove
+			<i class="bi bi-trash"></i> Delete
 		</Button>
 	</div>
 </div>
@@ -74,6 +77,7 @@ else
 	private List<string> newClasses = new();
 	private Modal modalAdd = default!;
 	private Modal modalRemove = default!;
+	private ConfirmDialog dialog = default!;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -137,7 +141,6 @@ else
 				ToastService.Notify(ToastMessages.Error(response.GetError()));
 			}
 
-			newClass = string.Empty;
 			await FetchClasses();
 		}
 		catch (Exception e)
@@ -145,6 +148,7 @@ else
 			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
 			ToastService.Notify(ToastMessages.Error(message));
 		}
+		newClass = string.Empty;
 	}
 
 	private async Task RemoveClasses()
@@ -154,6 +158,16 @@ else
 			ToastService.Notify(ToastMessages.Danger("Please select a class to remove."));
 			return;
 		}
+
+		var confirmation = await dialog.ShowAsync(
+			title: $"Are you sure you want to delete ({removeClass}) class?",
+			message1: "This will delete permanently delete the class.",
+			message2: "Do you want to proceed?",
+			confirmDialogOptions: DialogOptions.Delete()
+		);
+
+		if (!confirmation) return;
+
 		try
 		{
 			DatabaseLocal.Classes.Remove(removeClass);
@@ -169,7 +183,6 @@ else
 				ToastService.Notify(ToastMessages.Error(response.GetError()));
 			}
 
-			removeClass = string.Empty;
 			await FetchClasses();
 			await HideModalRemove();
 		}
@@ -178,6 +191,7 @@ else
 			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
 			ToastService.Notify(ToastMessages.Error(message));
 		}
+		removeClass = string.Empty;
 	}
 
 	private async Task ShowModalAdd() => await modalAdd!.ShowAsync();
