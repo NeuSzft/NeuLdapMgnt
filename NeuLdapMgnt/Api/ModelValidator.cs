@@ -17,22 +17,22 @@ public static class ModelValidator {
 	/// <param name="attributes">The <see cref="ValidationAttribute"/>s to use.</param>
 	/// <typeparam name="T">The type of the model.</typeparam>
 	/// <returns>A <see cref="RequestResult{T}"/> containing the result of the validation.</returns>
-	public static RequestResult<T> ValidateValue<T>(T value, params ValidationAttribute[] attributes) where T : class {
+	public static RequestResult ValidateValue<T>(T value, params ValidationAttribute[] attributes) where T : class {
 		List<ValidationResult> results = new();
 		if (Validator.TryValidateValue(value, new ValidationContext(new { value }), results, attributes))
-			return new RequestResult<T>().SetStatus(StatusCodes.Status201Created).SetValues(value);
-		return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(results.Select(x => x.ErrorMessage).NotNull().ToArray());
+			return new RequestResult().SetStatus(StatusCodes.Status201Created);
+		return new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors(results.Select(x => x.ErrorMessage).NotNull().ToArray());
 	}
 
 	/// <summary>Validates the <see cref="ValidationAttribute"/>s of a model.</summary>
 	/// <param name="obj">The object to validate.</param>
 	/// <typeparam name="T">The type of the model.</typeparam>
-	/// <returns>A <see cref="RequestResult{T}"/> containing the result of the validation.</returns>
-	public static RequestResult<T> Validate<T>(T obj) where T : class {
+	/// <returns>A <see cref="RequestResult"/> containing the result of the validation.</returns>
+	public static RequestResult Validate<T>(T obj) where T : class {
 		List<ValidationResult> results = new();
 		if (Validator.TryValidateObject(obj, new ValidationContext(obj), results, true))
-			return new RequestResult<T>().SetStatus(StatusCodes.Status201Created).SetValues(obj);
-		return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(results.Select(x => x.ErrorMessage).NotNull().ToArray());
+			return new RequestResult().SetStatus(StatusCodes.Status201Created);
+		return new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors(results.Select(x => x.ErrorMessage).NotNull().ToArray());
 	}
 
 	/// <summary>Tries to deserializes the json string, then validate the <see cref="ValidationAttribute"/>s of the model.</summary>
@@ -42,7 +42,7 @@ public static class ModelValidator {
 	public static RequestResult<T> ValidateJson<T>(string json) where T : class {
 		try {
 			T obj = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { AllowTrailingCommas = true })!;
-			return Validate(obj);
+			return Validate(obj).ToGeneric(obj);
 		}
 		catch (Exception e) {
 			return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(e.GetError());
