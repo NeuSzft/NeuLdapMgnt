@@ -32,10 +32,10 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 		{
 			return new()
 			{
-				YesButtonText = "DELETE",
+				YesButtonText = "Yes",
 				YesButtonColor = ButtonColor.Danger,
-				NoButtonText = "Cancel",
-				NoButtonColor = ButtonColor.Success,
+				NoButtonText = "No",
+				NoButtonColor = ButtonColor.Secondary,
 				IsScrollable = true,
 				Size = size
 			};

@@ -1,13 +1,13 @@
-﻿<div class="row text-center">
-	<div class="col-12">
-		<Spinner Type="SpinnerType.Border" />
-	</div>
-	@if (!string.IsNullOrEmpty(Text))
-	{
-		<div class="col mt-2">
-			<strong role="status">@Text</strong>
-		</div>
-	}
+﻿<div class="row h-100 d-flex justify-content-center align-items-center">
+    <div class="col text-center">
+        <Spinner Type="SpinnerType.Border" />
+        @if (!string.IsNullOrEmpty(Text))
+        {
+            <div class="mt-2">
+                <strong role="status">@Text</strong>
+            </div>
+        }
+    </div>
 </div>
 
 @code {
