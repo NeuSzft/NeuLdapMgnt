@@ -13,7 +13,7 @@ namespace NeuLdapMgnt.WebApp
 			return JsonSerializer.Deserialize<T>(objJson);
 		}
 
-		public static string GetErrorMessage(HttpRequestException httpError)
+		public static string GetErrorMessage(this HttpRequestException httpError)
 		{
 			if (httpError.StatusCode.HasValue)
 			{
