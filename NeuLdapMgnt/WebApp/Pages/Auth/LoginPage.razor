@@ -1,34 +1,35 @@
 ﻿@page "/login"
 
 <PageTitle>Login</PageTitle>
+<div class="d-flex justify-content-center align-items-center mb-5 h-100">
+	<EditForm Model="@credentials" OnValidSubmit="HandleLogin" class="d-flex flex-column gap-3" style="max-width: 350px;">
+		<DataAnnotationsValidator />
 
-<EditForm Model="@credentials" OnValidSubmit="HandleLogin" class="d-flex flex-column gap-3 mt-5 mx-auto" style="max-width: 350px;">
-	<DataAnnotationsValidator />
+		<div class="h4 border border-dark-subtle rounded p-3 mb-0 fw-bold user-select-none">Neu LDAP Management</div>
 
-	<Button Type="ButtonType.Link" Color="ButtonColor.Dark" Outline="true" Size="Size.ExtraLarge" Disabled="true"><strong>Neu LDAP Management</strong></Button>
+		<div class="form-floating">
+			<InstantInputText class="form-control" id="username" @bind-Value="credentials.Username" />
+			<label for="username">Username</label>
+			<ValidationMessage For="() => credentials.Username" />
+		</div>
 
-	<div class="form-group">
-		<label class="form-label" for="username">Username</label>
-		<InputText class="form-control" id="username" @bind-Value="credentials.Username" />
-		<ValidationMessage For="() => credentials.Username" />
-	</div>
-
-	<div class="form-group mb-2">
-		<label class="form-label" for="password">Password</label>
-		<InputText class="form-control" id="password" @bind-Value="credentials.Password" type="password" />
-		<ValidationMessage For="() => credentials.Password" />
-	</div>
-	<Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Outline="true" Disabled="isLoading">
-		@if (isLoading)
-		{
-			<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Primary" />
-		}
-		else
-		{
-			<span>Login</span>
-		}
-	</Button>
-</EditForm>
+		<div class="form-floating">
+			<InstantInputText class="form-control" id="password" @bind-Value="credentials.Password" type="password" />
+			<label for="password">Password</label>
+			<ValidationMessage For="() => credentials.Password" />
+		</div>
+		<Button Type="ButtonType.Submit" Color="ButtonColor.Primary" Outline="true" Disabled="isLoading">
+			@if (isLoading)
+			{
+				<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Primary" />
+			}
+			else
+			{
+				<span>Login</span>
+			}
+		</Button>
+	</EditForm>
+</div>
 
 @code {
 	private LoginModel credentials = new();
