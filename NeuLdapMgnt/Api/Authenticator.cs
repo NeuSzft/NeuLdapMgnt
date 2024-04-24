@@ -37,7 +37,7 @@ public static class Authenticator {
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
 	/// <returns>The <see cref="UserPassword"/> of the default admin or <c>null</c> if an error occured.</returns>
 	/// <remarks>When the default password is set, the default admin is also enabled.</remarks>
-	private static UserPassword? GetDefaultAdminPasswordAndCrateAdminWhenMissing(LdapService ldap, out string? error) {
+	public static UserPassword? GetDefaultAdminPasswordAndCrateAdminWhenMissing(LdapService ldap, out string? error) {
 		string? pwd = ldap.GetValue(DefaultAdminPasswordValueName, out error);
 
 		try {
@@ -54,7 +54,7 @@ public static class Authenticator {
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
 	/// <returns><c>true</c> if the value belonging to the <c>DefaultAdminEnabledValueName</c> key is also <c>true</c>, otherwise <c>false</c>.</returns>
-	private static bool IsDefaultAdminEnabled(LdapService ldap, out string? error) {
+	public static bool IsDefaultAdminEnabled(LdapService ldap, out string? error) {
 		try {
 			return bool.Parse(ldap.GetValue(DefaultAdminEnabledValueName, out error)!);
 		}

@@ -40,4 +40,16 @@ public static class Extensions {
 		RequestResult? result = JsonSerializer.Deserialize<RequestResult>(stream);
 		return (int)response.StatusCode == code && result is not null && result.StatusCode == code;
 	}
+
+	public static TRequestResult AssertSuccess<TRequestResult>(this TRequestResult result) where TRequestResult : RequestResult {
+		if (!result.IsSuccess())
+			Assert.Fail($"{result.GetType().Name} is not successful!");
+		return result;
+	}
+
+	public static TRequestResult AssertFailure<TRequestResult>(this TRequestResult result) where TRequestResult : RequestResult {
+		if (!result.IsFailure())
+			Assert.Fail($"{result.GetType().Name} is not a failure!");
+		return result;
+	}
 }
