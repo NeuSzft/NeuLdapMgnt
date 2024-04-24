@@ -50,9 +50,9 @@ demo-down:
 	$(dc) $(options-demo) down -v
 
 api-tests:
-	$(dc) $(options-api-tests) build testing-api-build testing-api-tests
+	$(dc) $(options-api-tests) build api-test-api-build api-test-tests
 	$(dc) $(options-api-tests) up -d
-	$(dc) $(options-api-tests) logs -f testing-api-tests
+	$(dc) $(options-api-tests) logs -f api-test-tests
 	$(dc) $(options-api-tests) down
 
 web-tests:

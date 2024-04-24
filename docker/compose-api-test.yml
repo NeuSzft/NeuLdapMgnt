@@ -1,63 +1,63 @@
-version: '3.8'
+version: "3.8"
 
 services:
-    testing-openldap:
-        extends:
-            file: ./compose-services.yml
-            service: openldap
-        environment:
-            - LDAP_ORGANISATION=Test
-            - LDAP_DOMAIN=test.local
-            - LDAP_ADMIN_PASSWORD=admin
-        networks:
-            - net-api-tests
+  api-test-openldap:
+    extends:
+      file: ./compose-services.yml
+      service: openldap
+    networks:
+      - api-test-net
 
-    testing-api-build:
-        extends:
-            file: ./compose-services.yml
-            service: api-build
-        networks:
-            - net-api-tests
-        volumes:
-            - testing-api-app:/app
+  api-test-api-build:
+    extends:
+      file: ./compose-services.yml
+      service: api-build
+    networks:
+      - api-test-net
+    volumes:
+      - api-test-api-app:/app
 
-    testing-api:
-        extends:
-            file: ./compose-services.yml
-            service: api
-        depends_on:
-            testing-openldap:
-                condition: service_started
-            testing-api-build:
-                condition: service_completed_successfully
-        environment:
-            ASPNETCORE_ENVIRONMENT: Development
-            LDAP_ADDRESS: testing-openldap
-            LDAP_PORT: 389
-            LDAP_DOMAIN: test.local
-            LDAP_USERNAME: admin
-            LDAP_PASSWORD: admin
-        networks:
-            - net-api-tests
-        volumes:
-            - testing-api-app:/app:ro
+  api-test-api:
+    extends:
+      file: ./compose-services.yml
+      service: api
+    depends_on:
+      api-test-api-build:
+        condition: service_completed_successfully
+      api-test-openldap:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      LDAP_ADDRESS: api-test-openldap
+      LOGS_DIR: /logs
+    networks:
+      api-test-net:
+        aliases:
+          - api
+    volumes:
+      - api-test-api-app:/app:ro
 
-    testing-api-tests:
-        extends:
-            file: ./compose-services.yml
-            service: api-test
-        depends_on:
-            - testing-api
-        environment:
-            API_URL: http://testing-api:5000
-        networks:
-            - net-api-tests
-        volumes:
-            - ../docs/test-results:/tr
+  api-test-tests:
+    extends:
+      file: ./compose-services.yml
+      service: api-tests
+    depends_on:
+      - api-test-api
+    environment:
+      API_URL: http://api:5000
+      LDAP_ADDRESS: api-test-openldap
+      LDAP_PORT: 389
+      LDAP_DOMAIN: neu.local
+      LDAP_USERNAME: admin
+      LDAP_PASSWORD: admin
+    networks:
+      - api-test-net
+    volumes:
+      - ../docs/test-results:/tr
 
 networks:
-    net-api-tests:
+  api-test-net:
 
 
 volumes:
-    testing-api-app:
+  api-test-api-app:

@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Api\NeuLdapMgnt.Api.csproj" />
     <ProjectReference Include="..\Models\NeuLdapMgnt.Models.csproj" />
   </ItemGroup>
 
