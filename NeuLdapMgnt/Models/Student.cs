@@ -34,7 +34,6 @@ namespace NeuLdapMgnt.Models
 		public override int Gid { get; set; } = GidMinValue;
 
 		[Required(ErrorMessage = "Class is required for students.")]
-		[Class]
 		[JsonRequired, JsonPropertyName("class")]
 		[LdapAttribute("roomNumber")]
 		public string Class { get; set; } = string.Empty;

@@ -2,7 +2,6 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes;
-using NeuLdapMgnt.Models.CustomValidationAttributes;
 
 namespace NeuLdapMgnt.Models;
 
@@ -31,12 +30,11 @@ public sealed class Teacher : Person, IEquatable<Teacher>
 	[LdapAttribute("gidNumber")]
 	public override int Gid { get; set; } = GidMinValue;
 
-    [Class]
-    [JsonRequired, JsonPropertyName("class")]
-    [LdapAttribute("roomNumber")]
-    public string Class { get; set; } = "-";
+	[JsonRequired, JsonPropertyName("class")]
+	[LdapAttribute("roomNumber")]
+	public string Class { get; set; } = "-";
 
-    public bool Equals(Teacher? other)
+	public bool Equals(Teacher? other)
 	{
 		if (other == null) return false;
 
