@@ -1,9 +1,9 @@
 ﻿<div class="border rounded">
-	<div class="row mb-2 border-bottom">
-		<div class="col-3 col-sm-2 col-lg-1">OM:</div>
-		<div class="col-4 student-original-id">@TeacherOriginal.Id</div>
+	<div class="row p-1 m-1 border-bottom">
+		<div class="col-3 col-sm-2 col-lg-1">ID:</div>
+		<div class="col-4 teacher-original-id">@TeacherOriginal.Id</div>
 		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
-		<div class="col-4 student-edited-id">
+		<div class="col-4 teacher-edited-id">
 			@if (TeacherOriginal.Id != TeacherEdited.Id)
 			{
 				<strong>@TeacherEdited.Id</strong>
@@ -14,11 +14,11 @@
 			}
 		</div>
 	</div>
-	<div class="row mb-2 border-bottom">
+	<div class="row p-1 m-1 border-bottom">
 		<div class="col-3 col-sm-2 col-lg-1">Name:</div>
-		<div class="col-4 student-original-fullname">@TeacherOriginal.FullName</div>
+		<div class="col-4 teacher-original-fullname">@TeacherOriginal.FullName</div>
 		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
-		<div class="col-4 student-edited-fullname">
+		<div class="col-4 teacher-edited-fullname">
 			@if (TeacherOriginal.FullName != TeacherEdited.FullName)
 			{
 				<strong>@TeacherEdited.FullName</strong>
@@ -29,43 +29,38 @@
 			}
 		</div>
 	</div>
-	@if (!string.IsNullOrEmpty(TeacherEdited.Class))
-	{
-		<div class="row mb-2 border-bottom">
-			<div class="col-3 col-sm-2 col-lg-1">Class:</div>
-			<div class="col-4 student-original-class">@TeacherOriginal.Class</div>
-			<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
-			<div class="col-4 student-edited-class">
-				@if (TeacherOriginal.Class != TeacherEdited.Class)
-				{
-					<strong>@TeacherEdited.Class</strong>
-				}
-				else
-				{
-					@TeacherEdited.Class
-				}
-			</div>
+	<div class="row p-1 m-1 border-bottom">
+		<div class="col-3 col-sm-2 col-lg-1">Class:</div>
+		<div class="col-4 teacher-original-class">@TeacherOriginal.Class</div>
+		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+		<div class="col-4 teacher-edited-class">
+			@if (TeacherOriginal.Class != TeacherEdited.Class)
+			{
+				<strong>@TeacherEdited.Class</strong>
+			}
+			else
+			{
+				@TeacherEdited.Class
+			}
 		</div>
-	}
-	@if (!string.IsNullOrEmpty(TeacherEdited.Email))
-	{
-		<div class="row mb-2 border-bottom">
-			<div class="col-3 col-sm-2 col-lg-1">Email:</div>
-			<div class="col-4 student-original-email text-break">@TeacherOriginal.Email</div>
-			<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
-			<div class="col-4 student-edited-email text-break flex-fill">
-				@if (TeacherOriginal.Email != TeacherEdited.Email)
-				{
-					<strong>@TeacherEdited.Email</strong>
-				}
-				else
-				{
-					@TeacherEdited.Email
-				}
-			</div>
+	</div>
+	<div class="row p-1 m-1">
+		<div class="col-3 col-sm-2 col-lg-1">Email:</div>
+		<div class="col-4 teacher-original-email text-break">@TeacherOriginal.Email</div>
+		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+		<div class="col-4 teacher-edited-email text-break flex-fill">
+			@if (TeacherOriginal.Email != TeacherEdited.Email)
+			{
+				<strong>@TeacherEdited.Email</strong>
+			}
+			else
+			{
+				@TeacherEdited.Email
+			}
 		</div>
-	}
+	</div>
 </div>
+
 @code {
 	[Parameter]
 	public Teacher TeacherOriginal { get; set; } = default!;

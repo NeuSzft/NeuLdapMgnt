@@ -1,26 +1,20 @@
 ﻿<div class="border rounded">
 	<div class="row p-1 m-1 border-bottom">
-		<div class="col-3 col-sm-2">OM:</div>
+		<div class="col-3 col-sm-2">ID:</div>
 		<div class="col">@Teacher.Id</div>
 	</div>
 	<div class="row p-1 m-1 border-bottom">
 		<div class="col-3 col-sm-2">Name:</div>
 		<div class="col">@Teacher.FullName</div>
 	</div>
-	@if (!string.IsNullOrEmpty(Teacher.Class))
-	{
-		<div class="row p-1 m-1 border-bottom">
-			<div class="col-3 col-sm-2">Class:</div>
-			<div class="col">@Teacher.Class</div>
-		</div>
-	}
-	@if (!string.IsNullOrEmpty(Teacher.Email))
-	{
-		<div class="row p-1 m-1">
-			<div class="col-3 col-sm-2">Email:</div>
-			<div class="col">@Teacher.Email</div>
-		</div>
-	}
+	<div class="row p-1 m-1 border-bottom">
+		<div class="col-3 col-sm-2">Class:</div>
+		<div class="col">@Teacher.Class</div>
+	</div>
+	<div class="row p-1 m-1">
+		<div class="col-3 col-sm-2">Email:</div>
+		<div class="col">@Teacher.Email</div>
+	</div>
 </div>
 
 @code {
