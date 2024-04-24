@@ -1,130 +1,380 @@
 ﻿@inherits LayoutComponentBase
 
-<!--SWITCH TO SHOW INACTIVE OR ACTIVE TABLE-->
-<div class="table-responsive rounded pb-1 px-1 border">
-    <table class="table table-striped  table-borderless align-middle">
-        <thead class="sticky-top">
-            <tr>
-                <th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
-                    Id
-                    @if (sortBy == "Id")
-                    {
-                        <i class="bi @GetSortIcon(isAscending)"></i>
-                    }
-                    else
-                    {
-                        <i class="bi bi-chevron-expand"></i>
-                    }
-                </th>
-                <th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
-                    Name
-                    @if (sortBy == "Name")
-                    {
-                        <i class="bi @GetSortIcon(isAscending)"></i>
-                    }
-                    else
-                    {
-                        <i class="bi bi-chevron-expand"></i>
-                    }
-                </th>
+<ConfirmDialog @ref="dialog" />
 
-                <th class="user-select-none" role="button" @onclick="@(() => SortTable("Username"))">
-                    Username
-                    @if (sortBy == "Username")
-                    {
-                        <i class="bi @GetSortIcon(isAscending)"></i>
-                    }
-                    else
-                    {
-                        <i class="bi bi-chevron-expand"></i>
-                    }
-                </th>
-                <th class="user-select-none" role="button" @onclick="@(() => SortTable("IsAdmin"))">
-                    Admin?
-                    @if (sortBy == "IsAdmin")
-                    {
-                        <i class="bi @GetSortIcon(isAscending)"></i>
-                    }
-                    else
-                    {
-                        <i class="bi bi-chevron-expand"></i>
-                    }
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var teacher in Teachers)
-            {
-                <tr>
-                    <td class="rounded-start">@teacher.Id</td>
-                    <td>@teacher.FullName</td>
-                    <td>@teacher.Username</td>
-                    <td class="rounded-end">
-                        <input type="checkbox"
-                               class="form-check-input m-auto"
-                               checked="@(DatabaseLocal.Admins.Exists(x => x.Equals(teacher.Id)))"
-                               disabled />
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+<Modal @ref="modalEdit" title="Edit selected teachers" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true" OnHidden="ToggleEditMode">
+	<BodyTemplate>
+		<span class="fw-bold mb-2">This action can not be reverted!</span>
+	</BodyTemplate>
+	<FooterTemplate>
+		<ButtonDelete Text="Delete" OnClick="DeleteSelected" />
+		<ButtonCancel Text="Cancel" OnClick="HideModalEdit" />
+		<ButtonSave Text="Save" />
+	</FooterTemplate>
+</Modal>
+
+<Modal @ref="modalErrors" title="Errors" ModalType="ModalType.Danger" Size="ModalSize.Regular" IsScrollable="true">
+	<BodyTemplate>
+		<CustomList List="ErrorList" />
+	</BodyTemplate>
+	<FooterTemplate>
+		<Button Color="ButtonColor.Secondary" @onclick="HideModalErrorList">Ok</Button>
+	</FooterTemplate>
+</Modal>
+
+@if (isDeleting)
+{
+	<Loading Text="Deleting teachers" />
+}
+else
+{
+	<div class="d-flex justify-content-between align-items-center g-2 my-2">
+		<div class="d-flex flex-grow-1 flex-md-grow-0">
+			<div class="input-group">
+				<label class="input-group-text" for="searchbar"><i class="bi bi-funnel"></i></label>
+				<div class="form-floating flex-grow-1">
+					<input type="search"
+						   class="form-control rounded-0 rounded-end"
+						   id="searchbar"
+						   @oninput="UpdateSearchQuery"
+						   @bind-value="searchQuery" />
+					<label for="searchbar">ID, Name, Class</label>
+				</div>
+			</div>
+		</div>
+		<div class="ms-2">
+			@if (isAction)
+			{
+				<Button Color="ButtonColor.Warning" Outline="true" Disabled="isEditing">
+					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Warning" />
+				</Button>
+			}
+			else
+			{
+				<ButtonEdit OnClick="ShowModalEdit" IsDisabled="isTeacherSelected" Text="Edit selected" />
+			}
+		</div>
+	</div>
+
+	<div class="table-responsive rounded px-1 border flex-fill">
+		<table class="table table-striped table-borderless align-middle">
+			<thead class="sticky-top">
+				<tr>
+					<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllTeachers">
+						@if (!AreAllFilteredTeachersSelected())
+						{
+							<span>Select all (@selectedTeachers.Count/@filteredTeachers.Count)</span>
+						}
+						else
+						{
+							<span>Deselect all (@selectedTeachers.Count/@filteredTeachers.Count)</span>
+						}
+					</th>
+					<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
+						Id
+						@if (sortBy == "Id")
+						{
+							<i class="bi @GetSortIcon(isAscending)"></i>
+						}
+						else
+						{
+							<i class="bi bi-chevron-expand"></i>
+						}
+					</th>
+					<th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
+						Name
+						@if (sortBy == "Name")
+						{
+							<i class="bi @GetSortIcon(isAscending)"></i>
+						}
+						else
+						{
+							<i class="bi bi-chevron-expand"></i>
+						}
+					</th>
+
+					<th class="user-select-none" role="button" @onclick="@(() => SortTable("Class"))">
+						Class
+						@if (sortBy == "Class")
+						{
+							<i class="bi @GetSortIcon(isAscending)"></i>
+						}
+						else
+						{
+							<i class="bi bi-chevron-expand"></i>
+						}
+					</th>
+					<th class="user-select-none">Admin?</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var teacher in filteredTeachers)
+				{
+					<tr>
+						<td class="rounded-start">
+							<input class="form-check-input"
+								   type="checkbox"
+								   checked="@selectedTeachers.Contains(teacher)"
+								   @onchange="() => SelectTeacher(teacher)" />
+						</td>
+						<td>@teacher.Id</td>
+						<td>@teacher.FullName</td>
+						<td>@teacher.Class</td>
+						<td>
+							<input class="form-check-input"
+								   type="checkbox"
+								   checked="@(DatabaseLocal.Admins.Exists(x => x.Equals(teacher.Id)))"
+								   disabled />
+						</td>
+						<td class="text-end rounded-end">
+							<ButtonInspectTeacher OnClick="InspectTeacher" Teacher="@teacher" />
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
 @code {
-    [Parameter]
-    public List<Teacher> Teachers { get; set; } = new();
-    private string sortBy = string.Empty;
-    private bool isAscending = false;
+	[Parameter]
+	public List<Teacher> Teachers { get; set; } = new();
 
-    private void SortTable(string propertyName)
-    {
-        if (sortBy == propertyName)
-        {
-            isAscending = !isAscending;
-        }
-        else
-        {
-            sortBy = propertyName;
-            isAscending = true;
-        }
+	private List<Teacher> filteredTeachers = new();
+	private List<Teacher> selectedTeachers = new();
+	private Timer? searchDelayTimer;
 
-        switch (propertyName)
-        {
-            case "Id":
-                Teachers = isAscending
-                ? Teachers
-                    .OrderBy(x => x.Id)
-                    .ToList()
-                : Teachers
-                    .OrderByDescending(x => x.Id)
-                    .ToList();
-                break;
+	private ConfirmDialog dialog = default!;
+	private Modal modalEdit = default!;
+	private Modal modalErrors = default!;
+	private List<string> ErrorList = new();
 
-            case "Name":
-                Teachers = isAscending
-                ? Teachers
-                    .OrderBy(x => x.FullName)
-                    .ToList()
-                : Teachers
-                    .OrderByDescending(x => x.FullName)
-                    .ToList();
-                break;
+	private string? searchQuery = string.Empty;
+	private string sortBy = string.Empty;
+	private bool isAscending = false;
 
-            case "Username":
-                Teachers = isAscending
-                ? Teachers
-                    .OrderBy(x => x.Username)
-                    .ToList()
-                : Teachers
-                    .OrderByDescending(x => x.Username)
-                    .ToList();
-                break;
+	private bool isTeacherSelected => !selectedTeachers.Any();
+	private bool isDeleting = false;
+	private bool isEditing = false;
+	private bool isAction => isDeleting || isEditing;
 
-            default:
-                break;
-        }
-    }
+	protected override void OnInitialized()
+	{
+		filteredTeachers = Teachers.ToList();
+		searchDelayTimer = new Timer(Callback, null, Timeout.Infinite, Timeout.Infinite);
+	}
 
-    private string GetSortIcon(bool asc) => asc ? "bi-sort-up" : "bi-sort-down";
+	private void SelectTeacher(Teacher teacher)
+	{
+		if (selectedTeachers.Contains(teacher))
+		{
+			selectedTeachers.Remove(teacher);
+		}
+		else
+		{
+			selectedTeachers.Add(teacher);
+		}
+	}
+
+	private void SelectAllTeachers()
+	{
+		if (AreAllFilteredTeachersSelected())
+		{
+			selectedTeachers.Clear();
+		}
+		else
+		{
+			selectedTeachers = filteredTeachers.ToList();
+		}
+
+		StateHasChanged();
+	}
+
+	private void EditSelected()
+	{
+		selectedTeachers.ForEach(x => Console.WriteLine(x.Id));
+	}
+
+	private async Task DeleteSelected()
+	{
+		if (!selectedTeachers.Any()) return;
+
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("List", selectedTeachers.Select(x => $"[{x.Class}] {x.Id} {x.FullName}").ToList());
+
+		var confirmation = await dialog.ShowAsync<CustomList>(
+			title: $"Are you sure you want to delete [{selectedTeachers.Count + 1000}] teachers?",
+			parameters: parameters,
+			confirmDialogOptions: DialogOptions.Delete(DialogSize.Large)
+		);
+
+		if (!confirmation) return;
+
+		isDeleting = true;
+		await HideModalEdit();
+
+		try
+		{
+			foreach (var teacher in selectedTeachers)
+			{
+				var response = await ApiRequests.DeleteTeacherAsync(teacher.Id);
+				if (response.IsSuccess())
+				{
+					Teachers.Remove(teacher);
+				}
+				else
+				{
+					ErrorList.Add(response.GetError());
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
+		}
+
+		filteredTeachers = Teachers.ToList();
+		selectedTeachers.Clear();
+		searchQuery = string.Empty;
+
+		if (ErrorList.Any())
+		{
+			await modalErrors.ShowAsync();
+		}
+		else
+		{
+			ToastService.Notify(ToastMessages.Success("Selected teachers were deleted!"));
+		}
+
+		isDeleting = false;
+	}
+
+	private void GetFilteredTeachers()
+	{
+		if (string.IsNullOrWhiteSpace(searchQuery))
+		{
+			filteredTeachers = Teachers.ToList();
+		}
+		else
+		{
+			filteredTeachers = Teachers
+				.Where(x => x.Id.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+							|| x.FullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+							|| x.Class.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+				.ToList();
+		}
+
+		selectedTeachers.Clear();
+	}
+
+	private void Callback(object? state)
+	{
+		InvokeAsync(() =>
+		{
+			GetFilteredTeachers();
+			StateHasChanged();
+		});
+	}
+
+	private void UpdateSearchQuery(ChangeEventArgs e)
+	{
+		searchQuery = e.Value?.ToString();
+		searchDelayTimer?.Change(400, Timeout.Infinite);
+	}
+
+	private bool AreAllFilteredTeachersSelected()
+	{
+		return selectedTeachers.Count > 0
+			&& selectedTeachers.Count.Equals(filteredTeachers.Count);
+	}
+
+	private void SortTable(string propertyName)
+	{
+		if (sortBy == propertyName)
+		{
+			isAscending = !isAscending;
+		}
+		else
+		{
+			sortBy = propertyName;
+			isAscending = true;
+		}
+
+		switch (propertyName)
+		{
+			case "Id":
+				filteredTeachers = isAscending
+				? filteredTeachers
+					.OrderBy(x => x.Id)
+					.ToList()
+				: filteredTeachers
+					.OrderByDescending(x => x.Id)
+					.ToList();
+				break;
+
+			case "Name":
+				filteredTeachers = isAscending
+				? filteredTeachers
+						.OrderBy(x => x.Class)
+						.ThenBy(x => x.FullName)
+						.ToList()
+				: filteredTeachers
+						.OrderByDescending(x => x.Class)
+						.ThenByDescending(x => x.FullName)
+						.ToList();
+				break;
+
+			case "Class":
+				filteredTeachers = isAscending
+				? filteredTeachers
+					.OrderBy(x => x.Username)
+					.ToList()
+				: filteredTeachers
+					.OrderByDescending(x => x.Username)
+					.ToList();
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	private string GetSortIcon(bool asc) => asc ? "bi-sort-up" : "bi-sort-down";
+
+	private void ShowTeacher(string id) => NavManager.NavigateTo($"/teachers/{id}");
+
+	private void InspectTeacher(Teacher teacher) => ShowTeacher(teacher.Id.ToString());
+
+	private void ToggleEditMode() => isEditing = !isEditing;
+
+	private async Task ShowModalEdit()
+	{
+		if (modalEdit is null) return;
+		await modalEdit.ShowAsync();
+		ToggleEditMode();
+	}
+
+	private async Task HideModalEdit()
+	{
+		if (modalEdit is null) return;
+		await modalEdit.HideAsync();
+	}
+
+	private async Task ShowModalErrorList()
+	{
+		if (modalErrors is null) return;
+		await modalErrors.ShowAsync();
+	}
+
+	private async Task HideModalErrorList()
+	{
+		if (modalErrors is null) return;
+		await modalErrors.HideAsync();
+
+		if (modalEdit is null) return;
+		await modalEdit.HideAsync();
+	}
+
+	public void Dispose() => searchDelayTimer?.Dispose();
 }
 
