@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Text.Json;
 
 namespace NeuLdapMgnt.WebApp
@@ -40,6 +41,14 @@ namespace NeuLdapMgnt.WebApp
 					return $"An error occurred: {httpError.Message}";
 				}
 			}
+		}
+
+		public static int GetClassOrderValue(string cls)
+		{
+            if (cls.Contains("ny", StringComparison.OrdinalIgnoreCase))
+				return 0;
+
+			return cls.Sum(x => x);
 		}
 	}
 }

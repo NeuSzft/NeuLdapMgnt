@@ -5,6 +5,14 @@
 <Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true" OnHidden="ToggleEditMode">
 	<BodyTemplate>
 		<span class="fw-bold mb-2">This action can not be reverted!</span>
+		<InputSelect class="form-select rounded" id="class-select" @bind-Value="selectedClass">
+			<option value="@string.Empty" disabled>Select class</option>
+			@foreach (var cls in DatabaseLocal.Classes)
+			{
+				<option value="@cls">@cls</option>
+			}
+		</InputSelect>
+		<label for="class-select">Class</label>
 	</BodyTemplate>
 	<FooterTemplate>
 		<ButtonDelete Text="Delete" OnClick="DeleteSelected" />
@@ -151,6 +159,8 @@ else
 	private bool isAction => isDeleting || isEditing;
 
 	private bool isStudentSelected => !selectedStudents.Any();
+
+	private string selectedClass = string.Empty;
 
 	protected override void OnInitialized()
 	{
@@ -317,14 +327,10 @@ else
 			case "Class":
 				filteredStudents = isAscending
 					? filteredStudents
-							.OrderBy(x => x.Class.Length)
-							.ThenBy(x => x.Class)
-							.ThenBy(x => x.FullName)
+							.OrderBy(x => Utils.GetClassOrderValue(x.Class))
 							.ToList()
 					: filteredStudents
-							.OrderByDescending(x => x.Class.Length)
-							.ThenByDescending(x => x.Class)
-							.ThenByDescending(x => x.FullName)
+							.OrderByDescending(x => Utils.GetClassOrderValue(x.Class))
 							.ToList();
 				break;
 

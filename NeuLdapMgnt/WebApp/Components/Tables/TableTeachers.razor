@@ -316,12 +316,10 @@ else
 			case "Name":
 				filteredTeachers = isAscending
 				? filteredTeachers
-						.OrderBy(x => x.Class)
-						.ThenBy(x => x.FullName)
+						.OrderBy(x => Utils.GetClassOrderValue(x.Class))
 						.ToList()
 				: filteredTeachers
-						.OrderByDescending(x => x.Class)
-						.ThenByDescending(x => x.FullName)
+						.OrderByDescending(x => Utils.GetClassOrderValue(x.Class))
 						.ToList();
 				break;
 
