@@ -21,8 +21,11 @@ internal static class Program {
 	public static readonly string TokenIssuer = typeof(Program).Assembly.FullName!;
 
 	public static void Main(string[] args) {
-		LdapService     ldapService     = LdapService.FromEnvs();
-		PostgresService postgresService = PostgresService.FromEnvs().SetIgnoredRoutes("/api/docs");
+		LdapService ldapService = LdapService.FromEnvs();
+
+		IPostgresService postgresService = true.ToString().Equals(Environment.GetEnvironmentVariable("LOG_TO_DB"), StringComparison.OrdinalIgnoreCase)
+			? PostgresService.FromEnvs().SetIgnoredRoutes("/api/docs")
+			: new DummyPostgresService();
 
 		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
