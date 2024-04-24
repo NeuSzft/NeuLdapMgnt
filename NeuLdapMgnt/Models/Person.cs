@@ -135,12 +135,29 @@ namespace NeuLdapMgnt.Models
 
 		public string GetUsername()
 		{
-			return $"{FirstName.PadRight(3, '_')[..3]}{LastName.PadRight(3, '_')[..3]}".ToLower();
+			return RemoveDiacritics($"{FirstName.PadRight(3, '_')[..3]}{LastName.PadRight(3, '_')[..3]}").ToLower();
 		}
 
 		private string GetHomeDirectory()
 		{
 			return string.IsNullOrEmpty(Username) ? "/home/" : $"/home/{GetUsername()}";
+		}
+
+		private static string RemoveDiacritics(string text)
+		{
+			var normalizedString = text.Normalize(NormalizationForm.FormD);
+			var stringBuilder = new StringBuilder();
+
+			foreach (var c in normalizedString)
+			{
+				var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+				if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+				{
+					stringBuilder.Append(c);
+				}
+			}
+
+			return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
 		}
 	}
 }
