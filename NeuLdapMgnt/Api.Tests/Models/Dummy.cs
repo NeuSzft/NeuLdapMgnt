@@ -1,25 +1,46 @@
 namespace NeuLdapMgnt.Api.Tests.Models;
 
-[LdapObjectClasses("account", "posixAccount")]
-public sealed class Dummy : IEquatable<Dummy> {
-	[LdapAttribute("uid")] public int Id { get; init; }
+[LdapObjectClasses("inetOrgPerson", "posixAccount")]
+public sealed class Dummy : ICloneable, IEquatable<Dummy> {
+	[LdapAttribute("uid")] public int Id { get; set; }
 
-	[LdapAttribute("uidNumber")] public int UserId { get; init; }
+	[LdapAttribute("uidNumber")] public int UserId { get; set; }
 
-	[LdapAttribute("gidNumber")] public int GroupId { get; init; }
+	[LdapAttribute("gidNumber")] public int GroupId { get; set; }
 
-	[LdapAttribute("cn")] public string Name { get; init; } = string.Empty;
+	[LdapAttribute("sn")] public string FirstName { get; set; } = string.Empty;
 
-	[LdapAttribute("homeDirectory")] public string HomeDir { get; init; } = string.Empty;
+	[LdapAttribute("cn")] public string LastName { get; set; } = string.Empty;
 
-	[LdapAttribute("userPassword", true)] public string? Password { get; init; }
+	[LdapAttribute("displayName")] public string FullName { get; set; } = string.Empty;
+
+	[LdapAttribute("homeDirectory")] public string HomeDir { get; set; } = string.Empty;
+
+	[LdapAttribute("userPassword", true)] public string? Password { get; set; }
+
+	object ICloneable.Clone() => Clone();
+
+	public Dummy Clone() {
+		return new() {
+			Id = Id,
+			UserId = UserId,
+			GroupId = GroupId,
+			FirstName = FirstName,
+			LastName = LastName,
+			FullName = FullName,
+			HomeDir = HomeDir,
+			Password = Password
+		};
+	}
 
 	public bool Equals(Dummy? other) {
 		return other is not null
 		       && Id == other.Id
 		       && UserId == other.UserId
 		       && GroupId == other.GroupId
-		       && Name == other.Name
+		       && FirstName == other.FirstName
+		       && LastName == other.LastName
+		       && FullName == other.FullName
 		       && HomeDir == other.HomeDir
 		       && Password == other.Password;
 	}
@@ -28,12 +49,8 @@ public sealed class Dummy : IEquatable<Dummy> {
 		return obj is Dummy dummy && Equals(dummy);
 	}
 
-	public override int GetHashCode() {
-		return HashCode.Combine(Id, UserId, GroupId, Name, HomeDir, Password);
-	}
-
 	public override string ToString() {
-		return $"[{Id}] {UserId}:{GroupId} {Name} '{HomeDir}' {Password}";
+		return $"[{Id}] {UserId}:{GroupId} {FullName} '{HomeDir}' {Password}";
 	}
 
 	public static IEnumerable<Dummy> CreateDummies(int n) {
@@ -42,7 +59,9 @@ public sealed class Dummy : IEquatable<Dummy> {
 				Id = i,
 				UserId = 1000 + i,
 				GroupId = 1000 + i,
-				Name = $"dummy.{i:D2}",
+				FirstName = "Test",
+				LastName = $"Dummy{i:D2}",
+				FullName = $"Test Dummy{i:D2}",
 				HomeDir = $"/home/dummy.{i:D2}",
 				Password = $"password{i:D2}"
 			};
