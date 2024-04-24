@@ -7,7 +7,7 @@
 		<h1>Teachers</h1>
 	</div>
 	<div class="col text-end">
-		<ButtonRefresh OnClick="RefreshTeachers" Text="Refresh" />
+		<ButtonRefresh OnClick="OnRefresh" Text="Refresh" />
 	</div>
 </div>
 
@@ -15,7 +15,7 @@
 {
 	<Loading Text="Loading teachers" />
 }
-else if (!DatabaseLocal.Teachers.Any())
+else if (!LocalDbService.Teachers.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
@@ -26,98 +26,27 @@ else if (!DatabaseLocal.Teachers.Any())
 }
 else
 {
-	<TableTeachers Teachers="DatabaseLocal.Teachers" />
+	<TableTeachers Teachers="LocalDbService.Teachers" />
 }
 
 @code {
-	private bool isLoading { get; set; }
+	private bool isLoading = false;
 
 	protected override async Task OnInitializedAsync()
 	{
-		isLoading = true;
 		ApiRequests.EnsureAuthentication(NavManager);
-		await RefreshTeachers();
-		await FetchClasses();
+		await OnRefresh();
+	}
+
+	private async Task OnRefresh()
+	{
+		isLoading = true;
+		await LocalDbService.FetchClasses();
+		await LocalDbService.FetchTeachers();
+		await LocalDbService.FetchAdmins();
 		isLoading = false;
 	}
 
-	private async Task RefreshTeachers()
-	{
-		try
-		{
-			isLoading = true;
-			DatabaseLocal.Teachers.Clear();
-			DatabaseLocal.Admins.Clear();
-
-			var responseTeachers = await ApiRequests.GetTeachersAsync();
-			if (responseTeachers.IsSuccess())
-			{
-				DatabaseLocal.Teachers = new(responseTeachers.Values);
-			}
-
-			if (responseTeachers.Errors.Any())
-			{
-				ToastService.Notify(ToastMessages.Error(responseTeachers.GetError()));
-			}
-
-			var responseAdmins = await ApiRequests.GetAdminsAsync();
-			if (responseAdmins.IsSuccess())
-			{
-				DatabaseLocal.Admins = new(responseAdmins.Values[0]);
-			}
-
-			if (responseAdmins.Errors.Any())
-			{
-				ToastService.Notify(ToastMessages.Error(responseAdmins.GetError()));
-			}
-
-
-			StateHasChanged();
-		}
-		catch (HttpRequestException httpError)
-		{
-			if (httpError.StatusCode is HttpStatusCode.BadRequest)
-			{
-				ToastService.Notify(ToastMessages.NoConnection());
-			}
-			else
-			{
-				ToastService.Notify(ToastMessages.Error(httpError.Message));
-			}
-		}
-		catch (Exception e)
-		{
-			ToastService.Notify(ToastMessages.Error(e.Message));
-		}
-		isLoading = false;
-	}
-
-	private async Task FetchClasses()
-	{
-		try
-		{
-			DatabaseLocal.Classes.Clear();
-
-			var response = await ApiRequests.GetClassesAsync();
-			if (response.IsSuccess())
-			{
-				DatabaseLocal.Classes = response.Values.SelectMany(x => x).OrderBy(x => x).ToList();
-			}
-			if (response.Errors.Any())
-			{
-				await ModalService.ShowAsync(ModalOptions.Error(response.GetError()));
-			}
-		}
-		catch (Exception e)
-		{
-			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
-			ToastService.Notify(ToastMessages.Error(message));
-		}
-	}
-
-	private void ToAddPage()
-	{
-		NavManager.NavigateTo("/teachers/add");
-	}
+	private void ToAddPage() => NavManager.NavigateTo("/teachers/add");
 }
 

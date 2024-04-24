@@ -51,7 +51,7 @@
 	<div class="form-floating">
 		<InputSelect class="form-select rounded" id="class-select" disabled="@(IsReadonly || isAction)" @bind-Value="teacherUpdated.Class">
 			<option value="-">-</option>
-			@foreach (var cls in DatabaseLocal.Classes)
+			@foreach (var cls in LocalDbService.Classes)
 			{
 				<option value="@cls">@cls</option>
 			}

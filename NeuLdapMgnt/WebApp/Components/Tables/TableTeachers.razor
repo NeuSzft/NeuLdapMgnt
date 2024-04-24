@@ -13,15 +13,6 @@
 	</FooterTemplate>
 </Modal>
 
-<Modal @ref="modalErrors" title="Errors" ModalType="ModalType.Danger" Size="ModalSize.Regular" IsScrollable="true">
-	<BodyTemplate>
-		<CustomList List="ErrorList" />
-	</BodyTemplate>
-	<FooterTemplate>
-		<Button Color="ButtonColor.Secondary" @onclick="HideModalErrorList">Ok</Button>
-	</FooterTemplate>
-</Modal>
-
 @if (isDeleting)
 {
 	<Loading Text="Deleting teachers" />
@@ -124,7 +115,7 @@ else
 						<td>
 							<input class="form-check-input"
 								   type="checkbox"
-								   checked="@(DatabaseLocal.Admins.Exists(x => x.Equals(teacher.Id)))"
+								   checked="@(LocalDbService.Admins.Exists(x => x.Equals(teacher.Id)))"
 								   disabled />
 						</td>
 						<td class="text-end rounded-end">
@@ -148,7 +139,6 @@ else
 	private ConfirmDialog dialog = default!;
 	private Modal modalEdit = default!;
 	private Modal modalErrors = default!;
-	private List<string> ErrorList = new();
 
 	private string? searchQuery = string.Empty;
 	private string sortBy = string.Empty;
@@ -193,7 +183,7 @@ else
 
 	private void EditSelected()
 	{
-		selectedTeachers.ForEach(x => Console.WriteLine(x.Id));
+
 	}
 
 	private async Task DeleteSelected()
@@ -201,52 +191,23 @@ else
 		if (!selectedTeachers.Any()) return;
 
 		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", selectedTeachers.Select(x => $"[{x.Class}] {x.Id} {x.FullName}").ToList());
+		parameters.Add("List", selectedTeachers.Select(x => $"[{x.Class}] {x.FullName}").ToList());
 
 		var confirmation = await dialog.ShowAsync<CustomList>(
-			title: $"Are you sure you want to delete [{selectedTeachers.Count + 1000}] teachers?",
+			title: $"Are you sure you want to delete [{selectedTeachers.Count}] teachers?",
 			parameters: parameters,
-			confirmDialogOptions: DialogOptions.Delete(DialogSize.Large)
+			confirmDialogOptions: DialogOptions.Delete()
 		);
 
 		if (!confirmation) return;
-
-		isDeleting = true;
 		await HideModalEdit();
 
-		try
-		{
-			foreach (var teacher in selectedTeachers)
-			{
-				var response = await ApiRequests.DeleteTeacherAsync(teacher.Id);
-				if (response.IsSuccess())
-				{
-					Teachers.Remove(teacher);
-				}
-				else
-				{
-					ErrorList.Add(response.GetError());
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
-		}
+		isDeleting = true;
+		await LocalDbService.DeleteTeachersInBulk(selectedTeachers);
 
 		filteredTeachers = Teachers.ToList();
 		selectedTeachers.Clear();
 		searchQuery = string.Empty;
-
-		if (ErrorList.Any())
-		{
-			await modalErrors.ShowAsync();
-		}
-		else
-		{
-			ToastService.Notify(ToastMessages.Success("Selected teachers were deleted!"));
-		}
-
 		isDeleting = false;
 	}
 

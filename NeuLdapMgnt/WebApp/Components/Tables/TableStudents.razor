@@ -4,35 +4,36 @@
 
 <Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true" OnHidden="ToggleEditMode">
 	<BodyTemplate>
-		<span class="fw-bold mb-2">This action can not be reverted!</span>
-		<InputSelect class="form-select rounded" id="class-select" @bind-Value="selectedClass">
-			<option value="@string.Empty" disabled>Select class</option>
-			@foreach (var cls in DatabaseLocal.Classes)
-			{
-				<option value="@cls">@cls</option>
-			}
-		</InputSelect>
-		<label for="class-select">Class</label>
+		<div class="fw-bold mb-2">This action can not be reverted!</div>
+		<div class="form-floating">
+			<InputSelect class="form-select rounded" id="class-select" @bind-Value="editedClass">
+				<option value="@string.Empty" disabled>Select class</option>
+				@foreach (var cls in LocalDbService.Classes)
+				{
+					<option value="@cls">@cls</option>
+				}
+			</InputSelect>
+			<label for="class-select">New Class</label>
+		</div>
 	</BodyTemplate>
 	<FooterTemplate>
 		<ButtonDelete Text="Delete" OnClick="DeleteSelected" />
 		<ButtonCancel Text="Cancel" OnClick="HideModalEdit" />
-		<ButtonSave Text="Save" />
+		<ButtonSave Text="Save" IsDisabled="isUpdating" OnClick="UpdateStudents" />
 	</FooterTemplate>
 </Modal>
 
-<Modal @ref="modalErrors" title="Errors" ModalType="ModalType.Danger" Size="ModalSize.Regular" IsScrollable="true">
-	<BodyTemplate>
-		<CustomList List="ErrorList" />
-	</BodyTemplate>
-	<FooterTemplate>
-		<Button Color="ButtonColor.Secondary" @onclick="HideModalErrorList">Ok</Button>
-	</FooterTemplate>
-</Modal>
-
-@if (isDeleting)
+@if (isLoading)
+{
+	<Loading Text="Loading students" />
+}
+else if (isDeleting)
 {
 	<Loading Text="Deleting students" />
+}
+else if (isUpdating)
+{
+	<Loading Text="Updating students" />
 }
 else
 {
@@ -148,24 +149,27 @@ else
 	private ConfirmDialog dialog = default!;
 	private Modal modalEdit = default!;
 	private Modal modalErrors = default!;
-	private List<string> ErrorList = new();
 
 	private string? searchQuery = string.Empty;
 	private string sortBy = "Id";
 
 	private bool isAscending = true;
+	private bool isLoading = true;
 	private bool isDeleting = false;
 	private bool isEditing = false;
-	private bool isAction => isDeleting || isEditing;
+	private bool isUpdating = false;
+	private bool isAction => isDeleting || isEditing || isUpdating;
 
 	private bool isStudentSelected => !selectedStudents.Any();
 
-	private string selectedClass = string.Empty;
+	private string editedClass = string.Empty;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		filteredStudents = Students.ToList();
 		searchDelayTimer = new Timer(Callback, null, Timeout.Infinite, Timeout.Infinite);
+		await LocalDbService.FetchClasses();
+		isLoading = false;
 	}
 
 	private void SelectStudent(Student student)
@@ -190,13 +194,21 @@ else
 		{
 			selectedStudents = filteredStudents.ToList();
 		}
-
-		StateHasChanged();
 	}
 
-	private void EditSelected()
+	private async Task UpdateStudents()
 	{
-		selectedStudents.ForEach(x => Console.WriteLine(x.Id));
+		if (string.IsNullOrEmpty(editedClass))
+		{
+			ToastService.Notify(ToastMessages.Danger("Please select a class."));
+			return;
+		}
+
+		isUpdating = true;
+		await HideModalEdit();
+		await LocalDbService.UpdateStudentClassInBulk(selectedStudents, editedClass);
+		selectedStudents.Clear();
+		isUpdating = false;
 	}
 
 	private async Task DeleteSelected()
@@ -207,50 +219,25 @@ else
 		parameters.Add("List", selectedStudents.Select(x => $"[{x.Class}] {x.FullName}").ToList());
 
 		var confirmation = await dialog.ShowAsync<CustomList>(
-			title: $"Are you sure you want to delete [{selectedStudents.Count + 1000}] students?",
+			title: $"Are you sure you want to delete [{selectedStudents.Count}] students?",
 			parameters: parameters,
 			confirmDialogOptions: DialogOptions.Delete()
 		);
 
 		if (!confirmation) return;
-
-		isDeleting = true;
 		await HideModalEdit();
 
-		try
-		{
-			foreach (var student in selectedStudents)
-			{
-				var response = await ApiRequests.DeleteStudentAsync(student.Id);
-				if (response.IsSuccess())
-				{
-					Students.Remove(student);
-				}
-				else
-				{
-					ErrorList.Add(response.GetError());
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			await ModalService.ShowAsync(ModalOptions.Error(e.Message));
-		}
+		isDeleting = true;
+		await LocalDbService.DeleteStudentsInBulk(selectedStudents);
+		isDeleting = false;
+
+		isLoading = true;
+		await LocalDbService.FetchStudents();
+		isLoading = false;
 
 		filteredStudents = Students.ToList();
 		selectedStudents.Clear();
 		searchQuery = string.Empty;
-
-		if (ErrorList.Any())
-		{
-			await modalErrors.ShowAsync();
-		}
-		else
-		{
-			ToastService.Notify(ToastMessages.Success("Selected students were deleted!"));
-		}
-
-		isDeleting = false;
 	}
 
 	private void GetFilteredStudents()

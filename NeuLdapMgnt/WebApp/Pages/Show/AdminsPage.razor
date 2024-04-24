@@ -4,12 +4,19 @@
 
 <h1>Admins</h1>
 
-<TableAdmins Admins="DatabaseLocal.Admins"/>
+<TableAdmins Admins="LocalDbService.Admins" />
 
 @code {
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
+
+		//LocalDbService.LoadingEnable("Fetching teachers");
+		await LocalDbService.FetchTeachers();
+
+		//LocalDbService.LoadingEnable("Fetching admins");
+		await LocalDbService.FetchAdmins();
+		//LocalDbService.LoadingDisable;
 	}
 }
 

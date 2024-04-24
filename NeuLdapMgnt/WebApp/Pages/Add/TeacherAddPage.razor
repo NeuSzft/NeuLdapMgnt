@@ -29,15 +29,16 @@ else
 
 	private async Task<bool> OnSubmit(Teacher teacherUpdated)
 	{
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("Teacher", teacherUpdated);
+
+		var confirmation = await dialog.ShowAsync<SummaryTeacher>("Create this teacher?", parameters, DialogOptions.Confirm());
+		if (!confirmation) return false;
+
+		isSubmitting = true;
+
 		try
 		{
-			var parameters = new Dictionary<string, object>();
-			parameters.Add("Teacher", teacherUpdated);
-
-			var confirmation = await dialog.ShowAsync<SummaryTeacher>("Create this teacher?", parameters, DialogOptions.Confirm());
-			if (!confirmation) return false;
-
-			isSubmitting = true;
 			var response = await ApiRequests.AddTeacherAsync(teacherUpdated);
 
 			if (response.IsSuccess())
