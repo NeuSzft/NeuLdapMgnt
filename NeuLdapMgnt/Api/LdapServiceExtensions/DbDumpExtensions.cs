@@ -8,7 +8,7 @@ public static class DbDumpExtensions {
 	/// <summary>Erases the entire LDAP database.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-	private static RequestResult EraseDatabase(this LdapService ldap) {
+	public static RequestResult EraseDatabase(this LdapService ldap) {
 		List<string> errors = ldap.EraseTreeElements(ldap.DomainComponents);
 		return new RequestResult().SetStatus(errors.Count == 0 ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError).SetErrors(errors.ToArray());
 	}
@@ -16,19 +16,13 @@ public static class DbDumpExtensions {
 	/// <summary>Imports a previous dump into the LDAP database.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="dump">The <see cref="LdapDbDump"/> to import.</param>
-	/// <param name="erase">Determines whether the database should be erased before importing.</param>
+	/// <param name="overwriteEntities">If <c>true</c> the existing entities will be overwritten.</param>
 	/// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-	public static RequestResult ImportDatabase(this LdapService ldap, LdapDbDump dump, bool erase = false) {
-		if (erase) {
-			RequestResult result = ldap.EraseDatabase();
-			if (result.Errors.Length > 0)
-				return result;
-		}
-
+	public static RequestResult ImportDatabase(this LdapService ldap, LdapDbDump dump, bool overwriteEntities) {
 		List<string> errors = new();
 
-		errors.AddRange(ldap.TryAddEntities(dump.Students, student => student.Id.ToString(), true).Errors);
-		errors.AddRange(ldap.TryAddEntities(dump.Teachers, teacher => teacher.Id, true).Errors);
+		errors.AddRange(ldap.TryAddEntities(dump.Students, student => student.Id.ToString(), true, overwriteEntities).Errors);
+		errors.AddRange(ldap.TryAddEntities(dump.Teachers, teacher => teacher.Id, true, overwriteEntities).Errors);
 		errors.AddRange(ldap.TryAddEntitiesToGroup("inactive", dump.Inactives).Errors);
 		errors.AddRange(ldap.TryAddEntitiesToGroup("admin", dump.Admins).Errors);
 

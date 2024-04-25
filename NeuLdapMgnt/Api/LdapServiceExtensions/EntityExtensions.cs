@@ -147,7 +147,7 @@ public static class EntityExtensions {
 	/// <param name="entities">The entities to be added.</param>
 	/// <param name="idGetter">A delegate that takes in an entity of type <typeparamref name="T"/> and returns an uid with the type of <c>long</c>.</param>
 	/// <param name="setHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are set.</param>
-	/// <param name="overwrite">If <c>true</c> the existing entries will be overwritten.</param>
+	/// <param name="overwrite">If <c>true</c> the existing entities will be overwritten.</param>
 	/// <typeparam name="T">The type of the entities.</typeparam>
 	/// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
 	public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, string> idGetter, bool setHiddenAttributes = false, bool overwrite = false) where T : class {

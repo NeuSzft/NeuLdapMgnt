@@ -7,7 +7,7 @@ namespace NeuLdapMgnt.Api.Endpoints;
 
 public static class DbManagementEndpoints {
 	public static void MapDbManagementEndpoints(this WebApplication app) {
-		app.MapGet("/api/database/export", (LdapService ldap, HttpRequest request) =>
+		app.MapGet("/api/database", (LdapService ldap, HttpRequest request) =>
 			   ldap.ExportDatabase().RenewToken(request).ToResult()
 		   )
 		   .WithOpenApi()
@@ -17,12 +17,12 @@ public static class DbManagementEndpoints {
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
 		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-		app.MapPut("/api/database/import", async (LdapService ldap, HttpRequest request) => {
+		app.MapPost("/api/database", async (LdapService ldap, HttpRequest request) => {
 			   var result = await ModelValidator.ValidateRequest<LdapDbDump>(request);
 			   if (result.IsFailure())
 				   return result.RenewToken(request).ToResult();
 
-			   return ldap.ImportDatabase(result.GetValue()!).RenewToken(request).ToResult();
+			   return ldap.ImportDatabase(result.GetValue()!, false).RenewToken(request).ToResult();
 		   })
 		   .WithOpenApi()
 		   .WithTags("Database Management")
@@ -33,7 +33,7 @@ public static class DbManagementEndpoints {
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
 		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-		app.MapPut("/api/database/erase-and-import", async (LdapService ldap, HttpRequest request) => {
+		app.MapPut("/api/database", async (LdapService ldap, HttpRequest request) => {
 			   var result = await ModelValidator.ValidateRequest<LdapDbDump>(request);
 			   if (result.IsFailure())
 				   return result.RenewToken(request).ToResult();
@@ -47,7 +47,16 @@ public static class DbManagementEndpoints {
 		   .Produces<RequestResult>(StatusCodes.Status207MultiStatus)
 		   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
-		   .Produces<RequestResult>(StatusCodes.Status500InternalServerError)
+		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
+
+		app.MapDelete("/api/database", (LdapService ldap, HttpRequest request) =>
+			   ldap.EraseDatabase().RenewToken(request).ToResult()
+		   )
+		   .WithOpenApi()
+		   .WithTags("Database Management")
+		   .RequireAuthorization()
+		   .Produces<RequestResult>()
+		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
 		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 	}
 }
