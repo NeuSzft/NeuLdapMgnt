@@ -5,6 +5,9 @@
 <Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true" OnHidden="ToggleEditMode">
 	<BodyTemplate>
 		<div class="fw-bold mb-2">This action can not be reverted!</div>
+		<div class="mb-2">
+			<Switch @ref="switchEditIsActive" @bind-Value="editIsInactive" Label="Set status to [Inactive]?" />
+		</div>
 		<div class="form-floating">
 			<InputSelect class="form-select rounded" id="class-select" @bind-Value="editedClass">
 				<option value="@string.Empty" disabled>Select class</option>
@@ -143,10 +146,10 @@ else
 	public List<Student> Students { get; set; } = new();
 
 	[Parameter]
-	public EventCallback<List<Student>> OnStudentsDelete { get; set; }
+	public EventCallback<IEnumerable<Student>> OnStudentsDelete { get; set; }
 
 	[Parameter]
-	public EventCallback<(List<Student>, string)> OnStudentsUpdate { get; set; }
+	public EventCallback<(IEnumerable<Student>, string?, bool)> OnStudentsUpdate { get; set; }
 
 	private List<Student> filteredStudents = new();
 	private List<Student> selectedStudents = new();
@@ -165,15 +168,52 @@ else
 	private bool isEditing = false;
 	private bool isUpdating = false;
 	private bool isAction => isDeleting || isEditing || isUpdating;
-
 	private bool isStudentSelected => !selectedStudents.Any();
 
+
 	private string editedClass = string.Empty;
+	private bool editIsInactive = false;
+	private Switch switchEditIsActive = default!;
 
 	protected override void OnInitialized()
 	{
 		filteredStudents = Students.ToList();
 		searchDelayTimer = new Timer(Callback, null, Timeout.Infinite, Timeout.Infinite);
+	}
+
+	private async Task UpdateSelected()
+	{
+		if (OnStudentsUpdate.HasDelegate)
+		{
+			await HideModalEdit();
+			isUpdating = true;
+			await OnStudentsUpdate.InvokeAsync((selectedStudents, editedClass, editIsInactive));
+			isUpdating = false;
+		}
+	}
+
+	private async Task DeleteSelected()
+	{
+		if (!selectedStudents.Any()) return;
+
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("List", selectedStudents.Select(x => $"[{x.Class}] {x.FullName}").ToList());
+
+		var confirmation = await dialog.ShowAsync<CustomList>(
+			title: $"Are you sure you want to delete [{selectedStudents.Count}] students?",
+			parameters: parameters,
+			confirmDialogOptions: DialogOptions.Delete()
+		);
+
+		if (!confirmation) return;
+
+		if (OnStudentsDelete.HasDelegate)
+		{
+			await HideModalEdit();
+			isDeleting = true;
+			await OnStudentsDelete.InvokeAsync(selectedStudents);
+			isDeleting = false;
+		}
 	}
 
 	private void SelectStudent(Student student)
@@ -197,47 +237,6 @@ else
 		else
 		{
 			selectedStudents = filteredStudents.ToList();
-		}
-	}
-
-	private async Task UpdateSelected()
-	{
-		if (string.IsNullOrEmpty(editedClass))
-		{
-			ToastService.Notify(ToastMessages.Danger("Please select a class."));
-			return;
-		}
-
-		if (OnStudentsUpdate.HasDelegate)
-		{
-			isUpdating = true;
-			await HideModalEdit();
-			await OnStudentsUpdate.InvokeAsync((selectedStudents, editedClass));
-			isUpdating = false;
-		}
-	}
-
-	private async Task DeleteSelected()
-	{
-		if (!selectedStudents.Any()) return;
-
-		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", selectedStudents.Select(x => $"[{x.Class}] {x.FullName}").ToList());
-
-		var confirmation = await dialog.ShowAsync<CustomList>(
-			title: $"Are you sure you want to delete [{selectedStudents.Count}] students?",
-			parameters: parameters,
-			confirmDialogOptions: DialogOptions.Delete()
-		);
-
-		if (!confirmation) return;
-
-		if (OnStudentsDelete.HasDelegate)
-		{
-			isDeleting = true;
-			await HideModalEdit();
-			await OnStudentsDelete.InvokeAsync(selectedStudents);
-			isDeleting = false;
 		}
 	}
 

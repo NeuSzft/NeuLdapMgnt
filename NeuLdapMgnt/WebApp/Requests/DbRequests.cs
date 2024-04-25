@@ -8,9 +8,18 @@ namespace NeuLdapMgnt.WebApp.Requests
 			=> await apiRequests.SendRequestAsync<LogEntry>(HttpMethod.Get, $"/api/logs?from={from}&to={to}");
 
 		public static async Task<RequestResult<string[]>> GetClassesAsync(this ApiRequests apiRequests)
-			=> await apiRequests.SendRequestAsync<string[]>(HttpMethod.Get, $"/api/classes");
+			=> await apiRequests.SendRequestAsync<string[]>(HttpMethod.Get, "/api/classes");
 
 		public static async Task<RequestResult<IEnumerable<string>>> AddClassesAsync(this ApiRequests apiRequests, IEnumerable<string> classes)
-			=> await apiRequests.SendRequestAsync<IEnumerable<string>>(HttpMethod.Put, $"/api/classes", classes);
+			=> await apiRequests.SendRequestAsync<IEnumerable<string>>(HttpMethod.Put, "/api/classes", classes);
+
+		public static async Task<RequestResult<string[]>> GetInactiveUsersAsync(this ApiRequests apiRequests)
+			=> await apiRequests.SendRequestAsync<string[]>(HttpMethod.Get, "/api/inactives");
+
+		public static async Task<RequestResult> DeactivateUserAsync(this ApiRequests apiRequests, string id)
+			=> await apiRequests.SendRequestAsync(HttpMethod.Post, $"/api/inactives/{id}");
+
+		public static async Task<RequestResult> ActivateUserAsync(this ApiRequests apiRequests, string id)
+			=> await apiRequests.SendRequestAsync(HttpMethod.Delete, $"/api/inactives/{id}");
 	}
 }

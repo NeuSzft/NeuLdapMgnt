@@ -26,7 +26,7 @@ public static class InactiveUserEndpoints {
            .WithOpenApi()
            .WithTags("Inactive Users")
            .RequireAuthorization()
-           .Produces(StatusCodes.Status200OK)
+           .Produces<RequestResult>()
            .Produces<RequestResult>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status409Conflict)
@@ -39,7 +39,7 @@ public static class InactiveUserEndpoints {
            .WithOpenApi()
            .WithTags("Inactive Users")
            .RequireAuthorization()
-           .Produces(StatusCodes.Status200OK)
+           .Produces<RequestResult>()
            .Produces<RequestResult>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
            .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);

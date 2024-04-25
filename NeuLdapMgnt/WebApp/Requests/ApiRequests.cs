@@ -119,6 +119,32 @@ namespace NeuLdapMgnt.WebApp.Requests
 			return await ProcessResponse<T>(response, method);
 		}
 
+		public async Task<RequestResult> SendRequestAsync(HttpMethod method, string uri, object? content = null)
+		{
+			EnsureAuthentication();
+
+			HttpRequestMessage request = new(method, uri);
+
+			// Sets the request content for POST and PUT methods
+			if (content != null && (method == HttpMethod.Post || method == HttpMethod.Put))
+			{
+				request.Content = new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json");
+			}
+
+			HttpResponseMessage response = await _httpClient.SendAsync(request);
+			var result = await response.Content.ReadFromJsonAsync<RequestResult>();
+
+			if (response.IsSuccessStatusCode)
+			{
+				UpdateToken(result);
+				return result!;
+			}
+			else
+			{
+				return new RequestResult().SetStatus(result!.StatusCode).SetErrors(result.Errors);
+			}
+		}
+
 		// Helper method to process the HTTP response, handling success and error cases
 		private async Task<RequestResult<T>> ProcessResponse<T>(HttpResponseMessage response, HttpMethod method)
 		{

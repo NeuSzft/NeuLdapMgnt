@@ -15,6 +15,14 @@
 {
 	<Loading Text="Loading students" />
 }
+else if (isUpdating)
+{
+	<Loading Text="Updating students" />
+}
+else if (isDeleting)
+{
+	<Loading Text="isDeleting students" />
+}
 else if (!LocalDbService.Students.Any())
 {
 	<div class="d-flex justify-content-center text-center">
@@ -33,39 +41,38 @@ else
 
 @code {
 	private bool isLoading = true;
+	private bool isDeleting = false;
+	private bool isUpdating = false;
 
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
+		isLoading = true;
 		await LocalDbService.FetchClasses();
 		await OnRefresh();
-	}
-
-	private async Task HandleDeleteStudents(List<Student> studentsToDelete)
-	{
-		isLoading = true;
-		StateHasChanged();
-		await LocalDbService.DeleteStudentsInBulk(studentsToDelete);
-		await OnRefresh();
 		isLoading = false;
 	}
 
-	private async Task HandleUpdateStudents((List<Student>, string) updateInfo)
+	private async Task HandleDeleteStudents(IEnumerable<Student> students)
 	{
-		var (studentsToUpdate, newClass) = updateInfo;
-		isLoading = true;
-		StateHasChanged();
-		await LocalDbService.UpdateStudentClassInBulk(studentsToUpdate, newClass);
+		isDeleting = true;
+		await LocalDbService.DeleteStudentsInBulk(students);
 		await OnRefresh();
-		isLoading = false;
+		isDeleting = false;
+	}
+
+	private async Task HandleUpdateStudents((IEnumerable<Student>, string, bool) context)
+	{
+		var (students, cls, isInactive) = context;
+		isUpdating = true;
+		await LocalDbService.UpdateStudentsInBulk(students, cls, isInactive);
+		await OnRefresh();
+		isUpdating = false;
 	}
 
 	private async Task OnRefresh()
 	{
-		isLoading = true;
 		await LocalDbService.FetchStudents();
-		StateHasChanged();
-		isLoading = false;
 	}
 
 	private void ToAddPage() => NavManager.NavigateTo("/students/add");
