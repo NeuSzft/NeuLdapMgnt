@@ -25,7 +25,6 @@ public class EntityExtensionsTests {
 		Assert.IsNotNull(withHidden);
 		Assert.IsNotNull(withHidden.Password);
 
-
 		Dummy? withoutHidden = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString()).AssertSuccess().GetValue();
 		Assert.IsNotNull(withoutHidden);
 		Assert.IsNull(withoutHidden.Password);
