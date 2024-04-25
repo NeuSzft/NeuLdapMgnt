@@ -18,6 +18,8 @@ public sealed class Dummy : ICloneable, IEquatable<Dummy> {
 
 	[LdapAttribute("userPassword", true)] public string? Password { get; set; }
 
+	[LdapAttribute("roomNumber")] public string? RoomNumber { get; set; }
+
 	object ICloneable.Clone() => Clone();
 
 	public Dummy Clone() {
@@ -29,7 +31,8 @@ public sealed class Dummy : ICloneable, IEquatable<Dummy> {
 			LastName = LastName,
 			FullName = FullName,
 			HomeDir = HomeDir,
-			Password = Password
+			Password = Password,
+			RoomNumber = RoomNumber
 		};
 	}
 
@@ -42,7 +45,8 @@ public sealed class Dummy : ICloneable, IEquatable<Dummy> {
 		       && LastName == other.LastName
 		       && FullName == other.FullName
 		       && HomeDir == other.HomeDir
-		       && Password == other.Password;
+		       && Password == other.Password
+		       && RoomNumber == other.RoomNumber;
 	}
 
 	public override bool Equals(object? obj) {

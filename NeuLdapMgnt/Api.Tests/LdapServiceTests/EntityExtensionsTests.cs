@@ -16,6 +16,22 @@ public class EntityExtensionsTests {
 	}
 
 	[TestMethod]
+	public void TestTryAddAndGetEntityHiddenAttribute() {
+		Dummy dummy = Dummy.CreateDummies(1).First();
+
+		Testing.LdapService.TryAddEntity(dummy, dummy.Id.ToString(), true).AssertSuccess();
+
+		Dummy? withHidden = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString(), true).AssertSuccess().GetValue();
+		Assert.IsNotNull(withHidden);
+		Assert.IsNotNull(withHidden.Password);
+
+
+		Dummy? withoutHidden = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString()).AssertSuccess().GetValue();
+		Assert.IsNotNull(withoutHidden);
+		Assert.IsNull(withoutHidden.Password);
+	}
+
+	[TestMethod]
 	public void TestTryAddDuplicateEntity() {
 		Dummy dummy = Dummy.CreateDummies(1).First();
 
@@ -44,7 +60,20 @@ public class EntityExtensionsTests {
 
 		var result = Testing.LdapService.GetAllEntities<Dummy>(true).AssertSuccess();
 
-		Assert.AreEqual(dummies.Length, result.Values.Length);
+		CollectionAssert.AreEqual(dummies, result.Values);
+	}
+
+	[TestMethod]
+	public void TestTryAddAndGetEntitiesOverwrite() {
+		Dummy[] dummies = Dummy.CreateDummies(5).ToArray();
+		Testing.LdapService.TryAddEntities(dummies, x => x.Id.ToString(), true).AssertSuccess();
+
+		foreach (var dummy in dummies)
+			dummy.GroupId = 1000;
+
+		Testing.LdapService.TryAddEntities(dummies, x => x.Id.ToString(), true, true).AssertSuccess();
+
+		var result = Testing.LdapService.GetAllEntities<Dummy>(true).AssertSuccess();
 		CollectionAssert.AreEqual(dummies, result.Values);
 	}
 
@@ -66,21 +95,34 @@ public class EntityExtensionsTests {
 
 	[TestMethod]
 	public void TestTryModifyEntity() {
-		Dummy[] dummies = Dummy.CreateDummies(5).ToArray();
-		Testing.LdapService.TryAddEntities(dummies, x => x.Id.ToString(), true);
+		Dummy dummy = Dummy.CreateDummies(1).First();
+		Testing.LdapService.TryAddEntity(dummy, dummy.Id.ToString(), true);
 
-		Dummy dummy    = dummies[2];
 		Dummy modDummy = dummy.Clone();
 
 		modDummy.HomeDir = "/home/new-home";
 		Testing.LdapService.TryModifyEntity(modDummy, dummy.Id.ToString()).AssertSuccess();
 
-		modDummy.Id = 5;
+		modDummy.Id = 1;
 		Testing.LdapService.TryModifyEntity(modDummy, dummy.Id.ToString()).AssertFailure();
 
-		modDummy.Id = 2;
+		modDummy.Id = 0;
 		var result = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString(), true).AssertSuccess();
 		Assert.AreEqual(modDummy, result.GetValue());
+	}
+
+	[TestMethod]
+	public void TestTryModifyEntityNullableAttribute() {
+		Dummy dummy = Dummy.CreateDummies(1).First();
+		Testing.LdapService.TryAddEntity(dummy, dummy.Id.ToString(), true);
+
+		Dummy modDummy = dummy.Clone();
+		modDummy.RoomNumber = null;
+
+		Testing.LdapService.TryModifyEntity(modDummy, dummy.Id.ToString()).AssertSuccess();
+
+		var request = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString(), true).AssertSuccess();
+		Assert.AreEqual(modDummy, request.GetValue());
 	}
 
 	[TestMethod]
