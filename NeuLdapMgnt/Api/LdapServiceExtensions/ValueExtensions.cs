@@ -46,16 +46,16 @@ public static class ValueExtensions {
 		return ldap.TryRequest(modRequest, out error) is not null;
 	}
 
-	public static bool UnsetValue(this LdapService ldap, string name, out string? error, bool returnTrueIfNotExists = false) {
+	public static bool UnsetValue(this LdapService ldap, string name, out string? error, bool successIfNotExists = false) {
 		if (ldap.ValueExists(name))
 			return ldap.TryRequest(new DeleteRequest($"cn={name},ou=values,{ldap.DomainComponents}"), out error) is not null;
 
 		error = null;
-		return returnTrueIfNotExists;
+		return successIfNotExists;
 	}
 
 	public static Dictionary<string, string> GetAllValues(this LdapService ldap, out string? error) {
-		SearchRequest   request  = new($"ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, "description");
+		SearchRequest   request  = new($"ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, "cn", "description");
 		SearchResponse? response = ldap.TryRequest(request, out error) as SearchResponse;
 
 		if (response is null)
