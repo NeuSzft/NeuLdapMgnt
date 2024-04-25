@@ -19,7 +19,7 @@
 	<FooterTemplate>
 		<ButtonDelete Text="Delete" OnClick="DeleteSelected" />
 		<ButtonCancel Text="Cancel" OnClick="HideModalEdit" />
-		<ButtonSave Text="Save" IsDisabled="isUpdating" OnClick="UpdateStudents" />
+		<ButtonSave Text="Save" IsDisabled="isUpdating" OnClick="UpdateSelected" />
 	</FooterTemplate>
 </Modal>
 
@@ -142,6 +142,12 @@ else
 	[Parameter]
 	public List<Student> Students { get; set; } = new();
 
+	[Parameter]
+	public EventCallback<List<Student>> OnStudentsDelete { get; set; }
+
+	[Parameter]
+	public EventCallback<(List<Student>, string)> OnStudentsUpdate { get; set; }
+
 	private List<Student> filteredStudents = new();
 	private List<Student> selectedStudents = new();
 	private Timer? searchDelayTimer;
@@ -154,7 +160,7 @@ else
 	private string sortBy = "Id";
 
 	private bool isAscending = true;
-	private bool isLoading = true;
+	private bool isLoading = false;
 	private bool isDeleting = false;
 	private bool isEditing = false;
 	private bool isUpdating = false;
@@ -164,12 +170,10 @@ else
 
 	private string editedClass = string.Empty;
 
-	protected override async Task OnInitializedAsync()
+	protected override void OnInitialized()
 	{
 		filteredStudents = Students.ToList();
 		searchDelayTimer = new Timer(Callback, null, Timeout.Infinite, Timeout.Infinite);
-		await LocalDbService.FetchClasses();
-		isLoading = false;
 	}
 
 	private void SelectStudent(Student student)
@@ -196,7 +200,7 @@ else
 		}
 	}
 
-	private async Task UpdateStudents()
+	private async Task UpdateSelected()
 	{
 		if (string.IsNullOrEmpty(editedClass))
 		{
@@ -204,11 +208,13 @@ else
 			return;
 		}
 
-		isUpdating = true;
-		await HideModalEdit();
-		await LocalDbService.UpdateStudentClassInBulk(selectedStudents, editedClass);
-		selectedStudents.Clear();
-		isUpdating = false;
+		if (OnStudentsUpdate.HasDelegate)
+		{
+			isUpdating = true;
+			await HideModalEdit();
+			await OnStudentsUpdate.InvokeAsync((selectedStudents, editedClass));
+			isUpdating = false;
+		}
 	}
 
 	private async Task DeleteSelected()
@@ -225,19 +231,14 @@ else
 		);
 
 		if (!confirmation) return;
-		await HideModalEdit();
 
-		isDeleting = true;
-		await LocalDbService.DeleteStudentsInBulk(selectedStudents);
-		isDeleting = false;
-
-		isLoading = true;
-		await LocalDbService.FetchStudents();
-		isLoading = false;
-
-		filteredStudents = Students.ToList();
-		selectedStudents.Clear();
-		searchQuery = string.Empty;
+		if (OnStudentsDelete.HasDelegate)
+		{
+			isDeleting = true;
+			await HideModalEdit();
+			await OnStudentsDelete.InvokeAsync(selectedStudents);
+			isDeleting = false;
+		}
 	}
 
 	private void GetFilteredStudents()
