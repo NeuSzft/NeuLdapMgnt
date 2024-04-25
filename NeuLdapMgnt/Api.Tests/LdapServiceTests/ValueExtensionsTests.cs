@@ -1,5 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
-
 namespace NeuLdapMgnt.Api.Tests.LdapServiceTests;
 
 [TestClass]

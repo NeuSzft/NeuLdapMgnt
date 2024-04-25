@@ -116,32 +116,10 @@ public static class EntityExtensions {
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
 	public static RequestResult<T> TryModifyEntity<T>(this LdapService ldap, T entity, string id, bool setHiddenAttributes = false) where T : class {
-		Type type = typeof(T);
-
 		if (!ldap.EntityExists<T>(id))
 			return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors("The object does not exist.");
 
-		IEnumerable<string> presentAttributes = ldap.TryGetPresentEntityAttributes<T>(id);
-
-		ModifyRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}");
-
-		foreach (PropertyInfo info in type.GetProperties())
-			if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute && (!attribute.Hidden || setHiddenAttributes)) {
-				if (info.GetValue(entity) is { } value) {
-					DirectoryAttributeModification mod = new() {
-						Name = attribute.Name,
-						Operation = DirectoryAttributeOperation.Replace
-					};
-					mod.Add(value.ToString());
-					request.Modifications.Add(mod);
-				}
-				else if (presentAttributes.Contains(attribute.Name)) {
-					request.Modifications.Add(new() {
-						Name = attribute.Name,
-						Operation = DirectoryAttributeOperation.Delete
-					});
-				}
-			}
+		ModifyRequest request = CreateModifyRequest(ldap, entity, id, setHiddenAttributes);
 
 		if (ldap.TryRequest(request, out var error) is not null)
 			return new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity);
@@ -169,9 +147,10 @@ public static class EntityExtensions {
 	/// <param name="entities">The entities to be added.</param>
 	/// <param name="idGetter">A delegate that takes in an entity of type <typeparamref name="T"/> and returns an uid with the type of <c>long</c>.</param>
 	/// <param name="setHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are set.</param>
+	/// <param name="overwrite">If <c>true</c> the existing entries will be overwritten.</param>
 	/// <typeparam name="T">The type of the entities.</typeparam>
 	/// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
-	public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, string> idGetter, bool setHiddenAttributes = false) where T : class {
+	public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, string> idGetter, bool setHiddenAttributes = false, bool overwrite = false) where T : class {
 		Type type = typeof(T);
 
 		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"), false);
@@ -180,17 +159,20 @@ public static class EntityExtensions {
 		if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
 			objectClassesAttribute = new("objectClass", objectClasses.Classes.Cast<object>().ToArray());
 
-		var requests = entities.Select(x => {
-			string id = idGetter(x);
+		var requests = entities.Select(entity => {
+			string id = idGetter(entity);
+
+			if (overwrite)
+				return new UniqueDirectoryRequest(CreateModifyRequest(ldap, entity, id, setHiddenAttributes), id);
 
 			AddRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}");
 			if (objectClassesAttribute is not null)
 				request.Attributes.Add(objectClassesAttribute);
 
-			foreach (DirectoryAttribute attribute in LdapService.GetDirectoryAttributes(x, setHiddenAttributes))
+			foreach (DirectoryAttribute attribute in LdapService.GetDirectoryAttributes(entity, setHiddenAttributes))
 				request.Attributes.Add(attribute);
 
-			return new UniqueDirectoryRequest(request, id.ToString());
+			return new UniqueDirectoryRequest(request, id);
 		});
 
 		string[] errors = ldap.TryRequests(requests).Select(x => x.Error).NotNull().ToArray();
@@ -243,5 +225,33 @@ public static class EntityExtensions {
 		}
 
 		return null;
+	}
+
+	private static ModifyRequest CreateModifyRequest<T>(LdapService ldap, T entity, string id, bool setHiddenAttributes) where T : class {
+		Type type = typeof(T);
+
+		IEnumerable<string> presentAttributes = ldap.TryGetPresentEntityAttributes<T>(id);
+
+		ModifyRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}");
+
+		foreach (PropertyInfo info in type.GetProperties())
+			if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute && (!attribute.Hidden || setHiddenAttributes)) {
+				if (info.GetValue(entity) is { } value) {
+					DirectoryAttributeModification mod = new() {
+						Name = attribute.Name,
+						Operation = DirectoryAttributeOperation.Replace
+					};
+					mod.Add(value.ToString());
+					request.Modifications.Add(mod);
+				}
+				else if (presentAttributes.Contains(attribute.Name)) {
+					request.Modifications.Add(new() {
+						Name = attribute.Name,
+						Operation = DirectoryAttributeOperation.Delete
+					});
+				}
+			}
+
+		return request;
 	}
 }
