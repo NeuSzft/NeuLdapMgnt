@@ -77,80 +77,6 @@ namespace NeuLdapMgnt.WebApp.Services
 			}
 		}
 
-		public async Task FetchTeachers()
-		{
-			try
-			{
-				Teachers.Clear();
-
-				var response = await ApiRequests.GetTeachersAsync();
-				if (response.IsSuccess())
-				{
-					Teachers = new(response.Values);
-				}
-
-				if (response.Errors.Any())
-				{
-					ToastService.Notify(ToastMessages.Error(response.GetError()));
-				}
-
-
-			}
-			catch (Exception e)
-			{
-				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
-				ToastService.Notify(ToastMessages.Error(message));
-			}
-		}
-
-		public async Task FetchAdmins()
-		{
-			try
-			{
-				Admins.Clear();
-
-				var response = await ApiRequests.GetAdminsAsync();
-				if (response.IsSuccess())
-				{
-					Admins = new(response.Values[0]);
-				}
-
-				if (response.Errors.Any())
-				{
-					ToastService.Notify(ToastMessages.Error(response.GetError()));
-				}
-			}
-			catch (Exception e)
-			{
-				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
-				ToastService.Notify(ToastMessages.Error(message));
-			}
-		}
-
-		public async Task FetchInactiveUsers()
-		{
-			try
-			{
-				InactiveUsers.Clear();
-
-				var response = await ApiRequests.GetInactiveUsersAsync();
-				if (response.IsSuccess())
-				{
-					InactiveUsers = new(response.Values[0]);
-				}
-
-				if (response.Errors.Any())
-				{
-					ToastService.Notify(ToastMessages.Error(response.GetError()));
-				}
-			}
-			catch (Exception e)
-			{
-				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
-				ToastService.Notify(ToastMessages.Error(message));
-			}
-		}
-
 		public async Task AddStudent(Student student)
 		{
 			try
@@ -217,9 +143,32 @@ namespace NeuLdapMgnt.WebApp.Services
 			}
 		}
 
+		public async Task FetchTeachers()
+		{
+			try
+			{
+				Teachers.Clear();
+
+				var response = await ApiRequests.GetTeachersAsync();
+				if (response.IsSuccess())
+				{
+					Teachers = new(response.Values);
+				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
 		public async Task UpdateTeachersInBulk(IEnumerable<Teacher> teachers, bool isAdmin, bool isInactive)
 		{
-			//TODO: FIX THIS SHIT
 			try
 			{
 				if (isInactive)
@@ -230,9 +179,9 @@ namespace NeuLdapMgnt.WebApp.Services
 
 				foreach (var teacher in teachers)
 				{
-					if (isAdmin && !Admins.Contains(teacher.Id)) 
+					if (isAdmin && !Admins.Contains(teacher.Id))
 					{
-						await ApiRequests.AddAdminAsync(teacher.Id);	
+						await ApiRequests.AddAdminAsync(teacher.Id);
 					}
 
 					if (isInactive && !InactiveUsers.Contains(teacher.Id))
@@ -271,6 +220,98 @@ namespace NeuLdapMgnt.WebApp.Services
 					await ApiRequests.DeleteTeacherAsync(teacher.Id);
 				}
 				ToastService.Notify(ToastMessages.Success("Selected teachers were deleted!"));
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
+		public async Task FetchAdmins()
+		{
+			try
+			{
+				Admins.Clear();
+
+				var response = await ApiRequests.GetAdminsAsync();
+				if (response.IsSuccess())
+				{
+					Admins = new(response.Values[0]);
+				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
+		public async Task FetchInactiveUsers()
+		{
+			try
+			{
+				InactiveUsers.Clear();
+
+				var response = await ApiRequests.GetInactiveUsersAsync();
+				if (response.IsSuccess())
+				{
+					InactiveUsers = new(response.Values[0]);
+				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
+		public async Task DeactivateUser(string id)
+		{
+			try
+			{
+				var response = await ApiRequests.DeactivateUserAsync(id);
+				if (response.IsSuccess())
+				{
+					await FetchInactiveUsers();
+				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
+		public async Task ActivateUser(string id)
+		{
+			try
+			{
+				var response = await ApiRequests.ActivateUserAsync(id);
+				if (response.IsSuccess())
+				{
+					await FetchInactiveUsers();
+				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
 			}
 			catch (Exception e)
 			{
