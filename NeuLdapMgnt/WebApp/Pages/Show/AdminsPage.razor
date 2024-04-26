@@ -3,20 +3,25 @@
 <PageTitle>Admins</PageTitle>
 
 <h1>Admins</h1>
-
-<TableAdmins Admins="LocalDbService.Admins" />
+@if (isLoading)
+{
+	<Loading Text="Loading admins" />
+}
+else
+{
+	<TableAdmins Admins="LocalDbService.Admins" />
+}
 
 @code {
+	private bool isLoading = false;
+
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
-
-		//LocalDbService.LoadingEnable("Fetching teachers");
-		await LocalDbService.FetchTeachers();
-
-		//LocalDbService.LoadingEnable("Fetching admins");
+		isLoading = true;
+		await TeacherService.FetchTeachers();
 		await LocalDbService.FetchAdmins();
-		//LocalDbService.LoadingDisable;
+		isLoading = false;
 	}
 }
 

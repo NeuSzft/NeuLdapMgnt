@@ -4,7 +4,7 @@
 
 <div class="row justify-content-between g-2">
 	<div class="col">
-		<h1>Teachers</h1>
+		<h1>Teachers [@TeacherService.Teachers.Count]</h1>
 	</div>
 	<div class="col text-end">
 		<ButtonRefresh OnClick="FetchData" Text="Refresh" />
@@ -15,24 +15,28 @@
 {
 	<Loading Text="Loading teachers" />
 }
-else if (!LocalDbService.Teachers.Any())
+else if (!TeacherService.Teachers.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
-			<h3 class="my-4">There are no teachers in the database</h3>
-			<ButtonAdd Text="Add Teachers" OnClick="ToAddPage" />
+			<h3 class="my-4">There are no <strong>[Active]</strong> teachers</h3>
+			<ButtonAdd Text="Add Teacher" OnClick="ToAddPage" />
+			<Button Color="ButtonColor.Dark" Outline="true" Class="ms-3" @onclick="ToInactivesPage">
+				<i class="bi bi-eye"></i>
+				View
+				<strong>[Inactives]</strong>
+			</Button>
 		</div>
 	</div>
 }
 else
 {
-	<TableTeachers Teachers="LocalDbService.Teachers"
-				   OnTeachersDelete="HandleDeleteTeachers"
+	<TableTeachers Teachers="TeacherService.Teachers"
 				   OnTeachersUpdate="HandleUpdateTeachers" />
 }
 
 @code {
-	private bool isLoading = false;
+	private bool isLoading = true;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -42,31 +46,24 @@ else
 		isLoading = false;
 	}
 
-	private async Task HandleDeleteTeachers(IEnumerable<Teacher> teachers)
-	{
-		isLoading = true;
-		StateHasChanged();
-		await LocalDbService.DeleteTeachersInBulk(teachers);
-		await FetchData();
-		isLoading = false;
-	}
-
-	private async Task HandleUpdateTeachers((IEnumerable<Teacher>, bool, bool) context)
+	private async Task HandleUpdateTeachers((List<Teacher>, bool, bool) context)
 	{
 		var (teachers, isAdmin, isInactive) = context;
 		isLoading = true;
-		await LocalDbService.UpdateTeachersInBulk(teachers, isAdmin, isInactive);
+		await TeacherService.UpdateTeachers(teachers, isAdmin, isInactive);
 		await FetchData();
 		isLoading = false;
 	}
 
 	private async Task FetchData()
 	{
-		await LocalDbService.FetchClasses();
-		await LocalDbService.FetchTeachers();
+		await LocalDbService.FetchInactiveUsers();
 		await LocalDbService.FetchAdmins();
+		await LocalDbService.FetchClasses();
+		await TeacherService.FetchTeachers();
 	}
 
 	private void ToAddPage() => NavManager.NavigateTo("/teachers/add");
+	private void ToInactivesPage() => NavManager.NavigateTo("/db/inactive-users");
 }
 

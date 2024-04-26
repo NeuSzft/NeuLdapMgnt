@@ -4,7 +4,7 @@
 
 <div class="row justify-content-between g-2">
 	<div class="col">
-		<h1>Students</h1>
+		<h1>Students [@StudentService.Students.Count]</h1>
 	</div>
 	<div class="col text-end">
 		<ButtonRefresh OnClick="OnRefresh" Text="Refresh" />
@@ -23,19 +23,23 @@ else if (isDeleting)
 {
 	<Loading Text="Deleting students" />
 }
-else if (!LocalDbService.Students.Any())
+else if (!StudentService.Students.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
-			<h3 class="my-4">There are no students in the database</h3>
+			<h3 class="my-4">There are no <strong>[Active]</strong> students</h3>
 			<ButtonAdd Text="Add Students" OnClick="ToAddPage" />
+			<Button Color="ButtonColor.Dark" Outline="true" Class="ms-3" @onclick="ToInactivesPage">
+				<i class="bi bi-eye"></i>
+				View
+				<strong>[Inactives]</strong>
+			</Button>
 		</div>
 	</div>
 }
 else
 {
-	<TableStudents Students="LocalDbService.Students"
-				   OnStudentsDelete="HandleDeleteStudents"
+	<TableStudents Students="StudentService.Students"
 				   OnStudentsUpdate="HandleUpdateStudents" />
 }
 
@@ -47,35 +51,29 @@ else
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
-		isLoading = true;
 		await LocalDbService.FetchClasses();
-		await OnRefresh();
+		await StudentService.FetchStudents();
 		isLoading = false;
 	}
 
-	private async Task HandleDeleteStudents(IEnumerable<Student> students)
-	{
-		isDeleting = true;
-		await LocalDbService.DeleteStudentsInBulk(students);
-		await OnRefresh();
-		isDeleting = false;
-	}
-
-	private async Task HandleUpdateStudents((IEnumerable<Student>, string, bool) context)
+	private async Task HandleUpdateStudents((List<Student>, string, bool) context)
 	{
 		var (students, cls, isInactive) = context;
 		isUpdating = true;
-		await LocalDbService.UpdateStudentsInBulk(students, cls, isInactive);
+		await StudentService.UpdateStudents(students, cls, isInactive);
 		await OnRefresh();
 		isUpdating = false;
 	}
 
 	private async Task OnRefresh()
 	{
-		await LocalDbService.FetchStudents();
+		isLoading = true;
+		await StudentService.FetchStudents();
+		isLoading = false;
 	}
 
 	private void ToAddPage() => NavManager.NavigateTo("/students/add");
+	private void ToInactivesPage() => NavManager.NavigateTo("/db/inactive-users");
 }
 
 

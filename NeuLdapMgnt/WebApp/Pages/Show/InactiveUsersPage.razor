@@ -27,7 +27,7 @@ else
 	{
 		<div class="d-flex justify-content-end align-items-center g-2 mb-3">
 			<div class="ms-2">
-				<Button Color="ButtonColor.Success" Outline="true" @onclick="OnActivateSelectedUsers">
+				<Button Color="ButtonColor.Success" Outline="true" Disabled="isUserSelected" @onclick="OnActivateSelectedUsers">
 					Activate selected
 				</Button>
 			</div>
@@ -37,7 +37,7 @@ else
 				<thead class="sticky-top">
 					<tr class="rounded">
 						<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllUsers">
-							@if (!AreAllUsersSelected())
+							@if (!AreUsersSelected())
 							{
 								<span>Select all</span>
 							}
@@ -93,10 +93,7 @@ else
 	private async Task OnActivateSelectedUsers()
 	{
 		isActivating = true;
-		foreach (var user in selectedUsers)
-		{
-			await LocalDbService.ActivateUser(user);
-		}
+		await LocalDbService.ActivateUsers(selectedUsers);
 		usersList = LocalDbService.InactiveUsers.ToList();
 		isActivating = false;
 		ToastService.Notify(ToastMessages.Success("Selected users were activated."));
@@ -106,13 +103,13 @@ else
 	{
 		if (long.TryParse(userId, out long studentId) && studentId != 0)
 		{
-			Student? student = await LocalDbService.FetchStudent(studentId);
+			Student? student = await StudentService.FetchStudent(studentId);
 			if (student is null) return;
 			NavManager.NavigateTo($"/students/{studentId}");
 		}
 		else
 		{
-			Teacher? teacher = await LocalDbService.FetchTeacher(userId);
+			Teacher? teacher = await TeacherService.FetchTeacher(userId);
 			if (teacher is null) return;
 			NavManager.NavigateTo($"/teachers/{userId}");
 		}
@@ -132,7 +129,7 @@ else
 
 	private void SelectAllUsers()
 	{
-		if (AreAllUsersSelected())
+		if (AreUsersSelected())
 		{
 			selectedUsers.Clear();
 		}
@@ -142,9 +139,5 @@ else
 		}
 	}
 
-	private bool AreAllUsersSelected()
-	{
-		return selectedUsers.Count > 0
-			&& selectedUsers.Count.Equals(usersList.Count);
-	}
+	private bool AreUsersSelected() => selectedUsers.Count > 0;
 }

@@ -8,8 +8,14 @@
 }
 else
 {
-	<h3>[@student.Class] @student.FullName</h3>
-	<FormStudent Student="student" OnSubmit="OnSubmit" IsReadonly="isLoading" CanDelete="true" OnDelete="OnDelete" />
+	@if (isInactive)
+	{
+		<h3><strong>[Inactive]</strong></h3>
+	}
+	<h3>
+		[@student.Class] @student.FullName
+	</h3>
+	<FormStudent Student="student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete" />
 	<ConfirmDialog @ref="dialog" />
 }
 
@@ -19,19 +25,24 @@ else
 
 	private Student student = new();
 	private ConfirmDialog dialog = default!;
+	private List<string> errorList = new();
+	//TODO: Show modal errorlist
 	private bool isLoading = true;
+	private bool isInactive = true;
 
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 		long.TryParse(Id, out long id);
 
-		var searchedStudent = await LocalDbService.FetchStudent(id);
+		var searchedStudent = await StudentService.FetchStudent(id);
 		if (searchedStudent is null) return;
 		student = searchedStudent;
 
 		await LocalDbService.FetchClasses();
+		await LocalDbService.FetchInactiveUsers();
 		isLoading = false;
+		isInactive = LocalDbService.InactiveUsers.Contains(id.ToString());
 	}
 
 	private async Task<bool> OnSubmit(Student editedStudent)
@@ -46,36 +57,15 @@ else
 		parameters.Add("StudentOriginal", student);
 		parameters.Add("StudentEdited", editedStudent);
 
-		var confirmation = await dialog.ShowAsync<SummaryStudentEdit>("Edit student?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
+		var confirmation = await dialog.ShowAsync<SummaryStudentEdit>("Edit this student?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
 		if (!confirmation) return false;
 
 		isLoading = true;
-
-		try
-		{
-			var response = await ApiRequests.UpdateStudentAsync(student.Id, editedStudent);
-			if (response.IsSuccess())
-			{
-				ToastService.Notify(ToastMessages.Success($"{student.FullName} was edited!"));
-				NavManager.NavigateTo("/students");
-				return true;
-			}
-
-			if (response.Errors.Any())
-			{
-				ToastService.Notify(ToastMessages.Error(response.GetError()));
-			}
-		}
-		catch (HttpRequestException httpError)
-		{
-			string errorMessage = Utils.GetErrorMessage(httpError);
-			ToastService.Notify(ToastMessages.Error(errorMessage));
-		}
-		catch (Exception e)
-		{
-			ToastService.Notify(ToastMessages.Error(e.Message));
-		}
+		var response = await StudentService.UpdateStudent(editedStudent);
+		errorList = response.ToList();
 		isLoading = false;
+		NavManager.NavigateTo("/students");
+
 		return false;
 	}
 
@@ -84,36 +74,14 @@ else
 		var parameters = new Dictionary<string, object>();
 		parameters.Add("Student", editedStudent);
 
-		var confirmation = await dialog.ShowAsync<SummaryStudent>("Delete this student?", parameters, DialogOptions.Delete());
+		var confirmation = await dialog.ShowAsync<SummaryStudent>("Deactivate this student?", parameters, DialogOptions.Confirm());
 		if (!confirmation) return false;
 
 		isLoading = true;
-
-		try
-		{
-			var response = await ApiRequests.DeleteStudentAsync(editedStudent.Id);
-			if (response.IsSuccess())
-			{
-				ToastService.Notify(ToastMessages.Success($"Student deleted successfully"));
-				NavManager.NavigateTo("/students");
-				return true;
-			}
-
-			if (response.Errors.Any())
-			{
-				ToastService.Notify(ToastMessages.Error(response.GetError()));
-			}
-		}
-		catch (HttpRequestException httpError)
-		{
-			string errorMessage = Utils.GetErrorMessage(httpError);
-			ToastService.Notify(ToastMessages.Error(errorMessage));
-		}
-		catch (Exception e)
-		{
-			ToastService.Notify(ToastMessages.Error(e.Message));
-		}
+		await LocalDbService.DeactivateUser(editedStudent.Id.ToString());
 		isLoading = false;
+		NavManager.NavigateTo("/students");
+
 		return false;
 	}
 }

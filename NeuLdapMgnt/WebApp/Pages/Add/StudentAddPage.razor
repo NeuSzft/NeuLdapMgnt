@@ -62,7 +62,7 @@ else
 		if (!confirmation) return false;
 		isSubmitting = true;
 
-		await LocalDbService.AddStudent(studentUpdated);
+		await StudentService.AddStudent(studentUpdated);
 
 		isSubmitting = false;
 		return false;

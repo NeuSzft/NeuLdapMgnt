@@ -26,6 +26,8 @@ else
 
 	private Teacher teacher = new();
 	private ConfirmDialog dialog = default!;
+	//TODO: modalerrorlist
+	private List<string> errorList = new();
 	private bool isLoading = true;
 
 	protected override async Task OnInitializedAsync()
@@ -34,7 +36,7 @@ else
 
 		await LocalDbService.FetchClasses();
 
-		var searchedTeacher = await LocalDbService.FetchTeacher(Id);
+		var searchedTeacher = await TeacherService.FetchTeacher(Id);
 		if (searchedTeacher is null) return;
 		teacher = searchedTeacher;
 		isLoading = false;
@@ -52,37 +54,15 @@ else
 		parameters.Add("TeacherOriginal", teacher);
 		parameters.Add("TeacherEdited", editedTeacher);
 
-		var confirmation = await dialog.ShowAsync<SummaryTeacherEdit>("Edit teacher?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
+		var confirmation = await dialog.ShowAsync<SummaryTeacherEdit>("Edit this teacher?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
 		if (!confirmation) return false;
 
 		isLoading = true;
-
-		try
-		{
-
-			var response = await ApiRequests.UpdateTeacherAsync(teacher.Id, editedTeacher);
-			if (response.IsSuccess())
-			{
-				ToastService.Notify(ToastMessages.Success($"{teacher.FullName} was edited!"));
-				NavManager.NavigateTo("/teachers");
-				return true;
-			}
-
-			if (response.Errors.Any())
-			{
-				ToastService.Notify(ToastMessages.Error(response.GetError()));
-			}
-		}
-		catch (HttpRequestException httpError)
-		{
-			string errorMessage = Utils.GetErrorMessage(httpError);
-			ToastService.Notify(ToastMessages.Error(errorMessage));
-		}
-		catch (Exception e)
-		{
-			ToastService.Notify(ToastMessages.Error(e.Message));
-		}
+		var response = await TeacherService.UpdateTeacher(editedTeacher);
+		errorList = response.ToList();
 		isLoading = false;
+		NavManager.NavigateTo("/teachers");
+
 		return false;
 	}
 
@@ -91,37 +71,14 @@ else
 		var parameters = new Dictionary<string, object>();
 		parameters.Add("Teacher", editedTeacher);
 
-		var confirmation = await dialog.ShowAsync<SummaryTeacher>("Delete this teacher?", parameters, DialogOptions.Delete());
+		var confirmation = await dialog.ShowAsync<SummaryTeacher>("Deactivate this teacher?", parameters, DialogOptions.Confirm());
 		if (!confirmation) return false;
 
 		isLoading = true;
-
-		try
-		{
-
-			var response = await ApiRequests.DeleteTeacherAsync(editedTeacher.Id);
-			if (response.IsSuccess())
-			{
-				ToastService.Notify(ToastMessages.Success($"Teacher deleted successfully"));
-				NavManager.NavigateTo("/teachers");
-				return true;
-			}
-
-			if (response.Errors.Any())
-			{
-				ToastService.Notify(ToastMessages.Error(response.GetError()));
-			}
-		}
-		catch (HttpRequestException httpError)
-		{
-			string errorMessage = Utils.GetErrorMessage(httpError);
-			ToastService.Notify(ToastMessages.Error(errorMessage));
-		}
-		catch (Exception e)
-		{
-			ToastService.Notify(ToastMessages.Error(e.Message));
-		}
+		await LocalDbService.DeactivateUser(editedTeacher.Id);
 		isLoading = false;
+		NavManager.NavigateTo("/teachers");
+
 		return false;
 	}
 }
