@@ -34,7 +34,7 @@ else
 
 		await LocalDbService.FetchClasses();
 
-		var searchedTeacher = LocalDbService.Teachers.FirstOrDefault(x => x.Id.Equals(Id));
+		var searchedTeacher = await LocalDbService.FetchTeacher(Id);
 		if (searchedTeacher is null) return;
 		teacher = searchedTeacher;
 		isLoading = false;
