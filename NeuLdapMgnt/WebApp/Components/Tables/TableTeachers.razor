@@ -15,12 +15,6 @@
 	</FooterTemplate>
 </Modal>
 
-@if (isDeleting)
-{
-	<Loading Text="Deleting teachers" />
-}
-else
-{
 	<div class="d-flex justify-content-between align-items-center g-2 mb-3">
 		<div class="d-flex flex-grow-1 flex-md-grow-0">
 			<div class="input-group">
@@ -36,7 +30,7 @@ else
 			</div>
 		</div>
 		<div class="ms-2">
-			@if (isAction)
+			@if (isEditing)
 			{
 				<Button Color="ButtonColor.Warning" Outline="true" Disabled="isEditing">
 					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Warning" />
@@ -138,7 +132,7 @@ else
 			</tbody>
 		</table>
 	</div>
-}
+
 
 @code {
 	[Parameter]
@@ -167,10 +161,7 @@ else
 	private bool editIsInactive = false;
 	private Switch switchEditIsInactive = default!;
 
-	private bool isDeleting = false;
 	private bool isEditing = false;
-	private bool isUpdating = false;
-	private bool isAction => isDeleting || isEditing || isUpdating;
 	private bool isTeacherSelected => !selectedTeachers.Any();
 
 	protected override void OnInitialized()
@@ -210,9 +201,7 @@ else
 
 		if (OnTeachersUpdate.HasDelegate)
 		{
-			isUpdating = true;
 			await OnTeachersUpdate.InvokeAsync((selectedTeachers, editIsAdmin, editIsInactive));
-			isUpdating = false;
 			await HideModalEdit();
 		}
 	}
@@ -234,9 +223,7 @@ else
 
 		if (OnTeachersDelete.HasDelegate)
 		{
-			isDeleting = true;
 			await OnTeachersDelete.InvokeAsync(selectedTeachers);
-			isDeleting = false;
 			await HideModalEdit();
 		}
 	}

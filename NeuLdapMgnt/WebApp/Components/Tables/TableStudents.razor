@@ -22,24 +22,10 @@
 	<FooterTemplate>
 		<ButtonDelete Text="Delete" OnClick="DeleteSelected" />
 		<ButtonCancel Text="Cancel" OnClick="HideModalEdit" />
-		<ButtonSave Text="Save" IsDisabled="isUpdating" OnClick="UpdateSelected" />
+		<ButtonSave Text="Save" OnClick="UpdateSelected" />
 	</FooterTemplate>
 </Modal>
 
-@if (isLoading)
-{
-	<Loading Text="Loading students" />
-}
-else if (isDeleting)
-{
-	<Loading Text="Deleting students" />
-}
-else if (isUpdating)
-{
-	<Loading Text="Updating students" />
-}
-else
-{
 	<div class="d-flex justify-content-between align-items-center g-2 mb-3">
 		<div class="d-flex flex-grow-1 flex-md-grow-0">
 			<div class="input-group">
@@ -55,7 +41,7 @@ else
 			</div>
 		</div>
 		<div class="ms-2">
-			@if (isAction)
+			@if (isEditing)
 			{
 				<Button Color="ButtonColor.Warning" Outline="true" Disabled="isEditing">
 					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Warning" />
@@ -139,7 +125,7 @@ else
 			</tbody>
 		</table>
 	</div>
-}
+
 
 @code {
 	[Parameter]
@@ -164,12 +150,8 @@ else
 
 	private bool isAscending = true;
 	private bool isLoading = false;
-	private bool isDeleting = false;
 	private bool isEditing = false;
-	private bool isUpdating = false;
-	private bool isAction => isDeleting || isEditing || isUpdating;
 	private bool isStudentSelected => !selectedStudents.Any();
-
 
 	private string editedClass = string.Empty;
 	private bool editIsInactive = false;
@@ -185,9 +167,7 @@ else
 	{
 		if (OnStudentsUpdate.HasDelegate)
 		{
-			isUpdating = true;
 			await OnStudentsUpdate.InvokeAsync((selectedStudents, editedClass, editIsInactive));
-			isUpdating = false;
 			await HideModalEdit();
 		}
 	}
@@ -209,9 +189,7 @@ else
 
 		if (OnStudentsDelete.HasDelegate)
 		{
-			isDeleting = true;
 			await OnStudentsDelete.InvokeAsync(selectedStudents);
-			isDeleting = false;
 			await HideModalEdit();
 		}
 	}
