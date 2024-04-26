@@ -1,0 +1,25 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JsRuntime
+
+@if (!Hidden) {
+	<div class="btn-group" style="position: absolute; bottom: 2em; right: 2em;">
+		<Button class="btn btn-warning" @onclick="DefaultAdminAuth">
+			<Tooltip Placement="TooltipPlacement.Top" Title="Login as the Default Admin">
+				<Icon Name="IconName.PersonFillCheck"/>
+			</Tooltip>
+		</Button>
+		<Button class="btn btn-warning" @onclick="ClearCaches">
+			<Tooltip Placement="TooltipPlacement.Top" Title="Clear Caches">
+				<Icon Name="IconName.TrashFill"/>
+			</Tooltip>
+		</Button>
+	</div>
+}
+
+@code {
+	[Parameter] public bool Hidden { get; set; }
+
+	private async Task DefaultAdminAuth() => await ApiRequests.LoginAsync("admin", "adminpass");
+
+	private async Task ClearCaches() => await JsRuntime.InvokeVoidAsync("cc");
+}

@@ -1,3 +1,4 @@
+// Download json as a file
 self.downloadJsonFile = function (file, json) {
     let link = document.createElement("a")
     link.download = file
@@ -8,7 +9,8 @@ self.downloadJsonFile = function (file, json) {
     document.body.removeChild(link)
 }
 
-self.eswc = function () {
+// Clear caches
+self.cc = function () {
     caches.keys().then(function (names) {
         for (let name of names)
             caches.delete(name).then(function (success) {
