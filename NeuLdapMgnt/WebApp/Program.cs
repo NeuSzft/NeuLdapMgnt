@@ -25,9 +25,14 @@ else
 
 ToastService toastService = new();
 ModalService modalService = new();
+NotificationService notificationService = new(toastService);
+LocalDbService localDbService = new(apiRequests, notificationService);
 
 builder.Services.AddSingleton<ToastService>(_ => toastService);
 builder.Services.AddSingleton<ModalService>(_ => modalService);
-builder.Services.AddSingleton<LocalDbService>(_ => new(apiRequests, toastService));
+builder.Services.AddSingleton<LocalDbService>(_ => localDbService);
+builder.Services.AddSingleton<NotificationService>(_ => notificationService);
+builder.Services.AddSingleton<StudentService>(_ => new(apiRequests, localDbService, notificationService));
+builder.Services.AddSingleton<TeacherService>(_ => new(apiRequests, localDbService, notificationService));
 
 await builder.Build().RunAsync();

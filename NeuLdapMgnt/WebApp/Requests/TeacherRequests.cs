@@ -8,7 +8,7 @@ namespace NeuLdapMgnt.WebApp.Requests
 			=> await apiRequests.SendRequestAsync<Teacher>(HttpMethod.Get, "api/teachers");
 
 		public static async Task<RequestResult<Teacher>> GetTeacherAsync(this ApiRequests apiRequests, string id)
-			=> await apiRequests.SendRequestAsync<Teacher>(HttpMethod.Get, $"api/teachers{id}");
+			=> await apiRequests.SendRequestAsync<Teacher>(HttpMethod.Get, $"api/teachers/{id}");
 
 		public static async Task<RequestResult<Teacher>> AddTeacherAsync(this ApiRequests apiRequests, Teacher teacher)
 			=> await apiRequests.SendRequestAsync<Teacher>(HttpMethod.Post, "api/teachers", teacher);
