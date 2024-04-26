@@ -28,6 +28,6 @@ ModalService modalService = new();
 
 builder.Services.AddSingleton<ToastService>(_ => toastService);
 builder.Services.AddSingleton<ModalService>(_ => modalService);
-builder.Services.AddSingleton<LocalDbService>(_ => new(apiRequests, modalService, toastService));
+builder.Services.AddSingleton<LocalDbService>(_ => new(apiRequests, toastService));
 
 await builder.Build().RunAsync();

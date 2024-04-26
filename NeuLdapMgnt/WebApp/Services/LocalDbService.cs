@@ -1,13 +1,8 @@
-﻿using NeuLdapMgnt.WebApp.Model;
-using NeuLdapMgnt.Models;
+﻿using Microsoft.AspNetCore.Components;
 using BlazorBootstrap;
+using NeuLdapMgnt.Models;
 using NeuLdapMgnt.WebApp.ComponentOptions;
-using NeuLdapMgnt.WebApp.Components;
 using NeuLdapMgnt.WebApp.Requests;
-using Microsoft.AspNetCore.Components;
-using System.Diagnostics;
-using System.Net;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace NeuLdapMgnt.WebApp.Services
 {
@@ -15,9 +10,6 @@ namespace NeuLdapMgnt.WebApp.Services
 	{
 		[Inject]
 		private ApiRequests ApiRequests { get; set; }
-
-		[Inject]
-		private ModalService ModalService { get; set; }
 
 		[Inject]
 		private ToastService ToastService { get; set; }
@@ -32,10 +24,9 @@ namespace NeuLdapMgnt.WebApp.Services
 
 		public List<string> InactiveUsers { get; set; } = new();
 
-		public LocalDbService(ApiRequests apiRequests, ModalService modalService, ToastService toastService)
+		public LocalDbService(ApiRequests apiRequests, ToastService toastService)
 		{
 			ApiRequests = apiRequests;
-			ModalService = modalService;
 			ToastService = toastService;
 		}
 
