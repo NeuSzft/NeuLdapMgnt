@@ -80,7 +80,7 @@ namespace NeuLdapMgnt.Models
 		[Email]
 		[JsonRequired, JsonPropertyName("email")]
 		[LdapAttribute("mail")]
-		public string Email { get; set; } = string.Empty;
+		public string? Email { get; set; }
 
 		[Required(ErrorMessage = "Directory is required.")]
 		[Directory]

@@ -7,6 +7,11 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 	{
 		protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 		{
+			if (value == null)
+			{
+				return ValidationResult.Success;
+			}
+
 			if (value is string email)
 			{
 				if (string.IsNullOrEmpty(email))
