@@ -1,0 +1,44 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime JsRuntime
+
+<form class="gap-2 p-4 border rounded">
+	<div class="mb-3">
+		<h3>Export the database into a JSON dump file</h3>
+	</div>
+	<div class="mb-3">
+		<Button @onclick="ExportDatabase" class="btn btn-primary">Export</Button>
+	</div>
+	@if (_exportedJson.Length > 0) {
+		<div class="mb-3">
+			<InputTextArea @bind-Value="_exportedJson" class="form-control" rows="12" style="resize: none" readonly/>
+		</div>
+		<div class="mb-3">
+			<Button @onclick="Download" class="btn btn-primary">Download</Button>
+		</div>
+	}
+</form>
+
+@code {
+	private DateTime _lastExportTime;
+
+	private string _exportedJson = string.Empty;
+
+	[Parameter] public Func<ModalType, string, IEnumerable<string>, Task>? ShowModal { get; set; }
+
+	private async Task ExportDatabase() {
+		RequestResult<LdapDbDump> result = await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Get, "/api/database");
+
+		if (result.IsSuccess()) {
+			_lastExportTime = DateTime.Now;
+			_exportedJson = JsonSerializer.Serialize(result.Values.FirstOrDefault(), new JsonSerializerOptions { WriteIndented = true });
+			ToastService.Notify(ToastMessages.Success("Successfully exported database"));
+		}
+		else if (ShowModal is not null)
+			await ShowModal(ModalType.Danger, "Export Errors", result.Errors);
+	}
+
+	private async Task Download() {
+		await JsRuntime.InvokeVoidAsync("downloadJsonFile", $"database-{_lastExportTime:yyyy.MM.dd-HH_mm_ss}.json", _exportedJson);
+	}
+
+}

@@ -1,0 +1,103 @@
+﻿@inherits LayoutComponentBase
+
+<form class="gap-2 p-4 border rounded">
+	<div class="mb-3">
+		<h3>Import a JSON dump file into the database</h3>
+	</div>
+	<div class="mb-3">
+		<FileUpload OnFileUploaded="OnFileImported" AllowedExtensions="_allowedExtension"/>
+	</div>
+	<div class="row align-items-center">
+		<div class="col-12 mb-3">
+			<InputRadioGroup Name="import-mode" @bind-Value="_importMode" class="form-control">
+				<div class="d-flex">
+					<InputRadio Name="import-mode" Value="0" id="import-mode-0" class="me-2"/>
+					<label for="import-mode-0">Add entries that do not exist yet.</label>
+				</div>
+				<div class="d-flex">
+					<InputRadio Name="import-mode" Value="1" id="import-mode-1" class="me-2"/>
+					<label for="import-mode-1">Overwrite existing entries.</label>
+				</div>
+				<div class="d-flex">
+					<InputRadio Name="import-mode" Value="2" id="import-mode-2" class="me-2"/>
+					<label for="import-mode-2">Erase database before importing.</label>
+				</div>
+			</InputRadioGroup>
+		</div>
+		<div class="col">
+			@if (_isUploading) {
+				<Button Color="ButtonColor.Primary" Outline="true" Disabled="@true">
+					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Primary"/>
+				</Button>
+			}
+			else {
+				<Button Color="ButtonColor.Primary" @onclick="ImportDatabase" Disabled="@(_importedJson.Length == 0)">
+					Import with <strong>@CurrentModeName</strong> mode
+				</Button>
+			}
+		</div>
+	</div>
+</form>
+
+@code {
+	private readonly string[] _allowedExtension = { ".json" };
+
+	private string _importedJson = string.Empty;
+
+	private int _importMode = 0;
+
+	private bool _isUploading = false;
+
+	[Parameter] public Func<ModalType, string, IEnumerable<string>, Task>? ShowModal { get; set; }
+
+	private string CurrentModeName => _importMode switch {
+		0 => "append",
+		1 => "overwrite",
+		2 => "erase",
+		_ => string.Empty
+	};
+
+	private async Task OnFileImported(IBrowserFile file) {
+		await using Stream stream = file.OpenReadStream();
+		using StreamReader reader = new(stream);
+		_importedJson = await reader.ReadToEndAsync();
+	}
+
+	private async Task ImportDatabase() {
+		_isUploading = true;
+
+		try {
+			LdapDbDump?   dump = JsonSerializer.Deserialize<LdapDbDump>(_importedJson);
+			RequestResult result;
+
+			switch (_importMode) {
+				case 1:
+					result = await ApiRequests.SendRequestAsync(HttpMethod.Put, "/api/database", dump);
+					if (ShowModal is not null && result.IsFailure())
+						await ShowModal(ModalType.Danger, "Import Errors", result.Errors);
+					break;
+				case 2:
+					await ApiRequests.SendRequestAsync(HttpMethod.Delete, "/api/database");
+					result = await ApiRequests.SendRequestAsync(HttpMethod.Post, "/api/database", dump);
+					if (ShowModal is not null && result.IsFailure())
+						await ShowModal(ModalType.Danger, "Import Errors", result.Errors);
+					break;
+				default:
+					result = await ApiRequests.SendRequestAsync(HttpMethod.Post, "/api/database", dump);
+					if (ShowModal is not null && result.IsFailure())
+						await ShowModal(ModalType.Warning, "Import Conflicts", result.Errors);
+					break;
+			}
+
+			ToastService.Notify(result.IsSuccess()
+				? ToastMessages.Success("Successfully imported database dump")
+				: ToastMessages.Warning("Imported database dump with partial success"));
+		}
+		catch (Exception e) {
+			ToastService.Notify(ToastMessages.Error(e.Message));
+		}
+
+		_isUploading = false;
+	}
+
+}
