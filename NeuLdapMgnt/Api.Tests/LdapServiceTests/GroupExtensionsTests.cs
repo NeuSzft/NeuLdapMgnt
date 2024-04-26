@@ -6,6 +6,29 @@ public class GroupExtensionsTests {
 	public void Cleanup() => Testing.EraseLdap();
 
 	[TestMethod]
+	public void TestSetAndGetMembersOfGroup() {
+		string[] members = ["0", "1", "2", "3", "4"];
+		Assert.IsTrue(Testing.LdapService.SetMembersOfGroup("dummies", members));
+
+		Assert.IsTrue(Testing.LdapService.GroupExists("dummies"));
+		CollectionAssert.AreEqual(members, Testing.LdapService.GetMembersOfGroup("dummies").ToArray());
+
+		members = ["0", "1", "2", "4", "8"];
+		Assert.IsTrue(Testing.LdapService.SetMembersOfGroup("dummies", members));
+
+		Assert.IsTrue(Testing.LdapService.GroupExists("dummies"));
+		CollectionAssert.AreEqual(members, Testing.LdapService.GetMembersOfGroup("dummies").ToArray());
+	}
+
+	[TestMethod]
+	public void TestSetMembersOfGroupToEmpty() {
+		Assert.IsTrue(Testing.LdapService.SetMembersOfGroup("dummies", []));
+
+		Assert.IsTrue(Testing.LdapService.GroupExists("dummies"));
+		Assert.IsFalse(Testing.LdapService.GetMembersOfGroup("dummies").Any());
+	}
+
+	[TestMethod]
 	public void TestTryAddAndRemoveGroup() {
 		Testing.LdapService.TryAddGroup("dummies").AssertSuccess();
 		Assert.IsTrue(Testing.LdapService.GroupExists("dummies"));
