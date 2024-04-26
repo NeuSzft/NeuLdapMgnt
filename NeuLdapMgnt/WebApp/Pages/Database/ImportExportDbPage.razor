@@ -2,9 +2,32 @@
 
 <PageTitle>Database Import/Export</PageTitle>
 
-<FormImportExportDb/>
+<Modal @ref="_modal" title="@_modalTitle" IsScrollable="true" ModalType="ModalType.Warning">
+	<BodyTemplate>
+		<CustomList List="_modalErrors"/>
+	</BodyTemplate>
+	<FooterTemplate>
+		<ButtonOk Text="Ok" OnClick="@HideModal"/>
+	</FooterTemplate>
+</Modal>
+
+<FormImportExportDb ShowModal="ShowModal"/>
 
 @code {
+
+	private Modal               _modal       = default!;
+	private string              _modalTitle  = string.Empty;
+	private IEnumerable<string> _modalErrors = Array.Empty<string>();
+
+	private async Task ShowModal(string title, IEnumerable<string> errors) {
+		_modalTitle = title;
+		_modalErrors = errors;
+		await _modal.ShowAsync();
+	}
+
+	private async Task HideModal() {
+		await _modal.HideAsync();
+	}
 
 	protected override void OnInitialized() {
 		ApiRequests.EnsureAuthentication(NavManager);
