@@ -2,9 +2,9 @@
 
 <PageTitle>Database Import/Export</PageTitle>
 
-<Modal @ref="_modal" title="@_modalTitle" IsScrollable="true" ModalType="ModalType.Warning">
+<Modal @ref="_modal" IsScrollable="true">
 	<BodyTemplate>
-		<CustomList List="_modalErrors"/>
+		<CustomList List="_errors"/>
 	</BodyTemplate>
 	<FooterTemplate>
 		<ButtonOk Text="Ok" OnClick="@HideModal"/>
@@ -15,13 +15,13 @@
 
 @code {
 
-	private Modal               _modal       = default!;
-	private string              _modalTitle  = string.Empty;
-	private IEnumerable<string> _modalErrors = Array.Empty<string>();
+	private Modal               _modal  = default!;
+	private IEnumerable<string> _errors = Array.Empty<string>();
 
-	private async Task ShowModal(string title, IEnumerable<string> errors) {
-		_modalTitle = title;
-		_modalErrors = errors;
+	private async Task ShowModal(ModalType modalType, string title, IEnumerable<string> errors) {
+		_modal.ModalType = modalType;
+		_modal.Title = title;
+		_errors = errors;
 		await _modal.ShowAsync();
 	}
 

@@ -14,11 +14,11 @@
 				<InputRadioGroup Name="import-mode" @bind-Value="_importMode" class="form-control">
 					<div class="d-flex">
 						<InputRadio Name="import-mode" Value="0" id="import-mode-0" class="me-2"/>
-						<label for="import-mode-0">Add entities that do not exist yet.</label>
+						<label for="import-mode-0">Add entries that do not exist yet.</label>
 					</div>
 					<div class="d-flex">
 						<InputRadio Name="import-mode" Value="1" id="import-mode-1" class="me-2"/>
-						<label for="import-mode-1">Overwrite existing entities.</label>
+						<label for="import-mode-1">Overwrite existing entries.</label>
 					</div>
 					<div class="d-flex">
 						<InputRadio Name="import-mode" Value="2" id="import-mode-2" class="me-2"/>
@@ -33,7 +33,7 @@
 					</Button>
 				}
 				else {
-					<ButtonOk Color="ButtonColor.Primary" OnClick="ImportDatabase" IsDisabled="@(_importedJson.Length == 0)" Text="Upload"/>
+					<ButtonOk Color="ButtonColor.Primary" OnClick="@ImportDatabase" IsDisabled="@(_importedJson.Length == 0)" Text="Upload"/>
 				}
 			</div>
 		</div>
@@ -70,7 +70,7 @@
 
 	private bool isUploading = false;
 
-	[Parameter] public Func<string, IEnumerable<string>, Task>? ShowModal { get; set; }
+	[Parameter] public Func<ModalType, string, IEnumerable<string>, Task>? ShowModal { get; set; }
 
 	private async Task OnFileImported(IBrowserFile file) {
 		await using Stream stream = file.OpenReadStream();
@@ -84,37 +84,45 @@
 		if (result.IsSuccess()) {
 			_lastExportTime = DateTime.Now;
 			_exportedJson = JsonSerializer.Serialize(result.Values.FirstOrDefault(), new JsonSerializerOptions { WriteIndented = true });
+			ToastService.Notify(ToastMessages.Success("Successfully exported database"));
 		}
 		else if (ShowModal is not null)
-			await ShowModal("Export Errors", result.Errors);
+			await ShowModal(ModalType.Danger, "Export Errors", result.Errors);
 	}
 
 	private async Task ImportDatabase() {
 		isUploading = true;
-		RequestResult? result = null;
 
 		try {
-			LdapDbDump? dump = JsonSerializer.Deserialize<LdapDbDump>(_importedJson);
+			LdapDbDump?   dump = JsonSerializer.Deserialize<LdapDbDump>(_importedJson);
+			RequestResult result;
 
 			switch (_importMode) {
 				case 1:
 					result = await ApiRequests.SendRequestAsync(HttpMethod.Put, "/api/database", dump);
+					if (ShowModal is not null && result.IsFailure())
+						await ShowModal(ModalType.Danger, "Import Errors", result.Errors);
 					break;
 				case 2:
 					await ApiRequests.SendRequestAsync(HttpMethod.Delete, "/api/database");
 					result = await ApiRequests.SendRequestAsync(HttpMethod.Post, "/api/database", dump);
+					if (ShowModal is not null && result.IsFailure())
+						await ShowModal(ModalType.Danger, "Import Errors", result.Errors);
 					break;
 				default:
 					result = await ApiRequests.SendRequestAsync(HttpMethod.Post, "/api/database", dump);
+					if (ShowModal is not null && result.IsFailure())
+						await ShowModal(ModalType.Warning, "Import Conflicts", result.Errors);
 					break;
 			}
+
+			ToastService.Notify(result.IsSuccess()
+				? ToastMessages.Success("Successfully imported database dump")
+				: ToastMessages.Warning("Imported database dump with partial success"));
 		}
 		catch (Exception e) {
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
-
-		if (ShowModal is not null && result is { Errors.Length: > 0 })
-			await ShowModal("Import Errors", result.Errors);
 
 		isUploading = false;
 	}
