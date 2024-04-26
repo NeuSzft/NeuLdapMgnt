@@ -70,6 +70,8 @@
 
 	private bool isUploading = false;
 
+	[Parameter] public Func<string, IEnumerable<string>, Task>? ShowModal { get; set; }
+
 	private async Task OnFileImported(IBrowserFile file) {
 		await using Stream stream = file.OpenReadStream();
 		using StreamReader reader = new(stream);
@@ -78,35 +80,41 @@
 
 	private async Task ExportDatabase() {
 		RequestResult<LdapDbDump> result = await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Get, "/api/database");
+
 		if (result.IsSuccess()) {
 			_lastExportTime = DateTime.Now;
 			_exportedJson = JsonSerializer.Serialize(result.Values.FirstOrDefault(), new JsonSerializerOptions { WriteIndented = true });
 		}
-		else
-			ToastService.Notify(ToastMessages.Error(result.GetError()));
+		else if (ShowModal is not null)
+			await ShowModal("Export Errors", result.Errors);
 	}
 
 	private async Task ImportDatabase() {
+		isUploading = true;
+		RequestResult? result = null;
+
 		try {
 			LdapDbDump? dump = JsonSerializer.Deserialize<LdapDbDump>(_importedJson);
-			isUploading = true;
 
 			switch (_importMode) {
 				case 1:
-					await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Post, "/api/database", dump);
+					result = await ApiRequests.SendRequestAsync(HttpMethod.Put, "/api/database", dump);
 					break;
 				case 2:
-					await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Put, "/api/database", dump);
+					await ApiRequests.SendRequestAsync(HttpMethod.Delete, "/api/database");
+					result = await ApiRequests.SendRequestAsync(HttpMethod.Post, "/api/database", dump);
 					break;
 				default:
-					await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Delete, "/api/database");
-					await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Post, "/api/database", dump);
+					result = await ApiRequests.SendRequestAsync(HttpMethod.Post, "/api/database", dump);
 					break;
 			}
 		}
 		catch (Exception e) {
 			ToastService.Notify(ToastMessages.Error(e.Message));
 		}
+
+		if (ShowModal is not null && result is { Errors.Length: > 0 })
+			await ShowModal("Import Errors", result.Errors);
 
 		isUploading = false;
 	}
