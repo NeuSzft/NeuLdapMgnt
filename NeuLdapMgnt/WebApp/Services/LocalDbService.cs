@@ -30,29 +30,6 @@ namespace NeuLdapMgnt.WebApp.Services
 			ToastService = toastService;
 		}
 
-		public async Task FetchClasses()
-		{
-			try
-			{
-				Classes.Clear();
-
-				var response = await ApiRequests.GetClassesAsync();
-				if (response.IsSuccess())
-				{
-					Classes = response.Values.SelectMany(x => x).OrderBy(x => x).ToList();
-				}
-				if (response.Errors.Any())
-				{
-					ToastService.Notify(ToastMessages.Error(response.GetError()));
-				}
-			}
-			catch (Exception e)
-			{
-				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
-				ToastService.Notify(ToastMessages.Error(message));
-			}
-		}
-
 		public async Task FetchStudents()
 		{
 			try
@@ -75,6 +52,29 @@ namespace NeuLdapMgnt.WebApp.Services
 				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
 				ToastService.Notify(ToastMessages.Error(message));
 			}
+		}
+
+		public async Task<Student?> FetchStudent(long id)
+		{
+			try
+			{
+				var response = await ApiRequests.GetStudentAsync(id);
+				if (response.IsSuccess())
+				{
+					return response.Values[0];
+				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+			return null;
 		}
 
 		public async Task AddStudent(Student student)
@@ -130,9 +130,14 @@ namespace NeuLdapMgnt.WebApp.Services
 		{
 			try
 			{
-				foreach (var student in students)
+				foreach (var student in students.Select(x => x.Id))
 				{
-					await ApiRequests.DeleteStudentAsync(student.Id);
+					await ApiRequests.DeleteStudentAsync(student);
+
+					if (InactiveUsers.Contains(student.ToString()))
+					{
+						await ActivateUser(student.ToString());
+					}
 				}
 				ToastService.Notify(ToastMessages.Success("Selected students were deleted!"));
 			}
@@ -165,6 +170,29 @@ namespace NeuLdapMgnt.WebApp.Services
 				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
 				ToastService.Notify(ToastMessages.Error(message));
 			}
+		}
+
+		public async Task<Teacher?> FetchTeacher(string id)
+		{
+			try
+			{
+				var response = await ApiRequests.GetTeacherAsync(id);
+				if (response.IsSuccess())
+				{
+					return response.Values[0];
+				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+			return null;
 		}
 
 		public async Task UpdateTeachersInBulk(IEnumerable<Teacher> teachers, bool isAdmin, bool isInactive)
@@ -215,9 +243,22 @@ namespace NeuLdapMgnt.WebApp.Services
 		{
 			try
 			{
-				foreach (var teacher in teachers)
+				await FetchAdmins();
+				await FetchInactiveUsers();
+
+				foreach (var teacher in teachers.Select(x => x.Id))
 				{
-					await ApiRequests.DeleteTeacherAsync(teacher.Id);
+					await ApiRequests.DeleteTeacherAsync(teacher);
+
+					if (Admins.Contains(teacher))
+					{
+						await ApiRequests.DeleteAdminAsync(teacher);
+					}
+
+					if (InactiveUsers.Contains(teacher))
+					{
+						await ActivateUser(teacher);
+					}
 				}
 				ToastService.Notify(ToastMessages.Success("Selected teachers were deleted!"));
 			}
@@ -264,6 +305,29 @@ namespace NeuLdapMgnt.WebApp.Services
 					InactiveUsers = new(response.Values[0]);
 				}
 
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
+		public async Task FetchClasses()
+		{
+			try
+			{
+				Classes.Clear();
+
+				var response = await ApiRequests.GetClassesAsync();
+				if (response.IsSuccess())
+				{
+					Classes = response.Values.SelectMany(x => x).OrderBy(x => Utils.GetClassOrderValue(x)).ToList();
+				}
 				if (response.Errors.Any())
 				{
 					ToastService.Notify(ToastMessages.Error(response.GetError()));
