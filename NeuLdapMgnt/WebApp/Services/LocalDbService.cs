@@ -30,6 +30,8 @@ namespace NeuLdapMgnt.WebApp.Services
 
 		public List<string> Classes { get; set; } = new();
 
+		public List<string> InactiveUsers { get; set; } = new();
+
 		public LocalDbService(ApiRequests apiRequests, ModalService modalService, ToastService toastService)
 		{
 			ApiRequests = apiRequests;
@@ -90,78 +92,17 @@ namespace NeuLdapMgnt.WebApp.Services
 			{
 				Teachers.Clear();
 
-				var responseTeachers = await ApiRequests.GetTeachersAsync();
-				if (responseTeachers.IsSuccess())
-				{
-					Teachers = new(responseTeachers.Values);
-				}
-
-				if (responseTeachers.Errors.Any())
-				{
-					ToastService.Notify(ToastMessages.Error(responseTeachers.GetError()));
-				}
-			}
-			catch (HttpRequestException httpError)
-			{
-				if (httpError.StatusCode is HttpStatusCode.BadRequest)
-				{
-					ToastService.Notify(ToastMessages.NoConnection());
-				}
-				else
-				{
-					ToastService.Notify(ToastMessages.Error(httpError.Message));
-				}
-			}
-			catch (Exception e)
-			{
-				ToastService.Notify(ToastMessages.Error(e.Message));
-			}
-		}
-
-		public async Task FetchAdmins()
-		{
-			try
-			{
-				Admins.Clear();
-
-				var responseAdmins = await ApiRequests.GetAdminsAsync();
-				if (responseAdmins.IsSuccess())
-				{
-					Admins = new(responseAdmins.Values[0]);
-				}
-
-				if (responseAdmins.Errors.Any())
-				{
-					ToastService.Notify(ToastMessages.Error(responseAdmins.GetError()));
-				}
-			}
-			catch (HttpRequestException httpError)
-			{
-				if (httpError.StatusCode is HttpStatusCode.BadRequest)
-				{
-					ToastService.Notify(ToastMessages.NoConnection());
-				}
-				else
-				{
-					ToastService.Notify(ToastMessages.Error(httpError.Message));
-				}
-			}
-			catch (Exception e)
-			{
-				ToastService.Notify(ToastMessages.Error(e.Message));
-			}
-		}
-
-		public async Task AddStudent(Student student)
-		{
-			try
-			{
-				var response = await ApiRequests.AddStudentAsync(student);
-
+				var response = await ApiRequests.GetTeachersAsync();
 				if (response.IsSuccess())
 				{
-					ToastService.Notify(ToastMessages.Success($"{student.FullName} ({student.Id}) was added!"));
+					Teachers = new(response.Values);
 				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+
 
 			}
 			catch (Exception e)
@@ -171,19 +112,93 @@ namespace NeuLdapMgnt.WebApp.Services
 			}
 		}
 
-		public async Task UpdateStudentClassInBulk(IEnumerable<Student> students, string newClass)
+		public async Task FetchAdmins()
 		{
 			try
 			{
+				Admins.Clear();
+
+				var response = await ApiRequests.GetAdminsAsync();
+				if (response.IsSuccess())
+				{
+					Admins = new(response.Values[0]);
+				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
+		public async Task FetchInactiveUsers()
+		{
+			try
+			{
+				InactiveUsers.Clear();
+
+				var response = await ApiRequests.GetInactiveUsersAsync();
+				if (response.IsSuccess())
+				{
+					InactiveUsers = new(response.Values[0]);
+				}
+
+				if (response.Errors.Any())
+				{
+					ToastService.Notify(ToastMessages.Error(response.GetError()));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
+		public async Task AddStudent(Student student)
+		{
+			try
+			{
+				var response = await ApiRequests.AddStudentAsync(student);
+				if (response.IsSuccess())
+				{
+					ToastService.Notify(ToastMessages.Success($"{student.FullName} ({student.Id}) was added!"));
+				}
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
+		public async Task UpdateStudentsInBulk(IEnumerable<Student> students, string newClass, bool isInactive)
+		{
+			try
+			{
+				if (isInactive)
+				{
+					var response = await ApiRequests.GetInactiveUsersAsync();
+					InactiveUsers = new(response.Values[0]);
+				}
+
 				foreach (var student in students)
 				{
-					if (student.Class.Equals(newClass))
+					if (isInactive && !InactiveUsers.Contains(student.Id.ToString()))
 					{
-						continue;
+						await ApiRequests.DeactivateUserAsync(student.Id.ToString());
 					}
 
-					student.Class = newClass;
-					await ApiRequests.UpdateStudentAsync(student.Id, student);
+					if (!string.IsNullOrEmpty(newClass) && !student.Class.Equals(newClass))
+					{
+						student.Class = newClass;
+						await ApiRequests.UpdateStudentAsync(student.Id, student);
+					}
 				}
 				ToastService.Notify(ToastMessages.Success("Selected students were updated."));
 			}
@@ -203,6 +218,51 @@ namespace NeuLdapMgnt.WebApp.Services
 					await ApiRequests.DeleteStudentAsync(student.Id);
 				}
 				ToastService.Notify(ToastMessages.Success("Selected students were deleted!"));
+			}
+			catch (Exception e)
+			{
+				string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
+				ToastService.Notify(ToastMessages.Error(message));
+			}
+		}
+
+		public async Task UpdateTeachersInBulk(IEnumerable<Teacher> teachers, bool isAdmin, bool isInactive)
+		{
+			//TODO: FIX THIS SHIT
+			try
+			{
+				if (isInactive)
+				{
+					var response = await ApiRequests.GetInactiveUsersAsync();
+					InactiveUsers = new(response.Values[0]);
+				}
+
+				foreach (var teacher in teachers)
+				{
+					if (isAdmin && !Admins.Contains(teacher.Id)) 
+					{
+						await ApiRequests.AddAdminAsync(teacher.Id);	
+					}
+
+					if (isInactive && !InactiveUsers.Contains(teacher.Id))
+					{
+						await ApiRequests.DeactivateUserAsync(teacher.Id);
+					}
+
+					await ApiRequests.UpdateTeacherAsync(teacher.Id, teacher);
+				}
+
+				if (isInactive)
+				{
+					await FetchTeachers();
+				}
+
+				if (isAdmin)
+				{
+					await FetchAdmins();
+				}
+
+				ToastService.Notify(ToastMessages.Success("Selected teachers were updated."));
 			}
 			catch (Exception e)
 			{

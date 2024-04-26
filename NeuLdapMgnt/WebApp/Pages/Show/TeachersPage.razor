@@ -7,7 +7,7 @@
 		<h1>Teachers</h1>
 	</div>
 	<div class="col text-end">
-		<ButtonRefresh OnClick="OnRefresh" Text="Refresh" />
+		<ButtonRefresh OnClick="FetchData" Text="Refresh" />
 	</div>
 </div>
 
@@ -26,7 +26,9 @@ else if (!LocalDbService.Teachers.Any())
 }
 else
 {
-	<TableTeachers Teachers="LocalDbService.Teachers" />
+	<TableTeachers Teachers="LocalDbService.Teachers"
+				   OnTeachersDelete="HandleDeleteTeachers"
+				   OnTeachersUpdate="HandleUpdateTeachers" />
 }
 
 @code {
@@ -35,16 +37,34 @@ else
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
-		await OnRefresh();
+		isLoading = true;
+		await FetchData();
+		isLoading = false;
 	}
 
-	private async Task OnRefresh()
+	private async Task HandleDeleteTeachers(IEnumerable<Teacher> teachers)
 	{
 		isLoading = true;
+		StateHasChanged();
+		await LocalDbService.DeleteTeachersInBulk(teachers);
+		await FetchData();
+		isLoading = false;
+	}
+
+	private async Task HandleUpdateTeachers((IEnumerable<Teacher>, bool, bool) context)
+	{
+		var (teachers, isAdmin, isInactive) = context;
+		isLoading = true;
+		await LocalDbService.UpdateTeachersInBulk(teachers, isAdmin, isInactive);
+		await FetchData();
+		isLoading = false;
+	}
+
+	private async Task FetchData()
+	{
 		await LocalDbService.FetchClasses();
 		await LocalDbService.FetchTeachers();
 		await LocalDbService.FetchAdmins();
-		isLoading = false;
 	}
 
 	private void ToAddPage() => NavManager.NavigateTo("/teachers/add");

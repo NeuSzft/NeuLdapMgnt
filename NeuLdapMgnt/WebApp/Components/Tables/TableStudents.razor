@@ -185,10 +185,10 @@ else
 	{
 		if (OnStudentsUpdate.HasDelegate)
 		{
-			await HideModalEdit();
 			isUpdating = true;
 			await OnStudentsUpdate.InvokeAsync((selectedStudents, editedClass, editIsInactive));
 			isUpdating = false;
+			await HideModalEdit();
 		}
 	}
 
@@ -209,10 +209,10 @@ else
 
 		if (OnStudentsDelete.HasDelegate)
 		{
-			await HideModalEdit();
 			isDeleting = true;
 			await OnStudentsDelete.InvokeAsync(selectedStudents);
 			isDeleting = false;
+			await HideModalEdit();
 		}
 	}
 

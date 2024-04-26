@@ -4,12 +4,14 @@
 
 <Modal @ref="modalEdit" title="Edit selected teachers" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true" OnHidden="ToggleEditMode">
 	<BodyTemplate>
-		<span class="fw-bold mb-2">This action can not be reverted!</span>
+		<div class="fw-bold mb-2">This action can not be reverted!</div>
+		<Switch @ref="switchEditIsInactive" @bind-Value="editIsInactive" Label="Set status to [Inactive]?" />
+		<Switch @ref="switchEditIsAdmin" @bind-Value="editIsAdmin" Label="Set status to [Administrator]?" />
 	</BodyTemplate>
 	<FooterTemplate>
 		<ButtonDelete Text="Delete" OnClick="DeleteSelected" />
 		<ButtonCancel Text="Cancel" OnClick="HideModalEdit" />
-		<ButtonSave Text="Save" />
+		<ButtonSave Text="Save" OnClick="UpdateSelected" />
 	</FooterTemplate>
 </Modal>
 
@@ -95,7 +97,17 @@ else
 							<i class="bi bi-chevron-expand"></i>
 						}
 					</th>
-					<th class="user-select-none">Admin?</th>
+					<th class="user-select-none" role="button" @onclick="@(() => SortTable("Admin"))">
+						Admin?
+						@if (sortBy == "Admin")
+						{
+							<i class="bi @GetSortIcon(isAscending)"></i>
+						}
+						else
+						{
+							<i class="bi bi-chevron-expand"></i>
+						}
+					</th>
 					<th class="user-select-none text-end">Inspect | Edit</th>
 				</tr>
 			</thead>
@@ -132,6 +144,12 @@ else
 	[Parameter]
 	public List<Teacher> Teachers { get; set; } = new();
 
+	[Parameter]
+	public EventCallback<IEnumerable<Teacher>> OnTeachersDelete { get; set; }
+
+	[Parameter]
+	public EventCallback<(IEnumerable<Teacher>, bool, bool)> OnTeachersUpdate { get; set; }
+
 	private List<Teacher> filteredTeachers = new();
 	private List<Teacher> selectedTeachers = new();
 	private Timer? searchDelayTimer;
@@ -144,15 +162,83 @@ else
 	private string sortBy = string.Empty;
 	private bool isAscending = false;
 
-	private bool isTeacherSelected => !selectedTeachers.Any();
+	private bool editIsAdmin = false;
+	private Switch switchEditIsAdmin = default!;
+	private bool editIsInactive = false;
+	private Switch switchEditIsInactive = default!;
+
 	private bool isDeleting = false;
 	private bool isEditing = false;
-	private bool isAction => isDeleting || isEditing;
+	private bool isUpdating = false;
+	private bool isAction => isDeleting || isEditing || isUpdating;
+	private bool isTeacherSelected => !selectedTeachers.Any();
 
 	protected override void OnInitialized()
 	{
 		filteredTeachers = Teachers.ToList();
 		searchDelayTimer = new Timer(Callback, null, Timeout.Infinite, Timeout.Infinite);
+	}
+
+	private async Task UpdateSelected()
+	{
+		if (!selectedTeachers.Any()) return;
+
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("List", selectedTeachers.Select(x => $"[{x.Class}] {x.FullName}").ToList());
+
+		string confirmTitle = $"Are you sure you want to update [{selectedTeachers.Count}] teachers?";
+		if (editIsInactive && editIsAdmin)
+		{
+			confirmTitle = "Set status to [Inactive] and [Administrator]?";
+		}
+		else if (editIsInactive && !editIsAdmin)
+		{
+			confirmTitle = "Set status to [Inactive]?";
+		}
+		else if (!editIsInactive && editIsAdmin)
+		{
+			confirmTitle = "Set status to [Administrator]?";
+		}
+
+		var confirmation = await dialog.ShowAsync<CustomList>(
+			title: confirmTitle,
+			parameters: parameters,
+			confirmDialogOptions: DialogOptions.Confirm()
+		);
+
+		if (!confirmation) return;
+
+		if (OnTeachersUpdate.HasDelegate)
+		{
+			isUpdating = true;
+			await OnTeachersUpdate.InvokeAsync((selectedTeachers, editIsAdmin, editIsInactive));
+			isUpdating = false;
+			await HideModalEdit();
+		}
+	}
+
+	private async Task DeleteSelected()
+	{
+		if (!selectedTeachers.Any()) return;
+
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("List", selectedTeachers.Select(x => $"[{x.Class}] {x.FullName}").ToList());
+
+		var confirmation = await dialog.ShowAsync<CustomList>(
+			title: $"Are you sure you want to delete [{selectedTeachers.Count}] teachers?",
+			parameters: parameters,
+			confirmDialogOptions: DialogOptions.Delete()
+		);
+
+		if (!confirmation) return;
+
+		if (OnTeachersDelete.HasDelegate)
+		{
+			isDeleting = true;
+			await OnTeachersDelete.InvokeAsync(selectedTeachers);
+			isDeleting = false;
+			await HideModalEdit();
+		}
 	}
 
 	private void SelectTeacher(Teacher teacher)
@@ -179,36 +265,6 @@ else
 		}
 
 		StateHasChanged();
-	}
-
-	private void EditSelected()
-	{
-
-	}
-
-	private async Task DeleteSelected()
-	{
-		if (!selectedTeachers.Any()) return;
-
-		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", selectedTeachers.Select(x => $"[{x.Class}] {x.FullName}").ToList());
-
-		var confirmation = await dialog.ShowAsync<CustomList>(
-			title: $"Are you sure you want to delete [{selectedTeachers.Count}] teachers?",
-			parameters: parameters,
-			confirmDialogOptions: DialogOptions.Delete()
-		);
-
-		if (!confirmation) return;
-		await HideModalEdit();
-
-		isDeleting = true;
-		await LocalDbService.DeleteTeachersInBulk(selectedTeachers);
-
-		filteredTeachers = Teachers.ToList();
-		selectedTeachers.Clear();
-		searchQuery = string.Empty;
-		isDeleting = false;
 	}
 
 	private void GetFilteredTeachers()
@@ -317,6 +373,8 @@ else
 	private async Task HideModalEdit()
 	{
 		if (modalEdit is null) return;
+		editIsAdmin = false;
+		editIsInactive = false;
 		await modalEdit.HideAsync();
 	}
 
