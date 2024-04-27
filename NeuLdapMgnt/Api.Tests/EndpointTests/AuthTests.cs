@@ -4,6 +4,30 @@ namespace NeuLdapMgnt.Api.Tests.EndpointTests;
 
 [TestClass]
 public class AuthTests {
+	[ClassInitialize]
+	public static void Init(TestContext context) {
+		Teacher teacher = new() {
+			Id = "george.sears",
+			Uid = 4000,
+			Gid = 4000,
+			Class = "-",
+			Username = "geosea",
+			FirstName = "George",
+			LastName = "Sears",
+			MiddleName = "",
+			Email = "solidus@mail.com",
+			HomeDirectory = "/home/geosea",
+			Password = new UserPassword("lalilulelo", 16).ToString(),
+			FullName = "George Sears"
+		};
+
+		Testing.LdapService.TryAddEntity(teacher, teacher.Id, true).AssertSuccess();
+		Testing.LdapService.TryAddEntityToGroup("admin", teacher.Id).AssertSuccess();
+	}
+
+	[ClassCleanup]
+	public static void Cleanup() => Testing.EraseLdap();
+
 	[TestMethod]
 	public async Task TestNoAuthorizationHeader() {
 		var response = await Testing.Client.GetAsync("/api/auth");
@@ -22,7 +46,7 @@ public class AuthTests {
 	}
 
 	[TestMethod]
-	public async Task TestWrongAdminUsername() {
+	public async Task TestWrongUsername() {
 		var request  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("wrongadmin", "adminpass");
 		var response = await Testing.Client.SendAsync(request);
 
@@ -31,7 +55,7 @@ public class AuthTests {
 	}
 
 	[TestMethod]
-	public async Task TestWrongAdminPassword() {
+	public async Task TestWrongDefaultAdminPassword() {
 		var request  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("admin", "wrongpass");
 		var response = await Testing.Client.SendAsync(request);
 
@@ -40,8 +64,31 @@ public class AuthTests {
 	}
 
 	[TestMethod]
-	public async Task TestCorrectAdminCredentialsAndResultToken() {
+	public async Task TestCorrectDefaultAdminCredentialsAndResultToken() {
 		var    request1  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("admin", "adminpass");
+		var    response1 = await Testing.Client.SendAsync(request1);
+		string token     = await response1.Content.ReadAsStringAsync();
+
+		Assert.AreEqual(HttpStatusCode.OK, response1.StatusCode);
+
+		var request2  = new HttpRequestMessage(HttpMethod.Get, "/api/testing/check-token").SetAuthHeader("Bearer", token);
+		var response2 = await Testing.Client.SendAsync(request2);
+
+		Assert.AreEqual(HttpStatusCode.OK, response2.StatusCode);
+	}
+
+	[TestMethod]
+	public async Task TestWrongAdminPassword() {
+		var request  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("george.sears", "wrongpass");
+		var response = await Testing.Client.SendAsync(request);
+
+		Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+		Assert.AreEqual("Wrong credentials.", await response.Content.ReadAsStringAsync());
+	}
+
+	[TestMethod]
+	public async Task TestCorrectAdminCredentialsAndResultToken() {
+		var    request1  = new HttpRequestMessage(HttpMethod.Get, "/api/auth").AuthWithBasic("george.sears", "lalilulelo");
 		var    response1 = await Testing.Client.SendAsync(request1);
 		string token     = await response1.Content.ReadAsStringAsync();
 
