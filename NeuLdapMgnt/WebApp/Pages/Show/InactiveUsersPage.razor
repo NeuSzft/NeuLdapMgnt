@@ -103,7 +103,7 @@ else
 		parameters.Add("List", selectedUsers);
 
 		var confirmation = await dialog.ShowAsync<CustomList>(
-			title: "Set status to [Active]?",
+			title: $"Set status to [Active] to [{selectedUsers.Count}] user(s)?",
 			parameters: parameters,
 			confirmDialogOptions: DialogOptions.Confirm());
 
