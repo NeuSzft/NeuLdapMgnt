@@ -14,7 +14,7 @@ public static class DbManagementEndpoints {
 		   .WithTags("Database Management")
 		   .WithDescription("### Returns a JSON dump of the database.")
 		   .RequireAuthorization()
-		   .Produces<RequestResult>(StatusCodes.Status207MultiStatus)
+		   .Produces<RequestResult<LdapDbDump>>(StatusCodes.Status207MultiStatus)
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
 		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 

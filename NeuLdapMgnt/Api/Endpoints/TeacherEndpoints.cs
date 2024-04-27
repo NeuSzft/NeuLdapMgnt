@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.IO;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using NeuLdapMgnt.Api.LdapServiceExtensions;
 using NeuLdapMgnt.Models;
+using NeuLdapMgnt.Models.CustomValidationAttributes;
 
 namespace NeuLdapMgnt.Api.Endpoints {
 	public static class TeacherEndpoints {
@@ -67,6 +69,34 @@ namespace NeuLdapMgnt.Api.Endpoints {
 			   .WithTags("Teachers")
 			   .WithDescription("### Deletes an entity that has the type \"*Teacher*\" and the specified UID.")
 			   .RequireAuthorization()
+			   .Produces(StatusCodes.Status200OK)
+			   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
+			   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
+			   .Produces<RequestResult>(StatusCodes.Status404NotFound)
+			   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
+
+			app.MapPut("/api/teachers/{id}/password", async (LdapService ldap, HttpRequest request, string id) => {
+				   using StreamReader reader   = new(request.Body);
+				   string             password = await reader.ReadToEndAsync();
+
+				   var validation = ModelValidator.ValidateValue(password, new PasswordAttribute());
+				   if (validation.IsFailure())
+					   return validation.RenewToken(request).ToResult();
+
+				   var response = ldap.TryGetEntity<Teacher>(id, true);
+				   if (response.IsFailure())
+					   return response.RenewToken(request).ToResult();
+
+				   Teacher teacher = response.GetValue()!;
+				   teacher.Password = new UserPassword(password, 16).ToString();
+
+				   return ldap.TryModifyEntity(teacher, id, true).RenewToken(request).ToResult();
+			   })
+			   .WithOpenApi()
+			   .WithTags("Teachers")
+			   .WithDescription("### Updates the password of an entity that has the type \"*Teacher*\" and the specified UID.")
+			   .RequireAuthorization()
+			   .Accepts<string>("text/plain")
 			   .Produces(StatusCodes.Status200OK)
 			   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
 			   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
