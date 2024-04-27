@@ -24,7 +24,7 @@ internal static class Program {
 		LdapService ldapService = LdapService.FromEnvs();
 
 		ILoggerService loggerService = true.ToString().Equals(Environment.GetEnvironmentVariable("LOG_TO_DB"), StringComparison.OrdinalIgnoreCase)
-			? PglLoggerService.FromEnvs().SetIgnoredRoutes("/api/docs")
+			? PgLoggerService.FromEnvs().SetIgnoredRoutes("/api/docs")
 			: new DummyLoggerService();
 
 		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);

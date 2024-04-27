@@ -7,29 +7,49 @@ using Npgsql;
 
 namespace NeuLdapMgnt.Api;
 
+/// <summary>Represents a type used for logging incoming API requests.</summary>
 public interface ILoggerService {
+	/// <summary>Creates a new log based on the provided <paramref name="entry"/>.</summary>
+	/// <param name="entry">The <see cref="LogEntry"/> to log.</param>
 	void CreateLogEntry(LogEntry entry);
 
+	/// <summary>Returns the log entries that were created during the specified time period.</summary>
+	/// <param name="start">The beginning of the time period.</param>
+	/// <param name="end">The end of the time period.</param>
+	/// <returns>The entries as <see cref="LogEntry"/> objects.</returns>
 	IEnumerable<LogEntry> GetLogEntries(DateTime start, DateTime end);
 }
 
+/// <summary>A dummy <see cref="ILoggerService"/> that does not perform any logging.</summary>
 public sealed class DummyLoggerService : ILoggerService {
+	/// <summary>Takes in a <see cref="LogEntry"/> but does nothing.</summary>
 	public void CreateLogEntry(LogEntry entry) { }
 
+	/// <summary>Takes in two timestamps and returns an empty collection.</summary>
 	public IEnumerable<LogEntry> GetLogEntries(DateTime start, DateTime end) => [];
 }
 
-public sealed class PglLoggerService : ILoggerService {
+/// <summary>An <see cref="ILoggerService"/> that logs into a Postgres database.</summary>
+public sealed class PgLoggerService : ILoggerService {
 	private readonly string _connectionString;
 
 	private IEnumerable<string> _ignoredRoutes = [];
 
-	public PglLoggerService(string host, string db, string password) {
+	/// <param name="host">The host to connect to.</param>
+	/// <param name="db">The name of the database to use.</param>
+	/// <param name="password">The password of the "postgres" user.</param>
+	public PgLoggerService(string host, string db, string password) {
 		_connectionString = $"Host={host};Database={db};Username=postgres;Password={password}";
 		CreateDefaultTables();
 	}
 
-	public static PglLoggerService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD") {
+	/// <summary>Creates a new <see cref="PgLoggerService"/> using the specified environment variables.</summary>
+	/// <param name="hostEnv">The environment variable that specifies the host of the Postgres database.</param>
+	/// <param name="dbEnv">The environment variable that specifies the name of the database.</param>
+	/// <param name="passwordEnv">The environment variable that specifies the password of the "postgres" user.</param>
+	/// <returns>The new <see cref="PgLoggerService"/>.</returns>
+	/// <exception cref="ArgumentException">An environment variable is not set or is an empty string.</exception>
+	public static PgLoggerService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD") {
 		return new(
 			Environment.GetEnvironmentVariable(hostEnv).ThrowIfNullOrEmpty(),
 			Environment.GetEnvironmentVariable(dbEnv).ThrowIfNullOrEmpty(),
@@ -37,13 +57,18 @@ public sealed class PglLoggerService : ILoggerService {
 		);
 	}
 
+	/// <summary>Opens a new <see cref="NpgsqlConnection"/>.</summary>
+	/// <returns>The opened <see cref="NpgsqlConnection"/>.</returns>
 	private NpgsqlConnection OpenConnection() {
 		NpgsqlConnection connection = new(_connectionString);
 		connection.Open();
 		return connection;
 	}
 
-	public PglLoggerService SetIgnoredRoutes(params string[] ignoredRoutes) {
+	/// <summary>Specifies the API routes whose requests should not be logged.</summary>
+	/// <param name="ignoredRoutes">The routes that should be ignored when logging.</param>
+	/// <returns>This <see cref="PgLoggerService"/>.</returns>
+	public PgLoggerService SetIgnoredRoutes(params string[] ignoredRoutes) {
 		_ignoredRoutes = ignoredRoutes;
 		return this;
 	}
@@ -106,6 +131,7 @@ public sealed class PglLoggerService : ILoggerService {
 		return connection.Query<LogEntry>(query, new { Start = start, End = end });
 	}
 
+	/// <summary>Creates the "users" and "entries" tables within the database.</summary>
 	private void CreateDefaultTables() {
 		string query = """
 			CREATE TABLE IF NOT EXISTS users(
