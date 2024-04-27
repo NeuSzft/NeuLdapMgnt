@@ -52,14 +52,9 @@
 				ToastService.Notify(ToastMessages.InvalidCredentials());
 			}
 		}
-		catch (HttpRequestException httpError)
-		{
-			string errorMessage = Utils.GetErrorMessage(httpError);
-			ToastService.Notify(ToastMessages.Error(errorMessage));
-		}
 		catch (Exception e)
 		{
-			ToastService.Notify(ToastMessages.Error(e.Message));
+			NotificationService.HandleError(e);
 		}
 
 		isLoading = false;

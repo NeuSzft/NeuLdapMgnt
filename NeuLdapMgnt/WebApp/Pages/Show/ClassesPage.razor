@@ -104,14 +104,9 @@ else
 			var response = await ApiRequests.AddClassesAsync(newClasses);
 
 			if (response.IsSuccess())
-			{
-				ToastService.Notify(ToastMessages.Success($"{newClass} class was added!"));
-			}
-
-			if (response.Errors.Any())
-			{
-				ToastService.Notify(ToastMessages.Error(response.GetError()));
-			}
+				NotificationService.NotifySuccess($"{newClass} class was added!");
+			else
+				NotificationService.NotifyError(response.GetError());
 
 			//LocalDbService.LoadingEnable("Fetching classes");
 			await LocalDbService.FetchClasses();
@@ -119,8 +114,7 @@ else
 		}
 		catch (Exception e)
 		{
-			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
-			ToastService.Notify(ToastMessages.Error(message));
+			NotificationService.HandleError(e);
 		}
 		newClass = string.Empty;
 	}
@@ -149,14 +143,9 @@ else
 			var response = await ApiRequests.AddClassesAsync(LocalDbService.Classes);
 
 			if (response.IsSuccess())
-			{
-				ToastService.Notify(ToastMessages.Success($"{removeClass} class was removed!"));
-			}
-
-			if (response.Errors.Any())
-			{
-				ToastService.Notify(ToastMessages.Error(response.GetError()));
-			}
+				NotificationService.NotifySuccess($"{removeClass} class was removed!");
+			else
+				NotificationService.NotifyError(response.GetError());
 
 			await HideModalRemove();
 			//LocalDbService.LoadingEnable("Fetching classes");
@@ -165,8 +154,7 @@ else
 		}
 		catch (Exception e)
 		{
-			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
-			ToastService.Notify(ToastMessages.Error(message));
+			NotificationService.HandleError(e);
 		}
 		removeClass = string.Empty;
 		//

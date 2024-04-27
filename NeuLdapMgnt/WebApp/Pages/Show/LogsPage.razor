@@ -39,23 +39,21 @@
 	</div>
 </div>
 
-@if (_isLoading)
-{
-	<Loading Text="Fetching logs" />
+@if (_isLoading) {
+	<Loading Text="Fetching logs"/>
 }
-else
-{
+else {
 	<TableLogs Entries=@_entries/>
 }
 
 @code {
 
-	DateOnly              _fromDate  = DateOnly.FromDateTime(DateTime.Now.AddHours(-12));
-	TimeOnly              _fromTime  = TimeOnly.FromDateTime(DateTime.Now.AddHours(-12));
-	DateOnly              _toDate    = DateOnly.FromDateTime(DateTime.Now);
-	TimeOnly              _toTime    = TimeOnly.FromDateTime(DateTime.Now);
-	IEnumerable<LogEntry> _entries   = Array.Empty<LogEntry>();
-	bool				  _isLoading = false;
+	DateOnly              _fromDate = DateOnly.FromDateTime(DateTime.Now.AddHours(-12));
+	TimeOnly              _fromTime = TimeOnly.FromDateTime(DateTime.Now.AddHours(-12));
+	DateOnly              _toDate   = DateOnly.FromDateTime(DateTime.Now);
+	TimeOnly              _toTime   = TimeOnly.FromDateTime(DateTime.Now);
+	IEnumerable<LogEntry> _entries  = Array.Empty<LogEntry>();
+	bool                  _isLoading;
 
 	protected override async Task OnInitializedAsync() {
 		ApiRequests.EnsureAuthentication(NavManager);
@@ -72,9 +70,9 @@ else
 			_entries = result.Values;
 		}
 		catch (Exception e) {
-			string message = e is HttpRequestException re ? re.GetErrorMessage() : e.Message;
-			ToastService.Notify(ToastMessages.Error(message));
+			NotificationService.HandleError(e);
 		}
+
 		_isLoading = false;
 	}
 

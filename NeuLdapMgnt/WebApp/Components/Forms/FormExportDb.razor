@@ -26,15 +26,20 @@
 	[Parameter] public Func<ModalType, string, IEnumerable<string>, Task>? ShowModal { get; set; }
 
 	private async Task ExportDatabase() {
-		RequestResult<LdapDbDump> result = await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Get, "/api/database");
+		try {
+			RequestResult<LdapDbDump> result = await ApiRequests.SendRequestAsync<LdapDbDump>(HttpMethod.Get, "/api/database");
 
-		if (result.IsSuccess()) {
-			_lastExportTime = DateTime.Now;
-			_exportedJson = JsonSerializer.Serialize(result.Values.FirstOrDefault(), new JsonSerializerOptions { WriteIndented = true });
-			ToastService.Notify(ToastMessages.Success("Successfully exported database"));
+			if (result.IsSuccess()) {
+				_lastExportTime = DateTime.Now;
+				_exportedJson = JsonSerializer.Serialize(result.Values.FirstOrDefault(), new JsonSerializerOptions { WriteIndented = true });
+				NotificationService.NotifySuccess("Successfully exported database");
+			}
+			else if (ShowModal is not null)
+				await ShowModal(ModalType.Danger, "Export Errors", result.Errors);
 		}
-		else if (ShowModal is not null)
-			await ShowModal(ModalType.Danger, "Export Errors", result.Errors);
+		catch (Exception e) {
+			NotificationService.HandleError(e);
+		}
 	}
 
 	private async Task Download() {

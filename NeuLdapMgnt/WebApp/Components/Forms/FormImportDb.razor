@@ -94,7 +94,7 @@
 				: ToastMessages.Warning("Imported database dump with partial success"));
 		}
 		catch (Exception e) {
-			ToastService.Notify(ToastMessages.Error(e.Message));
+			NotificationService.HandleError(e);
 		}
 
 		_isUploading = false;

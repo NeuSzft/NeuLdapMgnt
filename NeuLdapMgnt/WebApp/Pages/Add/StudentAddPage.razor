@@ -76,7 +76,7 @@ else
 			var response = await ApiRequests.UploadStudentFileAsync(file);
 			if (response.IsSuccess())
 			{
-				ToastService.Notify(ToastMessages.Success($"{file.Name} imported!"));
+				NotificationService.NotifySuccess($"{file.Name} imported!");
 				NavManager.NavigateTo("/students");
 			}
 
@@ -87,14 +87,9 @@ else
 				await ShowModal();
 			}
 		}
-		catch (HttpRequestException httpError)
-		{
-			string errorMessage = Utils.GetErrorMessage(httpError);
-			ToastService.Notify(ToastMessages.Error(errorMessage));
-		}
 		catch (Exception e)
 		{
-			ToastService.Notify(ToastMessages.Error(e.Message));
+			NotificationService.HandleError(e);
 		}
 		isUploading = false;
 	}

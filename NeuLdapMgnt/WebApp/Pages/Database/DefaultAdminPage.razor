@@ -39,7 +39,7 @@
 		if (result.IsSuccess())
 			_adminEnabled = result.GetValue();
 		else
-			ToastService.Notify(ToastMessages.Error(result.GetError()));
+			NotificationService.NotifyError(result.GetError());
 	}
 
 }

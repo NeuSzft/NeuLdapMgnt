@@ -43,24 +43,19 @@ else
 
 			if (response.IsSuccess())
 			{
-				ToastService.Notify(ToastMessages.Success($"{teacherUpdated.FullName} ({teacherUpdated.Id}) was added!"));
+				NotificationService.NotifySuccess($"{teacherUpdated.FullName} ({teacherUpdated.Id}) was added!");
 				teacher = new();
 				return true;
 			}
 
 			if (response.Errors.Any())
 			{
-				ToastService.Notify(ToastMessages.Error(response.GetError()));
+				NotificationService.NotifyError(response.GetError());
 			}
-		}
-		catch (HttpRequestException httpError)
-		{
-			string errorMessage = Utils.GetErrorMessage(httpError);
-			ToastService.Notify(ToastMessages.Error(errorMessage));
 		}
 		catch (Exception e)
 		{
-			ToastService.Notify(ToastMessages.Error(e.Message));
+			NotificationService.HandleError(e);
 		}
 
 		isSubmitting = false;

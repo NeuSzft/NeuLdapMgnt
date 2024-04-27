@@ -113,7 +113,7 @@ else
 		await LocalDbService.ActivateUsers(selectedUsers);
 		usersList = LocalDbService.InactiveUsers.ToList();
 		isActivating = false;
-		ToastService.Notify(ToastMessages.Success("Selected users were activated."));
+		NotificationService.NotifySuccess("Selected users were activated.");
 	}
 
 	private async Task OnDeleteSelectedUsers()
@@ -132,7 +132,7 @@ else
 		await LocalDbService.DeleteUsers(selectedUsers);
 		usersList = LocalDbService.InactiveUsers.ToList();
 		isActivating = false;
-		ToastService.Notify(ToastMessages.Success("Selected users were permanently deleted!"));
+		NotificationService.NotifySuccess("Selected users were permanently deleted!");
 	}
 
 	private async Task InspectUser(string userId)
