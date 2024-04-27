@@ -31,9 +31,11 @@ namespace NeuLdapMgnt.WebApp.Requests
 		}
 
 		// Redirects to login if the user is not authenticated
-		public void EnsureAuthentication(NavigationManager navManager)
+		public bool EnsureAuthentication(NavigationManager navManager)
 		{
-			if (!IsAuthenticated) navManager.NavigateTo("login");
+			if (!IsAuthenticated)
+				navManager.NavigateTo("login");
+			return IsAuthenticated;
 		}
 
 		// Throws an exception if the user is not authenticated
