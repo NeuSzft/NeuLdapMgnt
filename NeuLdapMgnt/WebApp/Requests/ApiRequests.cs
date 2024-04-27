@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using NeuLdapMgnt.Models;
+using NeuLdapMgnt.WebApp.Services;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
@@ -12,15 +14,17 @@ namespace NeuLdapMgnt.WebApp.Requests
 	{
 		[Inject] public NavigationManager NavManager { get; set; } = default!;
 
+		[Inject] public JwtService JwtService { get; set; }
+
 		private readonly HttpClient _httpClient;
-		private string? _token = null;
+		public JwtSecurityToken? CurrentToken { get; private set; }
 
 		public event Action? AuthenticationStateChanged;
 
 		// Property to check if a user token exists, indicating the user is authenticated
-		public bool IsAuthenticated => _token != null;
+		public bool IsAuthenticated => CurrentToken != null;
 
-		public ApiRequests(string baseUri)
+		public ApiRequests(string baseUri, JwtService jwtService)
 		{
 			// Initializes HttpClient with JSON as the default request content type
 			_httpClient = new()
@@ -28,6 +32,7 @@ namespace NeuLdapMgnt.WebApp.Requests
 				BaseAddress = new(baseUri),
 				DefaultRequestHeaders = { Accept = { new MediaTypeWithQualityHeaderValue("application/json") } }
 			};
+			JwtService = jwtService;
 		}
 
 		// Redirects to login if the user is not authenticated
@@ -56,9 +61,9 @@ namespace NeuLdapMgnt.WebApp.Requests
 			var response = await _httpClient.GetAsync("api/auth");
 			if (!response.IsSuccessStatusCode) return false;
 
-			_token = await response.Content.ReadAsStringAsync();
-			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-
+			string token = await response.Content.ReadAsStringAsync();
+			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+			CurrentToken = JwtService.DecodeToken(token);
 			AuthenticationStateChanged?.Invoke();
 			return true;
 		}
@@ -66,7 +71,7 @@ namespace NeuLdapMgnt.WebApp.Requests
 		// Clears the authentication token and logging the user out
 		public void Logout()
 		{
-			_token = null;
+			CurrentToken = null;
 			AuthenticationStateChanged?.Invoke();
 		}
 
@@ -78,8 +83,8 @@ namespace NeuLdapMgnt.WebApp.Requests
 				throw new InvalidOperationException("New token is missing.");
 			}
 
-			_token = result.NewToken;
-			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+			CurrentToken = JwtService.DecodeToken(result.NewToken);
+			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.NewToken);
 		}
 
 		/// <summary>Sends a request to the specified URI with the string content in it's body, when the <paramref name="method"/> is either <c>POST</c> or <c>PUT</c>.</summary>

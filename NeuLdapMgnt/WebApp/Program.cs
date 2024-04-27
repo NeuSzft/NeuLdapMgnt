@@ -12,14 +12,18 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddBlazorBootstrap();
 
 ApiRequests apiRequests;
+
+JwtService jwtService = new();
+builder.Services.AddSingleton<JwtService>(_ => jwtService);
+
 if (builder.HostEnvironment.IsDevelopment())
 {
-	apiRequests = new("http://localhost:5000");
+	apiRequests = new("http://localhost:5000", jwtService);
 	builder.Services.AddSingleton<ApiRequests>(_ => apiRequests);
 }
 else
 {
-	apiRequests = new(builder.HostEnvironment.BaseAddress);
+	apiRequests = new(builder.HostEnvironment.BaseAddress, jwtService);
 	builder.Services.AddSingleton<ApiRequests>(_ => apiRequests);
 }
 
