@@ -1,34 +1,50 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page" @ref="_page" @onkeydown="ToggleDebugTray" tabindex="0">
-    <div>
-        <NavMenu />
-    </div>
-    <main>
-        <article class="content pb-3 px-3 d-flex flex-column vh-100 overflow-auto">
-            @Body
-        </article>
-    </main>
+	@if (isAuthenticated)
+	{
+		<RemainingTime />
+		<NavMenu />
+	}
+	<main>
+		<article class="content pt-4 pb-3 px-3 d-flex flex-column vh-100 overflow-auto">
+			@Body
+		</article>
+	</main>
 </div>
 
 <Modal IsServiceModal="true" />
 <Toasts class="p-3" StackLength="6" Delay="4000" Placement="ToastsPlacement.TopRight" />
-<DebugTray Hidden="@_hideDebugTray"/>
+<DebugTray Hidden="@_hideDebugTray" />
 
 @code {
 
-    private ElementReference _page;
+	private ElementReference _page;
 
-    private bool _hideDebugTray = true;
+	private bool _hideDebugTray = true;
 
-    private void ToggleDebugTray(KeyboardEventArgs args) {
-        if (args.Key == "F9")
-            _hideDebugTray = !_hideDebugTray;
-    }
+	private void ToggleDebugTray(KeyboardEventArgs args)
+	{
+		if (args.Key == "F9")
+			_hideDebugTray = !_hideDebugTray;
+	}
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
-        if (firstRender)
-            await _page.FocusAsync();
-    }
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+			await _page.FocusAsync();
+	}
+}
+@code{
+	private bool isAuthenticated;
+	protected override void OnInitialized()
+	{
+		ApiRequests.AuthenticationStateChanged += OnAutheticationChanged;
+	}
 
+	private void OnAutheticationChanged()
+	{
+		isAuthenticated = ApiRequests.IsAuthenticated;
+		StateHasChanged();
+	}
 }

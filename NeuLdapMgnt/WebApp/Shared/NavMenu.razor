@@ -1,9 +1,6 @@
-﻿@if (isAuthenticated)
-{
-	<Sidebar2 IconName="IconName.Database"
-			  Title="LDAP Management"
-			  DataProvider="SidebarDataProvider" />
-}
+﻿<Sidebar2 IconName="IconName.Database"
+			Title="LDAP Management"
+			DataProvider="SidebarDataProvider" />
 
 @code {
 	private Sidebar sidebar = new();
@@ -49,18 +46,6 @@
 		};
 
 		return navItems;
-	}
-
-	protected override void OnInitialized()
-	{
-		isAuthenticated = ApiRequests.IsAuthenticated;
-		ApiRequests.AuthenticationStateChanged += OnAutheticationChanged;
-	}
-
-	private void OnAutheticationChanged()
-	{
-		isAuthenticated = ApiRequests.IsAuthenticated;
-		StateHasChanged();
 	}
 }
 
