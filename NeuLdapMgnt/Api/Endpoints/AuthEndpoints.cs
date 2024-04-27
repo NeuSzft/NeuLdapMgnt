@@ -12,6 +12,7 @@ public static class AuthEndpoints {
            .WithOpenApi()
            .WithName("BasicAuth")
            .WithTags("Authentication")
+           .WithDescription("### Performs Basic authentication and returns a Json Web Token on successful authentication.")
            .Produces<string>()
            .Produces<string>(StatusCodes.Status400BadRequest)
            .Produces<string>(StatusCodes.Status401Unauthorized)

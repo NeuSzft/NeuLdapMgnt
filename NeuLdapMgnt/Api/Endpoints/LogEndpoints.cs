@@ -8,22 +8,32 @@ namespace NeuLdapMgnt.Api.Endpoints;
 
 public static class LogEndpoints {
 	public static void MapLogEndpoints(this WebApplication app) {
-		app.MapGet("/api/logs", (IPostgresService pg, HttpRequest request) => {
+		app.MapGet("/api/logs", (IPostgresService pg, HttpRequest request, string? from, string? to) => {
 			   if (pg is DummyPostgresService)
 				   return new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors("Logging to database is disabled.").RenewToken(request).ToResult();
 
-			   DateTimeOffset from = request.Query.TryGetValue("from", out var fromStr) && long.TryParse(fromStr, out var fromSecs)
+			   DateTimeOffset fromOffset = long.TryParse(from, out var fromSecs)
 				   ? DateTimeOffset.FromUnixTimeSeconds(fromSecs)
 				   : DateTimeOffset.UnixEpoch;
 
-			   DateTimeOffset to = request.Query.TryGetValue("to", out var toStr) && long.TryParse(toStr, out var toSecs)
+			   DateTimeOffset toOffset = long.TryParse(to, out var toSecs)
 				   ? DateTimeOffset.FromUnixTimeSeconds(toSecs)
 				   : DateTimeOffset.UtcNow;
 
-			   return new RequestResult<LogEntry>().SetValues(pg.GetLogEntries(from.DateTime, to.DateTime).ToArray()).RenewToken(request).ToResult();
+			   return new RequestResult<LogEntry>().SetValues(pg.GetLogEntries(fromOffset.DateTime, toOffset.DateTime).ToArray()).RenewToken(request).ToResult();
 		   })
 		   .WithOpenApi()
 		   .WithTags("Logs")
+		   .WithDescription(
+			   """
+			   ### Returns all request logs within the specified timeframe.
+
+			   The timeframe can be specified with the "**from**" and "**to**" URL parameters which use Unix time.\
+			   Both parameters are optional, and the default values are *1970.01.01* for "**from**" and the *current time* for "**to**" meaning that all logs are returned.
+
+			   *Unix time is the seconds passed since 1970.01.01 00:00:00 (UTC).*
+			   """
+		   )
 		   .RequireAuthorization()
 		   .Produces<RequestResult<LogEntry>>()
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")

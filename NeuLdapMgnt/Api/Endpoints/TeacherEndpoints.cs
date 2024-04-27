@@ -10,6 +10,7 @@ namespace NeuLdapMgnt.Api.Endpoints {
 				   ldap.GetAllEntities<Teacher>().RenewToken(request).ToResult()
 			   ).WithOpenApi()
 			   .WithTags("Teachers")
+			   .WithDescription("### Returns all entities that have the type \"*Teacher*\".")
 			   .RequireAuthorization()
 			   .Produces<RequestResult<Teacher>>(StatusCodes.Status207MultiStatus)
 			   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
@@ -20,6 +21,7 @@ namespace NeuLdapMgnt.Api.Endpoints {
 				   return result.RenewToken(request).ToResult();
 			   }).WithOpenApi()
 			   .WithTags("Teachers")
+			   .WithDescription("### Returns an entity that has the type \"*Teacher*\" and the specified UID.")
 			   .RequireAuthorization()
 			   .Produces<Teacher>()
 			   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
@@ -34,6 +36,7 @@ namespace NeuLdapMgnt.Api.Endpoints {
 				   return ldap.TryAddEntity(result.GetValue()!, result.GetValue()!.Id).RenewToken(request).ToResult();
 			   }).WithOpenApi()
 			   .WithTags("Teachers")
+			   .WithDescription("### Adds a new entity with the type \"*Teacher*\".")
 			   .RequireAuthorization()
 			   .Accepts<Teacher>("application/json")
 			   .Produces(StatusCodes.Status201Created)
@@ -49,6 +52,7 @@ namespace NeuLdapMgnt.Api.Endpoints {
 				   return ldap.TryModifyEntity(result.GetValue()!, id).RenewToken(request).ToResult();
 			   }).WithOpenApi()
 			   .WithTags("Teachers")
+			   .WithDescription("### Overwrites an entity that has the type \"*Teacher*\" and the specified UID.")
 			   .RequireAuthorization()
 			   .Accepts<Teacher>("application/json")
 			   .Produces(StatusCodes.Status200OK)
@@ -61,6 +65,7 @@ namespace NeuLdapMgnt.Api.Endpoints {
 				   ldap.TryDeleteEntity<Teacher>(id).RenewToken(request).ToResult()
 			   ).WithOpenApi()
 			   .WithTags("Teachers")
+			   .WithDescription("### Deletes an entity that has the type \"*Teacher*\" and the specified UID.")
 			   .RequireAuthorization()
 			   .Produces(StatusCodes.Status200OK)
 			   .Produces<RequestResult>(StatusCodes.Status400BadRequest)

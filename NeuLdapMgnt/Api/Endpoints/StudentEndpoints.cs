@@ -14,6 +14,7 @@ public static class StudentEndpoints {
 		   )
 		   .WithOpenApi()
 		   .WithTags("Students")
+		   .WithDescription("### Returns all entities that have the type \"*Student*\".")
 		   .RequireAuthorization()
 		   .Produces<RequestResult<Student>>(StatusCodes.Status207MultiStatus)
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
@@ -25,6 +26,7 @@ public static class StudentEndpoints {
 		   })
 		   .WithOpenApi()
 		   .WithTags("Students")
+		   .WithDescription("### Returns an entity that has the type \"*Student*\" and the specified UID.")
 		   .RequireAuthorization()
 		   .Produces<Student>()
 		   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
@@ -40,6 +42,7 @@ public static class StudentEndpoints {
 		   })
 		   .WithOpenApi()
 		   .WithTags("Students")
+		   .WithDescription("### Adds a new entity with the type \"*Student*\".")
 		   .RequireAuthorization()
 		   .Accepts<Student>("application/json")
 		   .Produces(StatusCodes.Status201Created)
@@ -56,6 +59,7 @@ public static class StudentEndpoints {
 		   })
 		   .WithOpenApi()
 		   .WithTags("Students")
+		   .WithDescription("### Overwrites an entity that has the type \"*Student*\" and the specified UID.")
 		   .RequireAuthorization()
 		   .Accepts<Student>("application/json")
 		   .Produces(StatusCodes.Status200OK)
@@ -69,6 +73,7 @@ public static class StudentEndpoints {
 		   )
 		   .WithOpenApi()
 		   .WithTags("Students")
+		   .WithDescription("### Deletes an entity that has the type \"*Student*\" and the specified UID.")
 		   .RequireAuthorization()
 		   .Produces(StatusCodes.Status200OK)
 		   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
@@ -87,6 +92,7 @@ public static class StudentEndpoints {
 		   })
 		   .WithOpenApi()
 		   .WithTags("Students")
+		   .WithSummary("TODO: REMOVE LATER")
 		   .RequireAuthorization()
 		   .Accepts<IFormFile>("text/csv")
 		   .Produces<RequestResult>(StatusCodes.Status207MultiStatus)
@@ -97,7 +103,6 @@ public static class StudentEndpoints {
 		app.MapPut("/api/students/{id}/password", async (LdapService ldap, HttpRequest request, string id) => {
 			   using StreamReader reader   = new(request.Body);
 			   string             password = await reader.ReadToEndAsync();
-
 
 			   var validation = ModelValidator.ValidateValue(password, new PasswordAttribute());
 			   if (validation.IsFailure())
@@ -114,6 +119,7 @@ public static class StudentEndpoints {
 		   })
 		   .WithOpenApi()
 		   .WithTags("Students")
+		   .WithDescription("### Updates the password of an entity that has the type \"*Student*\" and the specified UID.")
 		   .RequireAuthorization()
 		   .Accepts<string>("text/plain")
 		   .Produces(StatusCodes.Status200OK)
