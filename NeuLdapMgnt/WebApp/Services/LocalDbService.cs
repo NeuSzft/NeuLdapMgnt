@@ -112,32 +112,6 @@ namespace NeuLdapMgnt.WebApp.Services
 			}
 		}
 
-		public async Task<List<string>> DeactivateUsers(List<string> ids)
-		{
-			List<string> errorList = new();
-			try
-			{
-				await FetchInactiveUsers();
-				foreach (var id in ids)
-				{
-					var response = await ApiRequests.DeactivateUserAsync(id);
-					if (response.IsSuccess())
-					{
-						InactiveUsers.Add(id);
-					}
-					else
-					{
-						errorList.AddRange(response.Errors);
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				NotificationService.HandleError(e);
-			}
-			return errorList;
-		}
-
 		public async Task<List<string>> ActivateUsers(List<string> ids)
 		{
 			List<string> errorList = new();
@@ -156,6 +130,39 @@ namespace NeuLdapMgnt.WebApp.Services
 						errorList.AddRange(response.Errors);
 					}
 				}
+			}
+			catch (Exception e)
+			{
+				NotificationService.HandleError(e);
+			}
+			return errorList;
+		}
+
+		public async Task<List<string>> DeleteUsers(List<string> ids)
+		{
+			List<string> errorList = new();
+			try
+			{
+				foreach (var id in ids)
+				{
+					if (long.TryParse(id, out long studentId) && studentId != 0)
+					{
+						var response = await ApiRequests.DeleteStudentAsync(id);
+						if (response.IsFailure())
+						{
+							errorList.Add(response.GetError());
+						}
+					}
+					else
+					{
+						var response = await ApiRequests.DeleteTeacherAsync(id);
+						if (response.IsFailure())
+						{
+							errorList.Add(response.GetError());
+						}
+					}
+				}
+				await ActivateUsers(ids.Where(x => !errorList.Contains(x)).ToList());
 			}
 			catch (Exception e)
 			{

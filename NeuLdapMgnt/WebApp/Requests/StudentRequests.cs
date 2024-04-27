@@ -16,7 +16,7 @@ namespace NeuLdapMgnt.WebApp.Requests
 		public static async Task<RequestResult<Student>> UpdateStudentAsync(this ApiRequests apiRequests, string id, Student student)
 			=> await apiRequests.SendRequestAsync<Student>(HttpMethod.Put, $"api/students/{id}", student);
 
-		public static async Task<RequestResult<Student>> DeleteStudentAsync(this ApiRequests apiRequests, string id)
-			=> await apiRequests.SendRequestAsync<Student>(HttpMethod.Delete, $"api/students/{id}");
+		public static async Task<RequestResult> DeleteStudentAsync(this ApiRequests apiRequests, string id)
+			=> await apiRequests.SendRequestAsync(HttpMethod.Delete, $"api/students/{id}");
 	}
 }

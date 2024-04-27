@@ -1,9 +1,9 @@
 ﻿@page "/db/inactive-users"
 
 <PageTitle>Inactive Users</PageTitle>
+<ConfirmDialog @ref="dialog" />
 
 <h1>Inactive Users</h1>
-
 
 @if (isLoading)
 {
@@ -29,6 +29,11 @@ else
 			<div class="ms-2">
 				<Button Color="ButtonColor.Success" Outline="true" Disabled="isUserSelected" @onclick="OnActivateSelectedUsers">
 					Activate selected
+				</Button>
+			</div>
+			<div class="ms-2">
+				<Button Color="ButtonColor.Danger" Outline="true" Disabled="isUserSelected" @onclick="OnDeleteSelectedUsers">
+					Delete permanently
 				</Button>
 			</div>
 		</div>
@@ -77,6 +82,8 @@ else
 @code {
 	private List<string> usersList = new();
 	private List<string> selectedUsers = new();
+	private ConfirmDialog dialog = default!;
+
 	private bool isLoading;
 	private bool isActivating;
 	private bool isUserSelected => !selectedUsers.Any();
@@ -92,11 +99,40 @@ else
 
 	private async Task OnActivateSelectedUsers()
 	{
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("List", selectedUsers);
+
+		var confirmation = await dialog.ShowAsync<CustomList>(
+			title: "Set status to [Active]?",
+			parameters: parameters,
+			confirmDialogOptions: DialogOptions.Confirm());
+
+		if (!confirmation) return;
+
 		isActivating = true;
 		await LocalDbService.ActivateUsers(selectedUsers);
 		usersList = LocalDbService.InactiveUsers.ToList();
 		isActivating = false;
 		ToastService.Notify(ToastMessages.Success("Selected users were activated."));
+	}
+
+	private async Task OnDeleteSelectedUsers()
+	{
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("List", selectedUsers);
+
+		var confirmation = await dialog.ShowAsync<CustomList>(
+			title: $"Delete permanently [{selectedUsers.Count}] user(s)?",
+			parameters: parameters,
+			confirmDialogOptions: DialogOptions.Confirm());
+
+		if (!confirmation) return;
+
+		isActivating = true;
+		await LocalDbService.DeleteUsers(selectedUsers);
+		usersList = LocalDbService.InactiveUsers.ToList();
+		isActivating = false;
+		ToastService.Notify(ToastMessages.Success("Selected users were permanently deleted!"));
 	}
 
 	private async Task InspectUser(string userId)
