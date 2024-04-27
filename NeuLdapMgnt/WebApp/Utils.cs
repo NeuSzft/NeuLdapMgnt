@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
 
 namespace NeuLdapMgnt.WebApp
@@ -43,12 +42,32 @@ namespace NeuLdapMgnt.WebApp
 			}
 		}
 
-		public static int GetClassOrderValue(string cls)
-		{
-            if (cls.Contains("ny", StringComparison.OrdinalIgnoreCase))
-				return 0;
+		public static int GetClassOrderValue(string cls) {
+			try {
+				int value = 0;
 
-			return cls.Sum(x => x);
+				if (cls.Contains('/')) {
+					string[] split = cls.Split('/');
+					if (int.TryParse(split[0], out var num))
+						value |= num << 16;
+					if (int.TryParse(new string(split[1].Where(char.IsDigit).ToArray()), out num))
+						value |= num << 8;
+					value |= cls.Last();
+				}
+				else {
+					string[] split = cls.Split('.');
+					if (int.TryParse(split[0], out var num))
+						value |= num << 8;
+					char c = split[1].ToUpper().First();
+					if (c != 'N')
+						value |= c;
+				}
+
+				return value;
+			}
+			catch {
+				return int.MinValue;
+			}
 		}
 	}
 }
