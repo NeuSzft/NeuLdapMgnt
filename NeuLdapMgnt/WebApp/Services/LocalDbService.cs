@@ -98,7 +98,7 @@ namespace NeuLdapMgnt.WebApp.Services
 				var response = await ApiRequests.DeactivateUserAsync(id);
 				if (response.IsSuccess())
 				{
-					await FetchInactiveUsers();
+					InactiveUsers.Remove(id);
 				}
 
 				if (response.Errors.Any())
@@ -117,21 +117,17 @@ namespace NeuLdapMgnt.WebApp.Services
 			List<string> errorList = new();
 			try
 			{
+				await FetchInactiveUsers();
 				foreach (var id in ids)
 				{
 					var response = await ApiRequests.DeactivateUserAsync(id);
 					if (response.IsSuccess())
 					{
-						await FetchInactiveUsers();
+						InactiveUsers.Add(id);
 					}
 					else
 					{
 						errorList.AddRange(response.Errors);
-					}
-
-					if (response.Errors.Any())
-					{
-						NotificationService.NotifyError(response.GetError());
 					}
 				}
 			}
@@ -142,37 +138,18 @@ namespace NeuLdapMgnt.WebApp.Services
 			return errorList;
 		}
 
-		public async Task ActivateUser(string id)
-		{
-			try
-			{
-				var response = await ApiRequests.ActivateUserAsync(id);
-				if (response.IsSuccess())
-				{
-					await FetchInactiveUsers();
-				}
-				else
-				{
-					NotificationService.NotifyError(response.GetError());
-				}
-			}
-			catch (Exception e)
-			{
-				NotificationService.HandleError(e);
-			}
-		}
-
 		public async Task<List<string>> ActivateUsers(List<string> ids)
 		{
 			List<string> errorList = new();
 			try
 			{
+				await FetchInactiveUsers();
 				foreach (string id in ids)
 				{
 					var response = await ApiRequests.ActivateUserAsync(id);
 					if (response.IsSuccess())
 					{
-						await FetchInactiveUsers();
+						InactiveUsers.Remove(id);
 					}
 					else
 					{
