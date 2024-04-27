@@ -7,29 +7,29 @@ using Npgsql;
 
 namespace NeuLdapMgnt.Api;
 
-public interface IPostgresService {
+public interface ILoggerService {
 	void CreateLogEntry(LogEntry entry);
 
 	IEnumerable<LogEntry> GetLogEntries(DateTime start, DateTime end);
 }
 
-public sealed class DummyPostgresService : IPostgresService {
+public sealed class DummyLoggerService : ILoggerService {
 	public void CreateLogEntry(LogEntry entry) { }
 
 	public IEnumerable<LogEntry> GetLogEntries(DateTime start, DateTime end) => [];
 }
 
-public sealed class PostgresService : IPostgresService {
+public sealed class PglLoggerService : ILoggerService {
 	private readonly string _connectionString;
 
 	private IEnumerable<string> _ignoredRoutes = [];
 
-	public PostgresService(string host, string db, string password) {
+	public PglLoggerService(string host, string db, string password) {
 		_connectionString = $"Host={host};Database={db};Username=postgres;Password={password}";
 		CreateDefaultTables();
 	}
 
-	public static PostgresService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD") {
+	public static PglLoggerService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD") {
 		return new(
 			Environment.GetEnvironmentVariable(hostEnv).ThrowIfNullOrEmpty(),
 			Environment.GetEnvironmentVariable(dbEnv).ThrowIfNullOrEmpty(),
@@ -43,7 +43,7 @@ public sealed class PostgresService : IPostgresService {
 		return connection;
 	}
 
-	public PostgresService SetIgnoredRoutes(params string[] ignoredRoutes) {
+	public PglLoggerService SetIgnoredRoutes(params string[] ignoredRoutes) {
 		_ignoredRoutes = ignoredRoutes;
 		return this;
 	}

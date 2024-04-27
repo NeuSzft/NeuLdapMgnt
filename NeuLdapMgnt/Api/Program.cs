@@ -23,9 +23,9 @@ internal static class Program {
 	public static void Main(string[] args) {
 		LdapService ldapService = LdapService.FromEnvs();
 
-		IPostgresService postgresService = true.ToString().Equals(Environment.GetEnvironmentVariable("LOG_TO_DB"), StringComparison.OrdinalIgnoreCase)
-			? PostgresService.FromEnvs().SetIgnoredRoutes("/api/docs")
-			: new DummyPostgresService();
+		ILoggerService loggerService = true.ToString().Equals(Environment.GetEnvironmentVariable("LOG_TO_DB"), StringComparison.OrdinalIgnoreCase)
+			? PglLoggerService.FromEnvs().SetIgnoredRoutes("/api/docs")
+			: new DummyLoggerService();
 
 		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -92,7 +92,7 @@ internal static class Program {
 		builder.Services.AddCors();
 		builder.Services.AddEndpointsApiExplorer();
 		builder.Services.AddSingleton(_ => ldapService);
-		builder.Services.AddSingleton(_ => postgresService);
+		builder.Services.AddSingleton(_ => loggerService);
 		builder.Services.AddSwaggerWrapperGen("neuldapmgnt", "Neu LDAP Management API", "alpha");
 
 		WebApplication app = builder.Build();
@@ -109,7 +109,7 @@ internal static class Program {
 			req.Headers.TryGetValue("Audience", out var aud);
 			var user = aud.ToString().DefaultIfNullOrEmpty("__NOAUTH__");
 
-			postgresService.CreateLogEntry(new() {
+			loggerService.CreateLogEntry(new() {
 				Time = now,
 				LogLevel = LogLevel.Information.ToString(),
 				Username = aud.ToString(),
@@ -139,7 +139,7 @@ internal static class Program {
 				}
 
 				await context.Response.CompleteAsync();
-				postgresService.CreateLogEntry(new() {
+				loggerService.CreateLogEntry(new() {
 					Time = DateTime.UtcNow,
 					LogLevel = LogLevel.Critical.ToString(),
 					Host = context.TryGetClientAddress() ?? "unknown",

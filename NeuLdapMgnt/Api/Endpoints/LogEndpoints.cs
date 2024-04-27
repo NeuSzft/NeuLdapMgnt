@@ -8,8 +8,8 @@ namespace NeuLdapMgnt.Api.Endpoints;
 
 public static class LogEndpoints {
 	public static void MapLogEndpoints(this WebApplication app) {
-		app.MapGet("/api/logs", (IPostgresService pg, HttpRequest request, string? from, string? to) => {
-			   if (pg is DummyPostgresService)
+		app.MapGet("/api/logs", (ILoggerService loggerService, HttpRequest request, string? from, string? to) => {
+			   if (loggerService is DummyLoggerService)
 				   return new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors("Logging to database is disabled.").RenewToken(request).ToResult();
 
 			   DateTimeOffset fromOffset = long.TryParse(from, out var fromSecs)
@@ -20,7 +20,7 @@ public static class LogEndpoints {
 				   ? DateTimeOffset.FromUnixTimeSeconds(toSecs)
 				   : DateTimeOffset.UtcNow;
 
-			   return new RequestResult<LogEntry>().SetValues(pg.GetLogEntries(fromOffset.DateTime, toOffset.DateTime).ToArray()).RenewToken(request).ToResult();
+			   return new RequestResult<LogEntry>().SetValues(loggerService.GetLogEntries(fromOffset.DateTime, toOffset.DateTime).ToArray()).RenewToken(request).ToResult();
 		   })
 		   .WithOpenApi()
 		   .WithTags("Logs")
