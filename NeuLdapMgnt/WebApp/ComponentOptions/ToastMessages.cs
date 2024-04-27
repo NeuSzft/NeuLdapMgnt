@@ -26,16 +26,6 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 			};
 		}
 
-		public static ToastMessage NoConnection()
-		{
-			return new()
-			{
-				Type = ToastType.Danger,
-				AutoHide = true,
-				Message = "Failed to connect to the api!"
-			};
-		}
-
 		public static ToastMessage Error(string message = "Error!")
 		{
 			return new()
