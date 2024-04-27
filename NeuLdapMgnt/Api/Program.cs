@@ -29,9 +29,6 @@ internal static class Program {
 
 		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-		using RequestLoggerProvider? requestLoggerProvider = Environment.GetEnvironmentVariable("LOGS_DIR") is { Length: > 0 } logsDir ? new(logsDir) : null;
-		ILogger?                     requestLogger         = requestLoggerProvider?.CreateLogger(nameof(RequestLogger));
-
 		// Create jwt authentication scheme
 		builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
 			options.TokenValidationParameters = new TokenValidationParameters {
@@ -101,7 +98,6 @@ internal static class Program {
 		WebApplication app = builder.Build();
 		ldapService.Logger = app.Logger;
 
-		// TODO: Remove unnecessary console logging
 		// Add a middleware that logs each request to the console
 		app.Use(async (HttpContext context, RequestDelegate next) => {
 			DateTime    now = DateTime.UtcNow;
@@ -113,7 +109,6 @@ internal static class Program {
 			req.Headers.TryGetValue("Audience", out var aud);
 			var user = aud.ToString().DefaultIfNullOrEmpty("__NOAUTH__");
 
-			requestLogger?.LogInformation($"{user}\t{req.Host}\t{req.Method}\t{req.Path}\t{context.Response.StatusCode}");
 			postgresService.CreateLogEntry(new() {
 				Time = now,
 				LogLevel = LogLevel.Information.ToString(),
