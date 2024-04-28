@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
 
 <ConfirmDialog @ref="dialog" />
 
@@ -104,7 +105,7 @@
 							   disabled />
 					</td>
 					<td class="text-end rounded-end">
-						<ButtonInspectTeacher OnClick="InspectTeacher" Teacher="@teacher" />
+						<ButtonInspect Id="@teacher.Id" />
 					</td>
 				</tr>
 			}
