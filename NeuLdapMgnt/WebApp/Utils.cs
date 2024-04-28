@@ -42,11 +42,14 @@ namespace NeuLdapMgnt.WebApp
 			}
 		}
 
-		public static int GetClassOrderValue(string cls) {
-			try {
+		public static int GetClassOrderValue(string cls)
+		{
+			try
+			{
 				int value = 0;
 
-				if (cls.Contains('/')) {
+				if (cls.Contains('/'))
+				{
 					string[] split = cls.Split('/');
 					if (int.TryParse(split[0], out var num))
 						value |= num << 16;
@@ -54,7 +57,8 @@ namespace NeuLdapMgnt.WebApp
 						value |= num << 8;
 					value |= cls.Last();
 				}
-				else {
+				else
+				{
 					string[] split = cls.Split('.');
 					if (int.TryParse(split[0], out var num))
 						value |= num << 8;
@@ -65,9 +69,12 @@ namespace NeuLdapMgnt.WebApp
 
 				return value;
 			}
-			catch {
+			catch
+			{
 				return int.MinValue;
 			}
 		}
+
+		public static bool IsStudent(string id) => long.TryParse(id, out long studentId) && studentId != 0;
 	}
 }

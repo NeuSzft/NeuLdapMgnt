@@ -13,15 +13,6 @@
 	[Parameter]
 	public bool IsDisabled { get; set; }
 
-	private void Inspect()
-	{
-		if (long.TryParse(Id, out long studentId) && studentId != 0)
-		{
-			NavManager.NavigateTo($"/students/{studentId}");
-		}
-		else
-		{
-			NavManager.NavigateTo($"/teachers/{Id}");
-		}
-	}
+	private void Inspect() 
+		=> NavManager.NavigateTo(Utils.IsStudent(Id) ? $"/students/{Id}" : $"/teachers/{Id}");
 }

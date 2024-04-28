@@ -139,7 +139,7 @@ namespace NeuLdapMgnt.WebApp.Services
 			{
 				foreach (var id in ids)
 				{
-					if (long.TryParse(id, out long studentId) && studentId != 0)
+					if (Utils.IsStudent(id))
 					{
 						var response = await ApiRequests.DeleteStudentAsync(id);
 						if (response.IsFailure())
