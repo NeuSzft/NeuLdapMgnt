@@ -1,45 +1,62 @@
 ﻿using System;
+using System.Globalization;
 using System.Numerics;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models;
 
-public class LogEntryIdConverter : JsonConverter<BigInteger> {
-	public override BigInteger Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => reader.GetString() is { } value ? BigInteger.Parse(value) : 0;
-
-	public override void Write(Utf8JsonWriter writer, BigInteger value, JsonSerializerOptions options) => writer.WriteStringValue(value.ToString());
-}
-
 public class LogEntry {
-	[JsonRequired, JsonPropertyName("id"), JsonConverter(typeof(LogEntryIdConverter))]
 	public BigInteger Id { get; init; }
 
-	[JsonRequired, JsonPropertyName("time")]
 	public required DateTime Time { get; init; }
 
-	[JsonRequired, JsonPropertyName("log_level")]
 	public required string LogLevel { get; init; }
 
-	[JsonInclude, JsonPropertyName("username")]
 	public string? Username { get; init; }
 
-	[JsonInclude, JsonPropertyName("full_name")]
 	public string? FullName { get; init; }
 
-	[JsonRequired, JsonPropertyName("host")]
 	public required string Host { get; init; }
 
-	[JsonRequired, JsonPropertyName("method")]
 	public required string Method { get; init; }
 
-	[JsonRequired, JsonPropertyName("request_path")]
 	public required string RequestPath { get; init; }
 
-	[JsonRequired, JsonPropertyName("status_code")]
 	public required int StatusCode { get; init; }
 
 	public override string ToString() {
 		return $"[{Time:yyyy.MM.dd - HH:mm:ss}] {Host} → {Method} {RequestPath} ({StatusCode})";
+	}
+
+	private static readonly CultureInfo CultureInfo = CultureInfo.GetCultureInfoByIetfLanguageTag("hu-HU");
+
+	/// <summary>Creates a tab separated vales (tsv) string from a <see cref="LogEntry"/>.</summary>
+	/// <param name="entry">The <see cref="LogEntry"/> to use.</param>
+	/// <returns>The values of the <see cref="LogEntry"/> separated by tabs.</returns>
+	public static string ToTsv(LogEntry entry) {
+		return $"{entry.Id}\t{entry.Time.ToString(CultureInfo)}\t{entry.LogLevel}\t{entry.Username}\t{entry.FullName}\t{entry.Host}\t{entry.Method}\t{entry.RequestPath}\t{entry.StatusCode}";
+	}
+
+	/// <summary>Creates a <see cref="LogEntry"/> from tab separated vales (tsv).</summary>
+	/// <param name="tsvLine">A line of string containing the values of the <see cref="LogEntry"/> separated by tabs.</param>
+	/// <returns>The newly created <see cref="LogEntry"/>.</returns>
+	/// <exception cref="FormatException">The format of the string is invalid.</exception>
+	public static LogEntry FromTsv(string tsvLine) {
+		string[] values = tsvLine.Split('\t');
+		try {
+			return new() {
+				Id = BigInteger.Parse(values[0]),
+				Time = DateTime.Parse(values[1], CultureInfo),
+				LogLevel = values[2],
+				Username = string.IsNullOrEmpty(values[3]) ? null : values[3],
+				FullName = string.IsNullOrEmpty(values[4]) ? null : values[4],
+				Host = values[5],
+				Method = values[6],
+				RequestPath = values[7],
+				StatusCode = int.Parse(values[8])
+			};
+		}
+		catch {
+			throw new FormatException($"The tab separated line cannot be converted into a {typeof(LogEntry)} using the {CultureInfo} culture");
+		}
 	}
 }

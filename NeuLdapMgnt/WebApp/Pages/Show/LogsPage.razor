@@ -56,8 +56,8 @@ else {
 	bool                  _isLoading;
 
 	protected override async Task OnInitializedAsync() {
-		ApiRequests.EnsureAuthentication(NavManager);
-		await Fetch();
+		if (ApiRequests.EnsureAuthentication(NavManager))
+			await Fetch();
 	}
 
 	private async Task Fetch() {
@@ -67,7 +67,7 @@ else {
 		try {
 			_isLoading = true;
 			var result = await ApiRequests.GetLogsAsync(from, to);
-			_entries = result.Values;
+			_entries = result.Values.Select(LogEntry.FromTsv);
 		}
 		catch (Exception e) {
 			NotificationService.HandleError(e);

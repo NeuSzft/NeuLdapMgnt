@@ -4,8 +4,8 @@ namespace NeuLdapMgnt.WebApp.Requests
 {
 	public static class DbRequests
 	{
-		public static async Task<RequestResult<LogEntry>> GetLogsAsync(this ApiRequests apiRequests, long from, long to)
-			=> await apiRequests.SendRequestAsync<LogEntry>(HttpMethod.Get, $"/api/logs?from={from}&to={to}");
+		public static async Task<RequestResult<string>> GetLogsAsync(this ApiRequests apiRequests, long from, long to)
+			=> await apiRequests.SendRequestAsync<string>(HttpMethod.Get, $"/api/logs?from={from}&to={to}");
 
 		public static async Task<RequestResult<string[]>> GetClassesAsync(this ApiRequests apiRequests)
 			=> await apiRequests.SendRequestAsync<string[]>(HttpMethod.Get, "/api/classes");

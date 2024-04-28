@@ -20,7 +20,7 @@ public static class LogEndpoints {
 				   ? DateTimeOffset.FromUnixTimeSeconds(toSecs)
 				   : DateTimeOffset.UtcNow;
 
-			   return new RequestResult<LogEntry>().SetValues(loggerService.GetLogEntries(fromOffset.DateTime, toOffset.DateTime).ToArray()).RenewToken(request).ToResult();
+			   return new RequestResult<string>().SetValues(loggerService.GetLogEntries(fromOffset.DateTime, toOffset.DateTime).Select(LogEntry.ToTsv).ToArray()).RenewToken(request).ToResult();
 		   })
 		   .WithOpenApi()
 		   .WithTags("Logs")
@@ -35,7 +35,7 @@ public static class LogEndpoints {
 			   """
 		   )
 		   .RequireAuthorization()
-		   .Produces<RequestResult<LogEntry>>()
+		   .Produces<RequestResult<string>>()
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
 		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 	}
