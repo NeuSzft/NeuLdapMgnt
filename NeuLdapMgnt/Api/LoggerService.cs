@@ -124,7 +124,8 @@ public sealed class PgLoggerService : ILoggerService {
 				entries.status_code AS "StatusCode"
 			FROM entries
 			LEFT JOIN users ON entries.username = users.username
-			WHERE time BETWEEN @Start AND @End;
+			WHERE time BETWEEN @Start AND @End
+			ORDER BY entries.id;
 			""";
 
 		using NpgsqlConnection connection = OpenConnection();
