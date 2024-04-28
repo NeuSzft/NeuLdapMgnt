@@ -77,7 +77,7 @@ else
 		ApiRequests.EnsureAuthentication(NavManager);
 
 		//LocalDbService.LoadingEnable("Fetching classes");
-		await LocalDbService.FetchClasses();
+		await LocalDbService.FetchClassesAsync();
 		//LocalDbService.LoadingDisable;
 	}
 
@@ -109,7 +109,7 @@ else
 				NotificationService.NotifyError(response.GetError());
 
 			//LocalDbService.LoadingEnable("Fetching classes");
-			await LocalDbService.FetchClasses();
+			await LocalDbService.FetchClassesAsync();
 			//LocalDbService.LoadingDisable;
 		}
 		catch (Exception e)
@@ -149,7 +149,7 @@ else
 
 			await HideModalRemove();
 			//LocalDbService.LoadingEnable("Fetching classes");
-			await LocalDbService.FetchClasses();
+			await LocalDbService.FetchClassesAsync();
 			//LocalDbService.LoadingDisable;
 		}
 		catch (Exception e)

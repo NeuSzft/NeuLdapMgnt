@@ -34,9 +34,9 @@ else
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 
-		await LocalDbService.FetchClasses();
+		await LocalDbService.FetchClassesAsync();
 
-		var searchedTeacher = await TeacherService.FetchTeacher(Id);
+		var searchedTeacher = await TeacherService.FetchTeacherAsync(Id);
 		if (searchedTeacher is null) return;
 		teacher = searchedTeacher;
 		isLoading = false;
@@ -58,7 +58,7 @@ else
 		if (!confirmation) return false;
 
 		isLoading = true;
-		var response = await TeacherService.UpdateTeacher(editedTeacher);
+		var response = await TeacherService.UpdateTeacherAsync(editedTeacher);
 		errorList = response.ToList();
 		isLoading = false;
 		NavManager.NavigateTo("/teachers");
@@ -75,7 +75,7 @@ else
 		if (!confirmation) return false;
 
 		isLoading = true;
-		await LocalDbService.DeactivateUser(editedTeacher.Id);
+		await LocalDbService.DeactivateUserAsync(editedTeacher.Id);
 		isLoading = false;
 		NavManager.NavigateTo("/teachers");
 

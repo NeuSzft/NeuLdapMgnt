@@ -50,17 +50,17 @@ else
 	{
 		var (teachers, isAdmin, isInactive) = context;
 		isLoading = true;
-		await TeacherService.UpdateTeachers(teachers, isAdmin, isInactive);
+		await TeacherService.UpdateTeachersAsync(teachers, isAdmin, isInactive);
 		await FetchData();
 		isLoading = false;
 	}
 
 	private async Task FetchData()
 	{
-		await LocalDbService.FetchInactiveUsers();
-		await LocalDbService.FetchAdmins();
-		await LocalDbService.FetchClasses();
-		await TeacherService.FetchTeachers();
+		await LocalDbService.FetchInactiveUsersAsync();
+		await LocalDbService.FetchAdminsAsync();
+		await LocalDbService.FetchClassesAsync();
+		await TeacherService.FetchTeachersAsync();
 	}
 
 	private void ToAddPage() => NavManager.NavigateTo("/teachers/add");

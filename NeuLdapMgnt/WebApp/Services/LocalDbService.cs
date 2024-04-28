@@ -23,12 +23,10 @@ namespace NeuLdapMgnt.WebApp.Services
 			NotificationService = notificationService;
 		}
 
-		public async Task FetchAdmins()
+		public async Task FetchAdminsAsync()
 		{
 			try
 			{
-				Admins.Clear();
-
 				var response = await ApiRequests.GetAdminsAsync();
 				if (response.IsSuccess())
 				{
@@ -46,12 +44,10 @@ namespace NeuLdapMgnt.WebApp.Services
 			}
 		}
 
-		public async Task FetchInactiveUsers()
+		public async Task FetchInactiveUsersAsync()
 		{
 			try
 			{
-				InactiveUsers.Clear();
-
 				var response = await ApiRequests.GetInactiveUsersAsync();
 				if (response.IsSuccess())
 				{
@@ -69,12 +65,10 @@ namespace NeuLdapMgnt.WebApp.Services
 			}
 		}
 
-		public async Task FetchClasses()
+		public async Task FetchClassesAsync()
 		{
 			try
 			{
-				Classes.Clear();
-
 				var response = await ApiRequests.GetClassesAsync();
 				if (response.IsSuccess())
 				{
@@ -91,7 +85,7 @@ namespace NeuLdapMgnt.WebApp.Services
 			}
 		}
 
-		public async Task DeactivateUser(string id)
+		public async Task DeactivateUserAsync(string id)
 		{
 			try
 			{
@@ -112,12 +106,12 @@ namespace NeuLdapMgnt.WebApp.Services
 			}
 		}
 
-		public async Task<List<string>> ActivateUsers(List<string> ids)
+		public async Task<List<string>> ActivateUsersAsync(List<string> ids)
 		{
 			List<string> errorList = new();
 			try
 			{
-				await FetchInactiveUsers();
+				await FetchInactiveUsersAsync();
 				foreach (string id in ids)
 				{
 					var response = await ApiRequests.ActivateUserAsync(id);
@@ -138,7 +132,7 @@ namespace NeuLdapMgnt.WebApp.Services
 			return errorList;
 		}
 
-		public async Task<List<string>> DeleteUsers(List<string> ids)
+		public async Task<List<string>> DeleteUsersAsync(List<string> ids)
 		{
 			List<string> errorList = new();
 			try
@@ -162,7 +156,7 @@ namespace NeuLdapMgnt.WebApp.Services
 						}
 					}
 				}
-				await ActivateUsers(ids.Where(x => !errorList.Contains(x)).ToList());
+				await ActivateUsersAsync(ids.Where(x => !errorList.Contains(x)).ToList());
 			}
 			catch (Exception e)
 			{
@@ -171,7 +165,7 @@ namespace NeuLdapMgnt.WebApp.Services
 			return errorList;
 		}
 
-		public async Task<List<string>> DeleteAdmins(List<string> ids)
+		public async Task<List<string>> DeleteAdminsAsync(List<string> ids)
 		{
 			List<string> errorList = new();
 			try

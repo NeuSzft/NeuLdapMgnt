@@ -36,28 +36,7 @@ else
 		if (!confirmation) return false;
 
 		isSubmitting = true;
-
-		try
-		{
-			var response = await ApiRequests.AddTeacherAsync(teacherUpdated);
-
-			if (response.IsSuccess())
-			{
-				NotificationService.NotifySuccess($"{teacherUpdated.FullName} ({teacherUpdated.Id}) was added!");
-				teacher = new();
-				return true;
-			}
-
-			if (response.Errors.Any())
-			{
-				NotificationService.NotifyError(response.GetError());
-			}
-		}
-		catch (Exception e)
-		{
-			NotificationService.HandleError(e);
-		}
-
+		await TeacherService.AddTeacherAsync(teacherUpdated);
 		isSubmitting = false;
 		return false;
 	}

@@ -22,13 +22,12 @@ public class StudentService
 		NotificationService = notificationService;
 	}
 
-	public async Task FetchStudents()
+	public async Task FetchStudentsAsync()
 	{
 		try
 		{
-			await DatabaseService.FetchInactiveUsers();
+			await DatabaseService.FetchInactiveUsersAsync();
 
-			Students.Clear();
 			var response = await ApiRequests.GetStudentsAsync();
 			if (response.IsSuccess())
 			{
@@ -46,7 +45,7 @@ public class StudentService
 		}
 	}
 
-	public async Task<Student?> FetchStudent(long id)
+	public async Task<Student?> FetchStudentAsync(long id)
 	{
 		try
 		{
@@ -66,7 +65,7 @@ public class StudentService
 		return null;
 	}
 
-	public async Task AddStudent(Student student)
+	public async Task AddStudentAsync(Student student)
 	{
 		try
 		{
@@ -86,7 +85,7 @@ public class StudentService
 		}
 	}
 
-	public async Task<List<string>> UpdateStudent(Student student)
+	public async Task<List<string>> UpdateStudentAsync(Student student)
 	{
 		List<string> errorList = new();
 		try
@@ -110,7 +109,7 @@ public class StudentService
 		return errorList;
 	}
 
-	public async Task<List<string>> UpdateStudents(List<Student> students, string newClass, bool isInactive)
+	public async Task<List<string>> UpdateStudentsAsync(List<Student> students, string newClass, bool isInactive)
 	{
 		List<string> errorList = new();
 		try

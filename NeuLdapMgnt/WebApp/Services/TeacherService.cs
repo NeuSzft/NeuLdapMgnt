@@ -23,7 +23,7 @@ public class TeacherService
 		NotificationService = notificationService;
 	}
 
-	public async Task FetchTeachers()
+	public async Task FetchTeachersAsync()
 	{
 		try
 		{
@@ -46,7 +46,7 @@ public class TeacherService
 		}
 	}
 
-	public async Task<Teacher?> FetchTeacher(string id)
+	public async Task<Teacher?> FetchTeacherAsync(string id)
 	{
 		try
 		{
@@ -66,7 +66,7 @@ public class TeacherService
 		return null;
 	}
 
-	public async Task<List<string>> UpdateTeacher(Teacher teacher)
+	public async Task<List<string>> UpdateTeacherAsync(Teacher teacher)
 	{
 		List<string> errorList = new();
 		try
@@ -90,7 +90,7 @@ public class TeacherService
 		return errorList;
 	}
 
-	public async Task<List<string>> UpdateTeachers(List<Teacher> teachers, bool isAdmin, bool isInactive)
+	public async Task<List<string>> UpdateTeachersAsync(List<Teacher> teachers, bool isAdmin, bool isInactive)
 	{
 		List<string> errorList = new();
 		try
@@ -101,11 +101,11 @@ public class TeacherService
 				DatabaseService.InactiveUsers = new(responseInactive.Values[0]);
 			}
 
-			var responseStatus = await UpdateTeachersStatus(teachers, isAdmin, isInactive, errorList);
+			var responseStatus = await UpdateTeachersStatusAsync(teachers, isAdmin, isInactive, errorList);
 			errorList = responseStatus.ToList();
 
-			if (isInactive) await FetchTeachers();
-			if (isAdmin) await DatabaseService.FetchAdmins();
+			if (isInactive) await FetchTeachersAsync();
+			if (isAdmin) await DatabaseService.FetchAdminsAsync();
 
 			NotificationService.NotifySuccess($"Status was updated for {teachers.Count} teacher(s)");
 		}
@@ -117,7 +117,7 @@ public class TeacherService
 		return errorList;
 	}
 
-	public async Task<List<string>> UpdateTeachersStatus(List<Teacher> teachers, bool isAdmin,
+	public async Task<List<string>> UpdateTeachersStatusAsync(List<Teacher> teachers, bool isAdmin,
 		bool isInactive, List<string> errorList)
 	{
 		foreach (var teacher in teachers)
@@ -148,5 +148,25 @@ public class TeacherService
 		}
 
 		return errorList;
+	}
+
+	public async Task AddTeacherAsync(Teacher teacher)
+	{
+		try
+		{
+			var response = await ApiRequests.AddTeacherAsync(teacher);
+			if (response.IsSuccess())
+			{
+				NotificationService.NotifySuccess($"{teacher.FullName} was added!");
+			}
+			else
+			{
+				NotificationService.NotifyError(response.GetError());
+			}
+		}
+		catch (Exception e)
+		{
+			NotificationService.HandleError(e);
+		}
 	}
 }

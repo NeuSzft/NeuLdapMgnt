@@ -80,7 +80,7 @@ else
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 		isLoading = true;
-		await LocalDbService.FetchAdmins();
+		await LocalDbService.FetchAdminsAsync();
 		admins = LocalDbService.Admins.ToList();
 		isLoading = false;
 	}
@@ -122,7 +122,7 @@ else
 		if (!confirmation) return;
 
 		isRemoving = true;
-		await LocalDbService.DeleteAdmins(selectedAdmins);
+		await LocalDbService.DeleteAdminsAsync(selectedAdmins);
 		admins = LocalDbService.Admins.ToList();
 		isRemoving = false;
 		NotificationService.NotifySuccess("Selected admins were removed!");

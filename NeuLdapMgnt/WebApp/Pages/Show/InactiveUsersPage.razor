@@ -92,7 +92,7 @@ else
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 		isLoading = true;
-		await LocalDbService.FetchInactiveUsers();
+		await LocalDbService.FetchInactiveUsersAsync();
 		usersList = LocalDbService.InactiveUsers.ToList();
 		isLoading = false;
 	}
@@ -110,7 +110,7 @@ else
 		if (!confirmation) return;
 
 		isActivating = true;
-		await LocalDbService.ActivateUsers(selectedUsers);
+		await LocalDbService.ActivateUsersAsync(selectedUsers);
 		usersList = LocalDbService.InactiveUsers.ToList();
 		isActivating = false;
 		NotificationService.NotifySuccess("Selected users were activated.");
@@ -129,7 +129,7 @@ else
 		if (!confirmation) return;
 
 		isActivating = true;
-		await LocalDbService.DeleteUsers(selectedUsers);
+		await LocalDbService.DeleteUsersAsync(selectedUsers);
 		usersList = LocalDbService.InactiveUsers.ToList();
 		isActivating = false;
 		NotificationService.NotifySuccess("Selected users were permanently deleted!");
@@ -139,13 +139,13 @@ else
 	{
 		if (long.TryParse(userId, out long studentId) && studentId != 0)
 		{
-			Student? student = await StudentService.FetchStudent(studentId);
+			Student? student = await StudentService.FetchStudentAsync(studentId);
 			if (student is null) return;
 			NavManager.NavigateTo($"/students/{studentId}");
 		}
 		else
 		{
-			Teacher? teacher = await TeacherService.FetchTeacher(userId);
+			Teacher? teacher = await TeacherService.FetchTeacherAsync(userId);
 			if (teacher is null) return;
 			NavManager.NavigateTo($"/teachers/{userId}");
 		}

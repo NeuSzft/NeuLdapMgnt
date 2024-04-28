@@ -50,7 +50,7 @@ else
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
-		await LocalDbService.FetchClasses();
+		await LocalDbService.FetchClassesAsync();
 	}
 
 	private async Task<bool> OnSubmit(Student studentUpdated)
@@ -62,7 +62,7 @@ else
 		if (!confirmation) return false;
 		isSubmitting = true;
 
-		await StudentService.AddStudent(studentUpdated);
+		await StudentService.AddStudentAsync(studentUpdated);
 
 		isSubmitting = false;
 		return false;

@@ -51,8 +51,8 @@ else
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
-		await LocalDbService.FetchClasses();
-		await StudentService.FetchStudents();
+		await LocalDbService.FetchClassesAsync();
+		await StudentService.FetchStudentsAsync();
 		isLoading = false;
 	}
 
@@ -60,7 +60,7 @@ else
 	{
 		var (students, cls, isInactive) = context;
 		isUpdating = true;
-		await StudentService.UpdateStudents(students, cls, isInactive);
+		await StudentService.UpdateStudentsAsync(students, cls, isInactive);
 		await OnRefresh();
 		isUpdating = false;
 	}
@@ -68,7 +68,7 @@ else
 	private async Task OnRefresh()
 	{
 		isLoading = true;
-		await StudentService.FetchStudents();
+		await StudentService.FetchStudentsAsync();
 		isLoading = false;
 	}
 

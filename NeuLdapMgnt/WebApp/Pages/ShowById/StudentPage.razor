@@ -8,13 +8,7 @@
 }
 else
 {
-	@if (isInactive)
-	{
-		<h3><strong>[Inactive]</strong></h3>
-	}
-	<h3>
-		[@student.Class] @student.FullName
-	</h3>
+	<h3>[@student.Class] @student.FullName</h3>
 	<FormStudent Student="student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete" />
 	<ConfirmDialog @ref="dialog" />
 }
@@ -26,23 +20,19 @@ else
 	private Student student = new();
 	private ConfirmDialog dialog = default!;
 	private List<string> errorList = new();
-	//TODO: Show modal errorlist
 	private bool isLoading = true;
-	private bool isInactive = true;
 
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 		long.TryParse(Id, out long id);
 
-		var searchedStudent = await StudentService.FetchStudent(id);
+		var searchedStudent = await StudentService.FetchStudentAsync(id);
 		if (searchedStudent is null) return;
 		student = searchedStudent;
 
-		await LocalDbService.FetchClasses();
-		await LocalDbService.FetchInactiveUsers();
+		await LocalDbService.FetchClassesAsync();
 		isLoading = false;
-		isInactive = LocalDbService.InactiveUsers.Contains(id.ToString());
 	}
 
 	private async Task<bool> OnSubmit(Student editedStudent)
@@ -61,7 +51,7 @@ else
 		if (!confirmation) return false;
 
 		isLoading = true;
-		var response = await StudentService.UpdateStudent(editedStudent);
+		var response = await StudentService.UpdateStudentAsync(editedStudent);
 		errorList = response.ToList();
 		isLoading = false;
 		NavManager.NavigateTo("/students");
@@ -78,7 +68,7 @@ else
 		if (!confirmation) return false;
 
 		isLoading = true;
-		await LocalDbService.DeactivateUser(editedStudent.Id.ToString());
+		await LocalDbService.DeactivateUserAsync(editedStudent.Id.ToString());
 		isLoading = false;
 		NavManager.NavigateTo("/students");
 
