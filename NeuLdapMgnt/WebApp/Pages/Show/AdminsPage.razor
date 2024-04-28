@@ -1,27 +1,135 @@
-﻿@page "/admins"
+﻿@page "/db/admins"
 
 <PageTitle>Admins</PageTitle>
+<ConfirmDialog @ref="dialog" />
 
 <h1>Admins</h1>
+
 @if (isLoading)
 {
 	<Loading Text="Loading admins" />
 }
+else if (isRemoving)
+{
+	<Loading Text="Removing admins" />
+}
 else
 {
-	<TableAdmins Admins="LocalDbService.Admins" />
+	@if (!admins.Any())
+	{
+		<div class="d-flex justify-content-center text-center">
+			<h3 class="my-4">There are no administrators</h3>
+		</div>
+	}
+	else
+	{
+		<div class="d-flex justify-content-end align-items-center g-2 mb-3">
+			<Button Color="ButtonColor.Danger" Outline="true" Disabled="!selectedAdmins.Any()" @onclick="OnRemoveSelectedAdmins">
+				Remove selected
+			</Button>
+		</div>
+		<div class="table-admins table-responsive rounded px-1 border flex-fill">
+			<table class="table table-striped table-borderless align-middle">
+				<thead class="sticky-top">
+					<tr>
+						<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllAdmins">
+							@if (!isAdminSelected)
+							{
+								<span>Select all</span>
+							}
+							else
+							{
+								<span>Deselect</span>
+							}
+						</th>
+						<th class="user-select-none" role="button">Id</th>
+						<th class="user-select-none text-end">Inspect |  Edit</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var admin in admins)
+					{
+						<tr>
+							<td class="rounded-start">
+								<input class="form-check-input"
+									   type="checkbox"
+									   @onchange="() => SelectAdmin(admin)" />
+							</td>
+							<td>@admin</td>
+							<td class="text-end rounded-end">
+								<ButtonInspect Id="@admin" />
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
 }
 
 @code {
+	public List<string> admins = new();
+	private List<string> selectedAdmins = new();
+	private ConfirmDialog dialog = default!;
+
 	private bool isLoading = false;
+	private bool isRemoving;
+	private bool isAdminSelected => selectedAdmins.Count > 0;
 
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 		isLoading = true;
-		await TeacherService.FetchTeachers();
 		await LocalDbService.FetchAdmins();
+		admins = LocalDbService.Admins.ToList();
 		isLoading = false;
 	}
+
+	private void SelectAdmin(string id)
+	{
+		if (selectedAdmins.Contains(id))
+		{
+			selectedAdmins.Remove(id);
+		}
+		else
+		{
+			selectedAdmins.Add(id);
+		}
+	}
+
+	private void SelectAllAdmins()
+	{
+		if (isAdminSelected)
+		{
+			selectedAdmins.Clear();
+		}
+		else
+		{
+			selectedAdmins = LocalDbService.Admins.ToList();
+		}
+	}
+
+	private async Task OnRemoveSelectedAdmins()
+	{
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("List", selectedAdmins);
+
+		var confirmation = await dialog.ShowAsync<CustomList>(
+			title: $"Remove [{selectedAdmins.Count}] admin(s)?",
+			parameters: parameters,
+			confirmDialogOptions: DialogOptions.Confirm());
+
+		if (!confirmation) return;
+
+		isRemoving = true;
+		await LocalDbService.DeleteAdmins(selectedAdmins);
+		admins = LocalDbService.Admins.ToList();
+		isRemoving = false;
+		NotificationService.NotifySuccess("Selected admins were removed!");
+	}
+
+	private void ShowAdmin(string id) => NavManager.NavigateTo($"/teachers/{id}");
+
+	private void InspectAdmin(Admin student) => ShowAdmin(student.Id.ToString());
 }
 
