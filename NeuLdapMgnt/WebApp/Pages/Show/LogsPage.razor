@@ -61,13 +61,18 @@ else {
 	}
 
 	private async Task Fetch() {
+		if (DateTimeOffset.Now - new DateTimeOffset(_toDate.ToDateTime(_toTime, DateTimeKind.Local)) < TimeSpan.FromMinutes(5)) {
+			_toDate = DateOnly.FromDateTime(DateTime.Now);
+			_toTime = TimeOnly.FromDateTime(DateTime.Now);
+		}
+
 		long from = new DateTimeOffset(_fromDate.ToDateTime(_fromTime, DateTimeKind.Local)).ToUniversalTime().ToUnixTimeSeconds();
 		long to   = new DateTimeOffset(_toDate.ToDateTime(_toTime, DateTimeKind.Local)).ToUniversalTime().ToUnixTimeSeconds();
 
 		try {
 			_isLoading = true;
 			var result = await ApiRequests.GetLogsAsync(from, to);
-			_entries = result.Values.Select(LogEntry.FromTsv);
+			_entries = result.Values.Select(LogEntry.FromTsv).Reverse();
 		}
 		catch (Exception e) {
 			NotificationService.HandleError(e);
