@@ -72,6 +72,10 @@ public class StudentService
 			var response = await ApiRequests.AddStudentAsync(student);
 			if (response.IsSuccess())
 			{
+				if (!string.IsNullOrEmpty(student.Password))
+				{
+					await ChangePasswordAsync(student.Id, student.Password);
+				}
 				NotificationService.NotifySuccess($"{student.FullName} was added!");
 			}
 			else
@@ -94,6 +98,10 @@ public class StudentService
 
 			if (response.IsSuccess())
 			{
+				if (!string.IsNullOrEmpty(student.Password))
+				{
+					await ChangePasswordAsync(student.Id, student.Password);
+				}
 				NotificationService.NotifySuccess($"{student.FullName} was updated!");
 			}
 			else
@@ -140,6 +148,11 @@ public class StudentService
 						errorList.AddRange(response.Errors);
 					}
 				}
+
+				if (!string.IsNullOrEmpty(student.Password))
+				{
+					await ChangePasswordAsync(student.Id, student.Password);
+				}
 			}
 
 			if (!string.IsNullOrEmpty(newClass))
@@ -158,5 +171,14 @@ public class StudentService
 		}
 
 		return errorList;
+	}
+
+	private async Task ChangePasswordAsync(long id, string password)
+	{
+		var response = await ApiRequests.ChangeStudentPassword(id.ToString(), password);
+		if (response.IsFailure())
+		{
+			NotificationService.NotifyError(response.GetError());
+		}
 	}
 }

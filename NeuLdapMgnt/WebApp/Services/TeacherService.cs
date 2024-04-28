@@ -76,6 +76,10 @@ public class TeacherService
 			if (response.IsSuccess())
 			{
 				NotificationService.NotifySuccess($"{teacher.FullName} was updated!");
+				if (!string.IsNullOrEmpty(teacher.Password))
+				{
+					await ChangePasswordAsync(teacher.Id, teacher.Password);
+				}
 			}
 			else
 			{
@@ -141,7 +145,11 @@ public class TeacherService
 			}
 
 			var responseUpdate = await ApiRequests.UpdateTeacherAsync(teacher.Id, teacher);
-			if (responseUpdate.IsFailure())
+			if (responseUpdate.IsSuccess() && !string.IsNullOrEmpty(teacher.Password))
+			{
+				await ChangePasswordAsync(teacher.Id, teacher.Password);
+			}
+			else
 			{
 				errorList.AddRange(responseUpdate.Errors);
 			}
@@ -167,6 +175,15 @@ public class TeacherService
 		catch (Exception e)
 		{
 			NotificationService.HandleError(e);
+		}
+	}
+
+	private async Task ChangePasswordAsync(string id, string password)
+	{
+		var response = await ApiRequests.ChangeStudentPassword(id, password);
+		if (response.IsFailure())
+		{
+			NotificationService.NotifyError(response.GetError());
 		}
 	}
 }
