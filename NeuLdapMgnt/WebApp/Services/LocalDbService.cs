@@ -170,5 +170,30 @@ namespace NeuLdapMgnt.WebApp.Services
 			}
 			return errorList;
 		}
+
+		public async Task<List<string>> DeleteAdmins(List<string> ids)
+		{
+			List<string> errorList = new();
+			try
+			{
+				foreach (var id in ids)
+				{
+					var response = await ApiRequests.DeleteAdminAsync(id);
+					if (response.IsFailure())
+					{
+						errorList.Add(response.GetError());
+					}
+					else
+					{
+						Admins.Remove(id);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				NotificationService.HandleError(e);
+			}
+			return errorList;
+		}
 	}
 }
