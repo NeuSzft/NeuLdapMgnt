@@ -8,7 +8,6 @@
 
 	private bool collapseNavMenu = true;
 	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-	private bool isAuthenticated;
 
 	private async Task<Sidebar2DataProviderResult> SidebarDataProvider(Sidebar2DataProviderRequest request)
 	{
