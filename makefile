@@ -47,7 +47,7 @@ demo-stop:
 	$(dc) $(options-demo) stop
 
 demo-down:
-	$(dc) $(options-demo) down -v
+	$(dc) $(options-demo) down
 
 api-tests:
 	$(dc) $(options-api-tests) build api-test-api-build api-test-tests
