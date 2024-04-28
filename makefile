@@ -2,9 +2,9 @@ dc = docker compose
 
 options-prod = -f ./docker/compose-prod.yml --env-file .env
 options-demo = -f ./docker/compose-demo.yml
-options-api-tests = -f ./docker/compose-api-test.yml
-options-selenium-tests = -f ./docker/compose-selenium-test.yml
-options-unit-tests = -f ./docker/compose-unit-test.yml
+options-api-tests = -f ./docker/compose-api-tests.yml
+options-selenium-tests = -f ./docker/compose-selenium-tests.yml
+options-model-tests = -f ./docker/compose-model-tests.yml
 
 start: env
 	$(dc) $(options-prod) build prod-api-build prod-webapp-build
@@ -49,6 +49,12 @@ demo-stop:
 demo-down:
 	$(dc) $(options-demo) down
 
+model-tests:
+	$(dc) $(options-model-tests) build model-tests
+	$(dc) $(options-model-tests) up -d
+	$(dc) $(options-model-tests) logs -f model-tests
+	$(dc) $(options-model-tests) down
+
 api-tests:
 	$(dc) $(options-api-tests) build api-test-api-build api-test-tests
 	$(dc) $(options-api-tests) up -d
@@ -61,10 +67,4 @@ web-tests:
 	$(dc) $(options-selenium-tests) logs -f selenium-tests
 	$(dc) $(options-selenium-tests) down -v
 
-unit-tests:
-	$(dc) $(options-unit-tests) build unit-tests
-	$(dc) $(options-unit-tests) up -d
-	$(dc) $(options-unit-tests) logs -f unit-tests
-	$(dc) $(options-unit-tests) down
-
-tests: | api-tests web-tests
+tests: | model-tests api-tests web-tests

@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  unit-tests:
+  model-tests:
     build:
       context: ..
       dockerfile_inline: |
