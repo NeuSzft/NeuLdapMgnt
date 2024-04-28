@@ -2,7 +2,7 @@
 
 <ConfirmDialog @ref="dialog" />
 
-<Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" Size="ModalSize.Large" IsScrollable="true" OnHidden="ToggleEditMode">
+<Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" IsScrollable="true" OnHidden="ToggleEditMode">
 	<BodyTemplate>
 		<div class="fw-bold mb-2">After saving this action cannot be reverted!</div>
 		<div class="mb-2">
@@ -27,17 +27,7 @@
 
 <div class="d-flex justify-content-between align-items-center g-2 mb-3">
 	<div class="d-flex flex-grow-1 flex-md-grow-0">
-		<div class="input-group">
-			<label class="input-group-text" for="searchbar"><i class="bi bi-funnel"></i></label>
-			<div class="form-floating flex-grow-1">
-				<input type="search"
-					   class="form-control rounded-0 rounded-end"
-					   id="searchbar"
-					   @oninput="UpdateSearchQuery"
-					   @bind-value="searchQuery" />
-				<label for="searchbar">OM, Name, Class</label>
-			</div>
-		</div>
+		<SearchBar Label="OM, Name, Class" OnSearchQueryChanged="UpdateSearchQuery" />
 	</div>
 	<div class="ms-2">
 		@if (isEditing)
@@ -64,7 +54,7 @@
 					}
 					else
 					{
-						<span>Deselect all</span>
+						<span>Deselect</span>
 					}
 				</th>
 				<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
@@ -244,9 +234,9 @@
 		});
 	}
 
-	private void UpdateSearchQuery(ChangeEventArgs e)
+	private void UpdateSearchQuery(string query)
 	{
-		searchQuery = e.Value?.ToString();
+		searchQuery = query;
 		searchDelayTimer?.Change(400, Timeout.Infinite);
 	}
 
