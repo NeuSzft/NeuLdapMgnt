@@ -24,7 +24,7 @@ else
 	else
 	{
 		<div class="d-flex justify-content-end align-items-center g-2 mb-3">
-			<Button Color="ButtonColor.Danger" Outline="true" Disabled="!selectedAdmins.Any()" @onclick="OnRemoveSelectedAdmins">
+			<Button id="remove-selected" Color="ButtonColor.Danger" Outline="true" Disabled="!selectedAdmins.Any()" @onclick="OnRemoveSelectedAdmins">
 				Remove selected
 			</Button>
 		</div>

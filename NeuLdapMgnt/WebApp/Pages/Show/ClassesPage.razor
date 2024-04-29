@@ -30,7 +30,7 @@
 <Modal @ref="modalRemove" Title="Delete class" ModalType="ModalType.Danger" Size="ModalSize.Small" OnHidden="HideModalRemove">
     <BodyTemplate>
         <div class="form-floating">
-            <InputSelect class="form-select rounded" id="class-year-select" @bind-Value="removeClass">
+            <InputSelect class="form-select rounded" id="class-select" @bind-Value="removeClass">
                 <option value=""></option>
                 @foreach (string cls in LocalDbService.Classes)
                 {
@@ -57,14 +57,17 @@
     <div class="col-1">
         <h1>Classes</h1>
     </div>
-    <div class="col d-flex justify-content-end text-nowrap gap-2">
-        <Button Color="ButtonColor.Primary" Outline="true" @onclick="ShowModalAdd">
-            <i class="bi bi-plus-lg"></i> Add
-        </Button>
-        <Button Color="ButtonColor.Danger" Outline="true" @onclick="ShowModalRemove">
-            <i class="bi bi-trash"></i> Delete
-        </Button>
-    </div>
+    @if (!isLoading)
+    {
+        <div class="col d-flex justify-content-end text-nowrap gap-2">
+            <Button id="add-class" Color="ButtonColor.Primary" Outline="true" @onclick="ShowModalAdd">
+                <i class="bi bi-plus-lg"></i> Add
+            </Button>
+            <Button id="delete-class" Color="ButtonColor.Danger" Outline="true" @onclick="ShowModalRemove">
+                <i class="bi bi-trash"></i> Delete
+            </Button>
+        </div>
+    }
 </div>
 
 

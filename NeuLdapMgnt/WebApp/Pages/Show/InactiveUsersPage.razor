@@ -23,7 +23,7 @@ else
 	{
 		<div class="d-flex justify-content-center text-center">
 			<div>
-				<h3 class="my-4">There are no inactive users</h3>
+				<h3 class="my-4">There are no <strong>[Inactive]</strong> users</h3>
 			</div>
 		</div>
 	}
@@ -31,12 +31,12 @@ else
 	{
 		<div class="d-flex justify-content-end align-items-center g-2 mb-3">
 			<div class="ms-2">
-				<Button Color="ButtonColor.Success" Outline="true" Disabled="isUserSelected" @onclick="OnActivateSelectedUsers">
+				<Button id="activate-users" Color="ButtonColor.Success" Outline="true" Disabled="isUserSelected" @onclick="OnActivateSelectedUsers">
 					Activate selected
 				</Button>
 			</div>
 			<div class="ms-2">
-				<Button Color="ButtonColor.Danger" Outline="true" Disabled="isUserSelected" @onclick="OnDeleteSelectedUsers">
+				<Button id="delete-users" Color="ButtonColor.Danger" Outline="true" Disabled="isUserSelected" @onclick="OnDeleteSelectedUsers">
 					Delete permanently
 				</Button>
 			</div>
