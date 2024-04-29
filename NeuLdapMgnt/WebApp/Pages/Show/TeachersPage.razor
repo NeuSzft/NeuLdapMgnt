@@ -7,7 +7,14 @@
 		<h1>Teachers [@TeacherService.Teachers.Count]</h1>
 	</div>
 	<div class="col text-end">
-		<ButtonRefresh OnClick="FetchData" Text="Refresh" />
+		@if (isLoading)
+		{
+			<ButtonLoading ButtonColor="ButtonColor.Secondary" SpinnerColor="SpinnerColor.Secondary" />
+		}
+		else
+		{
+			<ButtonRefresh OnClick="FetchData" Text="Refresh" />
+		}
 	</div>
 </div>
 

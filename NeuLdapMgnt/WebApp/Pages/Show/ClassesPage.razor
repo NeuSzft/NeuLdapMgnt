@@ -18,18 +18,16 @@
     <FooterTemplate>
         @if (isAdding)
         {
-            <Button Color="ButtonColor.Success" Outline="true" Disabled="true">
-
-            </Button>
+            <ButtonLoading ButtonColor="ButtonColor.Success" SpinnerColor="SpinnerColor.Success" />
         }
         else
-        {   
+        {
             <ButtonSave Text="Add" OnClick="SubmitClasses" />
         }
     </FooterTemplate>
 </Modal>
 
-<Modal @ref="modalRemove" Title="Delete class" ModalType="ModalType.Danger" Size="ModalSize.Small">
+<Modal @ref="modalRemove" Title="Delete class" ModalType="ModalType.Danger" Size="ModalSize.Small" OnHidden="HideModalRemove">
     <BodyTemplate>
         <div class="form-floating">
             <InputSelect class="form-select rounded" id="class-year-select" @bind-Value="removeClass">
@@ -43,8 +41,14 @@
         </div>
     </BodyTemplate>
     <FooterTemplate>
-        <ButtonCancel Text="Cancel" OnClick="HideModalRemove" />
-        <ButtonDelete Text="Delete" OnClick="RemoveClasses" />
+        @if (isRemoving)
+        {
+            <ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger" />
+        }
+        else
+        {
+            <ButtonDelete Text="Delete" OnClick="RemoveClasses" />
+        }
     </FooterTemplate>
 </Modal>
 
