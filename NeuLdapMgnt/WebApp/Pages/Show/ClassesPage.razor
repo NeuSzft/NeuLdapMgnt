@@ -57,19 +57,13 @@
 			<thead class="sticky-top">
 				<tr>
 					<th class="user-select-none">Name</th>
-					<th class="user-select-none text-end">Inspect</th>
 				</tr>
 			</thead>
 			<tbody>
 				@foreach (var cls in LocalDbService.Classes)
 				{
 					<tr>
-						<td class="rounded-start">@cls</td>
-						<td class="rounded-end text-end">
-							<Button Color="ButtonColor.Light" Class="border-secondary" @onclick="() => InspectClass(cls)" Size="Size.Small">
-								<i class="bi bi-eye"></i>
-							</Button>
-						</td>
+						<td class="rounded">@cls</td>
 					</tr>
 				}
 			</tbody>
@@ -181,8 +175,6 @@ else
 		removeClass = string.Empty;
 		isLoading = false;
 	}
-
-	private void InspectClass(string name) => NavManager.NavigateTo($"/classes/{name}");
 
 	private async Task ShowModalAdd() => await modalAdd!.ShowAsync();
 	private async Task HideModalAdd() => await modalAdd!.HideAsync();
