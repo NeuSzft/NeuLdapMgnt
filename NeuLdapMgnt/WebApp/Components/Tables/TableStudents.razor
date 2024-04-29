@@ -33,9 +33,7 @@
 	<div class="ms-2">
 		@if (isEditing)
 		{
-			<Button Color="ButtonColor.Warning" Outline="true" Disabled="isEditing">
-				<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Warning" />
-			</Button>
+			<ButtonLoading ButtonColor="ButtonColor.Warning" SpinnerColor="SpinnerColor.Warning"/>
 		}
 		else
 		{
@@ -91,7 +89,7 @@
 						<i class="bi bi-chevron-expand"></i>
 					}
 				</th>
-				<th class="user-select-none text-end">Inspect |  Edit</th>
+				<th class="user-select-none text-end">Inspect</th>
 			</tr>
 		</thead>
 		<tbody>

@@ -80,9 +80,7 @@
 			{
 				@if (isDeleting)
 				{
-					<Button Color="ButtonColor.Danger" Outline="true" Disabled="true">
-						<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Danger" />
-					</Button>
+					<ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger" />
 				}
 				else
 				{
@@ -94,9 +92,7 @@
 
 			@if (isSubmitting)
 			{
-				<Button Color="ButtonColor.Success" Outline="true" Disabled="true">
-					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Success" />
-				</Button>
+				<ButtonLoading ButtonColor="ButtonColor.Success" SpinnerColor="SpinnerColor.Success" />
 			}
 			else
 			{

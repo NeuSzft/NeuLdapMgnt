@@ -26,9 +26,7 @@
 		</div>
 		<div class="col">
 			@if (_isUploading) {
-				<Button Color="ButtonColor.Primary" Outline="true" Disabled="@true">
-					<Spinner Type="SpinnerType.Dots" Color="SpinnerColor.Primary"/>
-				</Button>
+				<ButtonLoading ButtonColor="ButtonColor.Primary" SpinnerColor="SpinnerColor.Primary" />
 			}
 			else {
 				<Button Color="ButtonColor.Primary" @onclick="ImportDatabase" Disabled="@(_importedJson.Length == 0)">
