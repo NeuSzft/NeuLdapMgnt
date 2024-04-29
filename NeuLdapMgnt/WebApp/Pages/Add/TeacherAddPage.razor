@@ -22,9 +22,10 @@ else
 	private string submitString => $"Creating {teacher.FullName}";
 	private bool isSubmitting = false;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
+		await LocalDbService.FetchClassesAsync();
 	}
 
 	private async Task<bool> OnSubmit(Teacher teacherUpdated)
