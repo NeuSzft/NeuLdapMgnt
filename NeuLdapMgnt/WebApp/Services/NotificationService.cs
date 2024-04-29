@@ -29,4 +29,9 @@ public class NotificationService
 	{
 		ToastService.Notify(ToastMessages.Success(message));
 	}
+
+	public void NotifyTimeout(int minutesLeft)
+	{
+		ToastService.Notify(ToastMessages.Dark($"After {minutesLeft} minute{(minutesLeft <= 1 ? "s" : string.Empty)} you will be logged out because of inactivity!"));
+	}
 }

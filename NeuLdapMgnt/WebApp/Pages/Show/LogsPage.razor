@@ -61,7 +61,7 @@ else {
 	}
 
 	private async Task Fetch() {
-		if (DateTimeOffset.Now - new DateTimeOffset(_toDate.ToDateTime(_toTime, DateTimeKind.Local)) < TimeSpan.FromMinutes(5)) {
+		if (DateTime.Now - _toDate.ToDateTime(_toTime, DateTimeKind.Local) < TimeSpan.FromMinutes(5)) {
 			_toDate = DateOnly.FromDateTime(DateTime.Now);
 			_toTime = TimeOnly.FromDateTime(DateTime.Now);
 		}
