@@ -37,14 +37,14 @@
 				<ValidationMessage For="() => studentUpdated.FirstName" id="student-first-name-validation-message" />
 			</div>
 			<div class="form-floating w-100">
-				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="last-name" @bind-Value="studentUpdated.LastName" />
-				<label for="last-name">Last</label>
-				<ValidationMessage For="() => studentUpdated.LastName" id="student-last-name-validation-message" />
-			</div>
-			<div class="form-floating w-100">
 				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="middle-name" @bind-Value="studentUpdated.MiddleName" />
 				<label for="middle-name">Middle</label>
 				<ValidationMessage For="() => studentUpdated.MiddleName" id="student-middle-name-validation-message" />
+			</div>
+			<div class="form-floating w-100">
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="last-name" @bind-Value="studentUpdated.LastName" />
+				<label for="last-name">Last</label>
+				<ValidationMessage For="() => studentUpdated.LastName" id="student-last-name-validation-message" />
 			</div>
 		</div>
 	</div>
