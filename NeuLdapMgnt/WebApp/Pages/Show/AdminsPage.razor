@@ -3,7 +3,7 @@
 <PageTitle>Admins</PageTitle>
 <ConfirmDialog @ref="dialog" />
 
-<h1>Admins</h1>
+<h1>Admins [@admins.Count]</h1>
 
 @if (isLoading)
 {
@@ -130,6 +130,6 @@ else
 
 	private void ShowAdmin(string id) => NavManager.NavigateTo($"/teachers/{id}");
 
-	private void InspectAdmin(Admin student) => ShowAdmin(student.Id.ToString());
+	private void InspectAdmin(Teacher admin) => ShowAdmin(admin.Id.ToString());
 }
 

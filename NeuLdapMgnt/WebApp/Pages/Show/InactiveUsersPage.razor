@@ -3,7 +3,7 @@
 <PageTitle>Inactive Users</PageTitle>
 <ConfirmDialog @ref="dialog" />
 
-<h1>Inactive Users</h1>
+<h1>Inactive Users [@usersList.Count]</h1>
 
 @if (isLoading)
 {
@@ -12,6 +12,10 @@
 else if (isActivating)
 {
 	<Loading Text="Activating Users" />
+}
+else if (isDeleting)
+{
+	<Loading Text="Deleting Users" />
 }
 else
 {
@@ -86,6 +90,7 @@ else
 
 	private bool isLoading;
 	private bool isActivating;
+	private bool isDeleting;
 	private bool isUserSelected => !selectedUsers.Any();
 
 	protected override async Task OnInitializedAsync()
@@ -110,6 +115,7 @@ else
 		if (!confirmation) return;
 
 		isActivating = true;
+		StateHasChanged();
 		await LocalDbService.ActivateUsersAsync(selectedUsers);
 		usersList = LocalDbService.InactiveUsers.ToList();
 		isActivating = false;
@@ -128,10 +134,11 @@ else
 
 		if (!confirmation) return;
 
-		isActivating = true;
+		isDeleting = true;
+		StateHasChanged();
 		await LocalDbService.DeleteUsersAsync(selectedUsers);
 		usersList = LocalDbService.InactiveUsers.ToList();
-		isActivating = false;
+		isDeleting = false;
 		NotificationService.NotifySuccess("Selected users were permanently deleted!");
 	}
 
