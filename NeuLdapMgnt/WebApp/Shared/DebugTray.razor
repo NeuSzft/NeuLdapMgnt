@@ -1,25 +1,63 @@
 @inherits LayoutComponentBase
+@implements IDisposable
 @inject IJSRuntime JsRuntime
 
-@if (!Hidden) {
-	<div class="btn-group" style="position: absolute; bottom: 2em; right: 2em;">
-		<Button class="btn btn-warning" @onclick="DefaultAdminAuth">
-			<Tooltip Placement="TooltipPlacement.Top" Title="Login as the Default Admin">
-				<Icon Name="IconName.PersonFillCheck"/>
+<div class="btn-group" style="position: absolute; bottom: 2em; right: 2em;">
+	<Button class="btn btn-warning border" @onclick="DefaultAdminAuth">
+		<Tooltip Placement="TooltipPlacement.Top" Title="Login as the Default Admin">
+			<Icon Name="IconName.PersonFillCheck"/>
+		</Tooltip>
+	</Button>
+	<Button class="btn btn-warning border" @onclick="ExpireLogoutTimer">
+		<Tooltip Placement="TooltipPlacement.Top" Title="Expire the logout timer">
+			<Icon Name="IconName.ClockFill"/>
+		</Tooltip>
+	</Button>
+	@if (!string.IsNullOrEmpty(_timeLeft)) {
+		<Button class="btn btn-light border" disabled style="background-color: white">
+			<Tooltip Placement="TooltipPlacement.Top" Title="Time left before auto login">
+				@_timeLeft
 			</Tooltip>
 		</Button>
-		<Button class="btn btn-warning" @onclick="ClearCaches">
-			<Tooltip Placement="TooltipPlacement.Top" Title="Clear Caches">
-				<Icon Name="IconName.TrashFill"/>
-			</Tooltip>
-		</Button>
-	</div>
-}
+	}
+	<Button class="btn btn-danger border" @onclick="ClearCachesAndReload">
+		<Tooltip Placement="TooltipPlacement.Top" Title="Clear caches and reload the webapp">
+			<Icon Name="IconName.ArrowClockwise"/>
+		</Tooltip>
+	</Button>
+</div>
 
 @code {
-	[Parameter] public bool Hidden { get; set; }
 
-	private async Task DefaultAdminAuth() => await ApiRequests.LoginAsync("admin", "adminpass");
+	private Timer? _timer;
 
-	private async Task ClearCaches() => await JsRuntime.InvokeVoidAsync("cc");
+	private string _timeLeft = string.Empty;
+
+	[Parameter, EditorRequired] public ElementReference Page { get; set; }
+
+	private async Task DefaultAdminAuth() {
+		await ApiRequests.LoginAsync("admin", "adminpass");
+		await Page.FocusAsync();
+	}
+
+	private async Task ExpireLogoutTimer() {
+		if (ApiRequests.CurrentToken is not null)
+			ApiRequests.CurrentToken.Payload["exp"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+		await Page.FocusAsync();
+	}
+
+	private async Task ClearCachesAndReload() {
+		await JsRuntime.InvokeVoidAsync("cc");
+		NavManager.NavigateTo(NavManager.BaseUri, true);
+	}
+
+	protected override void OnInitialized() {
+		_timer = new Timer(_ => InvokeAsync(() => {
+			_timeLeft = ApiRequests.CurrentToken is null ? string.Empty : JwtService.GetRemainingTime(ApiRequests.CurrentToken).ToString(@"mm\:ss");
+			StateHasChanged();
+		}), null, 0, 1000);
+	}
+
+	public void Dispose() => _timer?.Dispose();
+
 }

@@ -1,50 +1,85 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page" @ref="_page" @onkeydown="ToggleDebugTray" tabindex="0">
-	@if (isAuthenticated)
-	{
-		<RemainingTime />
-		<NavMenu />
+<div class="page" @ref="_page" @onkeyup="ToggleDebugTray" tabindex="0">
+	@if (_isAuthenticated) {
+		<NavMenu/>
 	}
 	<main>
-		<article class="content pt-4 pb-3 px-3 d-flex flex-column vh-100 overflow-auto">
+		<article class="content pb-3 px-3 d-flex flex-column vh-100 overflow-auto">
 			@Body
 		</article>
 	</main>
 </div>
 
-<Modal IsServiceModal="true" />
-<Toasts class="p-3" StackLength="6" Delay="4000" Placement="ToastsPlacement.TopRight" />
-<DebugTray Hidden="@_hideDebugTray" />
+<Modal IsServiceModal="true"/>
+<Toasts class="p-3" StackLength="6" Delay="4000" Placement="ToastsPlacement.TopRight"/>
+
+@if (_showDebugTray) {
+	<DebugTray Page="@_page"/>
+}
 
 @code {
 
 	private ElementReference _page;
 
-	private bool _hideDebugTray = true;
+	private bool _showDebugTray;
 
-	private void ToggleDebugTray(KeyboardEventArgs args)
-	{
+	private void ToggleDebugTray(KeyboardEventArgs args) {
 		if (args.Key == "F9")
-			_hideDebugTray = !_hideDebugTray;
+			_showDebugTray = !_showDebugTray;
 	}
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
+	protected override async Task OnAfterRenderAsync(bool firstRender) {
 		if (firstRender)
 			await _page.FocusAsync();
 	}
+
 }
-@code{
-	private bool isAuthenticated;
-	protected override void OnInitialized()
-	{
-		ApiRequests.AuthenticationStateChanged += OnAutheticationChanged;
+
+@code {
+
+	private bool _isAuthenticated;
+
+	private Timer? _logoutTimer;
+
+	private int _lastNotificationMinute = int.MaxValue;
+
+	protected override void OnInitialized() {
+		ApiRequests.AuthenticationStateChanged += OnAuthenticationChanged;
 	}
 
-	private void OnAutheticationChanged()
-	{
-		isAuthenticated = ApiRequests.IsAuthenticated;
+	private void OnAuthenticationChanged() {
+		_logoutTimer?.Dispose();
+		_logoutTimer = new(_ => InvokeAsync(() => {
+			if (ApiRequests.CurrentToken == null)
+				return;
+
+			TimeSpan remainingTime = JwtService.GetRemainingTime(ApiRequests.CurrentToken);
+
+			if (remainingTime <= TimeSpan.Zero) {
+				ApiRequests.Logout();
+				NavManager.NavigateTo("/login");
+
+				ModalService.ShowAsync(new ModalOption {
+					Type = ModalType.Dark,
+					Title = "Your session has expired due to inactivity.",
+					Message = "For security reasons, please log in again to continue.",
+					IsVerticallyCentered = true,
+					ShowFooterButton = false
+				});
+			}
+
+			foreach (int minute in new[] { 1, 2, 5 }) {
+				if (remainingTime.TotalMinutes <= minute && _lastNotificationMinute > minute) {
+					_lastNotificationMinute = minute;
+					NotificationService.NotifyTimeout(minute);
+					break;
+				}
+			}
+		}), null, 0, 5000);
+
+		_isAuthenticated = ApiRequests.IsAuthenticated;
 		StateHasChanged();
 	}
+
 }

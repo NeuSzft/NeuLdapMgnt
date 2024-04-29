@@ -1,30 +1,23 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 
-namespace NeuLdapMgnt.WebApp.Services
-{
-	public class JwtService
-	{
-		public JwtSecurityToken DecodeToken(string token)
-		{
-			var handler = new JwtSecurityTokenHandler();
-			return handler.ReadToken(token) as JwtSecurityToken
-				?? throw new ArgumentException("Invalid JWT token.");
-		}
+namespace NeuLdapMgnt.WebApp.Services;
 
-		public DateTime GetExpireDate(JwtSecurityToken token)
-		{
-			var expireDateUnix = token.Claims.First(claim => claim.Type == "exp").Value;
-			return DateTimeOffset.FromUnixTimeSeconds(long.Parse(expireDateUnix)).DateTime;
-		}
+public class JwtService {
+	public JwtSecurityToken DecodeToken(string token) {
+		var handler = new JwtSecurityTokenHandler();
+		return handler.ReadToken(token) as JwtSecurityToken
+		       ?? throw new ArgumentException("Invalid JWT token.");
+	}
 
-		public bool IsExpired(JwtSecurityToken token)
-		{
-			return DateTime.UtcNow > GetExpireDate(token);
-		}
+	public DateTime GetExpireDate(JwtSecurityToken token) {
+		return DateTimeOffset.FromUnixTimeSeconds(token.Payload.Expiration!.Value).DateTime;
+	}
 
-		public TimeSpan GetRemainingTime(JwtSecurityToken token)
-		{
-			return GetExpireDate(token) - DateTime.UtcNow;
-		}
+	public bool IsExpired(JwtSecurityToken token) {
+		return DateTime.UtcNow > GetExpireDate(token);
+	}
+
+	public TimeSpan GetRemainingTime(JwtSecurityToken token) {
+		return GetExpireDate(token) - DateTime.UtcNow;
 	}
 }
