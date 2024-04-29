@@ -4,6 +4,7 @@ using System.DirectoryServices.Protocols;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using NeuLdapMgnt.Models;
 
@@ -49,17 +50,35 @@ public sealed class LdapService {
 	/// <summary>Tries to send a request to the LDAP server.</summary>
 	/// <param name="request">The <see cref="DirectoryRequest"/> to be sent.</param>
 	/// <param name="logErrors">Specifies whether the exceptions should be logged. The default is <c>true</c>.</param>
+	/// <param name="callerMemberName">Obtains the name of the member that called the method. This parameter should not be explicitly set.</param>
+	/// <param name="callerLineNumber">Obtains the line number at which the method was called. This parameter should not be explicitly set.</param>
+	/// <param name="callerFilePath">Obtains the path of the file where the method call originates from. This parameter should not be explicitly set.</param>
 	/// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
 	/// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
-	public DirectoryResponse? TryRequest(DirectoryRequest request, bool logErrors = true) => TryRequest(request, out _, logErrors);
+	public DirectoryResponse? TryRequest(
+		DirectoryRequest          request, bool logErrors = true,
+		[CallerMemberName] string callerMemberName = "",
+		[CallerLineNumber] int    callerLineNumber = 0,
+		[CallerFilePath]   string callerFilePath   = ""
+	) => TryRequest(request, out _, logErrors, callerMemberName, callerLineNumber, callerFilePath);
 
 	/// <summary>Tries to send a request to the LDAP server.</summary>
 	/// <param name="request">The <see cref="DirectoryRequest"/> to be sent.</param>
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
 	/// <param name="logErrors">Specifies whether the exceptions should be logged. The default is <c>true</c>.</param>
+	/// <param name="callerMemberName">Obtains the name of the member that called the method. This parameter should not be explicitly set.</param>
+	/// <param name="callerLineNumber">Obtains the line number at which the method was called. This parameter should not be explicitly set.</param>
+	/// <param name="callerFilePath">Obtains the path of the file where the method call originates from. This parameter should not be explicitly set.</param>
 	/// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
 	/// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
-	public DirectoryResponse? TryRequest(DirectoryRequest request, out string? error, bool logErrors = true) {
+	public DirectoryResponse? TryRequest(
+		DirectoryRequest          request,
+		out string?               error,
+		bool                      logErrors        = true,
+		[CallerMemberName] string callerMemberName = "",
+		[CallerLineNumber] int    callerLineNumber = 0,
+		[CallerFilePath]   string callerFilePath   = ""
+	) {
 		using LdapConnection connection = new(_identifier, _credential, AuthType.Basic);
 		connection.SessionOptions.ProtocolVersion = 3;
 
@@ -77,7 +96,7 @@ public sealed class LdapService {
 		catch (DirectoryException e) {
 			error = e.GetError();
 			if (logErrors)
-				Logger?.LogError(e.ToString());
+				Logger?.LogError($"{callerMemberName} (line {callerLineNumber}) in {callerFilePath}{Environment.NewLine}- {error}");
 			return null;
 		}
 	}
@@ -85,9 +104,18 @@ public sealed class LdapService {
 	/// <summary>Tries to send multiple requests to the LDAP server.</summary>
 	/// <param name="requests">The <see cref="UniqueDirectoryRequest"/>s to send.</param>
 	/// <param name="logErrors">Specifies whether the exceptions should be logged. The default is <c>true</c>.</param>
+	/// <param name="callerMemberName">Obtains the name of the member that called the method. This parameter should not be explicitly set.</param>
+	/// <param name="callerLineNumber">Obtains the line number at which the method was called. This parameter should not be explicitly set.</param>
+	/// <param name="callerFilePath">Obtains the path of the file where the method call originates from. This parameter should not be explicitly set.</param>
 	/// <returns>A <see cref="List{T}">List&lt;LdapResult&gt;</see> containing the <see cref="LdapResult"/>s.</returns>
 	/// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
-	public List<LdapResult> TryRequests(IEnumerable<UniqueDirectoryRequest> requests, bool logErrors = true) {
+	public List<LdapResult> TryRequests(
+		IEnumerable<UniqueDirectoryRequest> requests,
+		bool                                logErrors        = true,
+		[CallerMemberName] string           callerMemberName = "",
+		[CallerLineNumber] int              callerLineNumber = 0,
+		[CallerFilePath]   string           callerFilePath   = ""
+	) {
 		using LdapConnection connection = new(_identifier, _credential, AuthType.Basic);
 		connection.SessionOptions.ProtocolVersion = 3;
 
@@ -105,10 +133,11 @@ public sealed class LdapService {
 				results.Add(new(connection.SendRequest(request.Request)));
 			}
 			catch (DirectoryException e) {
-				string id = request.Identifier;
+				string id    = request.Identifier;
+				string error = $"{id}: {e.GetError()}";
 				if (logErrors)
-					Logger?.LogError($"{id}: {e}");
-				results.Add(new(null, $"{id}: {e.GetError()}"));
+					Logger?.LogError($"{callerMemberName} (line {callerLineNumber}) in {callerFilePath}{Environment.NewLine}- {error}");
+				results.Add(new(null, error));
 			}
 
 		return results;

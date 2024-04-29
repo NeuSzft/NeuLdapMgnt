@@ -17,9 +17,10 @@ public class AuthTests {
 			MiddleName = "",
 			Email = "solidus@mail.com",
 			HomeDirectory = "/home/geosea",
-			Password = new UserPassword("lalilulelo", 16).ToString(),
+			Password = "lalilulelo",
 			FullName = "George Sears"
 		};
+		teacher.SetPassword(teacher.Password);
 
 		Testing.LdapService.TryAddEntity(teacher, teacher.Id, true).AssertSuccess();
 		Testing.LdapService.TryAddEntityToGroup("admin", teacher.Id).AssertSuccess();

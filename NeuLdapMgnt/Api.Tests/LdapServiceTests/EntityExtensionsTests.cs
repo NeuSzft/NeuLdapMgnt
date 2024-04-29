@@ -6,6 +6,13 @@ public class EntityExtensionsTests {
 	public void Cleanup() => Testing.EraseLdap();
 
 	[TestMethod]
+	public void TestPasswordChecking() {
+		const string pwd  = "example-password";
+		string       hash = Utils.BCryptHashPassword(pwd);
+		Assert.IsTrue(Utils.CheckBCryptPassword(hash, pwd));
+	}
+
+	[TestMethod]
 	public void TestTryAddEntity() {
 		Dummy[] dummies = Dummy.CreateDummies(5).ToArray();
 		foreach (Dummy dummy in dummies)
@@ -149,12 +156,13 @@ public class EntityExtensionsTests {
 
 		Assert.IsNull(Testing.LdapService.TryGetPasswordOfEntity("5", typeof(Dummy)));
 
-		UserPassword? adminPass = Authenticator.GetDefaultAdminPasswordAndCrateAdminWhenMissing(Testing.LdapService, out _);
-		Assert.IsNotNull(adminPass);
-		Assert.IsTrue(adminPass.CheckPassword("adminpass"));
+		string? hashBase64 = Authenticator.GetDefaultAdminPasswordAndCrateAdminWhenMissing(Testing.LdapService, out var error);
+		Assert.IsNull(error);
+		Assert.IsNotNull(hashBase64);
+		Assert.IsTrue(Utils.CheckBCryptPassword(hashBase64, "adminpass"));
 
-		string? passwordStr = Testing.LdapService.TryGetPasswordOfEntity(Authenticator.GetDefaultAdminName());
-		Assert.IsNotNull(passwordStr);
-		Assert.IsTrue(new UserPassword(passwordStr).CheckPassword("adminpass"));
+		hashBase64 = Testing.LdapService.TryGetPasswordOfEntity(Authenticator.GetDefaultAdminName());
+		Assert.IsNotNull(hashBase64);
+		Assert.IsTrue(Utils.CheckBCryptPassword(hashBase64, "adminpass"));
 	}
 }

@@ -203,7 +203,7 @@ public static class EntityExtensions {
 		return null;
 	}
 
-	/// <summary>Tries to get the password hash and salt of an entity.</summary>
+	/// <summary>Tries to get the bcrypt password hash of an entity.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="id">The uid of the entity to find.</param>
 	/// <param name="typesToTry">The model types to search trough.</param>

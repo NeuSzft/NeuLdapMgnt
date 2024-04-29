@@ -13,7 +13,7 @@ using PluralizeService.Core;
 
 namespace NeuLdapMgnt.Api;
 
-internal static class Utils {
+public static class Utils {
 	/// <summary>Returns a new <see cref="SymmetricSecurityKey"/> that is either loaded from the specified environment variable as a base64 string or creates a new one with the specified size.</summary>
 	/// <param name="env">Name of the environment variable.</param>
 	/// <param name="size">The size of the key in bytes to be generated if the env is not found.</param>
@@ -21,6 +21,26 @@ internal static class Utils {
 	public static SymmetricSecurityKey LoadOrCreateSecurityKey(string env, int size = 256) {
 		string? base64Key = Environment.GetEnvironmentVariable(env);
 		return new(base64Key is null ? RandomNumberGenerator.GetBytes(size) : Convert.FromBase64String(base64Key));
+	}
+
+	/// <summary>Hashes the password using bcrypt.</summary>
+	/// <param name="password">The password to hash.</param>
+	/// <returns>The hashed password with the "<c>{CRYPT}</c>" string prepended to it.</returns>
+	public static string BCryptHashPassword(string password) {
+		return "{CRYPT}" + BCrypt.Net.BCrypt.HashPassword(password);
+	}
+
+	/// <summary>Checks if the password matches the bcrypt hash.</summary>
+	/// <param name="hash">The bcrypt hash.</param>
+	/// <param name="password">The password to check.</param>
+	/// <returns><c>true</c> if the password matches the provided hash, otherwise <c>false</c>.</returns>
+	public static bool CheckBCryptPassword(string hash, string password) {
+		try {
+			return BCrypt.Net.BCrypt.Verify(password, hash.Replace("{CRYPT}", null));
+		}
+		catch {
+			return false;
+		}
 	}
 
 	// TODO: Probably replace this whole thing
@@ -50,7 +70,7 @@ internal static class Utils {
 				student.Username = student.GetUsername();
 				student.Class = "12.A";
 				student.Email = arr[3].Trim('"');
-				student.Password = new UserPassword(arr[4].Trim('"'), 16).ToString();
+				student.Password = "{CRYPT}" + arr[4].Trim('"');
 				student.HomeDirectory = $"/home/{student.Username}";
 
 				var errors = ModelValidator.Validate(student).Errors;
@@ -68,7 +88,7 @@ internal static class Utils {
 	}
 }
 
-internal static class ExtensionUtils {
+public static class ExtensionUtils {
 	/// <summary>If the provided string is <c>null</c> or has the length of zero then it returns <paramref name="defaultStr"/>, otherwise it returns the original string.</summary>
 	/// <param name="str">The original string.</param>
 	/// <param name="defaultStr">The string to return if the the original string is null or empty.</param>
@@ -139,5 +159,15 @@ internal static class ExtensionUtils {
 		if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var forwarded))
 			return forwarded.FirstOrDefault();
 		return context.Connection.RemoteIpAddress?.ToString();
+	}
+
+	public static void SetPassword(this Person person, string password) {
+		person.Password = Utils.BCryptHashPassword(password);
+	}
+
+	public static bool CheckPassword(this Person person, string password) {
+		if (person.Password is null)
+			return false;
+		return Utils.CheckBCryptPassword(person.Password, password);
 	}
 }

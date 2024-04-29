@@ -93,8 +93,7 @@ public static class AdminUserEndpoints {
 			   if (password.Length < 8)
 				   return new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors("Password must be at least 8 characters long.").RenewToken(request).ToResult();
 
-			   UserPassword userPassword = new(password, 16);
-			   ldap.SetValue(Authenticator.DefaultAdminPasswordValueName, userPassword.ToString(), out var error);
+			   ldap.SetValue(Authenticator.DefaultAdminPasswordValueName, Utils.BCryptHashPassword(password), out var error);
 			   if (error is not null)
 				   return new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(error).RenewToken(request).ToResult();
 

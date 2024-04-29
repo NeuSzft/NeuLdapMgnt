@@ -35,19 +35,18 @@ public static class Authenticator {
 	/// <summary>Tires to get the default admin password. If it is not or incorrectly set, then sets it to the default value defined by the <c>DEFAULT_ADMIN_PASSWORD</c> environment variable or "<c>adminpass</c>".</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
-	/// <returns>The <see cref="UserPassword"/> of the default admin or <c>null</c> if an error occured.</returns>
+	/// <returns>The base64 encoded password hash or <c>null</c> if an error occured.</returns>
 	/// <remarks>When the default password is set, the default admin is also enabled.</remarks>
-	public static UserPassword? GetDefaultAdminPasswordAndCrateAdminWhenMissing(LdapService ldap, out string? error) {
+	public static string GetDefaultAdminPasswordAndCrateAdminWhenMissing(LdapService ldap, out string? error) {
 		string? pwd = ldap.GetValue(DefaultAdminPasswordValueName, out error);
+		if (pwd is not null)
+			return pwd;
 
-		try {
-			return new UserPassword(pwd!);
-		}
-		catch {
-			UserPassword userPassword = new(Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD").DefaultIfNullOrEmpty("adminpass"), 16);
-			ldap.SetValue(DefaultAdminEnabledValueName, true.ToString(), out _);
-			return ldap.SetValue(DefaultAdminPasswordValueName, userPassword.ToString(), out error) ? userPassword : null;
-		}
+		string hashBase64 = Utils.BCryptHashPassword(Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD").DefaultIfNullOrEmpty("adminpass"));
+		ldap.SetValue(DefaultAdminEnabledValueName, true.ToString(), out error);
+		ldap.SetValue(DefaultAdminPasswordValueName, hashBase64, out error);
+
+		return hashBase64;
 	}
 
 	/// <summary>Checks whether the default admin is enabled or not.</summary>
@@ -96,24 +95,22 @@ public static class Authenticator {
 			return new(StatusCodes.Status400BadRequest, "Invalid Authorization header.", null);
 
 		if (username == GetDefaultAdminName()) {
-			UserPassword? userPassword = GetDefaultAdminPasswordAndCrateAdminWhenMissing(ldap, out var error);
-			if (userPassword is null)
+			string hashBase64 = GetDefaultAdminPasswordAndCrateAdminWhenMissing(ldap, out var error);
+			if (error is not null)
 				return new(StatusCodes.Status503ServiceUnavailable, error, null);
 
 			if (!IsDefaultAdminEnabled(ldap, out error))
 				return new(StatusCodes.Status403Forbidden, error ?? "The default admin is not enabled.", null);
 
-			if (userPassword.CheckPassword(password))
+			if (Utils.CheckBCryptPassword(hashBase64, password))
 				return new(StatusCodes.Status200OK, null, username);
 		}
 		else if (ldap.PartOfGroup("inactive", username)) {
 			return new(StatusCodes.Status403Forbidden, "User is inactive.", null);
 		}
-		else if (ldap.PartOfGroup("admin", username) && ldap.TryGetPasswordOfEntity(username, typeof(Teacher)) is { } pwd) {
+		else if (ldap.PartOfGroup("admin", username) && ldap.TryGetPasswordOfEntity(username, typeof(Teacher)) is { } hashBase64) {
 			try {
-				UserPassword userPassword = new(pwd);
-
-				if (userPassword.CheckPassword(password))
+				if (Utils.CheckBCryptPassword(hashBase64, password))
 					return new(StatusCodes.Status200OK, null, username);
 			}
 			catch {

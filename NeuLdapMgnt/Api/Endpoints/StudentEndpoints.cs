@@ -1,9 +1,7 @@
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using NeuLdapMgnt.Api.LdapServiceExtensions;
 using NeuLdapMgnt.Models;
-using NeuLdapMgnt.Models.CustomValidationAttributes;
 
 namespace NeuLdapMgnt.Api.Endpoints;
 
@@ -34,15 +32,28 @@ public static class StudentEndpoints {
 		   .Produces<RequestResult>(StatusCodes.Status404NotFound)
 		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-		app.MapPost("/api/students", async (LdapService ldap, HttpRequest request) => {
+		app.MapPost("/api/students", async (LdapService ldap, HttpRequest request, string? pwd) => {
 			   var result = await ModelValidator.ValidateRequest<Student>(request);
 			   if (result.IsFailure())
 				   return result.RenewToken(request).ToResult();
-			   return ldap.TryAddEntity(result.GetValue()!, result.GetValue()!.Id.ToString()).RenewToken(request).ToResult();
+
+			   Student student = result.GetValue()!;
+			   if (!string.IsNullOrEmpty(student.Password))
+				   student.SetPassword(student.Password);
+
+			   bool setPass = bool.TryParse(pwd, out var value) && value;
+
+			   return ldap.TryAddEntity(student, student.Id.ToString(), setPass).RenewToken(request).ToResult();
 		   })
 		   .WithOpenApi()
 		   .WithTags("Students")
-		   .WithDescription("### Adds a new entity with the type \"*Student*\".")
+		   .WithDescription(
+			   """
+			   ### Adds a new entity with the type "*Student*".
+
+			   If the "**pwd**" URL parameter is set to "**true**" then the plain text password included in the object will be hashed and stored as well.
+			   """
+		   )
 		   .RequireAuthorization()
 		   .Accepts<Student>("application/json")
 		   .Produces(StatusCodes.Status201Created)
@@ -51,15 +62,27 @@ public static class StudentEndpoints {
 		   .Produces<RequestResult>(StatusCodes.Status409Conflict)
 		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
 
-		app.MapPut("/api/students/{id}", async (LdapService ldap, HttpRequest request, string id) => {
+		app.MapPut("/api/students/{id}", async (LdapService ldap, HttpRequest request, string id, string? pwd) => {
 			   var result = await ModelValidator.ValidateRequest<Student>(request);
 			   if (result.IsFailure())
 				   return result.RenewToken(request).ToResult();
-			   return ldap.TryModifyEntity(result.GetValue()!, id).RenewToken(request).ToResult();
+
+			   Student student = result.GetValue()!;
+			   if (!string.IsNullOrEmpty(student.Password))
+				   student.SetPassword(student.Password);
+
+			   bool setPass = bool.TryParse(pwd, out var value) && value;
+			   return ldap.TryModifyEntity(student, id, setPass).RenewToken(request).ToResult();
 		   })
 		   .WithOpenApi()
 		   .WithTags("Students")
-		   .WithDescription("### Overwrites an entity that has the type \"*Student*\" and the specified UID.")
+		   .WithDescription(
+			   """
+			   ### Overwrites an entity with the type "*Student*".
+
+			   If the "**pwd**" URL parameter is set to "**true**" then the plain text password included in the object will be hashed and updated as well.
+			   """
+		   )
 		   .RequireAuthorization()
 		   .Accepts<Student>("application/json")
 		   .Produces<RequestResult>()
@@ -75,53 +98,6 @@ public static class StudentEndpoints {
 		   .WithTags("Students")
 		   .WithDescription("### Deletes an entity that has the type \"*Student*\" and the specified UID.")
 		   .RequireAuthorization()
-		   .Produces<RequestResult>()
-		   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
-		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
-		   .Produces<RequestResult>(StatusCodes.Status404NotFound)
-		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
-
-		app.MapPost("/api/students/import", async (LdapService ldap, HttpRequest request) => {
-			   using StreamReader reader = new(request.Body);
-
-			   var results = await Utils.CsvToStudents(reader);
-			   if (results.Error is not null)
-				   return Results.Text(results.Error, "text/plain", null, StatusCodes.Status400BadRequest);
-
-			   return ldap.TryAddEntities(results.Students, student => student.Id.ToString()).RenewToken(request).ToResult();
-		   })
-		   .WithOpenApi()
-		   .WithTags("Students")
-		   .WithSummary("TODO: REMOVE LATER")
-		   .RequireAuthorization()
-		   .Accepts<IFormFile>("text/csv")
-		   .Produces<RequestResult>(StatusCodes.Status207MultiStatus)
-		   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
-		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
-		   .Produces<RequestResult>(StatusCodes.Status503ServiceUnavailable);
-
-		app.MapPut("/api/students/{id}/password", async (LdapService ldap, HttpRequest request, string id) => {
-			   using StreamReader reader   = new(request.Body);
-			   string             password = await reader.ReadToEndAsync();
-
-			   var validation = ModelValidator.ValidateValue(password, new PasswordAttribute());
-			   if (validation.IsFailure())
-				   return validation.RenewToken(request).ToResult();
-
-			   var response = ldap.TryGetEntity<Student>(id, true);
-			   if (response.IsFailure())
-				   return response.RenewToken(request).ToResult();
-
-			   Student student = response.GetValue()!;
-			   student.Password = new UserPassword(password, 16).ToString();
-
-			   return ldap.TryModifyEntity(student, id, true).RenewToken(request).ToResult();
-		   })
-		   .WithOpenApi()
-		   .WithTags("Students")
-		   .WithDescription("### Updates the password of an entity that has the type \"*Student*\" and the specified UID.")
-		   .RequireAuthorization()
-		   .Accepts<string>("text/plain")
 		   .Produces<RequestResult>()
 		   .Produces<RequestResult>(StatusCodes.Status400BadRequest)
 		   .Produces<string>(StatusCodes.Status401Unauthorized, "text/plain")
