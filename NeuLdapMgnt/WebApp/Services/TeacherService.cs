@@ -180,7 +180,7 @@ public class TeacherService
 
 	private async Task ChangePasswordAsync(string id, string password)
 	{
-		var response = await ApiRequests.ChangeStudentPassword(id, password);
+		var response = await ApiRequests.ChangeTeacherPassword(id, password);
 		if (response.IsFailure())
 		{
 			NotificationService.NotifyError(response.GetError());
