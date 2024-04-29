@@ -370,7 +370,25 @@ public class AttributesUnitTests
 		Assert.AreEqual("Email must contain only alphanumeric characters '.', '@'.",
 			attribute.GetValidationResult("examp*le@example.com", _validationContext)!.ErrorMessage);
 	}
+	
+	[TestMethod]
+	public void EmailAttributeNullSuccess()
+	{
+		var attribute = new EmailAttribute();
 
+		Assert.AreEqual(ValidationResult.Success,
+			attribute.GetValidationResult(null, _validationContext));
+	}
+	
+	[TestMethod]
+	public void EmailAttributeInvalidDataTypeFails()
+	{
+		var attribute = new EmailAttribute();
+
+		Assert.AreEqual("Email: Invalid data type",
+			attribute.GetValidationResult(int.MaxValue, _validationContext)!.ErrorMessage);
+	}
+	
 	// Directory tests
 	[TestMethod]
 	public void DirectoryAttributeValidDirectorySuccess()
@@ -513,5 +531,21 @@ public class AttributesUnitTests
 		var attribute = new PasswordAttribute();
 		Assert.AreEqual("Password: Invalid data type",
 			attribute.GetValidationResult(12345678, _validationContext)!.ErrorMessage);
+	}
+	
+	[TestMethod]
+	public void PasswordAttributeEmptySuccess()
+	{
+		var attribute = new PasswordAttribute();
+		Assert.AreEqual(ValidationResult.Success,
+			attribute.GetValidationResult(string.Empty, _validationContext));
+	}
+	
+	[TestMethod]
+	public void PasswordAttributeNullSuccess()
+	{
+		var attribute = new PasswordAttribute();
+		Assert.AreEqual(ValidationResult.Success,
+			attribute.GetValidationResult(null, _validationContext));
 	}
 }
