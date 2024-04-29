@@ -16,6 +16,7 @@ namespace NeuLdapMgnt.Models
 		private string _firstName = string.Empty;
 		private string _middleName = string.Empty;
 		private string _homeDirectory = string.Empty;
+		private string _email = string.Empty;
 
 		[Required(ErrorMessage = "User ID is required.")]
 		[JsonRequired, JsonPropertyName("uid")]
@@ -80,7 +81,15 @@ namespace NeuLdapMgnt.Models
 		[Email]
 		[JsonRequired, JsonPropertyName("email")]
 		[LdapAttribute("mail")]
-		public string? Email { get; set; }
+		public string? Email
+		{
+			get => _email;
+			set
+			{
+				if (value is null) return;
+				_email = RemoveDiacritics(value).ToLower();
+			}
+		}
 
 		[Required(ErrorMessage = "Directory is required.")]
 		[Directory]
@@ -91,7 +100,7 @@ namespace NeuLdapMgnt.Models
 			get => _homeDirectory;
 			set
 			{
-				if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
+				if (string.IsNullOrEmpty(value))
 				{
 					_homeDirectory = "/home/";
 					return;
@@ -109,6 +118,9 @@ namespace NeuLdapMgnt.Models
 		[JsonPropertyName("full_name")]
 		[LdapAttribute("displayName")]
 		public string FullName { get; set; } = string.Empty;
+
+		[JsonIgnore]
+		public bool IsInactive { get; set; }
 
 		private string GetFullName()
 		{
@@ -143,7 +155,7 @@ namespace NeuLdapMgnt.Models
 			return string.IsNullOrEmpty(Username) ? "/home/" : $"/home/{GetUsername()}";
 		}
 
-		private static string RemoveDiacritics(string text)
+		protected static string RemoveDiacritics(string text)
 		{
 			var normalizedString = text.Normalize(NormalizationForm.FormD);
 			var stringBuilder = new StringBuilder();

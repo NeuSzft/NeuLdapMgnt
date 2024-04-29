@@ -18,17 +18,22 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes
 				{
 					return ValidationResult.Success;
 				}
-				else if (!email.Contains('@') || email.EndsWith('@'))
+				if (!email.Contains('@') || email.EndsWith('@'))
 				{
 					return new ValidationResult("Email is not a valid email address.",
 						new[] { validationContext.MemberName }!);
 				}
-				else if (email.Contains('@') && email.Count(x => x.Equals('@')) > 1)
+				if (email.Contains('@') && email.Count(x => x.Equals('@')) > 1)
 				{
 					return new ValidationResult("Email is not a valid email address.",
 						new[] { validationContext.MemberName }!);
 				}
-				else if (email.Contains('@') && !(email.StartsWith('@') || email.EndsWith('@')))
+				if (!email.All(x => char.IsLetterOrDigit(x) || x == '.' || x== '@'))
+				{
+					return new ValidationResult("Email must contain only alphanumeric characters '.', '@'.",
+						new[] { validationContext.MemberName }!);
+				}
+				if (email.Contains('@') && !(email.StartsWith('@') || email.EndsWith('@')))
 				{
 					return ValidationResult.Success;
 				}

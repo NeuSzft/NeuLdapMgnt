@@ -7,6 +7,8 @@ namespace NeuLdapMgnt.Models;
 
 public sealed class Teacher : Person, IEquatable<Teacher>
 {
+	private string _id = string.Empty;
+
 	public const int UidMinValue = 4000;
 	public const int UidMaxValue = 5999;
 	public const int GidMinValue = 4000;
@@ -16,7 +18,11 @@ public sealed class Teacher : Person, IEquatable<Teacher>
 	[IdTeacher]
 	[JsonPropertyName("id")]
 	[LdapAttribute("uid")]
-	public string Id { get; set; } = string.Empty;
+	public string Id
+	{
+		get => _id;
+		set => _id = RemoveDiacritics(value).ToLower();
+	}
 
 	[Required]
 	[UserId(UidMinValue, UidMaxValue)]

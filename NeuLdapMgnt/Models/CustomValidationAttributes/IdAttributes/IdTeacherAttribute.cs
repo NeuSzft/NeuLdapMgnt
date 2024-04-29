@@ -9,7 +9,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 		{
 			if (value is string id)
 			{
-				if (id.Any(x => !char.IsLetterOrDigit(x) && x != '.'))
+				if (!id.All(x => char.IsLetterOrDigit(x) || x == '.'))
 				{
 					return new ValidationResult("ID must contain only alphanumeric characters or '.'",
 						new[] { validationContext.MemberName }!);

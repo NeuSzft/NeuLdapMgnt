@@ -106,30 +106,6 @@ public class AttributesUnitTests
 			attribute.GetValidationResult("abc.cd", _validationContext)!.ErrorMessage);
 	}
 
-	[TestMethod]
-	public void AdminIdAttributeValidIdSuccess()
-	{
-		var attribute = new IdAdminAttribute();
-		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult("123", _validationContext));
-	}
-
-	[TestMethod]
-	public void AdminIdAttributeShortIdFails()
-	{
-		var attribute = new IdAdminAttribute();
-		Assert.AreEqual("ID must be at least 3 characters long.",
-			attribute.GetValidationResult("12", _validationContext)!.ErrorMessage);
-	}
-
-	[TestMethod]
-	public void AdminIdAttributeWithInvalidDataTypeFails()
-	{
-		var attribute = new IdAdminAttribute();
-		Assert.AreEqual("ID: Invalid data type",
-			attribute.GetValidationResult(123, _validationContext)!.ErrorMessage);
-	}
-
 	// User ID tests
 	[TestMethod]
 	public void UserIdAttributeWithInvalidDataTypeFails()
@@ -193,29 +169,6 @@ public class AttributesUnitTests
 			attribute.GetValidationResult(Teacher.UidMaxValue + 1, _validationContext)!.ErrorMessage);
 	}
 
-	[TestMethod]
-	public void AdminUidAttributeValidUidSuccess()
-	{
-		var attribute = new UserIdAttribute(Admin.UidMinValue, Admin.UidMaxValue);
-		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Admin.UidMinValue, _validationContext));
-
-
-		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Admin.UidMaxValue, _validationContext));
-	}
-
-	[TestMethod]
-	public void AdminUidAttributeInvalidUidFails()
-	{
-		var attribute = new UserIdAttribute(Admin.UidMinValue, Admin.UidMaxValue);
-		Assert.AreEqual($"User ID must be between {Admin.UidMinValue} and {Admin.UidMaxValue}.",
-			attribute.GetValidationResult(Admin.UidMinValue - 1, _validationContext)!.ErrorMessage);
-
-		Assert.AreEqual($"User ID must be between {Admin.UidMinValue} and {Admin.UidMaxValue}.",
-			attribute.GetValidationResult(Admin.UidMaxValue + 1, _validationContext)!.ErrorMessage);
-	}
-
 	// Group ID tests
 	[TestMethod]
 	public void GroupIdAttributeWithInvalidDataTypeFails()
@@ -274,27 +227,6 @@ public class AttributesUnitTests
 			attribute.GetValidationResult(Teacher.GidMinValue - 1, _validationContext)!.ErrorMessage);
 		Assert.AreEqual($"Group ID must be between {Teacher.GidMinValue} and {Teacher.GidMaxValue}.",
 			attribute.GetValidationResult(Teacher.GidMaxValue + 1, _validationContext)!.ErrorMessage);
-	}
-
-	[TestMethod]
-	public void AdminGidAttributeValidGidSuccess()
-	{
-		var attribute = new GroupIdAttribute(Admin.GidMinValue, Admin.GidMaxValue);
-		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Admin.GidMinValue, _validationContext));
-
-		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Admin.GidMaxValue, _validationContext));
-	}
-
-	[TestMethod]
-	public void AdminGidAttributeInvalidGidFails()
-	{
-		var attribute = new GroupIdAttribute(Admin.GidMinValue, Admin.GidMaxValue);
-		Assert.AreEqual($"Group ID must be between {Admin.GidMinValue} and {Admin.GidMaxValue}.",
-			attribute.GetValidationResult(Admin.GidMinValue - 1, _validationContext)!.ErrorMessage);
-		Assert.AreEqual($"Group ID must be between {Admin.GidMinValue} and {Admin.GidMaxValue}.",
-			attribute.GetValidationResult(Admin.GidMaxValue + 1, _validationContext)!.ErrorMessage);
 	}
 
 	// FirstName tests
@@ -425,6 +357,18 @@ public class AttributesUnitTests
 
 		Assert.AreEqual("Email is not a valid email address.",
 			attribute.GetValidationResult("example@@example.com", _validationContext)!.ErrorMessage);
+	}
+
+	[TestMethod]
+	public void EmailAttributeEmailWithSpecialCharacterFails()
+	{
+		var attribute = new EmailAttribute();
+
+		Assert.AreEqual("Email must contain only alphanumeric characters '.', '@'.",
+			attribute.GetValidationResult("example@example.com!", _validationContext)!.ErrorMessage);
+
+		Assert.AreEqual("Email must contain only alphanumeric characters '.', '@'.",
+			attribute.GetValidationResult("examp*le@example.com", _validationContext)!.ErrorMessage);
 	}
 
 	// Directory tests
