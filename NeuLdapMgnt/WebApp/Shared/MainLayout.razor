@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page" @ref="_page" @onkeyup="ToggleDebugTray" tabindex="0">
+<div class="page">
 	@if (_isAuthenticated) {
 		<NavMenu/>
 	}
@@ -13,28 +13,6 @@
 
 <Modal IsServiceModal="true"/>
 <Toasts class="p-3" StackLength="6" Delay="4000" Placement="ToastsPlacement.TopRight"/>
-
-@if (_showDebugTray) {
-	<DebugTray Page="@_page"/>
-}
-
-@code {
-
-	private ElementReference _page;
-
-	private bool _showDebugTray;
-
-	private void ToggleDebugTray(KeyboardEventArgs args) {
-		if (args.Key == "F9")
-			_showDebugTray = !_showDebugTray;
-	}
-
-	protected override async Task OnAfterRenderAsync(bool firstRender) {
-		if (firstRender)
-			await _page.FocusAsync();
-	}
-
-}
 
 @code {
 
