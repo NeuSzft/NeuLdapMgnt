@@ -55,7 +55,7 @@ public static class Authenticator {
 	/// <returns><c>true</c> if the value belonging to the <c>DefaultAdminEnabledValueName</c> key is also <c>true</c>, otherwise <c>false</c>.</returns>
 	public static bool IsDefaultAdminEnabled(LdapService ldap, out string? error) {
 		try {
-			return bool.Parse(ldap.GetValue(DefaultAdminEnabledValueName, out error)!);
+			return bool.TryParse(ldap.GetValue(DefaultAdminEnabledValueName, out error), out var value) && value;
 		}
 		catch (Exception e) {
 			error = e.ToString();
