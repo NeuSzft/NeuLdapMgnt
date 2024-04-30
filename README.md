@@ -1,20 +1,40 @@
 # Neu LDAP Management System
 
 ### Table of Contents
-1. [Dependencies](#dependencies)
-2. [Running the Project](#running-the-project)
+1. [Project Summary](#project-summary)
+2. [Dependencies](#dependencies)
+3. [Databases](#databases)
+    - [PostgreSQL](#postgresql)
+    - [OpenLDAP](#openldap)
+4. [Running the Project](#running-the-project)
     1. [Crate a *.env* file](#crate-a-env-file)
     2. [Environment variables](#environment-variables)
-    3. [Manage the services](#start-the-services)
-3. [Running the Demo](#running-the-demo)
-4. [Running the tests](#running-the-tests)
-5. [**TODO:** PostgreSQL database](#table-of-contents)
-6. [**TODO:** OpenLDAP database](#table-of-contents)
+    3. [Managing the services](#start-the-services)
+5. [Running the Demo](#running-the-demo)
+6. [Testing](#testing)
+
+
+## Project Summary
+**TODO!**
+
 
 ## Dependencies
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 - [GNU Make](https://www.gnu.org/software/make/)
+
+## Databases
+
+### PostgreSQL
+The Postgres database is responsible for storing the logs the API creates when it receives incoming requests and the users who have sent the requests.
+
+*[Read more about the Postgres database](./docs/POSTGRES.md)*
+
+### OpenLDAP
+The LDAP database is responsible for storing the teachers and students of the school.
+This includes their personal information and credentials. The LDAP database is also used for authenticating teachers who are admins, thus have access to the API.
+
+*[Read more about the LDAP database](./docs/POSTGRES.md)*
 
 
 ## Running the Project
@@ -87,6 +107,12 @@ make demo-down
 ```
 
 
-## Running the tests
+## Testing
+There are three major parts of the that can be tested separately, 
+- The API endpoints and services.
+- The model validation
+- The functionality of the webapp
 
-*[**🠲** Continue to TESTING](./docs/TESTING.md)*
+> All of these groups of tests run isolated in docker containers.
+
+*[Read more about testing](./docs/TESTING.md.md)*
