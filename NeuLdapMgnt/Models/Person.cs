@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json.Serialization;
 using NeuLdapMgnt.Models.CustomValidationAttributes;
@@ -12,10 +11,12 @@ namespace NeuLdapMgnt.Models
 	[LdapObjectClasses("inetOrgPerson", "posixAccount")]
 	public abstract class Person
 	{
-		private string _lastName = string.Empty;
-		private string _firstName = string.Empty;
-		private string _middleName = string.Empty;
+		private string  _lastName  = string.Empty;
+		private string  _firstName = string.Empty;
+		private string? _middleName;
+
 		private string _homeDirectory = string.Empty;
+
 		private string _email = string.Empty;
 
 		[Required(ErrorMessage = "User ID is required.")]
@@ -65,15 +66,13 @@ namespace NeuLdapMgnt.Models
 			}
 		}
 
-		[AllowNull]
 		[MiddleName]
-		[JsonPropertyName("middle_name")]
-		public string MiddleName
-		{
+		[JsonInclude, JsonPropertyName("middle_name")]
+		[LdapAttribute("title")]
+		public string? MiddleName {
 			get => _middleName;
-			set
-			{
-				_middleName = value is null ? string.Empty : value.Trim();
+			set {
+				_middleName = NullIfEmptyOrWhitespace(value);
 				FullName = GetFullName();
 			}
 		}
@@ -170,6 +169,13 @@ namespace NeuLdapMgnt.Models
 			}
 
 			return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+		}
+
+		protected string? NullIfEmptyOrWhitespace(string? str) {
+			if (str is null)
+				return null;
+			str = str.Trim();
+			return str.Length == 0 ? null : str;
 		}
 	}
 }
