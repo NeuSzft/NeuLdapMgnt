@@ -34,7 +34,7 @@ The Postgres database is responsible for storing the logs the API creates when i
 The LDAP database is responsible for storing the teachers and students of the school.
 This includes their personal information and credentials. The LDAP database is also used for authenticating teachers who are admins, thus have access to the API.
 
-*[Read more about the LDAP database](./docs/POSTGRES.md)*
+*[Read more about the LDAP database](./docs/OPENLDAP.md)*
 
 
 ## Running the Project

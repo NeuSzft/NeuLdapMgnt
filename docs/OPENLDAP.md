@@ -9,6 +9,7 @@
 4. [Groups](#groups)
 5. [Key-value pairs](#key-value-pairs)
 
+
 ## Overview
 The LDAP database is an essential part of this project.
 It is responsible for storing the teachers, students, classes and which teachers have administrator privileges.
@@ -23,6 +24,7 @@ If a teacher or student is no longer needed they can be put into the `inactive` 
 A teacher is an admin if they are part of the `admin` group.
 The classes that the students can be a part of or the teachers can be in charge of are stores as a key-value pair under the name `classes`. 
 The password of the [default admin](#default-admin) and wether or not it is enabled is also stored as two key value pairs.
+
 
 ## Default Admin
 The default admin acts as an admin teacher, but does not actually exist as an entity.\
