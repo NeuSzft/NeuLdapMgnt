@@ -31,7 +31,7 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 			return new()
 			{
 				Type = ToastType.Danger,
-				AutoHide = false,
+				AutoHide = true,
 				Message = message
 			};
 		}
