@@ -2,15 +2,64 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1 class="mb-4">Dashboard</h1>
 
-Welcome to your new app.
+<div class="container">
+	<div class="row">
+		<StatCard Title="Active Students" Count="@_studentCount" IconName="IconName.PersonFill"/>
+		<StatCard Title="Active Teachers" Count="@_teacherCount" IconName="IconName.PersonLinesFill"/>
+		<StatCard Title="Administrators" Count="@_adminCount" IconName="IconName.ShieldLockFill"/>
+		<StatCard Title="Inactive Users" Count="@_inactiveCount" IconName="IconName.PersonDashFill"/>
+		<StatCard Title="Last 24h logs" Count="@_todayLogsCount" IconName="IconName.JournalText"/>
+	</div>
+</div>
 
 @code {
+	private int? _studentCount;
+	private int? _teacherCount;
+	private int? _adminCount;
+	private int? _inactiveCount;
+	private int? _todayLogsCount;
 
-	protected override void OnInitialized()
+	private readonly DateOnly _fromDate = DateOnly.FromDateTime(DateTime.Now.AddHours(-24));
+	private readonly TimeOnly _fromTime = TimeOnly.FromDateTime(DateTime.Now.AddHours(-24));
+	private readonly DateOnly _toDate   = DateOnly.FromDateTime(DateTime.Now);
+	private readonly TimeOnly _toTime   = TimeOnly.FromDateTime(DateTime.Now);
+
+	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
+		await LoadDataAsync();
+	}
+
+	private async Task LoadDataAsync()
+	{
+		try
+		{
+			await StudentService.FetchStudentsAsync();
+			await TeacherService.FetchTeachersAsync();
+			await LocalDbService.FetchAdminsAsync();
+			await LocalDbService.FetchInactiveUsersAsync();
+			await LocalDbService.FetchClassesAsync();
+			await FetchLogs();
+			_studentCount = StudentService.Students.Count;
+			_teacherCount = TeacherService.Teachers.Count;
+			_adminCount = LocalDbService.Admins.Count;
+			_inactiveCount = LocalDbService.InactiveUsers.Count;
+		}
+		catch (Exception e)
+		{
+			NotificationService.HandleError(e);
+		}
+	}
+
+	private async Task FetchLogs()
+	{
+		long from = new DateTimeOffset(_fromDate.ToDateTime(_fromTime, DateTimeKind.Local)).ToUniversalTime().ToUnixTimeSeconds();
+		long to   = new DateTimeOffset(_toDate.ToDateTime(_toTime, DateTimeKind.Local)).ToUniversalTime().ToUnixTimeSeconds();
+
+		var result = await ApiRequests.GetLogsAsync(from, to);
+		_todayLogsCount = result.Values.Select(LogEntry.FromTsv).Count();
 	}
 
 }
