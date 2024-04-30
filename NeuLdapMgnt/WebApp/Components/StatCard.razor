@@ -1,0 +1,27 @@
+﻿<div class="stat-card col-md-3 mb-4" style="min-width:250px;">
+	<div class="card h-100 shadow-sm">
+		<div class="card-body">
+			<h5 class="card-title">
+				<Icon Name="@IconName" Class="fs-3 me-2 align-middle"/> @Title
+			</h5>
+			@if (Count is null)
+			{
+				<Loading/>
+			}
+			else
+			{
+				<p class="card-text display-4">
+					@Count
+				</p>
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter] public string Title { get; set; } = string.Empty;
+
+	[Parameter] public int? Count { get; set; }
+
+	[Parameter] public IconName IconName { get; set; }
+}
