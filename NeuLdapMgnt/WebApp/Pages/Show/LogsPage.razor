@@ -1,4 +1,5 @@
 ﻿@page "/db/request-logs"
+@inject IJSRuntime JsRuntime
 
 <PageTitle>Request Logs</PageTitle>
 
@@ -32,14 +33,18 @@
 	</fieldset>
 
 	<div class="d-flex flex-row flex-wrap justify-content-between my-3">
-		@if (_isLoading)
-		{
-			<ButtonLoading ButtonColor="ButtonColor.Secondary" SpinnerColor="SpinnerColor.Secondary" />
-		}
-		else
-		{
-			<ButtonRefresh OnClick="@Fetch" Text="Fetch Logs"/>
-		}
+		<div>
+			@if (_isLoading) {
+				<ButtonLoading ButtonColor="ButtonColor.Secondary" SpinnerColor="SpinnerColor.Secondary"/>
+			}
+			else {
+				<ButtonRefresh OnClick="@Fetch" Text="Fetch Logs"/>
+				<Button Color="ButtonColor.Primary" Outline="true" class="ms-3" @onclick="Download">
+					<Icon Name="IconName.Download"/>
+					Download Logs
+				</Button>
+			}
+		</div>
 		<div class="align-self-center text-end">
 			<a href="/api/docs" target="_blank">View API endpoint docs</a>
 		</div>
@@ -59,6 +64,7 @@ else {
 	TimeOnly              _fromTime = TimeOnly.FromDateTime(DateTime.Now.AddHours(-12));
 	DateOnly              _toDate   = DateOnly.FromDateTime(DateTime.Now);
 	TimeOnly              _toTime   = TimeOnly.FromDateTime(DateTime.Now);
+	IEnumerable<string>   _csvLines = Array.Empty<string>();
 	IEnumerable<LogEntry> _entries  = Array.Empty<LogEntry>();
 	bool                  _isLoading;
 
@@ -78,14 +84,18 @@ else {
 
 		try {
 			_isLoading = true;
-			var result = await ApiRequests.GetLogsAsync(from, to);
-			_entries = result.Values.Select(LogEntry.FromTsv).Reverse();
+			_csvLines = (await ApiRequests.GetLogsAsync(from, to)).Values;
+			_entries = _csvLines.Select(LogEntry.FromTsv).Reverse();
 		}
 		catch (Exception e) {
 			NotificationService.HandleError(e);
 		}
 
 		_isLoading = false;
+	}
+
+	private async Task Download() {
+		await JsRuntime.InvokeVoidAsync("downloadFile", "requests.log", "text/tab-separated-values", string.Join('\n', _csvLines));
 	}
 
 }
