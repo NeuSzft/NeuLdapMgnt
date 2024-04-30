@@ -1,12 +1,15 @@
 // Download json as a file
 self.downloadJsonFile = function (file, json) {
-    let link = document.createElement("a")
-    link.download = file
-    link.href = "data:application/json;charset=utf-8," + encodeURIComponent(json)
-    link.style.display = "none"
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    const blob = new Blob([new TextEncoder().encode(json)], { type: 'application/json;charset=utf-8' });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = file;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }
 
 // Clear caches

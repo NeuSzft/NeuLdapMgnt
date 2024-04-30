@@ -31,7 +31,11 @@
 
 			if (result.IsSuccess()) {
 				_lastExportTime = DateTime.Now;
-				_exportedJson = JsonSerializer.Serialize(result.Values.FirstOrDefault(), new JsonSerializerOptions { WriteIndented = true });
+				_exportedJson = _exportedJson = JsonSerializer.Serialize(result.Values.FirstOrDefault(), new JsonSerializerOptions { 
+					WriteIndented = true,
+					Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping 
+				});
+
 				NotificationService.NotifySuccess("Successfully exported database");
 			}
 			else if (ShowModal is not null)
