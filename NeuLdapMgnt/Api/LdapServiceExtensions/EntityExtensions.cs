@@ -162,7 +162,7 @@ public static class EntityExtensions {
 		var requests = entities.Select(entity => {
 			string id = idGetter(entity);
 
-			if (overwrite)
+			if (overwrite && ldap.EntityExists<T>(id))
 				return new UniqueDirectoryRequest(CreateModifyRequest(ldap, entity, id, setHiddenAttributes), id);
 
 			AddRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}");
