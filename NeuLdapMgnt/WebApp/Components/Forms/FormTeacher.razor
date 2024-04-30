@@ -36,14 +36,14 @@
 				<ValidationMessage For="() => teacherUpdated.FirstName" id="teacher-first-name-validation-message" />
 			</div>
 			<div class="form-floating w-100">
-				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="last-name" @bind-Value="teacherUpdated.LastName" />
-				<label for="last-name">Last</label>
-				<ValidationMessage For="() => teacherUpdated.LastName" id="teacher-last-name-validation-message" />
-			</div>
-			<div class="form-floating w-100">
 				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="middle-name" @bind-Value="teacherUpdated.MiddleName" />
 				<label for="middle-name">Middle</label>
 				<ValidationMessage For="() => teacherUpdated.MiddleName" id="teacher-middle-name-validation-message" />
+			</div>
+			<div class="form-floating w-100">
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="last-name" @bind-Value="teacherUpdated.LastName" />
+				<label for="last-name">Last</label>
+				<ValidationMessage For="() => teacherUpdated.LastName" id="teacher-last-name-validation-message" />
 			</div>
 		</div>
 	</div>
@@ -71,6 +71,13 @@
 		<label for="password">Password</label>
 		<ValidationMessage For="() => teacherUpdated.Password" id="teacher-password-validation-message" />
 	</div>
+	@if (teacherUpdated.Password?.Length < 1) {
+		<label for="password">
+			<small class="text-muted">
+				Setting the password is optional. When left empty it will be ignored.
+			</small>
+		</label>
+	}
 
 	@if (!IsReadonly)
 	{
