@@ -1,3 +1,5 @@
+name: neu-ldap-mgnt
+
 services:
   selenium-openldap:
     extends:
