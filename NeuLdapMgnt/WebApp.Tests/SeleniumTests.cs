@@ -1,4 +1,3 @@
-using DotLiquid.Util;
 using NeuLdapMgnt.Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
@@ -683,7 +682,6 @@ public class SeleniumTests
 		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
 
-		var tds = _webDriver.FindElements(By.CssSelector("table > tbody > tr > td")).ToList();
 		_webDriver.FindElement(By.CssSelector("table > tbody > tr > td > input")).Click();
 
 		_wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".btn-warning")));
@@ -696,7 +694,7 @@ public class SeleniumTests
 
 		NavLinks.Find(x => x.Text.Equals("Administrators"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("table")));
-		tds = _webDriver.FindElements(By.CssSelector("table > tbody > tr > td")).ToList();
+		var tds = _webDriver.FindElements(By.CssSelector("table > tbody > tr > td")).ToList();
 		Assert.AreEqual(id, tds[1].Text);
 	}
 
@@ -780,5 +778,170 @@ public class SeleniumTests
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
 		Assert.AreEqual("There are no teachers with [Administrator] status", 
 			_webDriver.FindElement(By.TagName("h3")).Text);
+	}
+
+	[TestMethod]
+	public void StudentCanBeInspectedFromStudentsPage()
+	{
+		string firstName = "John";
+		string lastName = "Doe";
+		string cls = "10.a";
+
+		Login();
+		ExpandNavbar();
+		NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("form")));
+
+		var form = _webDriver.FindElement(By.TagName("form"));
+		form.FindElement(By.Id("first-name")).SendKeys(firstName);
+		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("class-select")).Click();
+		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
+		form.Submit();
+		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
+
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("form")));
+		NavLinks.Find(x => x.Text.Equals("View Students"))?.Click();
+
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+		_webDriver.FindElement(By.ClassName("bi-eye")).Click();
+		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		
+		form = _webDriver.FindElement(By.TagName("form"));
+		Assert.AreEqual("70000000000", form.FindElement(By.CssSelector("input[type='number']")).GetAttribute("value"));
+		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
+		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
+	}
+	
+	[TestMethod]
+	public void StudentCanBeInspectedFromInactiveUsersPage()
+	{
+		string firstName = "John";
+		string lastName = "Doe";
+		string cls = "10.a";
+
+		Login();
+		ExpandNavbar();
+		NavLinks.Find(x => x.Text.Equals("View Students"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+
+		_webDriver.FindElement(By.CssSelector("table > tbody > tr > td > input")).Click();
+		_wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".btn-warning")));
+		_webDriver.FindElement(By.CssSelector(".btn-warning")).Click();
+		_webDriver.FindElement(By.CssSelector(".form-switch > input")).Click();
+		_webDriver.FindElement(By.CssSelector(".modal-dialog .btn-success")).Click();
+		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
+
+		NavLinks.Find(x => x.Text.Equals("Inactive Users"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+		_webDriver.FindElement(By.ClassName("bi-eye")).Click();
+		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		
+		var form = _webDriver.FindElement(By.TagName("form"));
+		Assert.AreEqual("70000000000", form.FindElement(By.CssSelector("input[type='number']")).GetAttribute("value"));
+		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
+		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
+	}
+	
+	[TestMethod]
+	public void TeacherCanBeInspectedFromTeachersPage()
+	{
+		string id = "john.doe";
+		string firstName = "John";
+		string lastName = "Doe";
+		string cls = "10.a";
+
+		Login();
+		ExpandNavbar();
+		NavLinks.Find(x => x.Text.Equals("Add Teacher"))?.Click();
+		_wait.Until(ExpectedConditions.TitleIs("Add Teacher"));
+
+		var form = _webDriver.FindElement(By.TagName("form"));
+		form.FindElement(By.Id("teacher-id")).SendKeys(id);
+		form.FindElement(By.Id("first-name")).SendKeys(firstName);
+		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("class-select")).Click();
+		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
+		form.Submit();
+		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
+
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("form")));
+		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
+
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+		_webDriver.FindElements(By.ClassName("bi-eye")).LastOrDefault()?.Click();
+		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		
+		form = _webDriver.FindElement(By.TagName("form"));
+		Assert.AreEqual(id, form.FindElement(By.Id("teacher-id")).GetAttribute("value"));
+		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
+		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
+	}
+	
+	[TestMethod]
+	public void TeacherCanBeInspectedFromAdminsPage()
+	{
+		string id = "john.doe";
+		string firstName = "John";
+		string lastName = "Doe";
+		string cls = "10.a";
+
+		Login();
+		ExpandNavbar();
+		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+
+		_webDriver.FindElement(By.CssSelector("table > tbody > tr > td > input")).Click();
+		_wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".btn-warning")));
+		_webDriver.FindElement(By.CssSelector(".btn-warning")).Click();
+		_webDriver.FindElements(By.CssSelector(".form-switch > input")).LastOrDefault()?.Click();
+		_webDriver.FindElement(By.CssSelector(".modal-dialog .btn-success")).Click();
+		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
+
+		NavLinks.Find(x => x.Text.Equals("Administrators"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+		_webDriver.FindElements(By.ClassName("bi-eye")).LastOrDefault()?.Click();
+		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		
+		var form = _webDriver.FindElement(By.TagName("form"));
+		Assert.AreEqual(id, form.FindElement(By.Id("teacher-id")).GetAttribute("value"));
+		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
+		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
+	}
+	
+	[TestMethod]
+	public void TeacherCanBeInspectedFromInactiveUsersPage()
+	{
+		string id = "john.doe";
+		string firstName = "John";
+		string lastName = "Doe";
+		string cls = "10.a";
+
+		Login();
+		ExpandNavbar();
+		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+
+		_webDriver.FindElement(By.CssSelector("table > tbody > tr > td > input")).Click();
+		_wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".btn-warning")));
+		_webDriver.FindElement(By.CssSelector(".btn-warning")).Click();
+		_webDriver.FindElement(By.CssSelector(".form-switch > input")).Click();
+		_webDriver.FindElement(By.CssSelector(".modal-dialog .btn-success")).Click();
+		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
+
+		NavLinks.Find(x => x.Text.Equals("Inactive Users"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+		_webDriver.FindElements(By.ClassName("bi-eye")).LastOrDefault()?.Click();
+		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		
+		var form = _webDriver.FindElement(By.TagName("form"));
+		Assert.AreEqual(id, form.FindElement(By.Id("teacher-id")).GetAttribute("value"));
+		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
+		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
 	}
 }
