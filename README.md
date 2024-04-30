@@ -115,4 +115,4 @@ There are three major parts of the that can be tested separately:
 
 > All of these groups of tests run isolated in docker containers.
 
-*[Read more about testing](./docs/TESTING.md.md)*
+*[Read more about testing](./docs/TESTING.md)*

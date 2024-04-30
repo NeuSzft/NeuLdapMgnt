@@ -3,10 +3,10 @@
 *[**🠰** Back to the README](../README.md)*
 
 ### Table of Contents
-1. [Running All Tests](#running-all-tests)
-2. [Running just the API Tests](#running-just-the-api-tests)
-3. [Running just the Selenium Tests](#running-just-the-selenium-tests)
-4. [Running just the Model Validation Tests](#running-just-the-model-validation-tests)
+1. [Running all Tests](#running-all-tests)
+2. [Running just the Model Validation Tests](#running-just-the-model-validation-tests)
+3. [Running just the API Tests](#running-just-the-api-tests)
+4. [Running just the Selenium Tests](#running-just-the-selenium-tests)
 
 
 ## Running all Tests
@@ -17,6 +17,16 @@ make tests
 ```
 
 
+## Running just the Model Validation Tests
+
+#### Command to run the tests:
+```
+make model-tests
+```
+
+[View the latest results of the tests](../testing/results/models.md)
+
+
 ## Running just the API Tests
 These tests are meant to check the different services created for the API to interact with the LDAP server and the authentication of its endpoints.
 
@@ -25,7 +35,7 @@ These tests are meant to check the different services created for the API to int
 make api-tests
 ```
 
-> The results of the api tests can be found [here](./test-results/api-test-results.md).
+[View the latest results of the tests](../testing/results/api.md)
 
 
 ## Running just the Selenium Tests
@@ -35,13 +45,4 @@ make api-tests
 make web-tests
 ```
 
-> The results of the selenium tests can be found within the [Webapp.Test](../NeuLdapMgnt/Webapp.Tests/) directory.
-
-
-## Running just the Model Validation Tests
-
-#### Command to run the tests:
-```
-make model-tests
-```
-> The results of unit tests can be found within the [Models.Test](../NeuLdapMgnt/Models.Tests/) directory.
+[View the latest results of the tests](../testing/results/selenium.md)

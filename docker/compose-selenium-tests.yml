@@ -79,7 +79,7 @@ services:
         COPY ./NeuLdapMgnt/WebApp.Tests /app/WebApp.Tests
         COPY ./NeuLdapMgnt/Models /app/Models
         WORKDIR /app/WebApp.Tests
-        ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/app/WebApp.Tests/README.md" ]
+        ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/tr/selenium.md" ]
     environment:
       DEFAULT_ADMIN_NAME: admin
       DEFAULT_ADMIN_PASSWORD: adminpass
@@ -94,7 +94,7 @@ services:
       selenium-nginx:
         condition: service_started
     volumes:
-      - ../NeuLdapMgnt/WebApp.Tests:/app/WebApp.Tests
+      - ../testing/results:/tr
     networks:
       - net-selenium
 

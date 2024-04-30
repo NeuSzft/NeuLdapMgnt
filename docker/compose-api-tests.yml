@@ -51,7 +51,7 @@ services:
     networks:
       - api-test-net
     volumes:
-      - ../docs/test-results:/tr
+      - ../testing/results:/tr
 
 networks:
   api-test-net:
