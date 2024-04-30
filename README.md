@@ -108,10 +108,10 @@ make demo-down
 
 
 ## Testing
-There are three major parts of the that can be tested separately, 
-- The API endpoints and services.
-- The model validation
-- The functionality of the webapp
+There are three major parts of the that can be tested separately:
+- API endpoints and services
+- model validation
+- functionality of the webapp
 
 > All of these groups of tests run isolated in docker containers.
 

@@ -1,4 +1,4 @@
-# Neu LDAP Management System
+# Neu LDAP Management System - Testing
 
 *[**🠰** Back to the README](../README.md)*
 
@@ -9,7 +9,7 @@
 4. [Running just the Model Validation Tests](#running-just-the-model-validation-tests)
 
 
-## Running All Tests
+## Running all Tests
 
 #### Command to run the tests:
 ```
