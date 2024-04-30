@@ -7,35 +7,31 @@
 		<h1>Students [@StudentService.Students.Count]</h1>
 	</div>
 	<div class="col text-end">
-		@if (isLoading)
+		@if (_isLoading)
 		{
-			<ButtonLoading ButtonColor="ButtonColor.Secondary" SpinnerColor="SpinnerColor.Secondary" />
+			<ButtonLoading ButtonColor="ButtonColor.Secondary" SpinnerColor="SpinnerColor.Secondary"/>
 		}
 		else
 		{
-			<ButtonRefresh OnClick="OnRefresh" Text="Refresh" />
+			<ButtonRefresh OnClick="OnRefresh" Text="Refresh"/>
 		}
 	</div>
 </div>
 
-@if (isLoading)
+@if (_isLoading)
 {
-	<Loading Text="Loading students" />
+	<Loading Text="Loading students"/>
 }
-else if (isUpdating)
+else if (_isUpdating)
 {
-	<Loading Text="Updating students" />
-}
-else if (isDeleting)
-{
-	<Loading Text="Deleting students" />
+	<Loading Text="Updating students"/>
 }
 else if (!StudentService.Students.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
 			<h3 class="my-4">There are no <strong>[Active]</strong> students</h3>
-			<ButtonAdd Text="Add Student" OnClick="ToAddPage" />
+			<ButtonAdd Text="Add Student" OnClick="ToAddPage"/>
 			<Button Color="ButtonColor.Dark" Outline="true" Class="ms-3" @onclick="ToInactivesPage">
 				<i class="bi bi-eye"></i>
 				View
@@ -47,40 +43,37 @@ else if (!StudentService.Students.Any())
 else
 {
 	<TableStudents Students="StudentService.Students"
-				   OnStudentsUpdate="HandleUpdateStudents" />
+	               OnStudentsUpdate="HandleUpdateStudents"/>
 }
 
 @code {
-	private bool isLoading = true;
-	private bool isDeleting = false;
-	private bool isUpdating = false;
+	private bool _isLoading  = true;
+	private bool _isUpdating;
 
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 		await LocalDbService.FetchClassesAsync();
 		await StudentService.FetchStudentsAsync();
-		isLoading = false;
+		_isLoading = false;
 	}
 
 	private async Task HandleUpdateStudents((List<Student>, string, bool) context)
 	{
 		var (students, cls, isInactive) = context;
-		isUpdating = true;
+		_isUpdating = true;
 		await StudentService.UpdateStudentsAsync(students, cls, isInactive);
 		await OnRefresh();
-		isUpdating = false;
+		_isUpdating = false;
 	}
 
 	private async Task OnRefresh()
 	{
-		isLoading = true;
+		_isLoading = true;
 		await StudentService.FetchStudentsAsync();
-		isLoading = false;
+		_isLoading = false;
 	}
 
-	private void ToAddPage() => NavManager.NavigateTo("/students/add");
+	private void ToAddPage()       => NavManager.NavigateTo("/students/add");
 	private void ToInactivesPage() => NavManager.NavigateTo("/db/inactive-users");
 }
-
-

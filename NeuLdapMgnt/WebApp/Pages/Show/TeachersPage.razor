@@ -7,27 +7,27 @@
 		<h1>Teachers [@TeacherService.Teachers.Count]</h1>
 	</div>
 	<div class="col text-end">
-		@if (isLoading)
+		@if (_isLoading)
 		{
-			<ButtonLoading ButtonColor="ButtonColor.Secondary" SpinnerColor="SpinnerColor.Secondary" />
+			<ButtonLoading ButtonColor="ButtonColor.Secondary" SpinnerColor="SpinnerColor.Secondary"/>
 		}
 		else
 		{
-			<ButtonRefresh OnClick="FetchData" Text="Refresh" />
+			<ButtonRefresh OnClick="FetchData" Text="Refresh"/>
 		}
 	</div>
 </div>
 
-@if (isLoading)
+@if (_isLoading)
 {
-	<Loading Text="Loading teachers" />
+	<Loading Text="Loading teachers"/>
 }
 else if (!TeacherService.Teachers.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
 			<h3 class="my-4">There are no <strong>[Active]</strong> teachers</h3>
-			<ButtonAdd Text="Add Teacher" OnClick="ToAddPage" />
+			<ButtonAdd Text="Add Teacher" OnClick="ToAddPage"/>
 			<Button Color="ButtonColor.Dark" Outline="true" Class="ms-3" @onclick="ToInactivesPage">
 				<i class="bi bi-eye"></i>
 				View
@@ -39,27 +39,27 @@ else if (!TeacherService.Teachers.Any())
 else
 {
 	<TableTeachers Teachers="TeacherService.Teachers"
-				   OnTeachersUpdate="HandleUpdateTeachers" />
+	               OnTeachersUpdate="HandleUpdateTeachers"/>
 }
 
 @code {
-	private bool isLoading = true;
+	private bool _isLoading = true;
 
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
-		isLoading = true;
+		_isLoading = true;
 		await FetchData();
-		isLoading = false;
+		_isLoading = false;
 	}
 
 	private async Task HandleUpdateTeachers((List<Teacher>, bool, bool) context)
 	{
 		var (teachers, isAdmin, isInactive) = context;
-		isLoading = true;
+		_isLoading = true;
 		await TeacherService.UpdateTeachersAsync(teachers, isAdmin, isInactive);
 		await FetchData();
-		isLoading = false;
+		_isLoading = false;
 	}
 
 	private async Task FetchData()
@@ -70,7 +70,6 @@ else
 		await TeacherService.FetchTeachersAsync();
 	}
 
-	private void ToAddPage() => NavManager.NavigateTo("/teachers/add");
+	private void ToAddPage()       => NavManager.NavigateTo("/teachers/add");
 	private void ToInactivesPage() => NavManager.NavigateTo("/db/inactive-users");
 }
-

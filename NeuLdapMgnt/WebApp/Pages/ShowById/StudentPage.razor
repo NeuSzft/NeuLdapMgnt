@@ -1,26 +1,24 @@
 ﻿@page "/students/{id}"
 
-<PageTitle>@student.FullName</PageTitle>
+<PageTitle>@_student.FullName</PageTitle>
 
-@if (isLoading)
+@if (_isLoading)
 {
-	<Loading Text="Loading student" />
+	<Loading Text="Loading student"/>
 }
 else
 {
-	<h3>[@student.Class] @student.FullName</h3>
-	<FormStudent Student="student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete" />
-	<ConfirmDialog @ref="dialog" />
+	<h3>[@_student.Class] @_student.FullName</h3>
+	<FormStudent Student="_student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete"/>
+	<ConfirmDialog @ref="_dialog"/>
 }
 
 @code {
-	[Parameter]
-	public string Id { get; set; } = null!;
+	[Parameter] public string Id { get; set; } = null!;
 
-	private Student student = new();
-	private ConfirmDialog dialog = default!;
-	private List<string> errorList = new();
-	private bool isLoading = true;
+	private Student       _student   = new();
+	private ConfirmDialog _dialog    = default!;
+	private bool          _isLoading = true;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -29,32 +27,30 @@ else
 
 		var searchedStudent = await StudentService.FetchStudentAsync(id);
 		if (searchedStudent is null) return;
-		student = searchedStudent;
+		_student = searchedStudent;
 
 		await LocalDbService.FetchClassesAsync();
-		isLoading = false;
+		_isLoading = false;
 	}
 
 	private async Task<bool> OnSubmit(Student editedStudent)
 	{
-		if (student.Equals(editedStudent))
+		if (_student.Equals(editedStudent))
 		{
 			ToastService.Notify(ToastMessages.Secondary($"No changes was found!"));
 			return false;
 		}
 
 		var parameters = new Dictionary<string, object>();
-		parameters.Add("StudentOriginal", student);
+		parameters.Add("StudentOriginal", _student);
 		parameters.Add("StudentEdited", editedStudent);
 
-		var confirmation = await dialog.ShowAsync<SummaryStudentEdit>("Edit this student?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
+		var confirmation = await _dialog.ShowAsync<SummaryStudentEdit>("Edit this student?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
 		if (!confirmation) return false;
 
-		isLoading = true;
-		var response = await StudentService.UpdateStudentAsync(editedStudent);
-		errorList = response.ToList();
-		isLoading = false;
-		NavManager.NavigateTo("/students");
+		_isLoading = true;
+		await StudentService.UpdateStudentAsync(editedStudent);
+		_isLoading = false;
 
 		return false;
 	}
@@ -64,14 +60,15 @@ else
 		var parameters = new Dictionary<string, object>();
 		parameters.Add("Student", editedStudent);
 
-		var confirmation = await dialog.ShowAsync<SummaryStudent>("Deactivate this student?", parameters, DialogOptions.Confirm());
+		var confirmation = await _dialog.ShowAsync<SummaryStudent>("Deactivate this student?", parameters, DialogOptions.Confirm());
 		if (!confirmation) return false;
 
-		isLoading = true;
+		_isLoading = true;
 		await LocalDbService.DeactivateUserAsync(editedStudent.Id.ToString());
-		isLoading = false;
+		_isLoading = false;
 		NavManager.NavigateTo("/students");
 
 		return false;
 	}
+
 }

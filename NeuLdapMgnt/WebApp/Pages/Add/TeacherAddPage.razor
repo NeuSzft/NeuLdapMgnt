@@ -4,23 +4,22 @@
 
 <h1>Add Teacher</h1>
 
-@if (isSubmitting)
+@if (_isSubmitting)
 {
-	<Loading Text="@submitString" />
+	<Loading Text="@SubmitString"/>
 }
 else
 {
-	<FormTeacher Teacher="teacher" CanDelete="false" IsReadonly="false" OnSubmit="OnSubmit" />
-	<ConfirmDialog @ref="dialog" />
+	<FormTeacher Teacher="@_teacher" CanDelete="@(false)" IsReadonly="@(false)" OnSubmit="OnSubmit"/>
+	<ConfirmDialog @ref="_dialog"/>
 }
 
 @code {
-	private Teacher teacher = new();
-	private ConfirmDialog dialog = default!;
+	private Teacher       _teacher = new();
+	private ConfirmDialog _dialog  = default!;
 
-	private string modalTitle => $"Error";
-	private string submitString => $"Creating {teacher.FullName}";
-	private bool isSubmitting = false;
+	private string SubmitString => $"Creating {_teacher.FullName}";
+	private bool   _isSubmitting;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -33,12 +32,13 @@ else
 		var parameters = new Dictionary<string, object>();
 		parameters.Add("Teacher", teacherUpdated);
 
-		var confirmation = await dialog.ShowAsync<SummaryTeacher>("Create this teacher?", parameters, DialogOptions.Confirm());
+		var confirmation = await _dialog.ShowAsync<SummaryTeacher>("Create this teacher?", parameters, DialogOptions.Confirm());
 		if (!confirmation) return false;
 
-		isSubmitting = true;
+		_isSubmitting = true;
 		await TeacherService.AddTeacherAsync(teacherUpdated);
-		isSubmitting = false;
+		_isSubmitting = false;
 		return false;
 	}
+
 }

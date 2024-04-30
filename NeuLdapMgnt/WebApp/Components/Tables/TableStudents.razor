@@ -1,16 +1,16 @@
 ﻿@inherits LayoutComponentBase
 @implements IDisposable
 
-<ConfirmDialog @ref="dialog" />
+<ConfirmDialog @ref="_dialog"/>
 
-<Modal @ref="modalEdit" title="Edit selected students" ModalType="ModalType.Warning" IsScrollable="true" OnHidden="ToggleEditMode">
+<Modal @ref="_modalEdit" title="Edit selected students" ModalType="ModalType.Warning" IsScrollable="true" OnHidden="ToggleEditMode">
 	<BodyTemplate>
 		<div class="fw-bold mb-2">After saving this action cannot be reverted!</div>
 		<div class="mb-2">
-			<Switch @ref="switchEditIsActive" Value="editIsInactive" ValueExpression="() => editIsInactive" ValueChanged="ToogleInactiveSwitch" Label="Set status to [Inactive]?" />
+			<Switch @ref="_switchEditIsActive" Value="_editIsInactive" ValueExpression="() => _editIsInactive" ValueChanged="ToogleInactiveSwitch" Label="Set status to [Inactive]?"/>
 		</div>
 		<div class="form-floating">
-			<InputSelect class="form-select rounded" id="class-select" @bind-Value="editedClass" disabled="@editIsInactive">
+			<InputSelect class="form-select rounded" id="class-select" @bind-Value="_editedClass" disabled="@_editIsInactive">
 				<option value="@string.Empty" disabled>Select class</option>
 				@foreach (var cls in LocalDbService.Classes)
 				{
@@ -21,23 +21,23 @@
 		</div>
 	</BodyTemplate>
 	<FooterTemplate>
-		<ButtonCancel Text="Cancel" OnClick="HideModalEdit" />
-		<ButtonSave Text="Save" OnClick="UpdateSelected" />
+		<ButtonCancel Text="Cancel" OnClick="HideModalEdit"/>
+		<ButtonSave Text="Save" OnClick="UpdateSelected"/>
 	</FooterTemplate>
 </Modal>
 
 <div class="d-flex justify-content-between align-items-center g-2 mb-3">
 	<div class="d-flex flex-grow-1 flex-md-grow-0">
-		<SearchBar Label="OM, Name, Class" OnSearchQueryChanged="UpdateSearchQuery" />
+		<SearchBar Label="OM, Name, Class" OnSearchQueryChanged="UpdateSearchQuery"/>
 	</div>
 	<div class="ms-2">
-		@if (isEditing)
+		@if (_isEditing)
 		{
 			<ButtonLoading ButtonColor="ButtonColor.Warning" SpinnerColor="SpinnerColor.Warning"/>
 		}
 		else
 		{
-			<ButtonEdit OnClick="ShowModalEdit" IsDisabled="isStudentSelected" Text="Edit selected" />
+			<ButtonEdit OnClick="ShowModalEdit" IsDisabled="IsStudentSelected" Text="Edit selected"/>
 		}
 	</div>
 </div>
@@ -45,131 +45,128 @@
 <div class="table-students table-responsive rounded px-1 border flex-fill">
 	<table class="table table-striped table-borderless align-middle">
 		<thead class="sticky-top">
-			<tr class="rounded">
-				<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllStudents">
-					@if (!AreFilteredStudentsSelected())
-					{
-						<span>Select all</span>
-					}
-					else
-					{
-						<span>Deselect</span>
-					}
-				</th>
-				<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
-					OM
-					@if (sortBy == "Id")
-					{
-						<i class="bi @GetSortIcon(isAscending)"></i>
-					}
-					else
-					{
-						<i class="bi bi-chevron-expand"></i>
-					}
-				</th>
-				<th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
-					Name
-					@if (sortBy == "Name")
-					{
-						<i class="bi @GetSortIcon(isAscending)"></i>
-					}
-					else
-					{
-						<i class="bi bi-chevron-expand"></i>
-					}
-				</th>
-				<th class="user-select-none" role="button" @onclick="@(() => SortTable("Class"))">
-					Class
-					@if (sortBy == "Class")
-					{
-						<i class="bi @GetSortIcon(isAscending)"></i>
-					}
-					else
-					{
-						<i class="bi bi-chevron-expand"></i>
-					}
-				</th>
-				<th class="user-select-none text-end">Inspect</th>
-			</tr>
+		<tr class="rounded">
+			<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllStudents">
+				@if (!AreFilteredStudentsSelected())
+				{
+					<span>Select all</span>
+				}
+				else
+				{
+					<span>Deselect</span>
+				}
+			</th>
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
+				OM
+				@if (_sortBy == "Id")
+				{
+					<i class="bi @GetSortIcon(_isAscending)"></i>
+				}
+				else
+				{
+					<i class="bi bi-chevron-expand"></i>
+				}
+			</th>
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Name"))">
+				Name
+				@if (_sortBy == "Name")
+				{
+					<i class="bi @GetSortIcon(_isAscending)"></i>
+				}
+				else
+				{
+					<i class="bi bi-chevron-expand"></i>
+				}
+			</th>
+			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Class"))">
+				Class
+				@if (_sortBy == "Class")
+				{
+					<i class="bi @GetSortIcon(_isAscending)"></i>
+				}
+				else
+				{
+					<i class="bi bi-chevron-expand"></i>
+				}
+			</th>
+			<th class="user-select-none text-end">Inspect</th>
+		</tr>
 		</thead>
 		<tbody>
-			@foreach (var student in filteredStudents)
-			{
-				<tr>
-					<td class="rounded-start">
-						<input class="form-check-input"
-							   type="checkbox"
-							   checked="@selectedStudents.Contains(student)"
-							   @onchange="() => SelectStudent(student)" />
-					</td>
-					<td>@student.Id</td>
-					<td>@student.FullName</td>
-					<td>@student.Class</td>
-					<td class="text-end rounded-end">
-						<ButtonInspect Id="@student.Id.ToString()" />
-					</td>
-				</tr>
-			}
+		@foreach (var student in _filteredStudents)
+		{
+			<tr>
+				<td class="rounded-start">
+					<input class="form-check-input"
+					       type="checkbox"
+					       checked="@_selectedStudents.Contains(student)"
+					       @onchange="() => SelectStudent(student)"/>
+				</td>
+				<td>@student.Id</td>
+				<td>@student.FullName</td>
+				<td>@student.Class</td>
+				<td class="text-end rounded-end">
+					<ButtonInspect Id="@student.Id.ToString()"/>
+				</td>
+			</tr>
+		}
 		</tbody>
 	</table>
 </div>
 
 
-
 @code {
-	[Parameter]
-	public List<Student> Students { get; set; } = new();
+	[Parameter] public List<Student> Students { get; set; } = new();
 
-	[Parameter]
-	public EventCallback<(List<Student>, string?, bool)> OnStudentsUpdate { get; set; }
+	[Parameter] public EventCallback<(List<Student>, string?, bool)> OnStudentsUpdate { get; set; }
 
-	private List<Student> filteredStudents = new();
-	private List<Student> selectedStudents = new();
-	private Timer? searchDelayTimer;
+	private Timer?        _searchDelayTimer;
+	private List<Student> _filteredStudents = new();
+	private List<Student> _selectedStudents = new();
+	private ConfirmDialog _dialog           = default!;
+	private Modal         _modalEdit        = default!;
+	private Modal         _modalErrors      = default!;
 
-	private ConfirmDialog dialog = default!;
-	private Modal modalEdit = default!;
-	private Modal modalErrors = default!;
+	private string? _searchQuery = string.Empty;
+	private string  _sortBy      = "Id";
 
-	private string? searchQuery = string.Empty;
-	private string sortBy = "Id";
+	private bool _isAscending = true;
+	private bool _isEditing   = false;
 
-	private bool isAscending = true;
-	private bool isEditing = false;
-	private bool isStudentSelected => !selectedStudents.Any();
-
-	private string editedClass = string.Empty;
-	private bool editIsInactive = false;
-	private Switch switchEditIsActive = default!;
+	private string _editedClass        = string.Empty;
+	private bool   _editIsInactive     = false;
+	private Switch _switchEditIsActive = default!;
+	
+	private bool   IsStudentSelected => !_selectedStudents.Any();
 
 	protected override void OnInitialized()
 	{
-		filteredStudents = Students.ToList();
-		searchDelayTimer = new Timer(Callback, null, Timeout.Infinite, Timeout.Infinite);
+		_filteredStudents = Students.ToList();
+		_searchDelayTimer = new Timer(Callback, null, Timeout.Infinite, Timeout.Infinite);
 	}
 
 	private void ToogleInactiveSwitch()
 	{
-		editIsInactive = !editIsInactive;
-		if (editIsInactive)
+		_editIsInactive = !_editIsInactive;
+		if (_editIsInactive)
 		{
-			editedClass = string.Empty;
+			_editedClass = string.Empty;
 		}
 	}
 
 	private async Task UpdateSelected()
 	{
-		if (!editIsInactive && string.IsNullOrEmpty(editedClass))
+		if (!_editIsInactive && string.IsNullOrEmpty(_editedClass))
 		{
 			ToastService.Notify(ToastMessages.Light("Select a new class or set status to continue."));
 			return;
 		}
 
 		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", selectedStudents.Select(x => $"[{x.Class}] {x.FullName}").ToList());
+		parameters.Add("List", _selectedStudents.Select(x => $"[{x.Class}] {x.FullName}").ToList());
 
-		var confirmation = await dialog.ShowAsync<CustomList>(
-			title: editIsInactive ? "Set status to [Inactive]?" : $"Set class to [{editedClass}]?",
+		var confirmation = await _dialog.ShowAsync<CustomList>(
+			title: _editIsInactive ? "Set status to [Inactive]?" : $"Set class to [{_editedClass}]?",
 			parameters: parameters,
 			confirmDialogOptions: DialogOptions.Confirm());
 
@@ -177,20 +174,20 @@
 
 		if (OnStudentsUpdate.HasDelegate)
 		{
-			await OnStudentsUpdate.InvokeAsync((selectedStudents, editedClass, editIsInactive));
+			await OnStudentsUpdate.InvokeAsync((_selectedStudents, _editedClass, _editIsInactive));
 			await HideModalEdit();
 		}
 	}
 
 	private void SelectStudent(Student student)
 	{
-		if (selectedStudents.Contains(student))
+		if (_selectedStudents.Contains(student))
 		{
-			selectedStudents.Remove(student);
+			_selectedStudents.Remove(student);
 		}
 		else
 		{
-			selectedStudents.Add(student);
+			_selectedStudents.Add(student);
 		}
 	}
 
@@ -198,30 +195,30 @@
 	{
 		if (AreFilteredStudentsSelected())
 		{
-			selectedStudents.Clear();
+			_selectedStudents.Clear();
 		}
 		else
 		{
-			selectedStudents = filteredStudents.ToList();
+			_selectedStudents = _filteredStudents.ToList();
 		}
 	}
 
 	private void GetFilteredStudents()
 	{
-		if (string.IsNullOrWhiteSpace(searchQuery))
+		if (string.IsNullOrWhiteSpace(_searchQuery))
 		{
-			filteredStudents = Students.ToList();
+			_filteredStudents = Students.ToList();
 		}
 		else
 		{
-			filteredStudents = Students
-				.Where(x => x.Id.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
-							|| x.FullName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
-							|| x.Class.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
-				.ToList();
+			_filteredStudents = Students
+			                    .Where(x => x.Id.ToString().Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)
+			                                || x.FullName.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)
+			                                || x.Class.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase))
+			                    .ToList();
 		}
 
-		selectedStudents.Clear();
+		_selectedStudents.Clear();
 	}
 
 	private void Callback(object? state)
@@ -235,11 +232,11 @@
 
 	private void UpdateSearchQuery(string query)
 	{
-		searchQuery = query;
-		searchDelayTimer?.Change(400, Timeout.Infinite);
+		_searchQuery = query;
+		_searchDelayTimer?.Change(400, Timeout.Infinite);
 	}
 
-	private bool AreFilteredStudentsSelected() => selectedStudents.Count > 0;
+	private bool AreFilteredStudentsSelected() => _selectedStudents.Count > 0;
 
 	private void ShowStudent(string id) => NavManager.NavigateTo($"/students/{id}");
 
@@ -249,77 +246,50 @@
 
 	private void SortTable(string propertyName)
 	{
-		if (sortBy == propertyName)
+		if (_sortBy == propertyName)
 		{
-			isAscending = !isAscending;
+			_isAscending = !_isAscending;
 		}
 		else
 		{
-			sortBy = propertyName;
-			isAscending = true;
+			_sortBy = propertyName;
+			_isAscending = true;
 		}
 
-		switch (propertyName)
+		_filteredStudents = propertyName switch
 		{
-			case "Id":
-				filteredStudents = isAscending
-					? filteredStudents.OrderBy(x => x.Id).ToList()
-					: filteredStudents.OrderByDescending(x => x.Id).ToList();
-				break;
-
-			case "Name":
-				filteredStudents = isAscending
-					? filteredStudents.OrderBy(x => x.FullName).ToList()
-					: filteredStudents.OrderByDescending(x => x.FullName).ToList();
-				break;
-
-			case "Class":
-				filteredStudents = isAscending
-					? filteredStudents
-							.OrderBy(x => Utils.GetClassOrderValue(x.Class))
-							.ToList()
-					: filteredStudents
-							.OrderByDescending(x => Utils.GetClassOrderValue(x.Class))
-							.ToList();
-				break;
-
-			default:
-				break;
-		}
+			"Id" => _isAscending
+				? _filteredStudents.OrderBy(x => x.Id).ToList()
+				: _filteredStudents.OrderByDescending(x => x.Id).ToList(),
+			"Name" => _isAscending
+				? _filteredStudents.OrderBy(x => x.FullName).ToList()
+				: _filteredStudents.OrderByDescending(x => x.FullName).ToList(),
+			"Class" => _isAscending
+				? _filteredStudents.OrderBy(x => Utils.GetClassOrderValue(x.Class)).ToList()
+				: _filteredStudents.OrderByDescending(x => Utils.GetClassOrderValue(x.Class)).ToList(),
+			_ => _filteredStudents
+		};
 
 		StateHasChanged();
 	}
 
 	private async Task ShowModalEdit()
 	{
-		if (modalEdit is null) return;
-		await modalEdit.ShowAsync();
+		await _modalEdit.ShowAsync();
 		ToggleEditMode();
 	}
 
-	private async Task HideModalEdit()
-	{
-		if (modalEdit is null) return;
-		await modalEdit.HideAsync();
-	}
+	private async Task HideModalEdit() => await _modalEdit.HideAsync();
 
-	private async Task ShowModalErrorList()
-	{
-		if (modalErrors is null) return;
-		await modalErrors.ShowAsync();
-	}
+	private async Task ShowModalErrorList() => await _modalErrors.ShowAsync();
 
 	private async Task HideModalErrorList()
 	{
-		if (modalErrors is null) return;
-		await modalErrors.HideAsync();
-
-		if (modalEdit is null) return;
-		await modalEdit.HideAsync();
+		await _modalErrors.HideAsync();
+		await _modalEdit.HideAsync();
 	}
 
-	private void ToggleEditMode() => isEditing = !isEditing;
+	private void ToggleEditMode() => _isEditing = !_isEditing;
 
-	public void Dispose() => searchDelayTimer?.Dispose();
+	public void Dispose() => _searchDelayTimer?.Dispose();
 }
-

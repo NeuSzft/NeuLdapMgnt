@@ -1,34 +1,32 @@
 ﻿@page "/teachers/{id}"
 
-<PageTitle>@teacher.FullName</PageTitle>
+<PageTitle>@_teacher.FullName</PageTitle>
 
-@if (isLoading)
+@if (_isLoading)
 {
-	<Loading Text="Loading teacher" />
+	<Loading Text="Loading teacher"/>
 }
 else
 {
-	@if (teacher.Class != "-")
+	@if (_teacher.Class != "-")
 	{
-		<h3>[@teacher.Class] @teacher.FullName</h3>
+		<h3>[@_teacher.Class] @_teacher.FullName</h3>
 	}
 	else
 	{
-		<h3>@teacher.FullName</h3>
+		<h3>@_teacher.FullName</h3>
 	}
-	<FormTeacher Teacher="teacher" OnSubmit="OnSubmit" IsReadonly="isLoading" CanDelete="true" OnDelete="OnDelete" />
-	<ConfirmDialog @ref="dialog" />
+
+	<FormTeacher Teacher="_teacher" OnSubmit="OnSubmit" IsReadonly="@(!_isLoading)" CanDelete="true" OnDelete="OnDelete"/>
+	<ConfirmDialog @ref="_dialog"/>
 }
 
 @code {
-	[Parameter]
-	public string Id { get; set; } = null!;
+	[Parameter] public string Id { get; set; } = null!;
 
-	private Teacher teacher = new();
-	private ConfirmDialog dialog = default!;
-	//TODO: modalerrorlist
-	private List<string> errorList = new();
-	private bool isLoading = true;
+	private Teacher       _teacher   = new();
+	private ConfirmDialog _dialog    = default!;
+	private bool          _isLoading = true;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -38,47 +36,47 @@ else
 
 		var searchedTeacher = await TeacherService.FetchTeacherAsync(Id);
 		if (searchedTeacher is null) return;
-		teacher = searchedTeacher;
-		isLoading = false;
+		_teacher = searchedTeacher;
+		_isLoading = false;
 	}
 
 	private async Task<bool> OnSubmit(Teacher editedTeacher)
 	{
-		if (teacher.Equals(editedTeacher))
+		if (_teacher.Equals(editedTeacher))
 		{
 			ToastService.Notify(ToastMessages.Secondary($"No changes was found!"));
 			return false;
 		}
 
-		var parameters = new Dictionary<string, object>();
-		parameters.Add("TeacherOriginal", teacher);
-		parameters.Add("TeacherEdited", editedTeacher);
+		var parameters = new Dictionary<string, object>
+		{
+			{ "TeacherOriginal", _teacher },
+			{ "TeacherEdited", editedTeacher }
+		};
 
-		var confirmation = await dialog.ShowAsync<SummaryTeacherEdit>("Edit this teacher?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
+		var confirmation = await _dialog.ShowAsync<SummaryTeacherEdit>("Edit this teacher?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
 		if (!confirmation) return false;
 
-		isLoading = true;
-		var response = await TeacherService.UpdateTeacherAsync(editedTeacher);
-		errorList = response.ToList();
-		isLoading = false;
-		NavManager.NavigateTo("/teachers");
+		_isLoading = true;
+		await TeacherService.UpdateTeacherAsync(editedTeacher);
+		_isLoading = false;
 
 		return false;
 	}
 
 	private async Task<bool> OnDelete(Teacher editedTeacher)
 	{
-		var parameters = new Dictionary<string, object>();
-		parameters.Add("Teacher", editedTeacher);
+		var parameters = new Dictionary<string, object> { { "Teacher", editedTeacher } };
 
-		var confirmation = await dialog.ShowAsync<SummaryTeacher>("Deactivate this teacher?", parameters, DialogOptions.Confirm());
+		var confirmation = await _dialog.ShowAsync<SummaryTeacher>("Deactivate this teacher?", parameters, DialogOptions.Confirm());
 		if (!confirmation) return false;
 
-		isLoading = true;
+		_isLoading = true;
 		await LocalDbService.DeactivateUserAsync(editedTeacher.Id);
-		isLoading = false;
+		_isLoading = false;
 		NavManager.NavigateTo("/teachers");
 
 		return false;
 	}
+
 }

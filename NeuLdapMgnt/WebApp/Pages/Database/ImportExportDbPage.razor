@@ -33,10 +33,6 @@
 		await _modal.ShowAsync();
 	}
 
-	private async Task HideModal() {
-		await _modal.HideAsync();
-	}
-
 	protected override void OnInitialized() {
 		ApiRequests.EnsureAuthentication(NavManager);
 	}

@@ -1,12 +1,10 @@
-﻿<Button Type="ButtonType.Submit" Color="ButtonColor.Success" Disabled="IsDisabled">
+﻿<Button Type="@ButtonType.Submit" Color="ButtonColor.Success" Disabled="@IsDisabled">
 	<i class="bi bi-check-lg"></i>
 	@Text
 </Button>
 
 @code {
-	[Parameter]
-	public string Text { get; set; } = string.Empty;
+	[Parameter] public string Text { get; set; } = string.Empty;
 
-	[Parameter]
-	public bool IsDisabled { get; set; }
+	[Parameter] public bool IsDisabled { get; set; }
 }

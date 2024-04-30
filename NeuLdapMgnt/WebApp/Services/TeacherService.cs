@@ -4,6 +4,9 @@ using NeuLdapMgnt.WebApp.Requests;
 
 namespace NeuLdapMgnt.WebApp.Services;
 
+/// <summary>
+/// Service for managing teachers.
+/// </summary>
 public class TeacherService
 {
 	[Inject] private ApiRequests ApiRequests { get; set; }
@@ -14,14 +17,22 @@ public class TeacherService
 
 	public List<Teacher> Teachers { get; set; } = new();
 
-	public TeacherService(ApiRequests apiRequests, LocalDbService localDbService,
-		NotificationService notificationService)
+	/// <summary>
+	/// Constructor for TeacherService.
+	/// </summary>
+	/// <param name="apiRequests">Instance of ApiRequests for API communication.</param>
+	/// <param name="localDbService">Instance of LocalDbService for local database operations.</param>
+	/// <param name="notificationService">Instance of NotificationService for handling notifications.</param>
+	public TeacherService(ApiRequests apiRequests, LocalDbService localDbService, NotificationService notificationService)
 	{
 		ApiRequests = apiRequests;
 		DatabaseService = localDbService;
 		NotificationService = notificationService;
 	}
 
+	/// <summary>
+	/// Fetches teachers asynchronously.
+	/// </summary>
 	public async Task FetchTeachersAsync()
 	{
 		try
@@ -45,6 +56,11 @@ public class TeacherService
 		}
 	}
 
+	/// <summary>
+	/// Fetches a teacher asynchronously by ID.
+	/// </summary>
+	/// <param name="id">The ID of the teacher to fetch.</param>
+	/// <returns>The fetched teacher, or null if not found.</returns>
 	public async Task<Teacher?> FetchTeacherAsync(string id)
 	{
 		try
@@ -65,6 +81,11 @@ public class TeacherService
 		return null;
 	}
 
+	/// <summary>
+	/// Updates a teacher asynchronously.
+	/// </summary>
+	/// <param name="teacher">The teacher to update.</param>
+	/// <returns>A list of error messages encountered during the update.</returns>
 	public async Task<List<string>> UpdateTeacherAsync(Teacher teacher)
 	{
 		List<string> errorList = new();
@@ -89,6 +110,13 @@ public class TeacherService
 		return errorList;
 	}
 
+	/// <summary>
+	/// Updates multiple teachers asynchronously.
+	/// </summary>
+	/// <param name="teachers">The list of teachers to update.</param>
+	/// <param name="isAdmin">Flag indicating whether the teachers should be set as administrators.</param>
+	/// <param name="isInactive">Flag indicating whether the teachers should be set as inactive.</param>
+	/// <returns>A list of error messages encountered during the update.</returns>
 	public async Task<List<string>> UpdateTeachersAsync(List<Teacher> teachers, bool isAdmin, bool isInactive)
 	{
 		List<string> errorList = new();
@@ -116,8 +144,15 @@ public class TeacherService
 		return errorList;
 	}
 
-	public async Task<List<string>> UpdateTeachersStatusAsync(List<Teacher> teachers, bool isAdmin,
-		bool isInactive, List<string> errorList)
+	/// <summary>
+	/// Updates the status of multiple teachers asynchronously.
+	/// </summary>
+	/// <param name="teachers">The list of teachers to update.</param>
+	/// <param name="isAdmin">Flag indicating whether the teachers should be set as administrators.</param>
+	/// <param name="isInactive">Flag indicating whether the teachers should be set as inactive.</param>
+	/// <param name="errorList">The list of errors encountered during the update.</param>
+	/// <returns>A list of error messages encountered during the update.</returns>
+	private async Task<List<string>> UpdateTeachersStatusAsync(List<Teacher> teachers, bool isAdmin, bool isInactive, List<string> errorList)
 	{
 		foreach (var teacher in teachers)
 		{
@@ -149,6 +184,10 @@ public class TeacherService
 		return errorList;
 	}
 
+	/// <summary>
+	/// Adds a new teacher asynchronously.
+	/// </summary>
+	/// <param name="teacher">The teacher to add.</param>
 	public async Task AddTeacherAsync(Teacher teacher)
 	{
 		try

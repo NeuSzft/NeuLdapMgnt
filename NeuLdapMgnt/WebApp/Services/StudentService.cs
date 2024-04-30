@@ -4,6 +4,9 @@ using NeuLdapMgnt.WebApp.Requests;
 
 namespace NeuLdapMgnt.WebApp.Services;
 
+/// <summary>
+/// Service for managing students.
+/// </summary>
 public class StudentService
 {
 	[Inject] private ApiRequests ApiRequests { get; set; }
@@ -14,14 +17,22 @@ public class StudentService
 
 	public List<Student> Students { get; set; } = new();
 
-	public StudentService(ApiRequests apiRequests, LocalDbService localDbService,
-		NotificationService notificationService)
+	/// <summary>
+	/// Constructor for StudentService.
+	/// </summary>
+	/// <param name="apiRequests">Instance of ApiRequests for API communication.</param>
+	/// <param name="localDbService">Instance of LocalDbService for local database operations.</param>
+	/// <param name="notificationService">Instance of NotificationService for handling notifications.</param>
+	public StudentService(ApiRequests apiRequests, LocalDbService localDbService, NotificationService notificationService)
 	{
 		ApiRequests = apiRequests;
 		DatabaseService = localDbService;
 		NotificationService = notificationService;
 	}
 
+	/// <summary>
+	/// Fetches students asynchronously.
+	/// </summary>
 	public async Task FetchStudentsAsync()
 	{
 		try
@@ -45,6 +56,11 @@ public class StudentService
 		}
 	}
 
+	/// <summary>
+	/// Fetches a student asynchronously by ID.
+	/// </summary>
+	/// <param name="id">The ID of the student to fetch.</param>
+	/// <returns>The fetched student, or null if not found.</returns>
 	public async Task<Student?> FetchStudentAsync(long id)
 	{
 		try
@@ -65,6 +81,10 @@ public class StudentService
 		return null;
 	}
 
+	/// <summary>
+	/// Adds a new student asynchronously.
+	/// </summary>
+	/// <param name="student">The student to add.</param>
 	public async Task AddStudentAsync(Student student)
 	{
 		try
@@ -85,6 +105,11 @@ public class StudentService
 		}
 	}
 
+	/// <summary>
+	/// Updates a student asynchronously.
+	/// </summary>
+	/// <param name="student">The student to update.</param>
+	/// <returns>A list of error messages encountered during the update.</returns>
 	public async Task<List<string>> UpdateStudentAsync(Student student)
 	{
 		List<string> errorList = new();
@@ -109,6 +134,13 @@ public class StudentService
 		return errorList;
 	}
 
+	/// <summary>
+	/// Updates multiple students asynchronously.
+	/// </summary>
+	/// <param name="students">The list of students to update.</param>
+	/// <param name="newClass">The new class for the students.</param>
+	/// <param name="isInactive">Flag indicating whether the students should be set to inactive.</param>
+	/// <returns>A list of error messages encountered during the update.</returns>
 	public async Task<List<string>> UpdateStudentsAsync(List<Student> students, string newClass, bool isInactive)
 	{
 		List<string> errorList = new();

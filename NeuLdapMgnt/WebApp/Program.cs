@@ -27,10 +27,10 @@ else
 	builder.Services.AddSingleton<ApiRequests>(_ => apiRequests);
 }
 
-ToastService toastService = new();
-ModalService modalService = new();
+ToastService        toastService        = new();
+ModalService        modalService        = new();
 NotificationService notificationService = new(toastService);
-LocalDbService localDbService = new(apiRequests, notificationService);
+LocalDbService      localDbService      = new(apiRequests, notificationService);
 
 builder.Services.AddSingleton<ToastService>(_ => toastService);
 builder.Services.AddSingleton<ModalService>(_ => modalService);

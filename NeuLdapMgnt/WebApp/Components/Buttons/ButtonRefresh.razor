@@ -1,23 +1,21 @@
-﻿<Button Color="ButtonColor.Secondary" Outline="true" Disabled="IsDisabled" @onclick="HandleOnRefresh">
-    <i class="bi bi-arrow-repeat"></i>
+﻿<Button Color="ButtonColor.Secondary" Outline="true" Disabled="@IsDisabled" @onclick="HandleOnRefresh">
+	<i class="bi bi-arrow-repeat"></i>
 	@Text
 </Button>
 
 @code {
-    [Parameter]
-    public EventCallback OnClick { get; set; }
+	[Parameter] public EventCallback OnClick { get; set; }
 
-    [Parameter]
-    public string Text { get; set; } = string.Empty;
+	[Parameter] public string Text { get; set; } = string.Empty;
 
-    [Parameter]
-    public bool IsDisabled { get; set; }
+	[Parameter] public bool IsDisabled { get; set; }
 
-    private async Task HandleOnRefresh()
-    {
-        if (OnClick.HasDelegate)
-        {
-            await OnClick.InvokeAsync();
-        }
-    }
+	private async Task HandleOnRefresh()
+	{
+		if (OnClick.HasDelegate)
+		{
+			await OnClick.InvokeAsync();
+		}
+	}
+
 }

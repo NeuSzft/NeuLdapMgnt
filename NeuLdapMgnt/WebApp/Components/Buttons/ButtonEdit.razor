@@ -1,23 +1,21 @@
 ﻿<Button Color="ButtonColor.Warning" disabled="@IsDisabled" @onclick="HandleOnEdit">
 	<i class="bi bi-pencil-square"></i>
-    @Text
+	@Text
 </Button>
 
 @code {
-    [Parameter]
-    public EventCallback OnClick { get; set; }
+	[Parameter] public EventCallback OnClick { get; set; }
 
-    [Parameter]
-    public string Text { get; set; } = string.Empty;
+	[Parameter] public string Text { get; set; } = string.Empty;
 
-    [Parameter]
-    public bool IsDisabled { get; set; }
+	[Parameter] public bool IsDisabled { get; set; }
 
-    private async Task HandleOnEdit()
-    {
-        if (OnClick.HasDelegate)
-        {
-            await OnClick.InvokeAsync();
-        }
-    }
+	private async Task HandleOnEdit()
+	{
+		if (OnClick.HasDelegate)
+		{
+			await OnClick.InvokeAsync();
+		}
+	}
+
 }

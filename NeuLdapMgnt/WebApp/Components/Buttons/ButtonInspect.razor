@@ -1,18 +1,16 @@
-﻿<Button id="@($"inspect-{Id}")" Color="ButtonColor.Light" Class="border-secondary" Disabled="IsDisabled" @onclick="Inspect" Size="Size.Small">
+﻿<Button id="@($"inspect-{Id}")" Color="ButtonColor.Light" Class="border-secondary" Disabled="@IsDisabled" @onclick="Inspect" Size="Size.Small">
 	<i class="bi bi-eye"></i>
 	@Text
 </Button>
 
 @code {
-	[Parameter]
-	public string Text { get; set; } = string.Empty;
+	[Parameter] public string Text { get; set; } = string.Empty;
 
-	[Parameter, EditorRequired]
-	public string Id { get; set; } = string.Empty;
+	[Parameter, EditorRequired] public string Id { get; set; } = string.Empty;
 
-	[Parameter]
-	public bool IsDisabled { get; set; }
+	[Parameter] public bool IsDisabled { get; set; }
 
-	private void Inspect() 
+	private void Inspect()
 		=> NavManager.NavigateTo(Utils.IsStudent(Id) ? $"/students/{Id}" : $"/teachers/{Id}");
+
 }

@@ -1,25 +1,25 @@
 ﻿@page "/db/inactive-users"
 
 <PageTitle>Inactive Users</PageTitle>
-<ConfirmDialog @ref="dialog" />
+<ConfirmDialog @ref="_dialog"/>
 
-<h1>Inactive Users [@usersList.Count]</h1>
+<h1>Inactive Users [@_usersList.Count]</h1>
 
-@if (isLoading)
+@if (_isLoading)
 {
-	<Loading Text="Fetching Inactive Users" />
+	<Loading Text="Fetching Inactive Users"/>
 }
-else if (isActivating)
+else if (_isActivating)
 {
-	<Loading Text="Activating Users" />
+	<Loading Text="Activating Users"/>
 }
-else if (isDeleting)
+else if (_isDeleting)
 {
-	<Loading Text="Deleting Users" />
+	<Loading Text="Deleting Users"/>
 }
 else
 {
-	@if (!usersList.Any())
+	@if (!_usersList.Any())
 	{
 		<div class="d-flex justify-content-center text-center">
 			<div>
@@ -31,12 +31,12 @@ else
 	{
 		<div class="d-flex justify-content-end align-items-center g-2 mb-3">
 			<div class="ms-2">
-				<Button id="activate-users" Color="ButtonColor.Success" Outline="true" Disabled="isUserSelected" @onclick="OnActivateSelectedUsers">
+				<Button id="activate-users" Color="ButtonColor.Success" Outline="true" Disabled="IsUserSelected" @onclick="OnActivateSelectedUsers">
 					Activate selected
 				</Button>
 			</div>
 			<div class="ms-2">
-				<Button id="delete-users" Color="ButtonColor.Danger" Outline="true" Disabled="isUserSelected" @onclick="OnDeleteSelectedUsers">
+				<Button id="delete-users" Color="ButtonColor.Danger" Outline="true" Disabled="IsUserSelected" @onclick="OnDeleteSelectedUsers">
 					Delete permanently
 				</Button>
 			</div>
@@ -44,39 +44,39 @@ else
 		<div class="table-students table-responsive rounded px-1 border flex-fill">
 			<table class="table table-striped table-borderless align-middle">
 				<thead class="sticky-top">
-					<tr class="rounded">
-						<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllUsers">
-							@if (!AreUsersSelected())
-							{
-								<span>Select all</span>
-							}
-							else
-							{
-								<span>Deselect all</span>
-							}
-						</th>
-						<th class="user-select-none">ID</th>
-						<th class="user-select-none text-end">Inspect</th>
-					</tr>
+				<tr class="rounded">
+					<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllUsers">
+						@if (!AreUsersSelected())
+						{
+							<span>Select all</span>
+						}
+						else
+						{
+							<span>Deselect all</span>
+						}
+					</th>
+					<th class="user-select-none">ID</th>
+					<th class="user-select-none text-end">Inspect</th>
+				</tr>
 				</thead>
 				<tbody>
-					@foreach (var user in LocalDbService.InactiveUsers)
-					{
-						<tr>
-							<td class="rounded-start">
-								<input class="form-check-input"
-									   type="checkbox"
-									   checked="@selectedUsers.Contains(user)"
-									   @onchange="() => SelectUser(user)" />
-							</td>
-							<td>@user</td>
-							<td class="text-end rounded-end">
-								<Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(user)">
-									<i class="bi bi-eye"></i>
-								</Button>
-							</td>
-						</tr>
-					}
+				@foreach (var user in LocalDbService.InactiveUsers)
+				{
+					<tr>
+						<td class="rounded-start">
+							<input class="form-check-input"
+							       type="checkbox"
+							       checked="@_selectedUsers.Contains(user)"
+							       @onchange="() => SelectUser(user)"/>
+						</td>
+						<td>@user</td>
+						<td class="text-end rounded-end">
+							<Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(user)">
+								<i class="bi bi-eye"></i>
+							</Button>
+						</td>
+					</tr>
+				}
 				</tbody>
 			</table>
 		</div>
@@ -84,61 +84,61 @@ else
 }
 
 @code {
-	private List<string> usersList = new();
-	private List<string> selectedUsers = new();
-	private ConfirmDialog dialog = default!;
+	private List<string>  _usersList     = new();
+	private List<string>  _selectedUsers = new();
+	private ConfirmDialog _dialog        = default!;
 
-	private bool isLoading;
-	private bool isActivating;
-	private bool isDeleting;
-	private bool isUserSelected => !selectedUsers.Any();
+	private bool _isLoading;
+	private bool _isActivating;
+	private bool _isDeleting;
+	private bool IsUserSelected => !_selectedUsers.Any();
 
 	protected override async Task OnInitializedAsync()
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
-		isLoading = true;
+		_isLoading = true;
 		await LocalDbService.FetchInactiveUsersAsync();
-		usersList = LocalDbService.InactiveUsers.ToList();
-		isLoading = false;
+		_usersList = LocalDbService.InactiveUsers.ToList();
+		_isLoading = false;
 	}
 
 	private async Task OnActivateSelectedUsers()
 	{
 		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", selectedUsers);
+		parameters.Add("List", _selectedUsers);
 
-		var confirmation = await dialog.ShowAsync<CustomList>(
-			title: $"Set status to [Active] to [{selectedUsers.Count}] user(s)?",
+		var confirmation = await _dialog.ShowAsync<CustomList>(
+			title: $"Set status to [Active] to [{_selectedUsers.Count}] user(s)?",
 			parameters: parameters,
 			confirmDialogOptions: DialogOptions.Confirm());
 
 		if (!confirmation) return;
 
-		isActivating = true;
+		_isActivating = true;
 		StateHasChanged();
-		await LocalDbService.ActivateUsersAsync(selectedUsers);
-		usersList = LocalDbService.InactiveUsers.ToList();
-		isActivating = false;
+		await LocalDbService.ActivateUsersAsync(_selectedUsers);
+		_usersList = LocalDbService.InactiveUsers.ToList();
+		_isActivating = false;
 		NotificationService.NotifySuccess("Selected users were activated.");
 	}
 
 	private async Task OnDeleteSelectedUsers()
 	{
 		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", selectedUsers);
+		parameters.Add("List", _selectedUsers);
 
-		var confirmation = await dialog.ShowAsync<CustomList>(
-			title: $"Delete permanently [{selectedUsers.Count}] user(s)?",
+		var confirmation = await _dialog.ShowAsync<CustomList>(
+			title: $"Delete permanently [{_selectedUsers.Count}] user(s)?",
 			parameters: parameters,
 			confirmDialogOptions: DialogOptions.Confirm());
 
 		if (!confirmation) return;
 
-		isDeleting = true;
+		_isDeleting = true;
 		StateHasChanged();
-		await LocalDbService.DeleteUsersAsync(selectedUsers);
-		usersList = LocalDbService.InactiveUsers.ToList();
-		isDeleting = false;
+		await LocalDbService.DeleteUsersAsync(_selectedUsers);
+		_usersList = LocalDbService.InactiveUsers.ToList();
+		_isDeleting = false;
 		NotificationService.NotifySuccess("Selected users were permanently deleted!");
 	}
 
@@ -160,13 +160,13 @@ else
 
 	private void SelectUser(string user)
 	{
-		if (selectedUsers.Contains(user))
+		if (_selectedUsers.Contains(user))
 		{
-			selectedUsers.Remove(user);
+			_selectedUsers.Remove(user);
 		}
 		else
 		{
-			selectedUsers.Add(user);
+			_selectedUsers.Add(user);
 		}
 	}
 
@@ -174,13 +174,13 @@ else
 	{
 		if (AreUsersSelected())
 		{
-			selectedUsers.Clear();
+			_selectedUsers.Clear();
 		}
 		else
 		{
-			selectedUsers = LocalDbService.InactiveUsers.ToList();
+			_selectedUsers = LocalDbService.InactiveUsers.ToList();
 		}
 	}
 
-	private bool AreUsersSelected() => selectedUsers.Count > 0;
+	private bool AreUsersSelected() => _selectedUsers.Count > 0;
 }

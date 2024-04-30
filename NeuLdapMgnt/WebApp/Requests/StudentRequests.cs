@@ -2,7 +2,8 @@
 
 namespace NeuLdapMgnt.WebApp.Requests;
 
-public static class StudentRequests {
+public static class StudentRequests
+{
 	public static async Task<RequestResult<Student>> GetStudentsAsync(this ApiRequests apiRequests)
 		=> await apiRequests.SendRequestAsync<Student>(HttpMethod.Get, "api/students");
 

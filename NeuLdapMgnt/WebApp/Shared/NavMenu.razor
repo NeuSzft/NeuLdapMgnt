@@ -1,47 +1,46 @@
 ﻿<Sidebar2 IconName="IconName.Database"
-		  Title="LDAP Management"
-		  DataProvider="SidebarDataProvider" />
+          Title="LDAP Management"
+          DataProvider="SidebarDataProvider"/>
 
 @code {
-	private Sidebar sidebar = new();
-	private List<NavItem>? navItems;
+	private Sidebar        _sidebar = new();
+	private List<NavItem>? _navItems;
 
-	private bool collapseNavMenu = true;
-	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+	private bool    _collapseNavMenu = true;
+	private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
 
 	private async Task<Sidebar2DataProviderResult> SidebarDataProvider(Sidebar2DataProviderRequest request)
 	{
-		if (navItems is null)
-			navItems = GetNavItems();
-
-		return await Task.FromResult(request.ApplyTo(navItems));
+		_navItems ??= GetNavItems();
+		return await Task.FromResult(request.ApplyTo(_navItems));
 	}
 
 	private List<NavItem> GetNavItems()
 	{
-		navItems = new List<NavItem> {
-			new NavItem { Id = "1", Href = "/", Match = NavLinkMatch.All, IconName = IconName.HouseDoorFill, Text = "Home" },
+		_navItems = new List<NavItem>
+		{
+			new() { Id = "1", Href = "/", Match = NavLinkMatch.All, IconName = IconName.HouseDoorFill, Text = "Home" },
 
-			new NavItem { Id = "10", Text = "Students" },
-			new NavItem { Id = "11", ParentId = "10", Text = "View Students", Href = "/students", Match = NavLinkMatch.All, IconName = IconName.Table },
-			new NavItem { Id = "12", ParentId = "10", Text = "Add Student", Href = "/students/add", Match = NavLinkMatch.All, IconName = IconName.PersonFillAdd },
+			new() { Id = "10", Text = "Students" },
+			new() { Id = "11", ParentId = "10", Text = "View Students", Href = "/students", Match = NavLinkMatch.All, IconName = IconName.Table },
+			new() { Id = "12", ParentId = "10", Text = "Add Student", Href = "/students/add", Match = NavLinkMatch.All, IconName = IconName.PersonFillAdd },
 
-			new NavItem { Id = "20", Text = "Teachers" },
-			new NavItem { Id = "21", ParentId = "20", Text = "View Teachers", Href = "/teachers", Match = NavLinkMatch.All, IconName = IconName.Table },
-			new NavItem { Id = "22", ParentId = "20", Text = "Add Teacher", Href = "/teachers/add",Match = NavLinkMatch.All, IconName = IconName.PersonFillAdd },
+			new() { Id = "20", Text = "Teachers" },
+			new() { Id = "21", ParentId = "20", Text = "View Teachers", Href = "/teachers", Match = NavLinkMatch.All, IconName = IconName.Table },
+			new() { Id = "22", ParentId = "20", Text = "Add Teacher", Href = "/teachers/add", Match = NavLinkMatch.All, IconName = IconName.PersonFillAdd },
 
-			new NavItem { Id = "40", Text = "Database" },
-			new NavItem { Id = "41", ParentId = "40", Text = "Administrators", Href = "/db/admins", Match = NavLinkMatch.All, IconName = IconName.Table  },
-			new NavItem { Id = "42", ParentId = "40", Text = "Inactive Users", Href = "/db/inactive-users", Match = NavLinkMatch.All, IconName = IconName.PersonFillDash },
-			new NavItem { Id = "43", ParentId = "40", Text = "Classes", Href = "/db/classes", Match = NavLinkMatch.All, IconName = IconName.ListTask },
-			new NavItem { Id = "44", ParentId = "40", Text = "Request Logs", Href = "/db/request-logs", Match = NavLinkMatch.All, IconName = IconName.ListColumnsReverse },
-			new NavItem { Id = "44", ParentId = "40", Text = "Import/Export", Href = "/db/import-export", Match = NavLinkMatch.All, IconName = IconName.DatabaseFillGear },
-			new NavItem { Id = "46", ParentId = "40", Text = "Default Admin", Href = "/db/default-admin", Match = NavLinkMatch.All, IconName = IconName.PersonFillGear },
+			new() { Id = "40", Text = "Database" },
+			new() { Id = "41", ParentId = "40", Text = "Administrators", Href = "/db/admins", Match = NavLinkMatch.All, IconName = IconName.Table },
+			new() { Id = "42", ParentId = "40", Text = "Inactive Users", Href = "/db/inactive-users", Match = NavLinkMatch.All, IconName = IconName.PersonFillDash },
+			new() { Id = "43", ParentId = "40", Text = "Classes", Href = "/db/classes", Match = NavLinkMatch.All, IconName = IconName.ListTask },
+			new() { Id = "44", ParentId = "40", Text = "Request Logs", Href = "/db/request-logs", Match = NavLinkMatch.All, IconName = IconName.ListColumnsReverse },
+			new() { Id = "44", ParentId = "40", Text = "Import/Export", Href = "/db/import-export", Match = NavLinkMatch.All, IconName = IconName.DatabaseFillGear },
+			new() { Id = "46", ParentId = "40", Text = "Default Admin", Href = "/db/default-admin", Match = NavLinkMatch.All, IconName = IconName.PersonFillGear },
 
-			new NavItem { Id = "99", Href = "/logout", IconName = IconName.DoorOpenFill, Text = "Logout" },
+			new() { Id = "99", Href = "/logout", IconName = IconName.DoorOpenFill, Text = "Logout" },
 		};
 
-		return navItems;
+		return _navItems;
 	}
-}
 
+}

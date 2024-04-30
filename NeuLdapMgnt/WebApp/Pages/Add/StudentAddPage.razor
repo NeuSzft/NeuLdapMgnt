@@ -2,50 +2,23 @@
 
 <PageTitle>Add Student</PageTitle>
 
-<Modal @ref="modal" title="@modalTitle" IsScrollable="true" ModalType="ModalType.Danger">
-	<BodyTemplate>
-		<CustomList List="errorList" />
-	</BodyTemplate>
-	<FooterTemplate></FooterTemplate>
-</Modal>
+<h1 class="d-inline-block">Add student</h1>
 
-<div class="row">
-	<div class="col-12 col-md">
-		<h1 class="d-inline-block">Add student</h1>
-	</div>
-	<div class="col-12 col-xl text-end">
-		@if (!isAction)
-		{
-			<FileUpload OnFileUploaded="OnFileUploaded" />
-		}
-	</div>
-</div>
-
-@if (isSubmitting)
+@if (_isSubmitting)
 {
-	<Loading Text="@submitString" />
-}
-else if (isUploading)
-{
-	<Loading Text="Importing students" />
+	<Loading Text="@SubmitString"/>
 }
 else
 {
-	<FormStudent Student="student" CanDelete="false" IsReadonly="isAction" OnSubmit="OnSubmit" />
-	<ConfirmDialog @ref="dialog" />
+	<FormStudent Student="_student" CanDelete="@(false)" IsReadonly="@(false)" OnSubmit="OnSubmit"/>
+	<ConfirmDialog @ref="_dialog"/>
 }
 
 @code {
-	private Student student = new();
-	private List<string> errorList = new();
-	private Modal modal = default!;
-	private ConfirmDialog dialog = default!;
-
-	private string modalTitle => $"Error";
-	private string submitString => $"Creating {student.FullName}";
-	private bool isSubmitting = false;
-	private bool isUploading = false;
-	private bool isAction => isSubmitting || isUploading;
+	private Student       _student = new();
+	private ConfirmDialog _dialog  = default!;
+	private string        SubmitString => $"Creating {_student.FullName}";
+	private bool          _isSubmitting;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -58,43 +31,14 @@ else
 		var parameters = new Dictionary<string, object>();
 		parameters.Add("Student", studentUpdated);
 
-		var confirmation = await dialog.ShowAsync<SummaryStudent>($"Add {studentUpdated.FullName}?", parameters, DialogOptions.Confirm());
+		var confirmation = await _dialog.ShowAsync<SummaryStudent>($"Add {studentUpdated.FullName}?", parameters, DialogOptions.Confirm());
 		if (!confirmation) return false;
-		isSubmitting = true;
+		_isSubmitting = true;
 
 		await StudentService.AddStudentAsync(studentUpdated);
 
-		isSubmitting = false;
+		_isSubmitting = false;
 		return false;
 	}
 
-	private async Task OnFileUploaded(IBrowserFile file)
-	{
-		isUploading = true;
-		try
-		{
-			var response = await ApiRequests.UploadStudentFileAsync(file);
-			if (response.IsSuccess())
-			{
-				NotificationService.NotifySuccess($"{file.Name} imported!");
-				NavManager.NavigateTo("/students");
-			}
-
-			if (response.Errors.Any())
-			{
-				errorList = response.Errors.ToList();
-				ToastService.Notify(ToastMessages.Danger($"{file.Name} import was finished with errors!"));
-				await ShowModal();
-			}
-		}
-		catch (Exception e)
-		{
-			NotificationService.HandleError(e);
-		}
-		isUploading = false;
-	}
-
-	private async Task ShowModal() => await modal!.ShowAsync();
-	private async Task HideModal() => await modal!.HideAsync();
 }
-

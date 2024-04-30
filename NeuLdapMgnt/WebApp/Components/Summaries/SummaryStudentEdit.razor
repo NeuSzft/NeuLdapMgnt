@@ -2,7 +2,9 @@
 	<div class="row p-1 m-1 border-bottom">
 		<div class="col-3 col-sm-2 col-lg-1">OM:</div>
 		<div class="col-4 student-original-id">@StudentOriginal.Id</div>
-		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+		<div class="col-1 text-end">
+			<i class="bi bi-arrow-right"></i>
+		</div>
 		<div class="col-4 student-edited-id">
 			@if (StudentOriginal.Id != StudentEdited.Id)
 			{
@@ -17,7 +19,9 @@
 	<div class="row p-1 m-1 border-bottom">
 		<div class="col-3 col-sm-2 col-lg-1">Name:</div>
 		<div class="col-4 student-original-fullname">@StudentOriginal.FullName</div>
-		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+		<div class="col-1 text-end">
+			<i class="bi bi-arrow-right"></i>
+		</div>
 		<div class="col-4 student-edited-fullname">
 			@if (StudentOriginal.FullName != StudentEdited.FullName)
 			{
@@ -32,7 +36,9 @@
 	<div class="row p-1 m-1 border-bottom">
 		<div class="col-3 col-sm-2 col-lg-1">Class:</div>
 		<div class="col-4 student-original-class">@StudentOriginal.Class</div>
-		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+		<div class="col-1 text-end">
+			<i class="bi bi-arrow-right"></i>
+		</div>
 		<div class="col-4 student-edited-class">
 			@if (StudentOriginal.Class != StudentEdited.Class)
 			{
@@ -47,7 +53,9 @@
 	<div class="row p-1 m-1">
 		<div class="col-3 col-sm-2 col-lg-1">Email:</div>
 		<div class="col-4 student-original-email text-break">@StudentOriginal.Email</div>
-		<div class="col-1 text-end"><i class="bi bi-arrow-right"></i></div>
+		<div class="col-1 text-end">
+			<i class="bi bi-arrow-right"></i>
+		</div>
 		<div class="col-4 student-edited-email text-break flex-fill">
 			@if (StudentOriginal.Email != StudentEdited.Email)
 			{
@@ -62,9 +70,7 @@
 </div>
 
 @code {
-	[Parameter]
-	public Student StudentOriginal { get; set; } = default!;
+	[Parameter] public Student StudentOriginal { get; set; } = default!;
 
-	[Parameter]
-	public Student StudentEdited { get; set; } = default!;
+	[Parameter] public Student StudentEdited { get; set; } = default!;
 }

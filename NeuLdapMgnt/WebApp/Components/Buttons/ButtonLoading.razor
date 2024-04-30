@@ -1,10 +1,9 @@
-﻿<Button Color="ButtonColor" Outline="true" Disabled="true">
-    <Spinner Type="SpinnerType.Dots" Color="SpinnerColor" />
+﻿<Button Color="ButtonColor" Outline="true" Disabled="@(true)">
+	<Spinner Type="SpinnerType.Dots" Color="SpinnerColor"/>
 </Button>
-@code {
-    [Parameter, EditorRequired]
-    public ButtonColor ButtonColor { get; set; }
 
-    [Parameter, EditorRequired]
-    public SpinnerColor SpinnerColor { get; set; }
+@code {
+	[Parameter, EditorRequired] public ButtonColor ButtonColor { get; set; }
+
+	[Parameter, EditorRequired] public SpinnerColor SpinnerColor { get; set; }
 }

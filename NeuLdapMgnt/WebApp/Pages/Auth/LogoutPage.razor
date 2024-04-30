@@ -1,9 +1,11 @@
 ﻿@page "/logout"
 
 @code {
+
 	protected override void OnInitialized()
 	{
 		ApiRequests.Logout();
 		NavManager.NavigateTo("/login");
 	}
+
 }

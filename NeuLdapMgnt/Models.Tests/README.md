@@ -5,10 +5,10 @@
 <p>
 <strong>Overall Result:</strong> ✔️ Pass <br />
 <strong>Pass Rate:</strong> 100% <br />
-<strong>Run Duration:</strong> 1s 100ms <br />
-<strong>Date:</strong> 2024-04-20 12:58:23 - 2024-04-20 12:58:25 <br />
+<strong>Run Duration:</strong> 1s 445ms <br />
+<strong>Date:</strong> 2024-04-30 12:45:41 - 2024-04-30 12:45:43 <br />
 <strong>Framework:</strong> .NETCoreApp,Version=v7.0 <br />
-<strong>Total Tests:</strong> 66 <br />
+<strong>Total Tests:</strong> 55 <br />
 </p>
 
 <table>
@@ -21,7 +21,7 @@
 </thead>
 <tbody>
 <tr>
-<td>66</td>
+<td>55</td>
 <td>0</td>
 <td>0</td>
 </tr>
@@ -48,7 +48,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>StudentIdAttributeValidOmSuccess</td>
-<td>9ms</td>
+<td>33ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -92,21 +92,6 @@
 </tr>
 <tr>
 <td> ✔️ Passed </td>
-<td>AdminIdAttributeValidIdSuccess</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>AdminIdAttributeShortIdFails</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>AdminIdAttributeWithInvalidDataTypeFails</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
 <td>UserIdAttributeWithInvalidDataTypeFails</td>
 <td>< 1ms</td>
 </tr>
@@ -132,16 +117,6 @@
 </tr>
 <tr>
 <td> ✔️ Passed </td>
-<td>AdminUidAttributeValidUidSuccess</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>AdminUidAttributeInvalidUidFails</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
 <td>GroupIdAttributeWithInvalidDataTypeFails</td>
 <td>< 1ms</td>
 </tr>
@@ -153,7 +128,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>StudentGidAttributeInvalidGidFails</td>
-<td>< 1ms</td>
+<td>2ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -163,16 +138,6 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherGidAttributeInvalidGidFails</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>AdminGidAttributeValidGidSuccess</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>AdminGidAttributeInvalidGidFails</td>
 <td>< 1ms</td>
 </tr>
 <tr>
@@ -207,7 +172,7 @@
 </tr>
 <tr>
 <td> ✔️ Passed </td>
-<td>MiddleNameAttributeEmptySuccess</td>
+<td>MiddleNameAttributeNullSuccess</td>
 <td>< 1ms</td>
 </tr>
 <tr>
@@ -228,7 +193,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>EmailAttributeValidEmailSuccess</td>
-<td>1ms</td>
+<td>< 1ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -247,6 +212,21 @@
 </tr>
 <tr>
 <td> ✔️ Passed </td>
+<td>EmailAttributeEmailWithSpecialCharacterFails</td>
+<td>< 1ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>EmailAttributeNullSuccess</td>
+<td>< 1ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
+<td>EmailAttributeInvalidDataTypeFails</td>
+<td>< 1ms</td>
+</tr>
+<tr>
+<td> ✔️ Passed </td>
 <td>DirectoryAttributeValidDirectorySuccess</td>
 <td>< 1ms</td>
 </tr>
@@ -258,7 +238,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>DirectoryAttributeInvalidEndFails</td>
-<td>1ms</td>
+<td>< 1ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -332,47 +312,12 @@
 </tr>
 <tr>
 <td> ✔️ Passed </td>
-<td>ClassAttributeEmptySuccess</td>
+<td>PasswordAttributeEmptySuccess</td>
 <td>< 1ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
-<td>ClassAttributeNullSuccess</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>ClassAttributeEndsWithDotFails</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>ClassAttributeMissingYearFails</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>ClassAttributeNyGroupWithWrongYearFails</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>ClassAttributeRszeGroupWithoutSlashFails</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>ClassAttributeGroupWithSlashMissingABFails</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>ClassAttributeValidClassSuccess</td>
-<td>< 1ms</td>
-</tr>
-<tr>
-<td> ✔️ Passed </td>
-<td>ClassAttributeWithInvalidDataTypeFails</td>
+<td>PasswordAttributeNullSuccess</td>
 <td>< 1ms</td>
 </tr>
 </tbody>

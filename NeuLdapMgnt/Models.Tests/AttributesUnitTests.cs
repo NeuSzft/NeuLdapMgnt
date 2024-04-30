@@ -284,12 +284,12 @@ public class AttributesUnitTests
 
 	// MiddleName tests
 	[TestMethod]
-	public void MiddleNameAttributeEmptySuccess()
+	public void MiddleNameAttributeNullSuccess()
 	{
 		var attribute = new MiddleNameAttribute();
 
 		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(string.Empty, _validationContext));
+			attribute.GetValidationResult(null, _validationContext));
 	}
 
 	[TestMethod]

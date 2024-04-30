@@ -1,55 +1,55 @@
 ﻿@inherits LayoutComponentBase
 
-<EditForm Model="@teacherUpdated" OnValidSubmit="HandleOnSubmit" class="d-flex flex-column gap-2 my-2">
-	<DataAnnotationsValidator />
+<EditForm Model="@_teacherUpdated" OnValidSubmit="HandleOnSubmit" class="d-flex flex-column gap-2 my-2">
+	<DataAnnotationsValidator/>
 
 	<div class="text-end">
 		@if (IsReadonly)
 		{
-			<ButtonEdit OnClick="ToggleEditMode" Text="Edit" IsDisabled="isEditModeEnabled" />
+			<ButtonEdit OnClick="ToggleEditMode" Text="Edit" IsDisabled="_isEditModeEnabled"/>
 		}
 	</div>
 
 	<div class="form-floating">
 		<InstantInputText class="form-control"
-						  type="text"
-						  disabled="@(CanDelete || IsReadonly || isAction)"
-						  @bind-Value="teacherUpdated!.Id"
-						  id="teacher-id" />
+		                  type="text"
+		                  disabled="@(CanDelete || IsReadonly || IsAction)"
+		                  @bind-Value="_teacherUpdated!.Id"
+		                  id="teacher-id"/>
 		<label for="teacher-id">ID</label>
-		<ValidationMessage For="() => teacherUpdated.Id" id="teacher-id-validation-message" />
+		<ValidationMessage For="() => _teacherUpdated.Id" id="teacher-id-validation-message"/>
 	</div>
 
 	<div class="input-group gap-2">
 		<label class="input-group-text user-select-none col-12 rounded gap-2" for="first-name">
 			Name
-			@if (!IsReadonly && teacherUpdated.FullName.Length > 2)
+			@if (!IsReadonly && _teacherUpdated.FullName.Length > 2)
 			{
-				<span>[@teacherUpdated.FullName]</span>
+				<span>[@_teacherUpdated.FullName]</span>
 			}
 		</label>
 
 		<div class="d-flex flex-column flex-md-row gap-2 w-100">
 			<div class="form-floating w-100">
-				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="first-name" @bind-Value="teacherUpdated.FirstName" />
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="first-name" @bind-Value="_teacherUpdated.FirstName"/>
 				<label for="first-name">First</label>
-				<ValidationMessage For="() => teacherUpdated.FirstName" id="teacher-first-name-validation-message" />
+				<ValidationMessage For="() => _teacherUpdated.FirstName" id="teacher-first-name-validation-message"/>
 			</div>
 			<div class="form-floating w-100">
-				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="last-name" @bind-Value="teacherUpdated.LastName" />
-				<label for="last-name">Last</label>
-				<ValidationMessage For="() => teacherUpdated.LastName" id="teacher-last-name-validation-message" />
-			</div>
-			<div class="form-floating w-100">
-				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || isAction)" id="middle-name" @bind-Value="teacherUpdated.MiddleName" />
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="middle-name" @bind-Value="_teacherUpdated.MiddleName"/>
 				<label for="middle-name">Middle</label>
-				<ValidationMessage For="() => teacherUpdated.MiddleName" id="teacher-middle-name-validation-message" />
+				<ValidationMessage For="() => _teacherUpdated.MiddleName" id="teacher-middle-name-validation-message"/>
+			</div>
+			<div class="form-floating w-100">
+				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="last-name" @bind-Value="_teacherUpdated.LastName"/>
+				<label for="last-name">Last</label>
+				<ValidationMessage For="() => _teacherUpdated.LastName" id="teacher-last-name-validation-message"/>
 			</div>
 		</div>
 	</div>
 
 	<div class="form-floating">
-		<InputSelect class="form-select rounded" id="class-select" disabled="@(IsReadonly || isAction)" @bind-Value="teacherUpdated.Class">
+		<InputSelect class="form-select rounded" id="class-select" disabled="@(IsReadonly || IsAction)" @bind-Value="_teacherUpdated.Class">
 			<option value="-">-</option>
 			@foreach (var cls in LocalDbService.Classes)
 			{
@@ -57,19 +57,19 @@
 			}
 		</InputSelect>
 		<label for="class-select">Class</label>
-		<ValidationMessage For="() => teacherUpdated.Class" id="student-class-validation-message" />
+		<ValidationMessage For="() => _teacherUpdated.Class" id="student-class-validation-message"/>
 	</div>
 
 	<div class="form-floating">
-		<InstantInputText class="form-control" disabled="@(IsReadonly || isAction)" id="teacher-email" @bind-Value="teacherUpdated.Email" />
+		<InstantInputText class="form-control" disabled="@(IsReadonly || IsAction)" id="teacher-email" @bind-Value="_teacherUpdated.Email"/>
 		<label for="teacher-email">Email</label>
-		<ValidationMessage For="() => teacherUpdated.Email" id="teacher-email-validation-message" />
+		<ValidationMessage For="() => _teacherUpdated.Email" id="teacher-email-validation-message"/>
 	</div>
 
 	<div class="form-floating">
-		<InstantInputText type="password" class="form-control" disabled="@(IsReadonly || isAction)" id="password" @bind-Value="teacherUpdated.Password" />
+		<InstantInputText type="password" class="form-control" disabled="@(IsReadonly || IsAction)" id="password" @bind-Value="_teacherUpdated.Password"/>
 		<label for="password">Password</label>
-		<ValidationMessage For="() => teacherUpdated.Password" id="teacher-password-validation-message" />
+		<ValidationMessage For="() => _teacherUpdated.Password" id="teacher-password-validation-message"/>
 	</div>
 
 	@if (!IsReadonly)
@@ -77,71 +77,67 @@
 		<div class="d-flex justify-content-end gap-2">
 			@if (CanDelete)
 			{
-				@if (isDeleting)
+				@if (_isDeleting)
 				{
-					<ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger" />
+					<ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger"/>
 				}
 				else
 				{
-					<ButtonDelete OnClick="HandleOnDelete" Text="Deactivate" IsDisabled="isAction" />
+					<ButtonDelete OnClick="HandleOnDelete" Text="Deactivate" IsDisabled="IsAction"/>
 				}
 			}
 
-			<ButtonCancel OnClick="ToggleEditMode" Text="Revert" IsDisabled="isAction" />
+			<ButtonCancel OnClick="ToggleEditMode" Text="Revert" IsDisabled="IsAction"/>
 
-			@if (isSubmitting)
+			@if (_isSubmitting)
 			{
-				<ButtonLoading ButtonColor="ButtonColor.Success" SpinnerColor="SpinnerColor.Success" />
+				<ButtonLoading ButtonColor="ButtonColor.Success" SpinnerColor="SpinnerColor.Success"/>
 			}
 			else
 			{
-				<ButtonSubmit Text="Submit" IsDisabled="isAction" />
+				<ButtonSubmit Text="Submit" IsDisabled="IsAction"/>
 			}
 		</div>
 	}
-	</EditForm>
+</EditForm>
 
-	@code {
-	[Parameter]
-	public Teacher Teacher { get; set; } = new();
+@code {
+	[Parameter] public Teacher Teacher { get; set; } = new();
 
-	[Parameter]
-	public Func<Teacher, Task<bool>> OnSubmit { get; set; } = default!;
+	[Parameter] public Func<Teacher, Task<bool>> OnSubmit { get; set; } = default!;
 
-	[Parameter]
-	public Func<Teacher, Task<bool>> OnDelete { get; set; } = default!;
+	[Parameter] public Func<Teacher, Task<bool>> OnDelete { get; set; } = default!;
 
-	[Parameter]
-	public bool IsReadonly { get; set; }
+	[Parameter] public bool IsReadonly { get; set; }
 
-	[Parameter]
-	public bool CanDelete { get; set; }
+	[Parameter] public bool CanDelete { get; set; }
 
-	private Teacher teacherOriginal = new();
-	private Teacher teacherUpdated = new();
-	private bool isDeleting = false;
-	private bool isSubmitting = false;
-	private bool isAction => isDeleting || isSubmitting;
-	private bool isEditModeEnabled = false;
+	private Teacher _teacherOriginal = new();
+	private Teacher _teacherUpdated  = new();
+	
+	private bool    _isDeleting;
+	private bool    _isSubmitting;
+	private bool    _isEditModeEnabled;
+	private bool    IsAction => _isDeleting || _isSubmitting;
 
 	protected override void OnInitialized()
 	{
-		teacherOriginal = Utils.GetClone<Teacher>(Teacher)!;
-		teacherUpdated = Utils.GetClone<Teacher>(teacherOriginal)!;
+		_teacherOriginal = Utils.GetClone(Teacher)!;
+		_teacherUpdated = Utils.GetClone(_teacherOriginal)!;
 	}
 
 	private async Task HandleOnSubmit()
 	{
-		isSubmitting = true;
-		bool isSubmitted = await OnSubmit.Invoke(teacherUpdated);
-		isSubmitting = false;
+		_isSubmitting = true;
+		await OnSubmit.Invoke(_teacherUpdated);
+		_isSubmitting = false;
 	}
 
 	private async Task HandleOnDelete()
 	{
-		isDeleting = true;
-		bool isDeleted = await OnDelete.Invoke(teacherUpdated);
-		isDeleting = false;
+		_isDeleting = true;
+		bool isDeleted = await OnDelete.Invoke(_teacherUpdated);
+		_isDeleting = false;
 
 		if (!isDeleted) return;
 		NavManager.NavigateTo("/students");
@@ -149,9 +145,10 @@
 
 	private void ToggleEditMode()
 	{
-		teacherUpdated = Utils.GetClone<Teacher>(teacherOriginal)!;
-		if (isEditModeEnabled || IsReadonly == false) return;
-		isEditModeEnabled = true;
+		_teacherUpdated = Utils.GetClone(_teacherOriginal)!;
+		if (_isEditModeEnabled || IsReadonly == false) return;
+		_isEditModeEnabled = true;
 		IsReadonly = !IsReadonly;
 	}
+
 }

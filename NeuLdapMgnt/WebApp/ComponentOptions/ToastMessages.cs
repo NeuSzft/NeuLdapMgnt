@@ -1,6 +1,4 @@
 ﻿using BlazorBootstrap;
-using Microsoft.AspNetCore.Components;
-using System.Net;
 
 namespace NeuLdapMgnt.WebApp.ComponentOptions
 {
@@ -31,16 +29,6 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 			return new()
 			{
 				Type = ToastType.Danger,
-				AutoHide = true,
-				Message = message
-			};
-		}
-
-		public static ToastMessage Primary(string message)
-		{
-			return new()
-			{
-				Type = ToastType.Primary,
 				AutoHide = true,
 				Message = message
 			};
@@ -82,16 +70,6 @@ namespace NeuLdapMgnt.WebApp.ComponentOptions
 			{
 				Type = ToastType.Warning,
 				AutoHide = autoHide,
-				Message = message
-			};
-		}
-
-		public static ToastMessage Info(string message)
-		{
-			return new()
-			{
-				Type = ToastType.Info,
-				AutoHide = true,
 				Message = message
 			};
 		}

@@ -1,6 +1,6 @@
 ﻿<div class="row d-flex justify-content-center align-items-center">
 	<div class="col text-center">
-		<Spinner Type="SpinnerType.Border" />
+		<Spinner Type="SpinnerType.Border"/>
 		@if (!string.IsNullOrEmpty(Text))
 		{
 			<div class="mt-2">
@@ -11,6 +11,5 @@
 </div>
 
 @code {
-	[Parameter]
-	public string Text { get; set; } = string.Empty;
+	[Parameter] public string Text { get; set; } = string.Empty;
 }

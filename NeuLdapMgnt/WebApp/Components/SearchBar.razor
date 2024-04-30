@@ -1,26 +1,25 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="input-group">
-	<label class="input-group-text" for="searchbar"><i class="bi bi-funnel"></i></label>
+	<label class="input-group-text" for="searchbar">
+		<i class="bi bi-funnel"></i>
+	</label>
 	<div class="form-floating flex-grow-1">
 		<input type="search"
-			   class="form-control rounded-0 rounded-end"
-			   id="searchbar"
-			   @oninput="(ChangeEventArgs e) => OnInput(e.Value?.ToString() ?? string.Empty)"
-			   @bind-value="SearchQuery" />
+		       class="form-control rounded-0 rounded-end"
+		       id="searchbar"
+		       @oninput="(ChangeEventArgs e) => OnInput(e.Value?.ToString() ?? string.Empty)"
+		       @bind-value="SearchQuery"/>
 		<label for="searchbar">@Label</label>
 	</div>
 </div>
 
 @code {
-	[Parameter]
-	public string Label { get; set; } = "Search";
+	[Parameter] public string Label { get; set; } = "Search";
 
-	[Parameter]
-	public string SearchQuery { get; set; } = string.Empty;
+	[Parameter] public string SearchQuery { get; set; } = string.Empty;
 
-	[Parameter]
-	public EventCallback<string> OnSearchQueryChanged { get; set; }
+	[Parameter] public EventCallback<string> OnSearchQueryChanged { get; set; }
 
 	private void OnInput(string query) => OnSearchQueryChanged.InvokeAsync(query);
 }

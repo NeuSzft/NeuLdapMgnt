@@ -2,232 +2,233 @@
 
 <PageTitle>Classes</PageTitle>
 
-<ConfirmDialog @ref="dialog" />
+<ConfirmDialog @ref="_dialog"/>
 
-<Modal @ref="modalAdd"
+<Modal @ref="_modalAdd"
        Title="Add new class"
        ModalType="ModalType.Light"
        Size="ModalSize.Small"
-       OnHidden="() => newClass = string.Empty">
-    <BodyTemplate>
-        <div class="form-floating">
-            <InputText class="form-control rounded" id="class-input" @bind-Value="newClass" />
-            <label for="class-input">Class</label>
-        </div>
-    </BodyTemplate>
-    <FooterTemplate>
-        @if (isAdding)
-        {
-            <ButtonLoading ButtonColor="ButtonColor.Success" SpinnerColor="SpinnerColor.Success" />
-        }
-        else
-        {
-            <ButtonSave Text="Add" OnClick="SubmitClasses" />
-        }
-    </FooterTemplate>
+       OnHidden="() => _newClass = string.Empty">
+	<BodyTemplate>
+		<div class="form-floating">
+			<InputText class="form-control rounded" id="class-input" @bind-Value="_newClass"/>
+			<label for="class-input">Class</label>
+		</div>
+	</BodyTemplate>
+	<FooterTemplate>
+		@if (_isAdding)
+		{
+			<ButtonLoading ButtonColor="ButtonColor.Success" SpinnerColor="SpinnerColor.Success"/>
+		}
+		else
+		{
+			<ButtonSave Text="Add" OnClick="SubmitClasses"/>
+		}
+	</FooterTemplate>
 </Modal>
 
-<Modal @ref="modalRemove" Title="Delete class" ModalType="ModalType.Danger" Size="ModalSize.Small" OnHidden="HideModalRemove">
-    <BodyTemplate>
-        <div class="form-floating">
-            <InputSelect class="form-select rounded" id="class-select" @bind-Value="removeClass">
-                <option value=""></option>
-                @foreach (string cls in LocalDbService.Classes)
-                {
-                    <option value="@cls">@cls</option>
-                }
-            </InputSelect>
-            <label for="class-select">Class to delete</label>
-        </div>
-    </BodyTemplate>
-    <FooterTemplate>
-        @if (isRemoving)
-        {
-            <ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger" />
-        }
-        else
-        {
-            <ButtonDelete Text="Delete" OnClick="RemoveClasses" />
-        }
-    </FooterTemplate>
+<Modal @ref="_modalRemove" Title="Delete class" ModalType="ModalType.Danger" Size="ModalSize.Small" OnHidden="HideModalRemove">
+	<BodyTemplate>
+		<div class="form-floating">
+			<InputSelect class="form-select rounded" id="class-select" @bind-Value="_removeClass">
+				<option value=""></option>
+				@foreach (string cls in LocalDbService.Classes)
+				{
+					<option value="@cls">@cls</option>
+				}
+			</InputSelect>
+			<label for="class-select">Class to delete</label>
+		</div>
+	</BodyTemplate>
+	<FooterTemplate>
+		@if (_isRemoving)
+		{
+			<ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger"/>
+		}
+		else
+		{
+			<ButtonDelete Text="Delete" OnClick="RemoveClasses"/>
+		}
+	</FooterTemplate>
 </Modal>
 
 
 <div class="row d-flex align-items-center mb-2">
-    <div class="col-1">
-        <h1>Classes</h1>
-    </div>
-    @if (!isLoading)
-    {
-        <div class="col d-flex justify-content-end text-nowrap gap-2">
-            <Button id="add-class" Color="ButtonColor.Primary" Outline="true" @onclick="ShowModalAdd">
-                <i class="bi bi-plus-lg"></i> Add
-            </Button>
-            <Button id="delete-class" Color="ButtonColor.Danger" Outline="true" @onclick="ShowModalRemove">
-                <i class="bi bi-trash"></i> Delete
-            </Button>
-        </div>
-    }
+	<div class="col-1">
+		<h1>Classes</h1>
+	</div>
+	@if (!_isLoading)
+	{
+		<div class="col d-flex justify-content-end text-nowrap gap-2">
+			<Button id="add-class" Color="ButtonColor.Primary" Outline="true" @onclick="ShowModalAdd">
+				<i class="bi bi-plus-lg"></i> Add
+			</Button>
+			<Button id="delete-class" Color="ButtonColor.Danger" Outline="true" @onclick="ShowModalRemove">
+				<i class="bi bi-trash"></i> Delete
+			</Button>
+		</div>
+	}
 </div>
 
 
-
-@if (isLoading)
+@if (_isLoading)
 {
-    <Loading Text="Fetching classes" />
+	<Loading Text="Fetching classes"/>
 }
-else if (isAdding)
+else if (_isAdding)
 {
-    <Loading Text="@($"Adding [{newClass}]")" />
+	<Loading Text="@($"Adding [{_newClass}]")"/>
 }
-else if (isRemoving)
+else if (_isRemoving)
 {
-    <Loading Text="@($"Removing [{newClass}]")" />
+	<Loading Text="@($"Removing [{_newClass}]")"/>
 }
 else if (LocalDbService.Classes.Any())
 {
-    <div class="table-admins table-responsive rounded px-1 border flex-fill">
-        <table class="table table-striped table-borderless align-middle">
-            <thead class="sticky-top">
-                <tr>
-                    <th class="user-select-none">Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var cls in LocalDbService.Classes)
-                {
-                    <tr>
-                        <td class="rounded">@cls</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+	<div class="table-admins table-responsive rounded px-1 border flex-fill">
+		<table class="table table-striped table-borderless align-middle">
+			<thead class="sticky-top">
+			<tr>
+				<th class="user-select-none">Name</th>
+			</tr>
+			</thead>
+			<tbody>
+			@foreach (var cls in LocalDbService.Classes)
+			{
+				<tr>
+					<td class="rounded">@cls</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	</div>
 }
 else
 {
-    <div class="d-flex justify-content-center text-center">
-        <div>
-            <h3 class="my-4">There are no classes in the database</h3>
-        </div>
-    </div>
+	<div class="d-flex justify-content-center text-center">
+		<div>
+			<h3 class="my-4">There are no classes in the database</h3>
+		</div>
+	</div>
 }
 
 
 @code {
-    private List<string> newClasses = new();
-    private Modal modalAdd = default!;
-    private Modal modalRemove = default!;
-    private ConfirmDialog dialog = default!;
+	private List<string>  _newClasses  = new();
+	private Modal         _modalAdd    = default!;
+	private Modal         _modalRemove = default!;
+	private ConfirmDialog _dialog      = default!;
 
-    private string newClass = string.Empty;
-    private string removeClass = string.Empty;
-    private bool isLoading = false;
-    private bool isAdding = false;
-    private bool isRemoving = false;
+	private string _newClass    = string.Empty;
+	private string _removeClass = string.Empty;
+	private bool   _isLoading;
+	private bool   _isAdding;
+	private bool   _isRemoving;
 
-    protected override async Task OnInitializedAsync()
-    {
-        ApiRequests.EnsureAuthentication(NavManager);
+	protected override async Task OnInitializedAsync()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
 
-        isLoading = true;
-        await LocalDbService.FetchClassesAsync();
-        isLoading = false;
-    }
+		_isLoading = true;
+		await LocalDbService.FetchClassesAsync();
+		_isLoading = false;
+	}
 
-    private async Task SubmitClasses()
-    {
-        newClass = newClass.ToLower();
-        if (string.IsNullOrEmpty(newClass))
-        {
-            ToastService.Notify(ToastMessages.Danger("Please fill in the class."));
-            return;
-        }
+	private async Task SubmitClasses()
+	{
+		_newClass = _newClass.ToLower();
+		if (string.IsNullOrEmpty(_newClass))
+		{
+			ToastService.Notify(ToastMessages.Danger("Please fill in the class."));
+			return;
+		}
 
-        if (LocalDbService.Classes.Any(x => x.Equals(newClass, StringComparison.OrdinalIgnoreCase)))
-        {
-            ToastService.Notify(ToastMessages.Danger("This class already exists."));
-            return;
-        }
+		if (LocalDbService.Classes.Any(x => x.Equals(_newClass, StringComparison.OrdinalIgnoreCase)))
+		{
+			ToastService.Notify(ToastMessages.Danger("This class already exists."));
+			return;
+		}
 
 
-        try
-        {
-            newClasses = LocalDbService.Classes.ToList();
-            newClasses.Add(newClass);
+		try
+		{
+			_newClasses = LocalDbService.Classes.ToList();
+			_newClasses.Add(_newClass);
 
-            isAdding = true;
-            StateHasChanged();
-            var response = await ApiRequests.AddClassesAsync(newClasses);
-            isAdding = false;
+			_isAdding = true;
+			StateHasChanged();
+			var response = await ApiRequests.AddClassesAsync(_newClasses);
+			_isAdding = false;
 
-            if (response.IsSuccess())
-            {
-                NotificationService.NotifySuccess($"{newClass} class was added!");
-            }
-            else
-            {
-                NotificationService.NotifyError(response.GetError());
-            }
+			if (response.IsSuccess())
+			{
+				NotificationService.NotifySuccess($"{_newClass} class was added!");
+			}
+			else
+			{
+				NotificationService.NotifyError(response.GetError());
+			}
 
-            isLoading = true;
-            await LocalDbService.FetchClassesAsync();
-            isLoading = false;
-        }
-        catch (Exception e)
-        {
-            NotificationService.HandleError(e);
-        }
-        newClass = string.Empty;
-    }
+			_isLoading = true;
+			await LocalDbService.FetchClassesAsync();
+			_isLoading = false;
+		}
+		catch (Exception e)
+		{
+			NotificationService.HandleError(e);
+		}
 
-    private async Task RemoveClasses()
-    {
-        if (string.IsNullOrEmpty(removeClass))
-        {
-            ToastService.Notify(ToastMessages.Danger("Please select a class to remove."));
-            return;
-        }
+		_newClass = string.Empty;
+	}
 
-        var confirmation = await dialog.ShowAsync(
-            title: $"Are you sure you want to delete [{removeClass}] class?",
-            message1: $"This action will permanently delete [{removeClass}] class.",
-            confirmDialogOptions: DialogOptions.Delete()
-        );
+	private async Task RemoveClasses()
+	{
+		if (string.IsNullOrEmpty(_removeClass))
+		{
+			ToastService.Notify(ToastMessages.Danger("Please select a class to remove."));
+			return;
+		}
 
-        if (!confirmation) return;
+		var confirmation = await _dialog.ShowAsync(
+			title: $"Are you sure you want to delete [{_removeClass}] class?",
+			message1: $"This action will permanently delete [{_removeClass}] class.",
+			confirmDialogOptions: DialogOptions.Delete()
+		);
 
-        try
-        {
-            LocalDbService.Classes.Remove(removeClass);
+		if (!confirmation) return;
 
-            isRemoving = true;
-            StateHasChanged();
-            var response = await ApiRequests.AddClassesAsync(LocalDbService.Classes);
-            isRemoving = false;
+		try
+		{
+			LocalDbService.Classes.Remove(_removeClass);
 
-            if (response.IsSuccess())
-            {
-                NotificationService.NotifySuccess($"{removeClass} class was removed!");
-            }
-            else
-            {
-                NotificationService.NotifyError(response.GetError());
-            }
+			_isRemoving = true;
+			StateHasChanged();
+			var response = await ApiRequests.AddClassesAsync(LocalDbService.Classes);
+			_isRemoving = false;
 
-            await LocalDbService.FetchClassesAsync();
-        }
-        catch (Exception e)
-        {
-            NotificationService.HandleError(e);
-        }
-        removeClass = string.Empty;
-        isLoading = false;
-    }
+			if (response.IsSuccess())
+			{
+				NotificationService.NotifySuccess($"{_removeClass} class was removed!");
+			}
+			else
+			{
+				NotificationService.NotifyError(response.GetError());
+			}
 
-    private async Task ShowModalAdd() => await modalAdd!.ShowAsync();
-    private async Task HideModalAdd() => await modalAdd!.HideAsync();
+			await LocalDbService.FetchClassesAsync();
+		}
+		catch (Exception e)
+		{
+			NotificationService.HandleError(e);
+		}
 
-    private async Task ShowModalRemove() => await modalRemove!.ShowAsync();
-    private async Task HideModalRemove() => await modalRemove!.HideAsync();
+		_removeClass = string.Empty;
+		_isLoading = false;
+	}
+
+	private async Task ShowModalAdd() => await _modalAdd!.ShowAsync();
+	private async Task HideModalAdd() => await _modalAdd!.HideAsync();
+
+	private async Task ShowModalRemove() => await _modalRemove!.ShowAsync();
+	private async Task HideModalRemove() => await _modalRemove!.HideAsync();
 }
