@@ -1,3 +1,4 @@
+using DotLiquid.Util;
 using NeuLdapMgnt.Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
@@ -141,9 +142,9 @@ public class SeleniumTests
 		_wait.Until(ExpectedConditions.TitleIs("Add Teacher"));
 		Assert.AreEqual("Add Teacher", _webDriver.Title);
 
-		NavLinks.Find(x => x.Text.Equals("Admins"))?.Click();
-		_wait.Until(ExpectedConditions.TitleIs("Admins"));
-		Assert.AreEqual("Admins", _webDriver.Title);
+		NavLinks.Find(x => x.Text.Equals("Administrators"))?.Click();
+		_wait.Until(ExpectedConditions.TitleIs("Administrators"));
+		Assert.AreEqual("Administrators", _webDriver.Title);
 
 		NavLinks.Find(x => x.Text.Equals("Inactive Users"))?.Click();
 		_wait.Until(ExpectedConditions.TitleIs("Inactive Users"));
@@ -652,6 +653,132 @@ public class SeleniumTests
 		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
 		Assert.AreEqual("There are no [Active] teachers",
+			_webDriver.FindElement(By.TagName("h3")).Text);
+	}
+
+	[TestMethod]
+	public void TeacherStatusCanBeSetToAdmin()
+	{
+		string id = "john.doe";
+		string firstName = "John";
+		string lastName = "Doe";
+		string cls = "10.a";
+
+		Login();
+		ExpandNavbar();
+		NavLinks.Find(x => x.Text.Equals("Add Teacher"))?.Click();
+		_wait.Until(ExpectedConditions.TitleIs("Add Teacher"));
+
+		var form = _webDriver.FindElement(By.TagName("form"));
+		form.FindElement(By.Id("teacher-id")).SendKeys(id);
+		form.FindElement(By.Id("first-name")).SendKeys(firstName);
+		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("class-select")).Click();
+		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
+		form.Submit();
+		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
+
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("form")));
+
+		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+
+		var tds = _webDriver.FindElements(By.CssSelector("table > tbody > tr > td")).ToList();
+		_webDriver.FindElement(By.CssSelector("table > tbody > tr > td > input")).Click();
+
+		_wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".btn-warning")));
+		_webDriver.FindElement(By.CssSelector(".btn-warning")).Click();
+		_webDriver.FindElements(By.CssSelector(".form-switch > input")).LastOrDefault()?.Click();
+		_webDriver.FindElement(By.CssSelector(".modal-dialog .btn-success")).Click();
+		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
+
+		Assert.IsTrue(_webDriver.FindElements(By.CssSelector(".toast-container .bg-success")).Count > 0);
+
+		NavLinks.Find(x => x.Text.Equals("Administrators"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("table")));
+		tds = _webDriver.FindElements(By.CssSelector("table > tbody > tr > td")).ToList();
+		Assert.AreEqual(id, tds[1].Text);
+	}
+
+	[TestMethod]
+	public void AdminCanBeDeletedButTeacherStillExists()
+	{
+		Login();
+		ExpandNavbar();
+
+		NavLinks.Find(x => x.Text.Equals("Administrators"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("table")));
+		_webDriver.FindElement(By.CssSelector("table > tbody > tr > td > input")).Click();
+
+		_wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".btn-outline-danger")));
+		_webDriver.FindElement(By.CssSelector(".btn-outline-danger")).Click();
+		_webDriver.FindElement(By.CssSelector(".modal-dialog .btn-success")).Click();
+
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
+		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("table")));
+
+		var tds = _webDriver.FindElements(By.CssSelector("table > tbody > tr > td"));
+		Assert.AreEqual("john.doe", tds[1].Text);
+	}
+
+	[TestMethod]
+	public void DeletingTeacherPermanentlyDeletesFromAdmins()
+	{
+		string id = "john.doe";
+		string firstName = "John";
+		string lastName = "Doe";
+		string cls = "10.a";
+
+		Login();
+		ExpandNavbar();
+		NavLinks.Find(x => x.Text.Equals("Add Teacher"))?.Click();
+		_wait.Until(ExpectedConditions.TitleIs("Add Teacher"));
+
+		var form = _webDriver.FindElement(By.TagName("form"));
+		form.FindElement(By.Id("teacher-id")).SendKeys(id);
+		form.FindElement(By.Id("first-name")).SendKeys(firstName);
+		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("class-select")).Click();
+		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
+		form.Submit();
+		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
+
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("form")));
+
+		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+
+		_webDriver.FindElement(By.CssSelector("table > tbody > tr > td > input")).Click();
+
+		_wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".btn-warning")));
+		_webDriver.FindElement(By.CssSelector(".btn-warning")).Click();
+		_webDriver.FindElements(By.CssSelector(".form-switch > input")).FirstOrDefault()?.Click();
+		_webDriver.FindElements(By.CssSelector(".form-switch > input")).LastOrDefault()?.Click();
+		_webDriver.FindElement(By.CssSelector(".modal-dialog .btn-success")).Click();
+		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
+
+		NavLinks.Find(x => x.Text.Equals("Inactive Users"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
+
+		foreach (var element in _webDriver.FindElements(By.ClassName("btn-close")))
+			element.Click();
+		
+		_webDriver.FindElement(By.CssSelector("table > tbody > tr > td > input")).Click();
+		_wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".btn-outline-danger")));
+		_webDriver.FindElement(By.CssSelector(".btn-outline-danger")).Click();
+		_webDriver.FindElement(By.CssSelector(".modal-dialog .btn-success")).Click();
+
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
+		
+		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
+		Assert.AreEqual("There are no [Active] teachers", 
+			_webDriver.FindElement(By.TagName("h3")).Text);
+		
+		NavLinks.Find(x => x.Text.Equals("Administrators"))?.Click();
+		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
+		Assert.AreEqual("There are no teachers with [Administrator] status", 
 			_webDriver.FindElement(By.TagName("h3")).Text);
 	}
 }
