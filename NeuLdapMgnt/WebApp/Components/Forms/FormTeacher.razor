@@ -14,7 +14,7 @@
 		<InstantInputText class="form-control"
 		                  type="text"
 		                  disabled="@(CanDelete || IsReadonly || IsAction)"
-		                  @bind-Value="_teacherUpdated!.Id"
+		                  @bind-Value="_teacherUpdated.Id"
 		                  id="teacher-id"/>
 		<label for="teacher-id">ID</label>
 		<ValidationMessage For="() => _teacherUpdated.Id" id="teacher-id-validation-message"/>
@@ -71,7 +71,7 @@
 		<label for="password">Password</label>
 		<ValidationMessage For="() => _teacherUpdated.Password" id="teacher-password-validation-message"/>
 	</div>
-	@if (teacherUpdated.Password?.Length < 1) {
+	@if (_teacherUpdated.Password?.Length < 1) {
 		<label for="password">
 			<small class="text-muted">
 				Setting the password is optional. When left empty it will be ignored.
