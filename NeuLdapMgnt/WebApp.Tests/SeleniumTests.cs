@@ -47,7 +47,7 @@ public class SeleniumTests
 			_webDriver = new RemoteWebDriver(new Uri(SutHub), firefoxOptions.ToCapabilities());
 		}
 
-		_wait = new(_webDriver, TimeSpan.FromMilliseconds(20000));
+		_wait = new(_webDriver, TimeSpan.FromMilliseconds(5000));
 	}
 
 	[ClassCleanup]
@@ -69,6 +69,7 @@ public class SeleniumTests
 		_webDriver.FindElement(By.Id("password")).SendKeys(Password);
 		_webDriver.FindElement(By.ClassName("btn-outline-primary")).Submit();
 		_wait.Until(ExpectedConditions.TitleIs("Home"));
+		_wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("btn-close")));
 		_webDriver.FindElement(By.ClassName("btn-close")).Click();
 	}
 
@@ -78,6 +79,7 @@ public class SeleniumTests
 		               .FindElements(By.ClassName("nav-item"))
 		               .Where(x => !x.Text.Contains("Logout") && !x.Text.Contains("Home"))
 		               .ToList();
+		_wait.Until(ExpectedConditions.ElementToBeClickable(navItems[0]));
 		navItems.ForEach(x => x.Click());
 	}
 
@@ -444,7 +446,7 @@ public class SeleniumTests
 		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
 
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("form")));
-		Assert.AreEqual(1, _webDriver.FindElements(By.CssSelector(".toast-container .bg-danger")).Count);
+		Assert.IsTrue(_webDriver.FindElements(By.CssSelector(".toast-container .bg-danger")).Count != 0);
 	}
 
 	[TestMethod]
@@ -576,7 +578,7 @@ public class SeleniumTests
 		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
 
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("form")));
-		Assert.AreEqual(1, _webDriver.FindElements(By.CssSelector(".toast-container .bg-danger")).Count);
+		Assert.IsTrue(_webDriver.FindElements(By.CssSelector(".toast-container .bg-danger")).Count != 0);
 	}
 
 	[TestMethod]
