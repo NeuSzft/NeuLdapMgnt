@@ -104,9 +104,9 @@ public static class ExtensionUtils {
 	/// <param name="nameOf">The name of the string variable.</param>
 	/// <returns>The original string.</returns>
 	/// <exception cref="ArgumentException">The provided string is <c>null</c> or has the length of zero.</exception>
-	public static string ThrowIfNullOrEmpty(this string? str, string? nameOf = null) {
+	public static string ThrowIfNullOrEmpty(this string? str, string nameOf) {
 		if (str is null || str.Length == 0)
-			throw new ArgumentException($"{nameOf ?? "string"} is null or empty");
+			throw new ArgumentException($"{nameOf} is null or empty");
 		return str;
 	}
 
