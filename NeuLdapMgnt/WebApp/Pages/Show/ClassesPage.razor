@@ -54,8 +54,8 @@
 
 
 <div class="row d-flex align-items-center mb-2">
-	<div class="col-1">
-		<h1>Classes</h1>
+	<div class="col">
+		<h1>Classes <span class="badge bg-primary p-1 mb-1 align-middle">@LocalDbService.Classes.Count</span></h1>
 	</div>
 	@if (!_isLoading)
 	{
@@ -226,9 +226,8 @@ else
 		_isLoading = false;
 	}
 
-	private async Task ShowModalAdd() => await _modalAdd!.ShowAsync();
-	private async Task HideModalAdd() => await _modalAdd!.HideAsync();
+	private async Task ShowModalAdd() => await _modalAdd.ShowAsync();
 
-	private async Task ShowModalRemove() => await _modalRemove!.ShowAsync();
-	private async Task HideModalRemove() => await _modalRemove!.HideAsync();
+	private async Task ShowModalRemove() => await _modalRemove.ShowAsync();
+	private async Task HideModalRemove() => await _modalRemove.HideAsync();
 }

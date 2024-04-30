@@ -3,7 +3,7 @@
 <PageTitle>Inactive Users</PageTitle>
 <ConfirmDialog @ref="_dialog"/>
 
-<h1>Inactive Users [@_usersList.Count]</h1>
+<h1>Inactive Users <span class="badge bg-primary p-1 mb-1 align-middle">@_usersList.Count</span></h1>
 
 @if (_isLoading)
 {
@@ -31,12 +31,12 @@ else
 	{
 		<div class="d-flex justify-content-end align-items-center g-2 mb-3">
 			<div class="ms-2">
-				<Button id="activate-users" Color="ButtonColor.Success" Outline="true" Disabled="IsUserSelected" @onclick="OnActivateSelectedUsers">
+				<Button id="activate-users" Color="ButtonColor.Success" Outline="true" Disabled="@IsUserSelected" @onclick="OnActivateSelectedUsers">
 					Activate selected
 				</Button>
 			</div>
 			<div class="ms-2">
-				<Button id="delete-users" Color="ButtonColor.Danger" Outline="true" Disabled="IsUserSelected" @onclick="OnDeleteSelectedUsers">
+				<Button id="delete-users" Color="ButtonColor.Danger" Outline="true" Disabled="@IsUserSelected" @onclick="OnDeleteSelectedUsers">
 					Delete permanently
 				</Button>
 			</div>

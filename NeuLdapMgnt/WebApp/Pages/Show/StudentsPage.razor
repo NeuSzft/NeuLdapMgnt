@@ -4,7 +4,7 @@
 
 <div class="row justify-content-between g-2">
 	<div class="col">
-		<h1>Students <span class="badge bg-primary p-1">@StudentService.Students.Count</span></h1>
+		<h1>Students <span class="badge bg-primary p-1 mb-1 align-middle">@StudentService.Students.Count</span></h1>
 	</div>
 	<div class="col text-end">
 		@if (_isLoading)
@@ -43,11 +43,11 @@ else if (!StudentService.Students.Any())
 else
 {
 	<TableStudents Students="StudentService.Students"
-	               OnStudentsUpdate="HandleUpdateStudents"/>
+	               OnStudentsUpdate="HandleUpdateStudents!"/>
 }
 
 @code {
-	private bool _isLoading  = true;
+	private bool _isLoading = true;
 	private bool _isUpdating;
 
 	protected override async Task OnInitializedAsync()
