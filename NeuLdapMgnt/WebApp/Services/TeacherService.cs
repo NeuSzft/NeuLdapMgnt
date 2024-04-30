@@ -121,7 +121,7 @@ public class TeacherService
 		return errorList;
 	}
 
-	public async Task<List<string>> UpdateTeachersStatusAsync(List<Teacher> teachers, bool isAdmin,
+	private async Task<List<string>> UpdateTeachersStatusAsync(List<Teacher> teachers, bool isAdmin,
 		bool isInactive, List<string> errorList)
 	{
 		foreach (var teacher in teachers)

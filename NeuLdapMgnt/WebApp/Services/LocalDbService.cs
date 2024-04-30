@@ -5,11 +5,9 @@ namespace NeuLdapMgnt.WebApp.Services
 {
 	public class LocalDbService
 	{
-		[Inject]
-		private ApiRequests ApiRequests { get; set; }
+		[Inject] private ApiRequests ApiRequests { get; set; }
 
-		[Inject]
-		private NotificationService NotificationService { get; set; }
+		[Inject] private NotificationService NotificationService { get; set; }
 
 		public List<string> Admins { get; set; } = new();
 
@@ -74,6 +72,7 @@ namespace NeuLdapMgnt.WebApp.Services
 				{
 					Classes = response.Values.SelectMany(x => x).OrderBy(Utils.GetClassOrderValue).ToList();
 				}
+
 				if (response.Errors.Any())
 				{
 					NotificationService.NotifyError(response.GetError());
@@ -129,6 +128,7 @@ namespace NeuLdapMgnt.WebApp.Services
 			{
 				NotificationService.HandleError(e);
 			}
+
 			return errorList;
 		}
 
@@ -154,14 +154,20 @@ namespace NeuLdapMgnt.WebApp.Services
 						{
 							errorList.Add(response.GetError());
 						}
+						else if (response.IsSuccess() && Admins.Contains(id))
+						{
+							await ApiRequests.DeleteAdminAsync(id);
+						}
 					}
 				}
+
 				await ActivateUsersAsync(ids.Where(x => !errorList.Contains(x)).ToList());
 			}
 			catch (Exception e)
 			{
 				NotificationService.HandleError(e);
 			}
+
 			return errorList;
 		}
 
@@ -187,6 +193,7 @@ namespace NeuLdapMgnt.WebApp.Services
 			{
 				NotificationService.HandleError(e);
 			}
+
 			return errorList;
 		}
 	}
