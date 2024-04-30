@@ -1,6 +1,6 @@
 ﻿@page "/db/admins"
 
-<PageTitle>Admins</PageTitle>
+<PageTitle>Administrators</PageTitle>
 <ConfirmDialog @ref="dialog" />
 
 <h1>Admins [@admins.Count]</h1>
@@ -18,7 +18,7 @@ else
 	@if (!admins.Any())
 	{
 		<div class="d-flex justify-content-center text-center">
-			<h3 class="my-4">There are no administrators</h3>
+			<h3 class="my-4">There are no teachers with <strong>[Administrator]</strong> status</h3>
 		</div>
 	}
 	else
@@ -68,7 +68,7 @@ else
 }
 
 @code {
-	public List<string> admins = new();
+	private List<string> admins = new();
 	private List<string> selectedAdmins = new();
 	private ConfirmDialog dialog = default!;
 
@@ -129,7 +129,5 @@ else
 	}
 
 	private void ShowAdmin(string id) => NavManager.NavigateTo($"/teachers/{id}");
-
-	private void InspectAdmin(Teacher admin) => ShowAdmin(admin.Id.ToString());
 }
 
