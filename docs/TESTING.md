@@ -1,6 +1,6 @@
 # Neu LDAP Management System
 
-*[**🠰** Back to README](../README.md)*
+*[**🠰** Back to the README](../README.md)*
 
 ### Table of Contents
 1. [Running All Tests](#running-all-tests)
@@ -25,7 +25,7 @@ These tests are meant to check the different services created for the API to int
 make api-tests
 ```
 
-> The results of the api tests can be found within the [/docs/test-results](./test-results/) directory.
+> The results of the api tests can be found [here](./test-results/api-test-results.md).
 
 
 ## Running just the Selenium Tests

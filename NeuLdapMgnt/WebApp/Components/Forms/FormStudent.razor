@@ -72,6 +72,13 @@
 		<label for="password">Password</label>
 		<ValidationMessage For="() => _studentUpdated.Password" id="student-password-validation-message"/>
 	</div>
+	@if (studentUpdated.Password?.Length < 1) {
+		<label for="password">
+			<small class="text-muted">
+				Setting the password is optional. When left empty it will be ignored.
+			</small>
+		</label>
+	}
 
 	@if (!IsReadonly)
 	{
