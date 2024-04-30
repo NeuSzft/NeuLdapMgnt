@@ -84,32 +84,32 @@ public class SeleniumTests
 	[TestMethod]
 	public void DefaultRedirectionToLoginPage()
 	{
-		_wait.Until(ExpectedConditions.TitleIs("Login"));
-		Assert.AreEqual("Login", _webDriver.Title);
+		_wait.Until(ExpectedConditions.TitleIs("Log In"));
+		Assert.AreEqual("Log In", _webDriver.Title);
 	}
 
 	[TestMethod]
 	public void RedirectionIsWorkingWhenUnauthorized()
 	{
 		_webDriver.Navigate().GoToUrl(_sutMngt + "/students");
-		_wait.Until(ExpectedConditions.TitleIs("Login"));
-		Assert.AreEqual("Login", _webDriver.Title);
+		_wait.Until(ExpectedConditions.TitleIs("Log In"));
+		Assert.AreEqual("Log In", _webDriver.Title);
 
 		_webDriver.Navigate().GoToUrl(_sutMngt + "/students/add");
-		_wait.Until(ExpectedConditions.TitleIs("Login"));
-		Assert.AreEqual("Login", _webDriver.Title);
+		_wait.Until(ExpectedConditions.TitleIs("Log In"));
+		Assert.AreEqual("Log In", _webDriver.Title);
 
 		_webDriver.Navigate().GoToUrl(_sutMngt + "/teachers");
-		_wait.Until(ExpectedConditions.TitleIs("Login"));
-		Assert.AreEqual("Login", _webDriver.Title);
+		_wait.Until(ExpectedConditions.TitleIs("Log In"));
+		Assert.AreEqual("Log In", _webDriver.Title);
 
 		_webDriver.Navigate().GoToUrl(_sutMngt + "/teachers/add");
-		_wait.Until(ExpectedConditions.TitleIs("Login"));
-		Assert.AreEqual("Login", _webDriver.Title);
+		_wait.Until(ExpectedConditions.TitleIs("Log In"));
+		Assert.AreEqual("Log In", _webDriver.Title);
 
 		_webDriver.Navigate().GoToUrl(_sutMngt + "/db/admins");
-		_wait.Until(ExpectedConditions.TitleIs("Login"));
-		Assert.AreEqual("Login", _webDriver.Title);
+		_wait.Until(ExpectedConditions.TitleIs("Log In"));
+		Assert.AreEqual("Log In", _webDriver.Title);
 	}
 
 	[TestMethod]
@@ -170,8 +170,8 @@ public class SeleniumTests
 		Assert.AreEqual("Home", _webDriver.Title);
 
 		NavLinks.Find(x => x.Text.Equals("Logout"))?.Click();
-		_wait.Until(ExpectedConditions.TitleIs("Login"));
-		Assert.AreEqual("Login", _webDriver.Title);
+		_wait.Until(ExpectedConditions.TitleIs("Log In"));
+		Assert.AreEqual("Log In", _webDriver.Title);
 	}
 
 	[TestMethod]
