@@ -51,9 +51,9 @@ public sealed class PgLoggerService : ILoggerService {
 	/// <exception cref="ArgumentException">An environment variable is not set or is an empty string.</exception>
 	public static PgLoggerService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD") {
 		return new(
-			Environment.GetEnvironmentVariable(hostEnv).ThrowIfNullOrEmpty(),
-			Environment.GetEnvironmentVariable(dbEnv).ThrowIfNullOrEmpty(),
-			Environment.GetEnvironmentVariable(passwordEnv).ThrowIfNullOrEmpty()
+			Environment.GetEnvironmentVariable(hostEnv).ThrowIfNullOrEmpty(nameof(hostEnv)),
+			Environment.GetEnvironmentVariable(dbEnv).ThrowIfNullOrEmpty(nameof(dbEnv)),
+			Environment.GetEnvironmentVariable(passwordEnv).ThrowIfNullOrEmpty(nameof(passwordEnv))
 		);
 	}
 
