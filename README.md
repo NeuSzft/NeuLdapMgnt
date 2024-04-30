@@ -13,6 +13,7 @@
 5. [Running the Demo](#running-the-demo)
 6. [Testing](#testing)
 7. [WebApp Manual](#webapp-manual)
+8. [API Endpoints](#api-endpoints)
 
 ## Project Summary
 This project aims to make managing the personal information and the credentials of teachers and students easier by providing a web interface and a RESTful API that uses an OpenLDAP database as persistent storage.
@@ -122,5 +123,8 @@ There are three major parts of the that can be tested separately:
 
 
 ## WebApp Manual
-
 Information about using the web application can be found [here](./docs/USERMANUAL.md).
+
+
+## API Endpoints
+The documentation of the endpoints can be accessed by navigating to the `/api/docs` page of the deployed project.
