@@ -12,29 +12,32 @@
     3. [Managing the services](#start-the-services)
 5. [Running the Demo](#running-the-demo)
 6. [Testing](#testing)
-
+7. [WebApp Manual](#webapp-manual)
 
 ## Project Summary
-**TODO!**
+This project aims to make managing the personal information and the credentials of teachers and students easier by providing a web interface and a RESTful API that uses an OpenLDAP database as persistent storage.
 
+The API made using [ASP.NET Core](https://dotnet.microsoft.com/en-us/apps/aspnet) and the frontend is made using [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) and is compiled into WebAssembly.\
+The project can be deployed as [Docker](https://www.docker.com/) containers.
 
 ## Dependencies
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 - [GNU Make](https://www.gnu.org/software/make/)
 
+
 ## Databases
+
+### OpenLDAP
+The OpenLDAP database is responsible for storing the teachers and students of the school.
+This includes their personal information and credentials. This database is also used for authenticating teachers who are admins, thus have access to the API.
+
+*[Read more about the OpenLDAP database](./docs/OPENLDAP.md)*
 
 ### PostgreSQL
 The Postgres database is responsible for storing the logs the API creates when it receives incoming requests and the users who have sent the requests.
 
 *[Read more about the Postgres database](./docs/POSTGRES.md)*
-
-### OpenLDAP
-The LDAP database is responsible for storing the teachers and students of the school.
-This includes their personal information and credentials. The LDAP database is also used for authenticating teachers who are admins, thus have access to the API.
-
-*[Read more about the LDAP database](./docs/OPENLDAP.md)*
 
 
 ## Running the Project
@@ -116,3 +119,8 @@ There are three major parts of the that can be tested separately:
 > All of these groups of tests run isolated in docker containers.
 
 *[Read more about testing](./docs/TESTING.md)*
+
+
+## WebApp Manual
+
+Information about using the web application can be found [here](./docs/USERMANUAL.md).
