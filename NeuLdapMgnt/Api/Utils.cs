@@ -42,50 +42,6 @@ public static class Utils {
 			return false;
 		}
 	}
-
-	// TODO: Probably replace this whole thing
-	public static async Task<(List<Student> Students, string? Error)> CsvToStudents(StreamReader reader, int startUid = 6000) {
-		List<Student> students = new();
-		int           uid      = startUid;
-		int           lineNum  = 0;
-
-		while (await reader.ReadLineAsync() is { } line) {
-			lineNum++;
-			if (line.Length == 0)
-				continue;
-
-			Student student = new();
-			students.Add(student);
-
-			string[] arr = line.Split([',', ';']);
-
-			try {
-				long.TryParse(arr[0], out var id);
-
-				student.Id = id;
-				student.Uid = uid;
-				student.Gid = uid;
-				student.FirstName = arr[1].Trim('"');
-				student.LastName = arr[2].Trim('"');
-				student.Username = student.GetUsername();
-				student.Class = "12.A";
-				student.Email = arr[3].Trim('"');
-				student.Password = "{CRYPT}" + arr[4].Trim('"');
-				student.HomeDirectory = $"/home/{student.Username}";
-
-				var errors = ModelValidator.Validate(student).Errors;
-				if (errors.Any())
-					return ([], $"Error on line {lineNum}:\n{string.Join('\n', errors)}");
-			}
-			catch {
-				return ([], $"Error on line {lineNum}");
-			}
-
-			uid++;
-		}
-
-		return (students, null);
-	}
 }
 
 public static class ExtensionUtils {
