@@ -1,7 +1,7 @@
-name: neu-ldap-mgnt
+name: neu-ldap-mgnt-selenium-tests
 
 services:
-  selenium-openldap:
+  openldap:
     extends:
       file: ./compose-services.yml
       service: openldap
@@ -9,71 +9,59 @@ services:
       - LDAP_ORGANISATION=Test
       - LDAP_DOMAIN=test.local
       - LDAP_ADMIN_PASSWORD=admin
-    networks:
-      - net-selenium
     volumes:
       - ldap-data-selenium:/var/lib/ldap
       - ldap-config-selenium:/etc/ldap/slapd.d
 
-  selenium-api-build:
+  api-build:
     extends:
       file: ./compose-services.yml
       service: api-build
-    networks:
-      - net-selenium
     volumes:
       - api-app-selenium:/app
 
-  selenium-api:
+  api:
     extends:
       file: ./compose-services.yml
       service: api
     depends_on:
-      selenium-openldap:
+      openldap:
         condition: service_started
-      selenium-api-build:
+      api-build:
         condition: service_completed_successfully
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      LDAP_ADDRESS: selenium-openldap
+      LDAP_ADDRESS: openldap
       LDAP_PORT: 389
       LDAP_DOMAIN: test.local
       LDAP_USERNAME: admin
       LDAP_PASSWORD: admin
       DEFAULT_ADMIN_NAME: admin
       DEFAULT_ADMIN_PASSWORD: adminpass
-    networks:
-      net-selenium:
-        aliases:
-          - api
     volumes:
       - api-app-selenium:/app:ro
 
-  selenium-webapp-build:
+  webapp-build:
     extends:
       file: ./compose-services.yml
       service: webapp-build
-    networks:
-      - net-selenium
     volumes:
       - webapp-app-selenium:/app
 
-  selenium-nginx:
+  nginx:
     extends:
       file: ./compose-services.yml
       service: nginx
     depends_on:
-      selenium-api-build:
+      api-build:
         condition: service_completed_successfully
-      selenium-webapp-build:
+      webapp-build:
         condition: service_completed_successfully
-    networks:
-      - net-selenium
     volumes:
       - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
       - webapp-app-selenium:/app:ro
 
-  selenium-tests:
+  tests:
     build:
       context: ..
       dockerfile_inline: |
@@ -86,43 +74,34 @@ services:
       DEFAULT_ADMIN_NAME: admin
       DEFAULT_ADMIN_PASSWORD: adminpass
       ASPNETCORE_ENVIRONMENT: Docker
-      SELENIUM_HUB_URL: http://selenium-hub:4444
-      WEBAPP_URL: http://selenium-nginx:80
+      SELENIUM_HUB_URL: http://hub:4444
+      WEBAPP_URL: http://nginx:80
     depends_on:
-      selenium-hub:
+      hub:
         condition: service_started
-      selenium-node-firefox:
+      node-firefox:
         condition: service_started
-      selenium-nginx:
+      nginx:
         condition: service_started
     volumes:
       - ../testing/results:/tr
-    networks:
-      - net-selenium
 
-  selenium-hub:
+  hub:
     image: selenium/hub:4.0.0
-    container_name: selenium-hub
-    networks:
-      - net-selenium
+    container_name: hub
 
-  selenium-node-firefox:
+  node-firefox:
     image: selenium/node-firefox:4.17.0-20240123
     shm_size: 2gb
     depends_on:
-      selenium-hub:
+      hub:
         condition: service_started
     environment:
-      - HUB_HOST=selenium-hub
+      - HUB_HOST=hub
       - HUB_PORT=4444
-      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_HOST=hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-    networks:
-      - net-selenium
-
-networks:
-  net-selenium:
 
 volumes:
   ldap-data-selenium:

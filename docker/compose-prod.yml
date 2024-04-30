@@ -1,16 +1,14 @@
 name: neu-ldap-mgnt
 
 services:
-  prod-postgres:
+  postgres:
     extends:
       file: ./compose-services.yml
       service: postgres
     volumes:
-      - prod-postgres-data:/var/lib/postgresql/data
-    networks:
-      - prod-net
+      - postgres-data:/var/lib/postgresql/data
 
-  prod-openldap:
+  openldap:
     extends:
       file: ./compose-services.yml
       service: openldap
@@ -18,83 +16,67 @@ services:
       LDAP_ORGANISATION: ${LDAP_ORGANIZATION}
       LDAP_DOMAIN: ${LDAP_DOMAIN}
       LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
-    networks:
-      - prod-net
     volumes:
-      - prod-ldap-data:/var/lib/ldap
-      - prod-ldap-config:/etc/ldap/slapd.d
+      - ldap-data:/var/lib/ldap
+      - ldap-config:/etc/ldap/slapd.d
 
-  prod-api-build:
+  api-build:
     extends:
       file: ./compose-services.yml
       service: api-build
-    networks:
-      - prod-net
     volumes:
-      - prod-api-app:/app
+      - api-app:/app
 
-  prod-api:
+  api:
     extends:
       file: ./compose-services.yml
       service: api
     depends_on:
-      prod-openldap:
+      openldap:
         condition: service_started
-      prod-api-build:
+      api-build:
         condition: service_completed_successfully
     environment:
-      LDAP_ADDRESS: prod-openldap
+      LDAP_ADDRESS: openldap
       LDAP_PORT: 389
       LDAP_DOMAIN: ${LDAP_DOMAIN}
       LDAP_USERNAME: admin
       LDAP_PASSWORD: ${LDAP_ADMIN_PASSWORD}
-      POSTGRES_HOST: prod-postgres
+      POSTGRES_HOST: postgres
       POSTGRES_PASSWORD: ${POSTGRES_USER_PASSWORD}
       DEFAULT_ADMIN_NAME: ${DEFAULT_ADMIN_USERNAME}
       DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
       LOG_TO_DB: ${LOG_TO_DB}
-    networks:
-      prod-net:
-        aliases:
-          - api
     volumes:
-      - prod-api-app:/app:ro
+      - api-app:/app:ro
 
-  prod-webapp-build:
+  webapp-build:
     extends:
       file: ./compose-services.yml
       service: webapp-build
-    networks:
-      - prod-net
     volumes:
-      - prod-webapp-app:/app
+      - webapp-app:/app
 
-  prod-nginx:
+  nginx:
     extends:
       file: ./compose-services.yml
       service: nginx
     depends_on:
-      prod-api-build:
+      api-build:
         condition: service_completed_successfully
-      prod-webapp-build:
+      webapp-build:
         condition: service_completed_successfully
-      prod-api:
+      api:
         condition: service_started
-    networks:
-      - prod-net
     ports:
       - ${PORT}:80
     volumes:
       - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
-      - prod-webapp-app:/app:ro
-
-networks:
-  prod-net:
-
+      - webapp-app:/app:ro
 
 volumes:
-  prod-postgres-data:
-  prod-ldap-data:
-  prod-ldap-config:
-  prod-api-app:
-  prod-webapp-app:
+  postgres-data:
+  ldap-data:
+  ldap-config:
+  api-app:
+  webapp-app:

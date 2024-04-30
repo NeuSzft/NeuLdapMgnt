@@ -1,7 +1,7 @@
-name: neu-ldap-mgnt
+name: neu-ldap-mgnt-model-tests
 
 services:
-  model-tests:
+  tests:
     build:
       context: ..
       dockerfile_inline: |

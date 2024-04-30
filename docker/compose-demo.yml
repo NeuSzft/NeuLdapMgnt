@@ -1,113 +1,93 @@
-name: neu-ldap-mgnt
+name: neu-ldap-mgnt-demo
 
 services:
-  demo-postgres:
+  postgres:
     extends:
       file: ./compose-services.yml
       service: postgres
     volumes:
-      - demo-postgres-data:/var/lib/postgresql/data
-    networks:
-      - demo-net
+      - postgres-data:/var/lib/postgresql/data
     ports:
       - 5432:5432
 
-  demo-openldap:
+  openldap:
     extends:
       file: ./compose-services.yml
       service: openldap
-    networks:
-      - demo-net
     ports:
       - 389:389
     volumes:
-      - demo-ldap-data:/var/lib/ldap
-      - demo-ldap-config:/etc/ldap/slapd.d
+      - ldap-data:/var/lib/ldap
+      - ldap-config:/etc/ldap/slapd.d
 
-  demo-ldapadmin:
+  ldapadmin:
     extends:
       file: ./compose-services.yml
       service: ldapadmin
     depends_on:
-      - demo-openldap
+      - openldap
     environment:
-      PHPLDAPADMIN_LDAP_HOSTS: demo-openldap
-    networks:
-      - demo-net
+      PHPLDAPADMIN_LDAP_HOSTS: openldap
     ports:
       - 8888:80
 
-  demo-api-build:
+  api-build:
     extends:
       file: ./compose-services.yml
       service: api-build
-    networks:
-      - demo-net
     volumes:
-      - demo-api-app:/app
+      - api-app:/app
 
-  demo-api:
+  api:
     extends:
       file: ./compose-services.yml
       service: api
     depends_on:
-      demo-api-build:
+      api-build:
         condition: service_completed_successfully
-      demo-openldap:
+      openldap:
         condition: service_started
-      demo-postgres:
+      postgres:
         condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      LDAP_ADDRESS: demo-openldap
-      POSTGRES_HOST: demo-postgres
+      LDAP_ADDRESS: openldap
+      POSTGRES_HOST: postgres
       LOG_TO_DB: true
       LOGS_DIR: /logs
       SECURITY_KEY: ITN3pnH472FGG71aC1AWFDrTn2TpgHtBuZdD/LYkD4bXe4hhAKWj8CsTfGPQJHr3qoY8/KM0zShbyreW6RapyGAL2M8JBOWLknXoC/1zJ4+9QOC7hpk4jqM13vHoJeL8JTKdYGCzx6gwZK9a4vgcsVCCc1QT6//WO7x0xdcZUsiHqp2t9PJjzLfMvK2nlaWe+aoBBPvsM4CAyWTMT8sZVHSmrjTunhVOn9cqoouHwe33a5grSf9Z9AhFtBTSH2DvlW4/DdA1kKcNeju/wZGhnE0DKNsguV6b5NcYLsRgU1NK2nrWd8yhUskOQCoDvLwnWc3Qto5l/AFnht08FSjLSQ==
-    networks:
-      demo-net:
-        aliases:
-          - api
     ports:
       - 5000:5000
     volumes:
-      - demo-api-app:/app:ro
+      - api-app:/app:ro
 
-  demo-webapp-build:
+  webapp-build:
     extends:
       file: ./compose-services.yml
       service: webapp-build
-    networks:
-      - demo-net
     volumes:
-      - demo-webapp-app:/app
+      - webapp-app:/app
 
-  demo-nginx:
+  nginx:
     extends:
       file: ./compose-services.yml
       service: nginx
     depends_on:
-      demo-api-build:
+      api-build:
         condition: service_completed_successfully
-      demo-webapp-build:
+      webapp-build:
         condition: service_completed_successfully
-      demo-api:
+      api:
         condition: service_started
-    networks:
-      - demo-net
     ports:
       - 8080:80
     volumes:
       - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
-      - demo-webapp-app:/app:ro
-
-networks:
-  demo-net:
-
+      - webapp-app:/app:ro
 
 volumes:
-  demo-ldap-data:
-  demo-ldap-config:
-  demo-postgres-data:
-  demo-api-app:
-  demo-webapp-app:
+  ldap-data:
+  ldap-config:
+  postgres-data:
+  api-app:
+  webapp-app:
