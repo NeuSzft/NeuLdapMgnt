@@ -11,15 +11,9 @@
 	<Button class="btn btn-warning border" @onclick="ExpireLogoutTimer">
 		<Tooltip Placement="TooltipPlacement.Top" Title="Expire the logout timer">
 			<Icon Name="IconName.ClockFill"/>
+			@_timeLeft
 		</Tooltip>
 	</Button>
-	@if (!string.IsNullOrEmpty(_timeLeft)) {
-		<Button class="btn btn-light border" disabled style="background-color: white">
-			<Tooltip Placement="TooltipPlacement.Top" Title="Time left before auto login">
-				@_timeLeft
-			</Tooltip>
-		</Button>
-	}
 	<Button class="btn btn-danger border" @onclick="ClearCachesAndReload">
 		<Tooltip Placement="TooltipPlacement.Top" Title="Clear caches and reload the webapp">
 			<Icon Name="IconName.ArrowClockwise"/>
@@ -53,7 +47,7 @@
 
 	protected override void OnInitialized() {
 		_timer = new Timer(_ => InvokeAsync(() => {
-			_timeLeft = ApiRequests.CurrentToken is null ? string.Empty : JwtService.GetRemainingTime(ApiRequests.CurrentToken).ToString(@"mm\:ss");
+			_timeLeft = ApiRequests.CurrentToken is null ? string.Empty : JwtService.GetRemainingTime(ApiRequests.CurrentToken).ToString("m\\:ss");
 			StateHasChanged();
 		}), null, 0, 1000);
 	}

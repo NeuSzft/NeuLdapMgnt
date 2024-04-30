@@ -1,5 +1,4 @@
-﻿using BlazorBootstrap;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using NeuLdapMgnt.Models;
 using NeuLdapMgnt.WebApp.Requests;
 
@@ -71,15 +70,11 @@ public class TeacherService
 		List<string> errorList = new();
 		try
 		{
-			var response = await ApiRequests.UpdateTeacherAsync(teacher.Id, teacher);
+			var response = await ApiRequests.UpdateTeacherAsync(teacher.Id, teacher, !string.IsNullOrWhiteSpace(teacher.Password));
 
 			if (response.IsSuccess())
 			{
 				NotificationService.NotifySuccess($"{teacher.FullName} was updated!");
-				if (!string.IsNullOrEmpty(teacher.Password))
-				{
-					await ChangePasswordAsync(teacher.Id, teacher.Password);
-				}
 			}
 			else
 			{
@@ -121,7 +116,7 @@ public class TeacherService
 		return errorList;
 	}
 
-	private async Task<List<string>> UpdateTeachersStatusAsync(List<Teacher> teachers, bool isAdmin,
+	public async Task<List<string>> UpdateTeachersStatusAsync(List<Teacher> teachers, bool isAdmin,
 		bool isInactive, List<string> errorList)
 	{
 		foreach (var teacher in teachers)
@@ -144,12 +139,8 @@ public class TeacherService
 				}
 			}
 
-			var responseUpdate = await ApiRequests.UpdateTeacherAsync(teacher.Id, teacher);
-			if (responseUpdate.IsSuccess() && !string.IsNullOrEmpty(teacher.Password))
-			{
-				await ChangePasswordAsync(teacher.Id, teacher.Password);
-			}
-			else
+			var responseUpdate = await ApiRequests.UpdateTeacherAsync(teacher.Id, teacher, !string.IsNullOrWhiteSpace(teacher.Password));
+			if (responseUpdate.IsFailure())
 			{
 				errorList.AddRange(responseUpdate.Errors);
 			}
@@ -162,7 +153,7 @@ public class TeacherService
 	{
 		try
 		{
-			var response = await ApiRequests.AddTeacherAsync(teacher);
+			var response = await ApiRequests.AddTeacherAsync(teacher, !string.IsNullOrWhiteSpace(teacher.Password));
 			if (response.IsSuccess())
 			{
 				NotificationService.NotifySuccess($"{teacher.FullName} was added!");
@@ -175,15 +166,6 @@ public class TeacherService
 		catch (Exception e)
 		{
 			NotificationService.HandleError(e);
-		}
-	}
-
-	private async Task ChangePasswordAsync(string id, string password)
-	{
-		var response = await ApiRequests.ChangeTeacherPassword(id, password);
-		if (response.IsFailure())
-		{
-			NotificationService.NotifyError(response.GetError());
 		}
 	}
 }

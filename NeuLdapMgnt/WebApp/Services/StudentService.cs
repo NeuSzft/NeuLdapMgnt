@@ -69,13 +69,9 @@ public class StudentService
 	{
 		try
 		{
-			var response = await ApiRequests.AddStudentAsync(student);
+			var response = await ApiRequests.AddStudentAsync(student, !string.IsNullOrWhiteSpace(student.Password));
 			if (response.IsSuccess())
 			{
-				if (!string.IsNullOrEmpty(student.Password))
-				{
-					await ChangePasswordAsync(student.Id, student.Password);
-				}
 				NotificationService.NotifySuccess($"{student.FullName} was added!");
 			}
 			else
@@ -94,14 +90,10 @@ public class StudentService
 		List<string> errorList = new();
 		try
 		{
-			var response = await ApiRequests.UpdateStudentAsync(student.Id.ToString(), student);
+			var response = await ApiRequests.UpdateStudentAsync(student.Id.ToString(), student, !string.IsNullOrWhiteSpace(student.Password));
 
 			if (response.IsSuccess())
 			{
-				if (!string.IsNullOrEmpty(student.Password))
-				{
-					await ChangePasswordAsync(student.Id, student.Password);
-				}
 				NotificationService.NotifySuccess($"{student.FullName} was updated!");
 			}
 			else
@@ -142,16 +134,11 @@ public class StudentService
 				if (!string.IsNullOrEmpty(newClass) && !student.Class.Equals(newClass))
 				{
 					student.Class = newClass;
-					var response = await ApiRequests.UpdateStudentAsync(student.Id.ToString(), student);
+					var response = await ApiRequests.UpdateStudentAsync(student.Id.ToString(), student, !string.IsNullOrWhiteSpace(student.Password));
 					if (response.IsFailure())
 					{
 						errorList.AddRange(response.Errors);
 					}
-				}
-
-				if (!string.IsNullOrEmpty(student.Password))
-				{
-					await ChangePasswordAsync(student.Id, student.Password);
 				}
 			}
 
@@ -171,14 +158,5 @@ public class StudentService
 		}
 
 		return errorList;
-	}
-
-	private async Task ChangePasswordAsync(long id, string password)
-	{
-		var response = await ApiRequests.ChangeStudentPassword(id.ToString(), password);
-		if (response.IsFailure())
-		{
-			NotificationService.NotifyError(response.GetError());
-		}
 	}
 }
