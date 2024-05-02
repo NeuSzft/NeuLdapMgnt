@@ -1,4 +1,5 @@
 ﻿@page "/students/{id}"
+@inject IJSRuntime JsRuntime
 
 <PageTitle>@_student.FullName</PageTitle>
 
@@ -8,8 +9,20 @@
 }
 else
 {
-	<h3>[@_student.Class] @_student.FullName</h3>
-	<FormStudent Student="_student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="true" OnDelete="OnDelete"/>
+	<h3>@_student.FullName</h3>
+	<div class="d-flex flex-row gap-2">
+		<BadgeClass Class="@_student.Class"/>
+		@if (_student.IsInactive)
+		{
+			<BadgeInactive/>
+		}
+		else
+		{
+			<BadgeActive/>
+		}
+	</div>
+
+	<FormStudent Student="_student" OnSubmit="OnSubmit" IsReadonly="true" CanDelete="!_student.IsInactive" OnDelete="OnDelete"/>
 	<ConfirmDialog @ref="_dialog"/>
 }
 
@@ -25,7 +38,7 @@ else
 		ApiRequests.EnsureAuthentication(NavManager);
 		long.TryParse(Id, out long id);
 
-		var searchedStudent = await StudentService.FetchStudentAsync(id);
+		var searchedStudent = await StudentService.FetchStudentAsync(id.ToString());
 		if (searchedStudent is null) return;
 		_student = searchedStudent;
 
@@ -41,33 +54,37 @@ else
 			return false;
 		}
 
-		var parameters = new Dictionary<string, object>();
-		parameters.Add("StudentOriginal", _student);
-		parameters.Add("StudentEdited", editedStudent);
+		var parameters = new Dictionary<string, object>
+		{
+			{ "StudentOriginal", _student },
+			{ "StudentEdited", editedStudent }
+		};
 
 		var confirmation = await _dialog.ShowAsync<SummaryStudentEdit>("Edit this student?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
 		if (!confirmation) return false;
 
 		_isLoading = true;
 		await StudentService.UpdateStudentAsync(editedStudent);
+		await StudentService.FetchStudentAsync(editedStudent.Id.ToString());
 		_isLoading = false;
 
+		await JsRuntime.InvokeVoidAsync("history.back");
 		return false;
 	}
 
 	private async Task<bool> OnDelete(Student editedStudent)
 	{
-		var parameters = new Dictionary<string, object>();
-		parameters.Add("Student", editedStudent);
+		var parameters = new Dictionary<string, object> { { "Student", editedStudent } };
 
 		var confirmation = await _dialog.ShowAsync<SummaryStudent>("Deactivate this student?", parameters, DialogOptions.Confirm());
 		if (!confirmation) return false;
 
 		_isLoading = true;
 		await LocalDbService.DeactivateUserAsync(editedStudent.Id.ToString());
+		await StudentService.FetchStudentAsync(editedStudent.Id.ToString());
 		_isLoading = false;
-		NavManager.NavigateTo("/students");
 
+		await JsRuntime.InvokeVoidAsync("history.back");
 		return false;
 	}
 

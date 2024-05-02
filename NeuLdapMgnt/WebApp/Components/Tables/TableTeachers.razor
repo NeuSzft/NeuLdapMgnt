@@ -99,7 +99,7 @@
 				<td>
 					<input class="form-check-input"
 					       type="checkbox"
-					       checked="@(LocalDbService.Admins.Exists(x => x.Equals(teacher.Id)))"
+					       checked="@teacher.IsAdmin"
 					       disabled/>
 				</td>
 				<td class="text-end rounded-end">

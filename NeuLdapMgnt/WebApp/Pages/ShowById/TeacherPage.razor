@@ -1,4 +1,5 @@
 ﻿@page "/teachers/{id}"
+@inject IJSRuntime JsRuntime
 
 <PageTitle>@_teacher.FullName</PageTitle>
 
@@ -8,16 +9,29 @@
 }
 else
 {
-	@if (_teacher.Class != "-")
-	{
-		<h3>[@_teacher.Class] @_teacher.FullName</h3>
-	}
-	else
-	{
-		<h3>@_teacher.FullName</h3>
-	}
+	<h3>@_teacher.FullName</h3>
+	<div class="d-flex flex-row gap-2">
+		@if (_teacher.Class != "-")
+		{
+			<BadgeClass Class="@_teacher.Class" />
+		}
 
-	<FormTeacher Teacher="_teacher" OnSubmit="OnSubmit" IsReadonly="@(!_isLoading)" CanDelete="true" OnDelete="OnDelete"/>
+		@if (_teacher.IsAdmin)
+		{
+			<BadgeAdministrator />
+		}
+
+		@if (_teacher.IsInactive)
+		{
+			<BadgeInactive />
+		}
+		else
+		{
+			<BadgeActive />
+		}
+	</div>
+
+	<FormTeacher Teacher="_teacher" OnSubmit="OnSubmit" IsReadonly="@(!_isLoading)" CanDelete="!_teacher.IsInactive" OnDelete="OnDelete"/>
 	<ConfirmDialog @ref="_dialog"/>
 }
 
@@ -59,8 +73,10 @@ else
 
 		_isLoading = true;
 		await TeacherService.UpdateTeacherAsync(editedTeacher);
+		await TeacherService.FetchTeacherAsync(editedTeacher.Id);
 		_isLoading = false;
-
+		
+		await JsRuntime.InvokeVoidAsync("history.back");
 		return false;
 	}
 
@@ -73,9 +89,10 @@ else
 
 		_isLoading = true;
 		await LocalDbService.DeactivateUserAsync(editedTeacher.Id);
+		await TeacherService.FetchTeacherAsync(editedTeacher.Id);
 		_isLoading = false;
-		NavManager.NavigateTo("/teachers");
-
+		
+		await JsRuntime.InvokeVoidAsync("history.back");
 		return false;
 	}
 

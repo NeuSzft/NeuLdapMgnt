@@ -146,7 +146,7 @@ else
 	{
 		if (long.TryParse(userId, out long studentId) && studentId != 0)
 		{
-			Student? student = await StudentService.FetchStudentAsync(studentId);
+			Student? student = await StudentService.FetchStudentAsync(studentId.ToString());
 			if (student is null) return;
 			NavManager.NavigateTo($"/students/{studentId}");
 		}

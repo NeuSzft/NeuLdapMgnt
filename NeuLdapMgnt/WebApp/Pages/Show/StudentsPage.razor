@@ -4,7 +4,7 @@
 
 <div class="row justify-content-between g-2">
 	<div class="col">
-		<h1>Students <span class="badge bg-primary p-1 mb-1 align-middle">@StudentService.Students.Count</span></h1>
+		<h1>Students <span class="badge bg-primary p-1 mb-1 align-middle">@StudentService.Students.Count(x=> !x.IsInactive)</span></h1>
 	</div>
 	<div class="col text-end">
 		@if (_isLoading)
@@ -26,7 +26,7 @@ else if (_isUpdating)
 {
 	<Loading Text="Updating students"/>
 }
-else if (!StudentService.Students.Any())
+else if (StudentService.Students.All(x =>x.IsInactive) || !StudentService.Students.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
@@ -42,7 +42,7 @@ else if (!StudentService.Students.Any())
 }
 else
 {
-	<TableStudents Students="StudentService.Students"
+	<TableStudents Students="StudentService.Students.Where(x => !x.IsInactive).ToList()"
 	               OnStudentsUpdate="HandleUpdateStudents!"/>
 }
 
@@ -54,8 +54,7 @@ else
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 		await LocalDbService.FetchClassesAsync();
-		await StudentService.FetchStudentsAsync();
-		_isLoading = false;
+		await OnRefresh();
 	}
 
 	private async Task HandleUpdateStudents((List<Student>, string, bool) context)
@@ -70,6 +69,7 @@ else
 	private async Task OnRefresh()
 	{
 		_isLoading = true;
+		await LocalDbService.FetchInactiveUsersAsync();
 		await StudentService.FetchStudentsAsync();
 		_isLoading = false;
 	}

@@ -72,7 +72,8 @@
 		<label for="password">Password</label>
 		<ValidationMessage For="() => _studentUpdated.Password" id="student-password-validation-message"/>
 	</div>
-	@if (_studentUpdated.Password?.Length < 1) {
+	@if (_studentUpdated.Password?.Length < 1)
+	{
 		<label for="password">
 			<small class="text-muted">
 				Setting the password is optional. When left empty it will be ignored.
@@ -144,11 +145,8 @@
 	private async Task HandleOnDelete()
 	{
 		_isDeleting = true;
-		bool isDeleted = await OnDelete.Invoke(_studentUpdated);
+		await OnDelete.Invoke(_studentUpdated);
 		_isDeleting = false;
-
-		if (!isDeleted) return;
-		NavManager.NavigateTo("/students");
 	}
 
 	private void ToggleEditMode()
