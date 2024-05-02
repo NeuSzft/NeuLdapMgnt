@@ -4,7 +4,7 @@
 
 <div class="row justify-content-between g-2">
 	<div class="col">
-		<h1>Students <span class="badge bg-primary p-1 mb-1 align-middle">@StudentService.Students.Count(x=> !x.IsInactive)</span></h1>
+		<h1>Students <span class="badge bg-primary p-1 mb-1 align-middle">@StudentService.Students.Count(x => !x.IsInactive)</span></h1>
 	</div>
 	<div class="col text-end">
 		@if (_isLoading)
@@ -26,16 +26,16 @@ else if (_isUpdating)
 {
 	<Loading Text="Updating students"/>
 }
-else if (StudentService.Students.All(x =>x.IsInactive) || !StudentService.Students.Any())
+else if (StudentService.Students.All(x => x.IsInactive) || !StudentService.Students.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
-			<h3 class="my-4">There are no <strong>[Active]</strong> students</h3>
+			<h3 class="my-4">There are no <BadgeActive/> students</h3>
 			<ButtonAdd Text="Add Student" OnClick="ToAddPage"/>
 			<Button Color="ButtonColor.Dark" Outline="true" Class="ms-3" @onclick="ToInactivesPage">
 				<i class="bi bi-eye"></i>
 				View
-				<strong>[Inactives]</strong>
+				<strong>Inactives</strong>
 			</Button>
 		</div>
 	</div>

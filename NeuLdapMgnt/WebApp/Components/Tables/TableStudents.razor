@@ -104,7 +104,9 @@
 				</td>
 				<td>@student.Id</td>
 				<td>@student.FullName</td>
-				<td>@student.Class</td>
+				<td>
+					<BadgeClass Class="@student.Class"/>
+				</td>
 				<td class="text-end rounded-end">
 					<ButtonInspect Id="@student.Id.ToString()"/>
 				</td>
@@ -136,8 +138,8 @@
 	private string _editedClass        = string.Empty;
 	private bool   _editIsInactive     = false;
 	private Switch _switchEditIsActive = default!;
-	
-	private bool   IsStudentSelected => !_selectedStudents.Any();
+
+	private bool IsStudentSelected => !_selectedStudents.Any();
 
 	protected override void OnInitialized()
 	{

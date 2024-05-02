@@ -23,7 +23,7 @@ else
 	{
 		<div class="d-flex justify-content-center text-center">
 			<div>
-				<h3 class="my-4">There are no <strong>[Inactive]</strong> users</h3>
+				<h3 class="my-4">There are no <BadgeInactive/> users</h3>
 			</div>
 		</div>
 	}
@@ -56,22 +56,72 @@ else
 						}
 					</th>
 					<th class="user-select-none">ID</th>
+					<th class="user-select-none">Name</th>
+					<th class="user-select-none">Status</th>
+					<th class="user-select-none">Class</th>
 					<th class="user-select-none text-end">Inspect</th>
 				</tr>
 				</thead>
 				<tbody>
-				@foreach (var user in LocalDbService.InactiveUsers)
+				@foreach (var teacher in TeacherService.Teachers.Where(x => x.IsInactive))
 				{
 					<tr>
 						<td class="rounded-start">
 							<input class="form-check-input"
 							       type="checkbox"
-							       checked="@_selectedUsers.Contains(user)"
-							       @onchange="() => SelectUser(user)"/>
+							       checked="@_selectedUsers.Contains(teacher.Id)"
+							       @onchange="() => SelectUser(teacher.Id)"/>
 						</td>
-						<td>@user</td>
+						<td>@teacher.Id</td>
+						<td>@teacher.FullName</td>
+						<td>
+							<div class="d-flex flex-column flex-grow-0 gap-1 align-items-start">
+								@if (teacher.IsAdmin)
+								{
+									<BadgeAdministrator/>
+								}
+								@if (teacher.IsEmployee)
+								{
+									<BadgeEmployee/>
+								}
+								else
+								{
+									<BadgeTeacher/>
+								}
+							</div>
+						</td>
+						<td>
+							@if (!teacher.IsEmployee)
+							{
+								<BadgeClass Class="@teacher.Class"/>
+							}
+						</td>
 						<td class="text-end rounded-end">
-							<Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(user)">
+							<Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(teacher.Id)">
+								<i class="bi bi-eye"></i>
+							</Button>
+						</td>
+					</tr>
+				}
+				@foreach (var student in StudentService.Students.Where(x => x.IsInactive))
+				{
+					<tr>
+						<td class="rounded-start">
+							<input class="form-check-input"
+							       type="checkbox"
+							       checked="@_selectedUsers.Contains(student.Id.ToString())"
+							       @onchange="() => SelectUser(student.Id.ToString())"/>
+						</td>
+						<td>@student.Id</td>
+						<td>@student.FullName</td>
+						<td>
+							<BadgeStudent/>
+						</td>
+						<td>
+							<BadgeClass Class="@student.Class"/>
+						</td>
+						<td class="text-end rounded-end">
+							<Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(student.Id.ToString())">
 								<i class="bi bi-eye"></i>
 							</Button>
 						</td>
@@ -98,6 +148,8 @@ else
 		ApiRequests.EnsureAuthentication(NavManager);
 		_isLoading = true;
 		await LocalDbService.FetchInactiveUsersAsync();
+		await TeacherService.FetchTeachersAsync();
+		await StudentService.FetchStudentsAsync();
 		_usersList = LocalDbService.InactiveUsers.ToList();
 		_isLoading = false;
 	}
@@ -108,7 +160,7 @@ else
 		parameters.Add("List", _selectedUsers);
 
 		var confirmation = await _dialog.ShowAsync<CustomList>(
-			title: $"Set status to [Active] to [{_selectedUsers.Count}] user(s)?",
+			title: $"Set {_selectedUsers.Count} user(s) status to [Active]?",
 			parameters: parameters,
 			confirmDialogOptions: DialogOptions.Confirm());
 
@@ -128,7 +180,7 @@ else
 		parameters.Add("List", _selectedUsers);
 
 		var confirmation = await _dialog.ShowAsync<CustomList>(
-			title: $"Delete permanently [{_selectedUsers.Count}] user(s)?",
+			title: $"Delete permanently {_selectedUsers.Count} user(s)?",
 			parameters: parameters,
 			confirmDialogOptions: DialogOptions.Confirm());
 

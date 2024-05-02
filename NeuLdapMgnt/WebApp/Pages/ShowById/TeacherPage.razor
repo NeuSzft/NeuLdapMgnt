@@ -11,16 +11,21 @@ else
 {
 	<h3>@_teacher.FullName</h3>
 	<div class="d-flex flex-row gap-2">
-		@if (_teacher.Class != "-")
-		{
-			<BadgeClass Class="@_teacher.Class" />
-		}
-
 		@if (_teacher.IsAdmin)
 		{
 			<BadgeAdministrator />
 		}
-
+		
+		@if (_teacher.IsEmployee)
+		{
+			<BadgeEmployee/>
+		}
+		else
+		{
+			<BadgeTeacher/>
+			<BadgeClass Class="@_teacher.Class" />
+		}
+		
 		@if (_teacher.IsInactive)
 		{
 			<BadgeInactive />
