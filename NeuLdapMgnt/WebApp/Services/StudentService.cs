@@ -37,13 +37,15 @@ public class StudentService
 	{
 		try
 		{
-			await DatabaseService.FetchInactiveUsersAsync();
-
 			var response = await ApiRequests.GetStudentsAsync();
 			if (response.IsSuccess())
 			{
-				Students = new(response.Values.Where(x =>
-					!DatabaseService.InactiveUsers.Contains(x.Id.ToString())));
+				Students.Clear();
+				foreach (var student in response.Values)
+				{
+					student.IsInactive = DatabaseService.InactiveUsers.Contains(student.Id.ToString());
+					Students.Add(student);
+				}
 			}
 			else
 			{
@@ -61,14 +63,16 @@ public class StudentService
 	/// </summary>
 	/// <param name="id">The ID of the student to fetch.</param>
 	/// <returns>The fetched student, or null if not found.</returns>
-	public async Task<Student?> FetchStudentAsync(long id)
+	public async Task<Student?> FetchStudentAsync(string id)
 	{
 		try
 		{
-			var response = await ApiRequests.GetStudentAsync(id.ToString());
+			var response = await ApiRequests.GetStudentAsync(id);
 			if (response.IsSuccess())
 			{
-				return response.Values[0];
+				Student student = response.Values[0];
+				student.IsInactive = DatabaseService.InactiveUsers.Contains(student.Id.ToString());
+				return student;
 			}
 
 			NotificationService.NotifyError(response.GetError());
@@ -156,21 +160,20 @@ public class StudentService
 			{
 				if (isInactive && !DatabaseService.InactiveUsers.Contains(student.Id.ToString()))
 				{
-					var response = await ApiRequests.DeactivateUserAsync(student.Id.ToString());
-					if (response.IsFailure())
+					var responseDeactivate = await ApiRequests.DeactivateUserAsync(student.Id.ToString());
+					if (responseDeactivate.IsFailure())
 					{
-						errorList.AddRange(response.Errors);
+						errorList.AddRange(responseDeactivate.Errors);
 					}
 				}
 
-				if (!string.IsNullOrEmpty(newClass) && !student.Class.Equals(newClass))
+				if (string.IsNullOrEmpty(newClass) || student.Class.Equals(newClass)) continue;
+				
+				student.Class = newClass;
+				var response = await ApiRequests.UpdateStudentAsync(student.Id.ToString(), student, !string.IsNullOrWhiteSpace(student.Password));
+				if (response.IsFailure())
 				{
-					student.Class = newClass;
-					var response = await ApiRequests.UpdateStudentAsync(student.Id.ToString(), student, !string.IsNullOrWhiteSpace(student.Password));
-					if (response.IsFailure())
-					{
-						errorList.AddRange(response.Errors);
-					}
+					errorList.AddRange(response.Errors);
 				}
 			}
 

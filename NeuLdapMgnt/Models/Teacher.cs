@@ -40,6 +40,9 @@ public sealed class Teacher : Person, IEquatable<Teacher>
 	[LdapAttribute("roomNumber")]
 	public string Class { get; set; } = "-";
 
+	[JsonIgnore]
+	public bool IsAdmin { get; set; }
+	
 	public bool Equals(Teacher? other)
 	{
 		if (other == null) return false;

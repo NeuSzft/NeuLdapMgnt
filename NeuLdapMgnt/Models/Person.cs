@@ -120,7 +120,7 @@ namespace NeuLdapMgnt.Models
 
 		[JsonIgnore]
 		public bool IsInactive { get; set; }
-
+		
 		private string GetFullName()
 		{
 			StringBuilder builder = new();

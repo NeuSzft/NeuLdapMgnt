@@ -37,13 +37,16 @@ public class TeacherService
 	{
 		try
 		{
-			Teachers.Clear();
-
 			var response = await ApiRequests.GetTeachersAsync();
 			if (response.IsSuccess())
 			{
-				Teachers = new(response.Values.Where(x =>
-					!DatabaseService.InactiveUsers.Contains(x.Id.ToString())));
+				Teachers.Clear();
+				foreach (var teacher in response.Values)
+				{
+					teacher.IsInactive = DatabaseService.InactiveUsers.Contains(teacher.Id);
+					teacher.IsAdmin = DatabaseService.Admins.Contains(teacher.Id);
+					Teachers.Add(teacher);
+				}
 			}
 			else
 			{
@@ -68,7 +71,10 @@ public class TeacherService
 			var response = await ApiRequests.GetTeacherAsync(id);
 			if (response.IsSuccess())
 			{
-				return response.Values[0];
+				Teacher teacher = response.Values[0];
+				teacher.IsInactive = DatabaseService.InactiveUsers.Contains(teacher.Id);
+				teacher.IsAdmin = DatabaseService.Admins.Contains(teacher.Id);
+				return teacher;
 			}
 
 			NotificationService.NotifyError(response.GetError());
