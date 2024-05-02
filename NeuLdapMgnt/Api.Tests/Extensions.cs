@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.Json;
 
 namespace NeuLdapMgnt.Api.Tests;
 
@@ -33,12 +32,6 @@ public static class Extensions {
 	public static HttpRequestMessage AuthWithExpiredJwt(this HttpRequestMessage request) {
 		string token = Testing.Client.GetStringAsync("/api/testing/get-exp-token").Result;
 		return request.SetAuthHeader("Bearer", token);
-	}
-
-	public static bool CheckStatusCode(this HttpResponseMessage response, int code) {
-		using Stream   stream = response.Content.ReadAsStream();
-		RequestResult? result = JsonSerializer.Deserialize<RequestResult>(stream);
-		return (int)response.StatusCode == code && result is not null && result.StatusCode == code;
 	}
 
 	public static TRequestResult AssertSuccess<TRequestResult>(this TRequestResult result) where TRequestResult : RequestResult {

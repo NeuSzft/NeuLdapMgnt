@@ -156,13 +156,13 @@ public class EntityExtensionsTests {
 
 		Assert.IsNull(Testing.LdapService.TryGetPasswordOfEntity("5", typeof(Dummy)));
 
-		string? hashBase64 = Authenticator.GetDefaultAdminPasswordAndCrateAdminWhenMissing(Testing.LdapService, out var error);
+		string? hash = Authenticator.GetDefaultAdminPasswordAndCrateAdminWhenMissing(Testing.LdapService, out var error);
 		Assert.IsNull(error);
-		Assert.IsNotNull(hashBase64);
-		Assert.IsTrue(Utils.CheckBCryptPassword(hashBase64, "adminpass"));
+		Assert.IsNotNull(hash);
+		Assert.IsTrue(Utils.CheckBCryptPassword(hash, "adminpass"));
 
-		hashBase64 = Testing.LdapService.TryGetPasswordOfEntity(Authenticator.GetDefaultAdminName());
-		Assert.IsNotNull(hashBase64);
-		Assert.IsTrue(Utils.CheckBCryptPassword(hashBase64, "adminpass"));
+		hash = Testing.LdapService.TryGetPasswordOfEntity(Authenticator.GetDefaultAdminName());
+		Assert.IsNotNull(hash);
+		Assert.IsTrue(Utils.CheckBCryptPassword(hash, "adminpass"));
 	}
 }
