@@ -60,6 +60,8 @@ public sealed class Teacher : Person, IEquatable<Teacher>
 			&& Password == other.Password;
 	}
 
+	public bool IsEmployee => Class.Equals("-");
+	
 	public override bool Equals(object? obj)
 	{
 		return Equals(obj as Teacher);
