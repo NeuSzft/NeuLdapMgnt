@@ -42,11 +42,11 @@ public static class Authenticator {
 		if (pwd is not null)
 			return pwd;
 
-		string hashBase64 = Utils.BCryptHashPassword(Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD").DefaultIfNullOrEmpty("adminpass"));
+		string bcryptHash = Utils.BCryptHashPassword(Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD").DefaultIfNullOrEmpty("adminpass"));
 		ldap.SetValue(DefaultAdminEnabledValueName, true.ToString(), out error);
-		ldap.SetValue(DefaultAdminPasswordValueName, hashBase64, out error);
+		ldap.SetValue(DefaultAdminPasswordValueName, bcryptHash, out error);
 
-		return hashBase64;
+		return bcryptHash;
 	}
 
 	/// <summary>Checks whether the default admin is enabled or not.</summary>
@@ -95,27 +95,21 @@ public static class Authenticator {
 			return new(StatusCodes.Status400BadRequest, "Invalid Authorization header.", null);
 
 		if (username == GetDefaultAdminName()) {
-			string hashBase64 = GetDefaultAdminPasswordAndCrateAdminWhenMissing(ldap, out var error);
+			string bcryptHash = GetDefaultAdminPasswordAndCrateAdminWhenMissing(ldap, out var error);
 			if (error is not null)
 				return new(StatusCodes.Status503ServiceUnavailable, error, null);
 
 			if (!IsDefaultAdminEnabled(ldap, out error))
 				return new(StatusCodes.Status403Forbidden, error ?? "The default admin is not enabled.", null);
 
-			if (Utils.CheckBCryptPassword(hashBase64, password))
+			if (Utils.CheckBCryptPassword(bcryptHash, password))
 				return new(StatusCodes.Status200OK, null, username);
 		}
 		else if (ldap.PartOfGroup("inactive", username)) {
 			return new(StatusCodes.Status403Forbidden, "User is inactive.", null);
 		}
-		else if (ldap.PartOfGroup("admin", username) && ldap.TryGetPasswordOfEntity(username, typeof(Teacher)) is { } hashBase64) {
-			try {
-				if (Utils.CheckBCryptPassword(hashBase64, password))
-					return new(StatusCodes.Status200OK, null, username);
-			}
-			catch {
-				return new(StatusCodes.Status500InternalServerError, "Invalid credentials within LDAP database.", null);
-			}
+		else if (ldap.PartOfGroup("admin", username) && ldap.TryGetPasswordOfEntity(username, typeof(Teacher)) is { } bcryptHash && Utils.CheckBCryptPassword(bcryptHash, password)) {
+			return new(StatusCodes.Status200OK, null, username);
 		}
 
 		return new(StatusCodes.Status401Unauthorized, "Wrong credentials.", null);
