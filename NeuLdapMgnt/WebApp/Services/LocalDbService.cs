@@ -113,6 +113,7 @@ public class LocalDbService
 			if (response.IsSuccess())
 			{
 				InactiveUsers.Remove(id);
+				NotificationService.NotifySuccess($"{id} status was set to [Inactive]");
 			}
 
 			if (response.Errors.Any())
