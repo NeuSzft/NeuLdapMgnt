@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.Protocols;
 
 namespace NeuLdapMgnt.Api.LdapServiceExtensions;
@@ -36,7 +37,7 @@ public static class ValueExtensions {
 	/// <param name="value">The new value of the pair.</param>
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
 	/// <returns><c>true</c> if the key-value pair fas successfully set or <c>false</c> if the request fails.</returns>
-	public static bool SetValue(this LdapService ldap, string key, string value, out string? error) {
+	public static bool SetValue(this LdapService ldap, string key, string value, [NotNullWhen(false)] out string? error) {
 		ldap.TryRequest(new AddRequest($"ou=values,{ldap.DomainComponents}", "organizationalUnit"), false);
 
 		if (!ldap.ValueExists(key)) {
@@ -66,7 +67,7 @@ public static class ValueExtensions {
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
 	/// <param name="successIfNotExists">If <c>true</c> the operation will be treated as a success even if the key-value pair does not exists.</param>
 	/// <returns><c>true</c> if the key-value pair fas successfully unset or <c>false</c> if the request fails.</returns>
-	public static bool UnsetValue(this LdapService ldap, string key, out string? error, bool successIfNotExists = false) {
+	public static bool UnsetValue(this LdapService ldap, string key, [NotNullWhen(false)] out string? error, bool successIfNotExists = false) {
 		if (ldap.ValueExists(key))
 			return ldap.TryRequest(new DeleteRequest($"cn={key},ou=values,{ldap.DomainComponents}"), out error) is not null;
 

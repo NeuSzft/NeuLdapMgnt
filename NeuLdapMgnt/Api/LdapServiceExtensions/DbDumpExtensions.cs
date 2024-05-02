@@ -36,8 +36,7 @@ public static class DbDumpExtensions {
 		}
 
 		foreach (var item in dump.Values) {
-			ldap.SetValue(item.Key, item.Value, out var error);
-			if (error is not null)
+			if (!ldap.SetValue(item.Key, item.Value, out var error))
 				errors.Add(error);
 		}
 
