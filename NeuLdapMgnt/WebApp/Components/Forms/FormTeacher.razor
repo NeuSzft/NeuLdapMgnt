@@ -13,7 +13,7 @@
 	<div class="form-floating">
 		<InstantInputText class="form-control"
 		                  type="text"
-		                  disabled="@(CanDelete || IsReadonly || IsAction)"
+		                  disabled="@(Teacher.Id != string.Empty)"
 		                  @bind-Value="_teacherUpdated.Id"
 		                  id="teacher-id"/>
 		<label for="teacher-id">ID</label>

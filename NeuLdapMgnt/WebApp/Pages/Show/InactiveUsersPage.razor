@@ -147,13 +147,18 @@ else
 	{
 		ApiRequests.EnsureAuthentication(NavManager);
 		_isLoading = true;
-		await LocalDbService.FetchInactiveUsersAsync();
-		await TeacherService.FetchTeachersAsync();
-		await StudentService.FetchStudentsAsync();
+		await Fetch();
 		_usersList = LocalDbService.InactiveUsers.ToList();
 		_isLoading = false;
 	}
 
+	private async Task Fetch()
+	{
+		await LocalDbService.FetchInactiveUsersAsync();
+		await TeacherService.FetchTeachersAsync();
+		await StudentService.FetchStudentsAsync();
+	}
+	
 	private async Task OnActivateSelectedUsers()
 	{
 		var parameters = new Dictionary<string, object>();
@@ -169,7 +174,9 @@ else
 		_isActivating = true;
 		StateHasChanged();
 		await LocalDbService.ActivateUsersAsync(_selectedUsers);
+		await Fetch();
 		_usersList = LocalDbService.InactiveUsers.ToList();
+		_selectedUsers.Clear();
 		_isActivating = false;
 		NotificationService.NotifySuccess("Selected users were activated.");
 	}
@@ -189,7 +196,9 @@ else
 		_isDeleting = true;
 		StateHasChanged();
 		await LocalDbService.DeleteUsersAsync(_selectedUsers);
+		await Fetch();
 		_usersList = LocalDbService.InactiveUsers.ToList();
+		_selectedUsers.Clear();
 		_isDeleting = false;
 		NotificationService.NotifySuccess("Selected users were permanently deleted!");
 	}

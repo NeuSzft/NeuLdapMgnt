@@ -1,0 +1,78 @@
+@page "/db/classes/{cls}"
+
+<PageTitle>@GetFormattedClass()</PageTitle>
+
+<div class="row justify-content-between g-2">
+	<div class="col">
+		<h1>
+			@Cls <span class="badge bg-primary p-1 mb-1 align-middle">@StudentService.Students.Count(x => x.Class.Equals(GetFormattedClass()))</span>
+		</h1>
+	</div>
+	<div class="col text-end">
+		@if (_isLoading)
+		{
+			<ButtonLoading ButtonColor="ButtonColor.Secondary" SpinnerColor="SpinnerColor.Secondary"/>
+		}
+		else
+		{
+			<ButtonRefresh OnClick="OnRefresh" Text="Refresh"/>
+		}
+	</div>
+</div>
+
+@if (_isLoading)
+{
+	<Loading Text="Loading students"/>
+}
+else if (_isUpdating)
+{
+	<Loading Text="Updating students"/>
+}
+else if (StudentService.Students.All(x => x.IsInactive) || !StudentService.Students.Any(x=>x.Class.Equals(GetFormattedClass())))
+{
+	<div class="d-flex justify-content-center text-center">
+		<div>
+			<h3 class="my-4">There are no students found in this class</h3>
+			<ButtonAdd Text="To Students" OnClick="ToStudentsPage"/>
+		</div>
+	</div>
+}
+else
+{
+	<TableStudents Students="StudentService.Students.Where(x => x.Class.Equals(GetFormattedClass())).ToList()"
+	               OnStudentsUpdate="HandleUpdateStudents!"/>
+}
+
+@code {
+	[Parameter] public string Cls { get; set; } = string.Empty;
+
+	private bool _isLoading = true;
+	private bool _isUpdating;
+
+	protected override async Task OnInitializedAsync()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+		await LocalDbService.FetchClassesAsync();
+		await OnRefresh();
+	}
+
+	private async Task HandleUpdateStudents((List<Student>, string, bool) context)
+	{
+		var (students, cls, isInactive) = context;
+		_isUpdating = true;
+		await StudentService.UpdateStudentsAsync(students, cls, isInactive);
+		await OnRefresh();
+		_isUpdating = false;
+	}
+
+	private async Task OnRefresh()
+	{
+		_isLoading = true;
+		await LocalDbService.FetchInactiveUsersAsync();
+		await StudentService.FetchStudentsAsync();
+		_isLoading = false;
+	}
+
+	private string GetFormattedClass() => Cls.Replace('-', '/');
+	private void   ToStudentsPage()    => NavManager.NavigateTo("/students");
+}

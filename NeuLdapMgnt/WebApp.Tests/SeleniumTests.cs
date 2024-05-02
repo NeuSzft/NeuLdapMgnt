@@ -185,9 +185,9 @@ public class SeleniumTests
 		NavLinks.Find(x => x.Text.Equals("View Students"))?.Click();
 		_wait.Until(ExpectedConditions.TitleIs("Students"));
 		_wait.Until(ExpectedConditions.TextToBePresentInElement(_webDriver.FindElement(By.TagName("h3")),
-			"There are no [Active] students"));
+			"There are no Active students"));
 
-		Assert.AreEqual("There are no [Active] students", _webDriver.FindElement(By.TagName("h3")).Text);
+		Assert.AreEqual("There are no Active students", _webDriver.FindElement(By.TagName("h3")).Text);
 	}
 
 	[TestMethod]
@@ -252,7 +252,7 @@ public class SeleniumTests
 
 		_webDriver.FindElement(By.ClassName("btn-primary")).Click();
 		_wait.Until(ExpectedConditions.TitleIs("Add Student"));
-		
+
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).SendKeys(Keys.ArrowDown);
 		Assert.AreEqual($"OM must be between {Student.IdMinValue} and {Student.IdMaxValue}.",
@@ -272,7 +272,7 @@ public class SeleniumTests
 		Login();
 		ExpandNavbar();
 		NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
-		
+
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.Id("first-name")).SendKeys(Keys.Space);
 		Assert.AreEqual("First name is required.",
@@ -317,7 +317,7 @@ public class SeleniumTests
 		Login();
 		ExpandNavbar();
 		NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
-		
+
 		var form = _webDriver.FindElement(By.TagName("form"));
 
 		form.FindElement(By.Id("password")).SendKeys("a");
@@ -412,7 +412,7 @@ public class SeleniumTests
 
 		_webDriver.FindElement(By.ClassName("btn-primary")).Click();
 		_wait.Until(ExpectedConditions.TitleIs("Add Student"));
-		
+
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.Id("first-name")).SendKeys(firstName);
 		form.FindElement(By.Id("last-name")).SendKeys(lastName);
@@ -484,7 +484,7 @@ public class SeleniumTests
 		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
 
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
-		Assert.AreEqual("There are no [Active] students",
+		Assert.AreEqual("There are no Active students",
 			_webDriver.FindElement(By.TagName("h3")).Text);
 	}
 
@@ -516,12 +516,12 @@ public class SeleniumTests
 		_webDriver.FindElement(By.CssSelector(".modal-dialog .btn-success")).Click();
 
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
-		Assert.AreEqual("There are no [Inactive] users",
+		Assert.AreEqual("There are no Inactive users",
 			_webDriver.FindElement(By.TagName("h3")).Text);
 
 		NavLinks.Find(x => x.Text.Equals("View Students"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
-		Assert.AreEqual("There are no [Active] students",
+		Assert.AreEqual("There are no Active students",
 			_webDriver.FindElement(By.TagName("h3")).Text);
 	}
 
@@ -541,7 +541,7 @@ public class SeleniumTests
 
 		_webDriver.FindElement(By.ClassName("btn-primary")).Click();
 		_wait.Until(ExpectedConditions.TitleIs("Add Teacher"));
-		
+
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.Id("teacher-id")).SendKeys(id);
 		form.FindElement(By.Id("first-name")).SendKeys(firstName);
@@ -597,7 +597,7 @@ public class SeleniumTests
 		var tds = _webDriver.FindElements(By.CssSelector("table > tbody > tr > td")).ToList();
 		Assert.AreEqual(id, tds[1].Text);
 		Assert.AreEqual($"{firstName} {lastName}", tds[2].Text);
-		Assert.AreEqual(cls, tds[3].Text);
+		Assert.AreEqual(cls, tds[4].Text);
 	}
 
 	[TestMethod]
@@ -616,7 +616,7 @@ public class SeleniumTests
 		_webDriver.FindElement(By.CssSelector(".modal-confirmation .btn-success")).Click();
 
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
-		Assert.AreEqual("There are no [Active] teachers",
+		Assert.AreEqual("There are no Active teachers",
 			_webDriver.FindElement(By.TagName("h3")).Text);
 	}
 
@@ -648,12 +648,12 @@ public class SeleniumTests
 		_webDriver.FindElement(By.CssSelector(".modal-dialog .btn-success")).Click();
 
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
-		Assert.AreEqual("There are no [Inactive] users",
+		Assert.AreEqual("There are no Inactive users",
 			_webDriver.FindElement(By.TagName("h3")).Text);
 
 		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
-		Assert.AreEqual("There are no [Active] teachers",
+		Assert.AreEqual("There are no Active teachers",
 			_webDriver.FindElement(By.TagName("h3")).Text);
 	}
 
@@ -773,12 +773,12 @@ public class SeleniumTests
 
 		NavLinks.Find(x => x.Text.Equals("View Teachers"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
-		Assert.AreEqual("There are no [Active] teachers",
+		Assert.AreEqual("There are no Active teachers",
 			_webDriver.FindElement(By.TagName("h3")).Text);
 
 		NavLinks.Find(x => x.Text.Equals("Administrators"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("h3")));
-		Assert.AreEqual("There are no teachers with [Administrator] status",
+		Assert.AreEqual("There are no teachers with Administrator status",
 			_webDriver.FindElement(By.TagName("h3")).Text);
 	}
 
@@ -793,7 +793,7 @@ public class SeleniumTests
 		ExpandNavbar();
 		NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("form")));
-		
+
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.Id("first-name")).SendKeys(firstName);
 		form.FindElement(By.Id("last-name")).SendKeys(lastName);
@@ -937,7 +937,7 @@ public class SeleniumTests
 
 		NavLinks.Find(x => x.Text.Equals("Inactive Users"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
-		_webDriver.FindElements(By.ClassName("bi-eye")).LastOrDefault()?.Click();
+		_webDriver.FindElements(By.ClassName("bi-eye")).FirstOrDefault()?.Click();
 		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
 
 		var form = _webDriver.FindElement(By.TagName("form"));
