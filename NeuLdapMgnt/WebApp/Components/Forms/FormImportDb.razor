@@ -42,7 +42,7 @@
 
 	private string _importedJson = string.Empty;
 
-	private int _importMode = 0;
+	private int _importMode = -1;
 
 	private bool _isUploading = false;
 
@@ -62,6 +62,12 @@
 	}
 
 	private async Task ImportDatabase() {
+		if (_importMode < 0)
+		{
+			ToastService.Notify(ToastMessages.Danger("Select an import mode!"));
+			return;
+		}
+
 		_isUploading = true;
 
 		try {
@@ -90,11 +96,18 @@
 			ToastService.Notify(result.IsSuccess()
 				? ToastMessages.Success("Successfully imported database dump")
 				: ToastMessages.Warning("Imported database dump with partial success"));
+
+			await LocalDbService.FetchInactiveUsersAsync();
+			await LocalDbService.FetchAdminsAsync();
+			await LocalDbService.FetchClassesAsync();
+			await TeacherService.FetchTeachersAsync();
+			await StudentService.FetchStudentsAsync();
 		}
 		catch (Exception e) {
 			NotificationService.HandleError(e);
 		}
 
+		_importMode = -1;
 		_isUploading = false;
 	}
 
