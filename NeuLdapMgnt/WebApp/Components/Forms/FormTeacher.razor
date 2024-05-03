@@ -66,21 +66,15 @@
 		<ValidationMessage For="() => _teacherUpdated.Email" id="teacher-email-validation-message"/>
 	</div>
 
-	<div class="form-floating">
-		<InstantInputText type="password" class="form-control" disabled="@(IsReadonly || IsAction)" id="password" @bind-Value="_teacherUpdated.Password"/>
-		<label for="password">Password</label>
-		<ValidationMessage For="() => _teacherUpdated.Password" id="teacher-password-validation-message"/>
-	</div>
-	@if (_teacherUpdated.Password?.Length < 1) {
-		<label for="password">
+	@if (!IsReadonly) {
+		@if (string.IsNullOrWhiteSpace(_teacherUpdated.Password)) {
 			<small class="text-muted">
 				Setting the password is optional. When left empty it will be ignored.
 			</small>
-		</label>
-	}
+		}
 
-	@if (!IsReadonly)
-	{
+		<PasswordInput @bind-Value="_teacherUpdated.Password" IdBase="teacher" InputsDisabled="@IsAction"/>
+
 		<div class="d-flex justify-content-end gap-2">
 			@if (CanDelete)
 			{
