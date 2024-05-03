@@ -238,7 +238,8 @@ public class SeleniumTests
 		Assert.AreEqual(string.Empty, form.FindElement(By.Id("last-name")).GetAttribute("value"));
 		Assert.AreEqual(string.Empty, form.FindElement(By.Id("middle-name")).GetAttribute("value"));
 		Assert.AreEqual(string.Empty, form.FindElement(By.Id("class-select")).GetAttribute("value"));
-		Assert.AreEqual(string.Empty, form.FindElement(By.Id("password")).GetAttribute("value"));
+		Assert.AreEqual(string.Empty, form.FindElement(By.Id("student-password")).GetAttribute("value"));
+		Assert.AreEqual(string.Empty, form.FindElement(By.Id("student-confirm-password")).GetAttribute("value"));
 	}
 
 	[TestMethod]
@@ -312,35 +313,38 @@ public class SeleniumTests
 	}
 
 	[TestMethod]
-	public void AddStudentsEditFormIsValidatingPasswordCorrectly()
-	{
+	public void AddStudentsEditFormIsValidatingPasswordCorrectly() {
+		By passwordInput  = By.Id("student-password");
+		By passwordValMsg = By.Id("student-password-validation-message");
+		By confirmInput   = By.Id("student-confirm-password");
+		By confirmValMsg  = By.Id("student-confirm-password-validation-message");
+
 		Login();
 		ExpandNavbar();
 		NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 
-		form.FindElement(By.Id("password")).SendKeys("a");
-		Assert.AreEqual("Password must contain at least one uppercase letter.",
-			form.FindElement(By.Id("student-password-validation-message")).Text);
+		form.FindElement(passwordInput).SendKeys("a");
+		Assert.AreEqual("Password must contain at least one uppercase letter.", form.FindElement(passwordValMsg).Text);
 
-		form.FindElement(By.Id("password")).SendKeys("A");
-		Assert.AreEqual("Password must contain at least one number.",
-			form.FindElement(By.Id("student-password-validation-message")).Text);
+		form.FindElement(passwordInput).SendKeys("A");
+		Assert.AreEqual("Password must contain at least one number.", form.FindElement(passwordValMsg).Text);
 
-		form.FindElement(By.Id("password")).SendKeys("0");
-		Assert.AreEqual("Password must contain at least one special character.",
-			form.FindElement(By.Id("student-password-validation-message")).Text);
+		form.FindElement(passwordInput).SendKeys("0");
+		Assert.AreEqual("Password must contain at least one special character.", form.FindElement(passwordValMsg).Text);
 
-		form.FindElement(By.Id("password")).SendKeys(Keys.Add);
-		Assert.AreEqual("Password must be at least 8 characters long.",
-			form.FindElement(By.Id("student-password-validation-message")).Text);
+		form.FindElement(passwordInput).SendKeys("+");
+		Assert.AreEqual("Password must be at least 8 characters long.", form.FindElement(passwordValMsg).Text);
 
 		for (int i = 0; i < 7; i++)
-			form.FindElement(By.Id("password")).SendKeys("a");
+			form.FindElement(passwordInput).SendKeys("a");
+		Assert.ThrowsException<NoSuchElementException>(() => form.FindElement(passwordValMsg).Text);
 
-		Assert.ThrowsException<NoSuchElementException>(() =>
-			form.FindElement(By.Id("student-password-validation-message")).Text);
+		Assert.AreEqual("Passwords do not match.", form.FindElement(confirmValMsg).Text);
+
+		form.FindElement(confirmInput).SendKeys("aA0+aaaaaaa");
+		Assert.ThrowsException<NoSuchElementException>(() => form.FindElement(confirmValMsg).Text);
 	}
 
 	[TestMethod]
