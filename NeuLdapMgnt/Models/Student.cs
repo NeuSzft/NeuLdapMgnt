@@ -15,7 +15,7 @@ namespace NeuLdapMgnt.Models
 		public const int GidMinValue = 6000;
 		public const int GidMaxValue = 9999;
 
-		[Required(ErrorMessage = "OM is required.")]
+		[Required(ErrorMessage = "ID is required.")]
 		[IdStudent(IdMinValue, IdMaxValue)]
 		[JsonPropertyName("id")]
 		[LdapAttribute("uid")]

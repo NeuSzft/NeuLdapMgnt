@@ -28,7 +28,7 @@
 
 <div class="d-flex justify-content-between align-items-center g-2 mb-3">
 	<div class="d-flex flex-grow-1 flex-md-grow-0">
-		<SearchBar Label="OM, Name, Class" OnSearchQueryChanged="UpdateSearchQuery"/>
+		<SearchBar Label="ID, Name, Class" OnSearchQueryChanged="UpdateSearchQuery"/>
 	</div>
 	<div class="ms-2">
 		@if (_isEditing)
@@ -57,7 +57,7 @@
 				}
 			</th>
 			<th class="user-select-none" role="button" @onclick="@(() => SortTable("Id"))">
-				OM
+				ID
 				@if (_sortBy == "Id")
 				{
 					<i class="bi @GetSortIcon(_isAscending)"></i>

@@ -5,8 +5,8 @@
 <p>
 <strong>Overall Result:</strong> ✔️ Pass <br />
 <strong>Pass Rate:</strong> 100% <br />
-<strong>Run Duration:</strong> 2m 26s  <br />
-<strong>Date:</strong> 2024-05-02 17:21:25 - 2024-05-02 17:23:52 <br />
+<strong>Run Duration:</strong> 2m 23s  <br />
+<strong>Date:</strong> 2024-05-03 10:31:39 - 2024-05-03 10:34:02 <br />
 <strong>Framework:</strong> .NETCoreApp,Version=v7.0 <br />
 <strong>Total Tests:</strong> 34 <br />
 </p>
@@ -48,172 +48,172 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>DefaultRedirectionToLoginPage</td>
-<td>1s 390ms</td>
+<td>1s 285ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>RedirectionIsWorkingWhenUnauthorized</td>
-<td>5s 660ms</td>
+<td>5s 653ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>SuccessfulLoginRedirectsToHomePage</td>
-<td>2s 494ms</td>
+<td>2s 482ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>NavbarLinksAreWorking</td>
-<td>7s 51ms</td>
+<td>7s 155ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>NoStudentsArePresent</td>
-<td>2s 962ms</td>
+<td>2s 993ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>NoStudentsArePresentAndAddStudentsButtonIsPresent</td>
-<td>2s 912ms</td>
+<td>2s 934ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AfterPressingAddStudentsButtonRedirectsToAddStudent</td>
-<td>3s 172ms</td>
+<td>3s 526ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormHasLoadedDefaultValues</td>
-<td>3s 279ms</td>
+<td>3s 328ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingOmCorrectly</td>
-<td>3s 753ms</td>
+<td>3s 426ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingFullNameCorrectly</td>
-<td>3s 715ms</td>
+<td>3s 329ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentsEditFormIsValidatingPasswordCorrectly</td>
-<td>3s 570ms</td>
+<td>3s 200ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>ClassCanBeAdded</td>
-<td>3s 932ms</td>
+<td>4s 325ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>ClassDuplicateCannotBeAdded</td>
-<td>4s 9ms</td>
+<td>3s 968ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>ClassCanBeDeleted</td>
-<td>4s 692ms</td>
+<td>4s 328ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddStudentCreatesStudent</td>
-<td>4s 394ms</td>
+<td>3s 981ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>CannotAddDuplicateStudent</td>
-<td>4s 119ms</td>
+<td>3s 739ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>CreatedStudentAppearsInTable</td>
-<td>3s 262ms</td>
+<td>2s 882ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>StudentStatusCanBeSetToInactive</td>
-<td>4s 404ms</td>
+<td>4s 59ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>InactiveStudentAppearsInTable</td>
-<td>3s 578ms</td>
+<td>3s 512ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>StudentCanBePermanentlyDeleted</td>
-<td>4s 374ms</td>
+<td>3s 902ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AddTeacherCreatesTeacher</td>
-<td>4s 439ms</td>
+<td>4s 392ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>CannotAddDuplicateTeacher</td>
-<td>4s 225ms</td>
+<td>3s 800ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>CreatedTeacherAppearsInTable</td>
-<td>3s 339ms</td>
+<td>2s 902ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherStatusCanBeSetToInactive</td>
-<td>4s 448ms</td>
+<td>4s 388ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>InactiveTeacherAppearsInTable</td>
-<td>3s 169ms</td>
+<td>3s 173ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherCanBePermanentlyDeleted</td>
-<td>3s 929ms</td>
+<td>3s 932ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherStatusCanBeSetToAdmin</td>
-<td>6s 46ms</td>
+<td>5s 595ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>AdminCanBeDeletedButTeacherStillExists</td>
-<td>4s 316ms</td>
+<td>3s 861ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>DeletingTeacherPermanentlyDeletesFromAdmins</td>
-<td>7s 584ms</td>
+<td>7s 602ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>StudentCanBeInspectedFromStudentsPage</td>
-<td>4s 631ms</td>
+<td>4s 601ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>StudentCanBeInspectedFromInactiveUsersPage</td>
-<td>4s 659ms</td>
+<td>4s 655ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherCanBeInspectedFromTeachersPage</td>
-<td>4s 396ms</td>
+<td>4s 710ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherCanBeInspectedFromAdminsPage</td>
-<td>4s 622ms</td>
+<td>4s 950ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherCanBeInspectedFromInactiveUsersPage</td>
-<td>4s 981ms</td>
+<td>4s 613ms</td>
 </tr>
 </tbody>
 </table>

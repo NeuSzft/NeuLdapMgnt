@@ -19,7 +19,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 			{
 				if (id < _min || id > _max)
 				{
-					return new ValidationResult($"OM must be between {_min} and {_max}.",
+					return new ValidationResult($"ID must be between {_min} and {_max}.",
 						new[] { validationContext.MemberName }!);
 				}
 				else
@@ -28,7 +28,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 				}
 			}
 
-			return new ValidationResult("OM: Invalid data type", new[] { validationContext.MemberName }!);
+			return new ValidationResult("ID: Invalid data type", new[] { validationContext.MemberName }!);
 		}
 	}
 }

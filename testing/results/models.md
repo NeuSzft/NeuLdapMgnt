@@ -5,8 +5,8 @@
 <p>
 <strong>Overall Result:</strong> ✔️ Pass <br />
 <strong>Pass Rate:</strong> 100% <br />
-<strong>Run Duration:</strong> 1s 445ms <br />
-<strong>Date:</strong> 2024-04-30 12:45:41 - 2024-04-30 12:45:43 <br />
+<strong>Run Duration:</strong> 949ms <br />
+<strong>Date:</strong> 2024-05-03 10:35:33 - 2024-05-03 10:35:34 <br />
 <strong>Framework:</strong> .NETCoreApp,Version=v7.0 <br />
 <strong>Total Tests:</strong> 55 <br />
 </p>
@@ -48,7 +48,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>StudentIdAttributeValidOmSuccess</td>
-<td>33ms</td>
+<td>7ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -63,12 +63,12 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherIdAttributeWithInvalidDataTypeFails</td>
-<td>< 1ms</td>
+<td>2ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
 <td>TeacherIdAttributeInvalidFormatFails</td>
-<td>< 1ms</td>
+<td>1ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -128,7 +128,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>StudentGidAttributeInvalidGidFails</td>
-<td>2ms</td>
+<td>< 1ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -193,7 +193,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>EmailAttributeValidEmailSuccess</td>
-<td>< 1ms</td>
+<td>1ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>
@@ -278,7 +278,7 @@
 <tr>
 <td> ✔️ Passed </td>
 <td>PasswordAttributeTooShortFails</td>
-<td>< 1ms</td>
+<td>1ms</td>
 </tr>
 <tr>
 <td> ✔️ Passed </td>

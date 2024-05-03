@@ -255,15 +255,15 @@ public class SeleniumTests
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).SendKeys(Keys.ArrowDown);
-		Assert.AreEqual($"OM must be between {Student.IdMinValue} and {Student.IdMaxValue}.",
-			form.FindElement(By.Id("student-om-validation-message")).Text);
+		Assert.AreEqual($"ID must be between {Student.IdMinValue} and {Student.IdMaxValue}.",
+			form.FindElement(By.Id("student-id-validation-message")).Text);
 
 		for (int i = 0; i < 11; i++)
 			form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).SendKeys(Keys.Backspace);
 
 		form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).SendKeys("80000000000");
-		Assert.AreEqual($"OM must be between {Student.IdMinValue} and {Student.IdMaxValue}.",
-			form.FindElement(By.Id("student-om-validation-message")).Text);
+		Assert.AreEqual($"ID must be between {Student.IdMinValue} and {Student.IdMaxValue}.",
+			form.FindElement(By.Id("student-id-validation-message")).Text);
 	}
 
 	[TestMethod]
