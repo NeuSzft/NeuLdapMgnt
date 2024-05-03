@@ -63,6 +63,14 @@ else
 						<td>@teacher.FullName</td>
 						<td>
 							<div class="d-flex flex-column flex-grow-0 gap-1 align-items-start">
+								@if (teacher.IsInactive)
+								{
+									<BadgeInactive/>
+								}
+								else
+								{
+									<BadgeActive/>
+								}
 								@if (teacher.IsEmployee)
 								{
 									<BadgeEmployee/>
@@ -147,10 +155,11 @@ else
 
 		_isRemoving = true;
 		await LocalDbService.DeleteAdminsAsync(_selectedAdmins);
+		await TeacherService.FetchTeachersAsync();
 		_admins = LocalDbService.Admins.ToList();
+		_selectedAdmins.Clear();
 		_isRemoving = false;
+		
 		NotificationService.NotifySuccess("Selected admins were removed!");
 	}
-
-	private void InspectAdmin(string id) => NavManager.NavigateTo($"/teachers/{id}");
 }
