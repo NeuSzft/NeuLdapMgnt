@@ -4,7 +4,7 @@ services:
     environment:
       LDAP_ORGANISATION: Neu
       LDAP_DOMAIN: neu.local
-      LDAP_ADMIN_PASSWORD: admin
+      LDAP_ADMIN_PASSWORD: ldappass
 
   ldapadmin:
     image: osixia/phpldapadmin:latest
@@ -49,7 +49,7 @@ services:
       LDAP_PORT: 389
       LDAP_DOMAIN: neu.local
       LDAP_USERNAME: admin
-      LDAP_PASSWORD: admin
+      LDAP_PASSWORD: ldappass
       POSTGRES_DB: api-logs
       POSTGRES_PASSWORD: postgres
       DEFAULT_ADMIN_NAME: admin
