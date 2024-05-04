@@ -85,8 +85,6 @@ internal static class Program {
 
 	private static void Main() {
 		string markdown = ModelsToMarkdown(
-			typeof(LdapAttributeAttribute),
-			typeof(LdapObjectClassesAttribute),
 			typeof(LdapDbDump),
 			typeof(LogEntry),
 			typeof(RequestResult),

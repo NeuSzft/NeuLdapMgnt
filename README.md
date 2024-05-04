@@ -14,6 +14,7 @@
 6. [Testing](#testing)
 7. [WebApp Manual](#webapp-manual)
 8. [API Endpoints](#api-endpoints)
+9. [Models shared by the API and WebApp](#models-shared-by-the-api-and-webapp)
 
 ## Project Summary
 This project aims to make managing the personal information and the credentials of teachers and students easier by providing a web interface and a RESTful API that uses an OpenLDAP database as persistent storage.
@@ -128,3 +129,7 @@ Information about using the web application can be found [here](./docs/USERMANUA
 
 ## API Endpoints
 The documentation of the endpoints can be accessed by navigating to the `/api/docs` page of the deployed project.
+
+
+## Models shared by the API and WebApp
+These models are used for communication between the API and the WebApp. A list of them can be found [here](./docs/MODELS.md).
