@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -41,6 +42,12 @@ public static class Utils {
 		catch {
 			return false;
 		}
+	}
+
+	/// <summary>Gets the version of the assembly in the <c>major.minor.revision</c> format.</summary>
+	/// <returns>The version of the assembly or 1.0.0 if it is not specified.</returns>
+	public static string GetAssemblyVersion(Assembly assembly) {
+		return assembly.GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Revision}" : "1.0.0";
 	}
 }
 

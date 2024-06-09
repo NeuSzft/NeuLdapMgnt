@@ -17,6 +17,9 @@ stop:
 down:
 	$(dc) $(options-prod) down
 
+status:
+	$(dc) $(options-prod) ps -a
+
 env:
 ifeq ($(wildcard ./.env),)
 	$(file >  .env,# Environment variables used for deployment)

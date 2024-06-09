@@ -17,7 +17,7 @@ public static class TestingEndpoints {
 
         app.MapGet("/api/testing/get-exp-token", () => {
                JwtSecurityToken jwt = new(
-                   Program.TokenIssuer,
+                   Program.ServiceName,
                    "testuser",
                    null,
                    DateTime.Now.Subtract(TimeSpan.FromHours(2)),

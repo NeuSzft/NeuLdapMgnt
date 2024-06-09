@@ -18,7 +18,7 @@ namespace NeuLdapMgnt.Api;
 internal static class Program {
 	public static readonly SymmetricSecurityKey SecurityKey = Utils.LoadOrCreateSecurityKey("SECURITY_KEY");
 
-	public static readonly string TokenIssuer = typeof(Program).Assembly.FullName!;
+	public static readonly string ServiceName = typeof(Program).Namespace!;
 
 	public static void Main(string[] args) {
 		LdapService ldapService = LdapService.FromEnvs();
@@ -39,8 +39,8 @@ internal static class Program {
 				RequireAudience = true,
 
 				IssuerSigningKey = SecurityKey,
-				ValidIssuers = new[] { TokenIssuer },
-				ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha512 }
+				ValidIssuers = [ ServiceName ],
+				ValidAlgorithms = [ SecurityAlgorithms.HmacSha512 ]
 			};
 
 			options.Events = new JwtBearerEvents {
@@ -93,7 +93,7 @@ internal static class Program {
 		builder.Services.AddEndpointsApiExplorer();
 		builder.Services.AddSingleton(_ => ldapService);
 		builder.Services.AddSingleton(_ => loggerService);
-		builder.Services.AddSwaggerWrapperGen("neuldapmgnt", "Neu LDAP Management API", "alpha");
+		builder.Services.AddSwaggerWrapperGen(ServiceName.ToLower(), "Neu LDAP Management API", Utils.GetAssemblyVersion(typeof(Program).Assembly));
 
 		WebApplication app = builder.Build();
 		ldapService.Logger = app.Logger;
@@ -154,7 +154,7 @@ internal static class Program {
 		app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 		// Add swagger middlewares
-		app.UseSwaggerWrapper("neuldapmgnt");
+		app.UseSwaggerWrapper(ServiceName.ToLower());
 
 		// Map endpoints
 		app.MapAuthEndpoints();

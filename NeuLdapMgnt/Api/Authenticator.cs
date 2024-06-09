@@ -130,7 +130,7 @@ public static class Authenticator {
 	/// <returns>The base64url encoded JSON Web Token.</returns>
 	public static string CreateToken(string username) {
 		JwtSecurityToken jwt = new(
-			Program.TokenIssuer,
+			Program.ServiceName,
 			username,
 			null,
 			DateTime.Now,
