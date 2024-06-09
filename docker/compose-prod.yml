@@ -36,6 +36,8 @@ services:
         condition: service_started
       api-build:
         condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     environment:
       LDAP_ADDRESS: openldap
       LDAP_PORT: 389
