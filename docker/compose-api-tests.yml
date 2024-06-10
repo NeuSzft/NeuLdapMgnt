@@ -41,7 +41,7 @@ services:
       LDAP_PORT: 389
       LDAP_DOMAIN: neu.local
       LDAP_USERNAME: admin
-      LDAP_PASSWORD: admin
+      LDAP_PASSWORD: ldappass
     volumes:
       - ../testing/results:/tr
 
