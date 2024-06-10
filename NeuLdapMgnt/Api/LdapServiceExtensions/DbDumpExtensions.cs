@@ -48,7 +48,7 @@ public static class DbDumpExtensions {
 	/// <returns>A <see cref="RequestResult{T}">RequestResult&lt;LdapDbDump&gt;</see> containing the outcome of the operation.</returns>
 	public static RequestResult<LdapDbDump> ExportDatabase(this LdapService ldap) {
 		var studentResults = ldap.GetAllEntities<Student>(true);
-		var teacherResults = ldap.GetAllEntities<Teacher>(true);
+		var teacherResults = ldap.GetAllEntities<Employee>(true);
 
 		List<string> errors = new();
 		errors.AddRange(studentResults.Errors);

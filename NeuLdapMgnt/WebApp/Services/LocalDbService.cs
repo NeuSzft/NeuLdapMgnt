@@ -181,7 +181,7 @@ public class LocalDbService
 				}
 				else
 				{
-					var response = await ApiRequests.DeleteTeacherAsync(id);
+					var response = await ApiRequests.DeleteEmployeeAsync(id);
 					if (response.IsFailure())
 					{
 						errorList.Add(response.GetError());

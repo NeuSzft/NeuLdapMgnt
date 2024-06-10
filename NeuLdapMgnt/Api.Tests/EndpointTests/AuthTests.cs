@@ -6,7 +6,7 @@ namespace NeuLdapMgnt.Api.Tests.EndpointTests;
 public class AuthTests {
 	[ClassInitialize]
 	public static void Init(TestContext context) {
-		Teacher teacher = new() {
+		Employee employee = new() {
 			Id = "george.sears",
 			Uid = 4000,
 			Gid = 4000,
@@ -20,10 +20,10 @@ public class AuthTests {
 			Password = "lalilulelo",
 			FullName = "George Sears"
 		};
-		teacher.SetPassword(teacher.Password);
+		employee.SetPassword(employee.Password);
 
-		Testing.LdapService.TryAddEntity(teacher, teacher.Id, true).AssertSuccess();
-		Testing.LdapService.TryAddEntityToGroup("admin", teacher.Id).AssertSuccess();
+		Testing.LdapService.TryAddEntity(employee, employee.Id, true).AssertSuccess();
+		Testing.LdapService.TryAddEntityToGroup("admin", employee.Id).AssertSuccess();
 	}
 
 	[ClassCleanup]

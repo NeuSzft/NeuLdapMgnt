@@ -5,7 +5,7 @@ using NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes;
 
 namespace NeuLdapMgnt.Models;
 
-public sealed class Teacher : Person, IEquatable<Teacher>
+public sealed class Employee : Person, IEquatable<Employee>
 {
 	private string _id = string.Empty;
 
@@ -15,7 +15,7 @@ public sealed class Teacher : Person, IEquatable<Teacher>
 	public const int GidMaxValue = 5999;
 
 	[Required]
-	[IdTeacher]
+	[IdEmployee]
 	[JsonPropertyName("id")]
 	[LdapAttribute("uid")]
 	public string Id
@@ -43,7 +43,10 @@ public sealed class Teacher : Person, IEquatable<Teacher>
 	[JsonIgnore]
 	public bool IsAdmin { get; set; }
 	
-	public bool Equals(Teacher? other)
+	[JsonIgnore]
+	public bool IsTeacher { get; set; }
+	
+	public bool Equals(Employee? other)
 	{
 		if (other == null) return false;
 
@@ -60,12 +63,7 @@ public sealed class Teacher : Person, IEquatable<Teacher>
 			&& Password == other.Password;
 	}
 
-	public bool IsEmployee => Class.Equals("-");
-	
-	public override bool Equals(object? obj)
-	{
-		return Equals(obj as Teacher);
-	}
+	public override bool Equals(object? obj) => Equals(obj as Employee);
 
 	public override int GetHashCode()
 	{

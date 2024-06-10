@@ -70,7 +70,7 @@ public class DbDumpExtensionsTests {
 			}
 		],
 		Teachers = [
-			new Teacher {
+			new Employee {
 				Id = "george.sears",
 				Uid = 4000,
 				Gid = 4000,

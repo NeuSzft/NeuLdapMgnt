@@ -91,7 +91,7 @@ internal static class Program {
 			typeof(RequestResult<>),
 			typeof(Person),
 			typeof(Student),
-			typeof(Teacher)
+			typeof(Employee)
 		);
 
 		WriteMarkdownToFile(markdown);

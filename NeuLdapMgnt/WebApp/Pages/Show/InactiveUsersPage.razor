@@ -63,41 +63,41 @@ else
 				</tr>
 				</thead>
 				<tbody>
-				@foreach (var teacher in TeacherService.Teachers.Where(x => x.IsInactive))
+				@foreach (var employee in EmployeeService.Employees.Where(x => x.IsInactive))
 				{
 					<tr>
 						<td class="rounded-start">
 							<input class="form-check-input"
 							       type="checkbox"
-							       checked="@_selectedUsers.Contains(teacher.Id)"
-							       @onchange="() => SelectUser(teacher.Id)"/>
+							       checked="@_selectedUsers.Contains(employee.Id)"
+							       @onchange="() => SelectUser(employee.Id)"/>
 						</td>
-						<td>@teacher.Id</td>
-						<td>@teacher.FullName</td>
+						<td>@employee.Id</td>
+						<td>@employee.FullName</td>
 						<td>
 							<div class="d-flex flex-column flex-grow-0 gap-1 align-items-start">
-								@if (teacher.IsAdmin)
+								@if (employee.IsAdmin)
 								{
 									<BadgeAdministrator/>
 								}
-								@if (teacher.IsEmployee)
+								@if (employee.IsTeacher)
 								{
-									<BadgeEmployee/>
+									<BadgeTeacher/>
 								}
 								else
 								{
-									<BadgeTeacher/>
+									<BadgeEmployee/>
 								}
 							</div>
 						</td>
 						<td>
-							@if (!teacher.IsEmployee)
+							@if (!employee.IsTeacher)
 							{
-								<BadgeClass Class="@teacher.Class"/>
+								<BadgeClass Class="@employee.Class"/>
 							}
 						</td>
 						<td class="text-end rounded-end">
-							<Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(teacher.Id)">
+							<Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(employee.Id)">
 								<i class="bi bi-eye"></i>
 							</Button>
 						</td>
@@ -155,10 +155,10 @@ else
 	private async Task Fetch()
 	{
 		await LocalDbService.FetchInactiveUsersAsync();
-		await TeacherService.FetchTeachersAsync();
+		await EmployeeService.FetchEmployeesAsync();
 		await StudentService.FetchStudentsAsync();
 	}
-	
+
 	private async Task OnActivateSelectedUsers()
 	{
 		var parameters = new Dictionary<string, object>();
@@ -213,9 +213,9 @@ else
 		}
 		else
 		{
-			Teacher? teacher = await TeacherService.FetchTeacherAsync(userId);
-			if (teacher is null) return;
-			NavManager.NavigateTo($"/teachers/{userId}");
+			Employee? employee = await EmployeeService.FetchEmployeeAsync(userId);
+			if (employee is null) return;
+			NavManager.NavigateTo($"/employees/{userId}");
 		}
 	}
 

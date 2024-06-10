@@ -1,10 +1,10 @@
-﻿@page "/teachers"
+﻿@page "/employees"
 
-<PageTitle>Teachers</PageTitle>
+<PageTitle>Employees</PageTitle>
 
 <div class="row justify-content-between g-2">
 	<div class="col">
-		<h1>Teachers <span class="badge bg-primary p-1 mb-1 align-middle">@TeacherService.Teachers.Count(x => !x.IsInactive)</span></h1>
+		<h1>Employees <span class="badge bg-primary p-1 mb-1 align-middle">@EmployeeService.Employees.Count(x => !x.IsInactive)</span></h1>
 	</div>
 	<div class="col text-end">
 		@if (_isLoading)
@@ -20,14 +20,14 @@
 
 @if (_isLoading)
 {
-	<Loading Text="Loading teachers"/>
+	<Loading Text="Loading employees"/>
 }
-else if (TeacherService.Teachers.All(x => x.IsInactive) || !TeacherService.Teachers.Any())
+else if (EmployeeService.Employees.All(x => x.IsInactive) || !EmployeeService.Employees.Any())
 {
 	<div class="d-flex justify-content-center text-center">
 		<div>
-			<h3 class="my-4">There are no <BadgeActive/> teachers</h3>
-			<ButtonAdd Text="Add Teacher" OnClick="ToAddPage"/>
+			<h3 class="my-4">There are no <BadgeActive/> employees</h3>
+			<ButtonAdd Text="Add Employee" OnClick="ToAddPage"/>
 			<Button Color="ButtonColor.Dark" Outline="true" Class="ms-3" @onclick="ToInactivesPage">
 				<i class="bi bi-eye"></i>
 				View
@@ -38,8 +38,8 @@ else if (TeacherService.Teachers.All(x => x.IsInactive) || !TeacherService.Teach
 }
 else
 {
-	<TableTeachers Teachers="TeacherService.Teachers.Where(x => !x.IsInactive).ToList()"
-	               OnTeachersUpdate="HandleUpdateTeachers"/>
+	<TableEmployees Employees="EmployeeService.Employees.Where(x => !x.IsInactive).ToList()"
+	                OnEmployeesUpdate="HandleUpdateEmployees"/>
 }
 
 @code {
@@ -53,11 +53,11 @@ else
 		_isLoading = false;
 	}
 
-	private async Task HandleUpdateTeachers((List<Teacher>, bool, bool) context)
+	private async Task HandleUpdateEmployees((List<Employee>, bool, bool) context)
 	{
-		var (teachers, isAdmin, isInactive) = context;
+		var (employees, isAdmin, isInactive) = context;
 		_isLoading = true;
-		await TeacherService.UpdateTeachersAsync(teachers, isAdmin, isInactive);
+		await EmployeeService.UpdateEmployeesAsync(employees, isAdmin, isInactive);
 		await FetchData();
 		_isLoading = false;
 	}
@@ -66,9 +66,9 @@ else
 	{
 		await LocalDbService.FetchInactiveUsersAsync();
 		await LocalDbService.FetchClassesAsync();
-		await TeacherService.FetchTeachersAsync();
+		await EmployeeService.FetchEmployeesAsync();
 	}
 
-	private void ToAddPage()       => NavManager.NavigateTo("/teachers/add");
+	private void ToAddPage()       => NavManager.NavigateTo("/employees/add");
 	private void ToInactivesPage() => NavManager.NavigateTo("/db/inactive-users");
 }

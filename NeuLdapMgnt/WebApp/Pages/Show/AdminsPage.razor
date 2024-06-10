@@ -50,20 +50,20 @@ else
 				</tr>
 				</thead>
 				<tbody>
-				@foreach (var teacher in TeacherService.Teachers.Where(x => x.IsAdmin))
+				@foreach (var employee in EmployeeService.Employees.Where(x => x.IsAdmin))
 				{
 					<tr>
 						<td class="rounded-start">
 							<input class="form-check-input"
 							       type="checkbox"
-							       checked="@_selectedAdmins.Contains(teacher.Id)"
-							       @onchange="() => SelectAdmin(teacher.Id)"/>
+							       checked="@_selectedAdmins.Contains(employee.Id)"
+							       @onchange="() => SelectAdmin(employee.Id)"/>
 						</td>
-						<td>@teacher.Id</td>
-						<td>@teacher.FullName</td>
+						<td>@employee.Id</td>
+						<td>@employee.FullName</td>
 						<td>
 							<div class="d-flex flex-column flex-grow-0 gap-1 align-items-start">
-								@if (teacher.IsInactive)
+								@if (employee.IsInactive)
 								{
 									<BadgeInactive/>
 								}
@@ -71,24 +71,24 @@ else
 								{
 									<BadgeActive/>
 								}
-								@if (teacher.IsEmployee)
+								@if (employee.IsTeacher)
 								{
 									<BadgeEmployee/>
 								}
 								else
 								{
-									<BadgeTeacher/>
+									<BadgeEmployee/>
 								}
 							</div>
 						</td>
 						<td >
-							@if (!teacher.IsEmployee)
+							@if (!employee.IsTeacher)
 							{
-								<BadgeClass Class="@teacher.Class"/>
+								<BadgeClass Class="@employee.Class"/>
 							}
 						</td>
 						<td class="text-end rounded-end">
-							<ButtonInspect Id="@teacher.Id"/>
+							<ButtonInspect Id="@employee.Id"/>
 						</td>
 					</tr>
 				}
@@ -112,7 +112,7 @@ else
 		ApiRequests.EnsureAuthentication(NavManager);
 		_isLoading = true;
 		await LocalDbService.FetchAdminsAsync();
-		await TeacherService.FetchTeachersAsync();
+		await EmployeeService.FetchEmployeesAsync();
 		_admins = LocalDbService.Admins.ToList();
 		_isLoading = false;
 	}
@@ -155,11 +155,12 @@ else
 
 		_isRemoving = true;
 		await LocalDbService.DeleteAdminsAsync(_selectedAdmins);
-		await TeacherService.FetchTeachersAsync();
+		await EmployeeService.FetchEmployeesAsync();
 		_admins = LocalDbService.Admins.ToList();
 		_selectedAdmins.Clear();
 		_isRemoving = false;
-		
+
 		NotificationService.NotifySuccess("Selected admins were removed!");
 	}
+
 }

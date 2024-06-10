@@ -108,7 +108,7 @@ public static class Authenticator {
 		else if (ldap.PartOfGroup("inactive", username)) {
 			return new(StatusCodes.Status403Forbidden, "User is inactive.", null);
 		}
-		else if (ldap.PartOfGroup("admin", username) && ldap.TryGetPasswordOfEntity(username, typeof(Teacher)) is { } bcryptHash && Utils.CheckBCryptPassword(bcryptHash, password)) {
+		else if (ldap.PartOfGroup("admin", username) && ldap.TryGetPasswordOfEntity(username, typeof(Employee)) is { } bcryptHash && Utils.CheckBCryptPassword(bcryptHash, password)) {
 			return new(StatusCodes.Status200OK, null, username);
 		}
 

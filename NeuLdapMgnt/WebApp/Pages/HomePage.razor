@@ -7,7 +7,7 @@
 <div class="container">
 	<div class="row">
 		<StatCard Title="Active Students" Count="@_studentCount" IconName="IconName.PersonFill"/>
-		<StatCard Title="Active Teachers" Count="@_teacherCount" IconName="IconName.PersonLinesFill"/>
+		<StatCard Title="Active Employees" Count="@_employeeCount" IconName="IconName.PersonLinesFill"/>
 		<StatCard Title="Administrators" Count="@_adminCount" IconName="IconName.ShieldLockFill"/>
 		<StatCard Title="Inactive Users" Count="@_inactiveCount" IconName="IconName.PersonDashFill"/>
 		<StatCard Title="Last 24h logs" Count="@_todayLogsCount" IconName="IconName.JournalText"/>
@@ -16,7 +16,7 @@
 
 @code {
 	private int? _studentCount;
-	private int? _teacherCount;
+	private int? _employeeCount;
 	private int? _adminCount;
 	private int? _inactiveCount;
 	private int? _todayLogsCount;
@@ -37,13 +37,13 @@
 		try
 		{
 			await StudentService.FetchStudentsAsync();
-			await TeacherService.FetchTeachersAsync();
+			await EmployeeService.FetchEmployeesAsync();
 			await LocalDbService.FetchAdminsAsync();
 			await LocalDbService.FetchInactiveUsersAsync();
 			await LocalDbService.FetchClassesAsync();
 			await FetchLogs();
 			_studentCount = StudentService.Students.Count;
-			_teacherCount = TeacherService.Teachers.Count;
+			_employeeCount = EmployeeService.Employees.Count;
 			_adminCount = LocalDbService.Admins.Count;
 			_inactiveCount = LocalDbService.InactiveUsers.Count;
 		}

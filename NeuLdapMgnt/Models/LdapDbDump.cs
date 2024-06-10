@@ -9,9 +9,9 @@ public record LdapDbDump {
     [JsonRequired, JsonPropertyName("students")]
     public required IEnumerable<Student> Students { get; init; }
 
-    /// <summary>The <see cref="Teacher"/> entities.</summary>
+    /// <summary>The <see cref="Employee"/> entities.</summary>
     [JsonRequired, JsonPropertyName("teachers")]
-    public required IEnumerable<Teacher> Teachers { get; init; }
+    public required IEnumerable<Employee> Teachers { get; init; }
 
     /// <summary>The uids of the "<c>inactive</c>" group.</summary>
     [JsonRequired, JsonPropertyName("inactives")]

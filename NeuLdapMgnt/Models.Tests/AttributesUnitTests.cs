@@ -57,49 +57,49 @@ public class AttributesUnitTests
 	}
 
 	[TestMethod]
-	public void TeacherIdAttributeWithInvalidDataTypeFails()
+	public void EmployeeIdAttributeWithInvalidDataTypeFails()
 	{
-		var attribute = new IdTeacherAttribute();
+		var attribute = new IdEmployeeAttribute();
 		Assert.AreEqual("ID: Invalid data type",
 			attribute.GetValidationResult(123, _validationContext)!.ErrorMessage);
 	}
 
 	[TestMethod]
-	public void TeacherIdAttributeInvalidFormatFails()
+	public void EmployeeIdAttributeInvalidFormatFails()
 	{
-		var attribute = new IdTeacherAttribute();
+		var attribute = new IdEmployeeAttribute();
 		Assert.AreEqual("ID invalid.",
 			attribute.GetValidationResult("abc..def", _validationContext)!.ErrorMessage);
 	}
 
 	[TestMethod]
-	public void TeacherIdAttributeIncludesNonDotCharFails()
+	public void EmployeeIdAttributeIncludesNonDotCharFails()
 	{
-		var attribute = new IdTeacherAttribute();
+		var attribute = new IdEmployeeAttribute();
 		Assert.AreEqual("ID must contain only alphanumeric characters or '.'",
 			attribute.GetValidationResult("abc,def", _validationContext)!.ErrorMessage);
 	}
 
 	[TestMethod]
-	public void TeacherIdAttributeValidIdSuccess()
+	public void EmployeeIdAttributeValidIdSuccess()
 	{
-		var attribute = new IdTeacherAttribute();
+		var attribute = new IdEmployeeAttribute();
 		Assert.AreEqual(ValidationResult.Success,
 			attribute.GetValidationResult("abc.def", _validationContext));
 	}
 
 	[TestMethod]
-	public void TeacherIdAttributeMissingDotFails()
+	public void EmployeeIdAttributeMissingDotFails()
 	{
-		var attribute = new IdTeacherAttribute();
+		var attribute = new IdEmployeeAttribute();
 		Assert.AreEqual("ID must contain '.'",
 			attribute.GetValidationResult("abcdef", _validationContext)!.ErrorMessage);
 	}
 
 	[TestMethod]
-	public void TeacherIdAttributeShortPartsFails()
+	public void EmployeeIdAttributeShortPartsFails()
 	{
-		var attribute = new IdTeacherAttribute();
+		var attribute = new IdEmployeeAttribute();
 		Assert.AreEqual("The first part of the ID must be at least 3 characters long.",
 			attribute.GetValidationResult("ab.cde", _validationContext)!.ErrorMessage);
 		Assert.AreEqual("The second part of the ID must be at least 3 characters long.",
@@ -147,26 +147,26 @@ public class AttributesUnitTests
 	}
 
 	[TestMethod]
-	public void TeacherUidAttributeValidUidSuccess()
+	public void EmployeeUidAttributeValidUidSuccess()
 	{
-		var attribute = new UserIdAttribute(Teacher.UidMinValue, Teacher.UidMaxValue);
+		var attribute = new UserIdAttribute(Employee.UidMinValue, Employee.UidMaxValue);
 		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Teacher.UidMinValue, _validationContext));
+			attribute.GetValidationResult(Employee.UidMinValue, _validationContext));
 
 
 		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Teacher.UidMaxValue, _validationContext));
+			attribute.GetValidationResult(Employee.UidMaxValue, _validationContext));
 	}
 
 	[TestMethod]
-	public void TeacherUidAttributeInvalidUidFails()
+	public void EmployeeUidAttributeInvalidUidFails()
 	{
-		var attribute = new UserIdAttribute(Teacher.UidMinValue, Teacher.UidMaxValue);
-		Assert.AreEqual($"User ID must be between {Teacher.UidMinValue} and {Teacher.UidMaxValue}.",
-			attribute.GetValidationResult(Teacher.UidMinValue - 1, _validationContext)!.ErrorMessage);
+		var attribute = new UserIdAttribute(Employee.UidMinValue, Employee.UidMaxValue);
+		Assert.AreEqual($"User ID must be between {Employee.UidMinValue} and {Employee.UidMaxValue}.",
+			attribute.GetValidationResult(Employee.UidMinValue - 1, _validationContext)!.ErrorMessage);
 
-		Assert.AreEqual($"User ID must be between {Teacher.UidMinValue} and {Teacher.UidMaxValue}.",
-			attribute.GetValidationResult(Teacher.UidMaxValue + 1, _validationContext)!.ErrorMessage);
+		Assert.AreEqual($"User ID must be between {Employee.UidMinValue} and {Employee.UidMaxValue}.",
+			attribute.GetValidationResult(Employee.UidMaxValue + 1, _validationContext)!.ErrorMessage);
 	}
 
 	// Group ID tests
@@ -209,24 +209,24 @@ public class AttributesUnitTests
 	}
 
 	[TestMethod]
-	public void TeacherGidAttributeValidGidSuccess()
+	public void EmployeeGidAttributeValidGidSuccess()
 	{
-		var attribute = new GroupIdAttribute(Teacher.GidMinValue, Teacher.GidMaxValue);
+		var attribute = new GroupIdAttribute(Employee.GidMinValue, Employee.GidMaxValue);
 		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Teacher.GidMinValue, _validationContext));
+			attribute.GetValidationResult(Employee.GidMinValue, _validationContext));
 
 		Assert.AreEqual(ValidationResult.Success,
-			attribute.GetValidationResult(Teacher.GidMaxValue, _validationContext));
+			attribute.GetValidationResult(Employee.GidMaxValue, _validationContext));
 	}
 
 	[TestMethod]
-	public void TeacherGidAttributeInvalidGidFails()
+	public void EmployeeGidAttributeInvalidGidFails()
 	{
-		var attribute = new GroupIdAttribute(Teacher.GidMinValue, Teacher.GidMaxValue);
-		Assert.AreEqual($"Group ID must be between {Teacher.GidMinValue} and {Teacher.GidMaxValue}.",
-			attribute.GetValidationResult(Teacher.GidMinValue - 1, _validationContext)!.ErrorMessage);
-		Assert.AreEqual($"Group ID must be between {Teacher.GidMinValue} and {Teacher.GidMaxValue}.",
-			attribute.GetValidationResult(Teacher.GidMaxValue + 1, _validationContext)!.ErrorMessage);
+		var attribute = new GroupIdAttribute(Employee.GidMinValue, Employee.GidMaxValue);
+		Assert.AreEqual($"Group ID must be between {Employee.GidMinValue} and {Employee.GidMaxValue}.",
+			attribute.GetValidationResult(Employee.GidMinValue - 1, _validationContext)!.ErrorMessage);
+		Assert.AreEqual($"Group ID must be between {Employee.GidMinValue} and {Employee.GidMaxValue}.",
+			attribute.GetValidationResult(Employee.GidMaxValue + 1, _validationContext)!.ErrorMessage);
 	}
 
 	// FirstName tests

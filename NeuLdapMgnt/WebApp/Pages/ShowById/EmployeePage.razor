@@ -1,0 +1,104 @@
+﻿@page "/employees/{id}"
+@inject IJSRuntime JsRuntime
+
+<PageTitle>@_employee.FullName</PageTitle>
+
+@if (_isLoading)
+{
+	<Loading Text="Loading employee"/>
+}
+else
+{
+	<h3>@_employee.FullName</h3>
+	<div class="d-flex flex-row gap-2">
+		@if (_employee.IsAdmin)
+		{
+			<BadgeAdministrator/>
+		}
+
+		@if (_employee.IsTeacher)
+		{
+			<BadgeTeacher/>
+		}
+		else
+		{
+			<BadgeEmployee/>
+			<BadgeClass Class="@_employee.Class"/>
+		}
+
+		@if (_employee.IsInactive)
+		{
+			<BadgeInactive/>
+		}
+		else
+		{
+			<BadgeActive/>
+		}
+	</div>
+
+	<FormEmployee Employee="_employee" OnSubmit="OnSubmit" IsReadonly="@(!_isLoading)" CanDelete="!_employee.IsInactive" OnDelete="OnDelete"/>
+	<ConfirmDialog @ref="_dialog"/>
+}
+
+@code {
+	[Parameter] public string Id { get; set; } = null!;
+
+	private Employee      _employee  = new();
+	private ConfirmDialog _dialog    = default!;
+	private bool          _isLoading = true;
+
+	protected override async Task OnInitializedAsync()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+
+		await LocalDbService.FetchClassesAsync();
+
+		var searchedEmployee = await EmployeeService.FetchEmployeeAsync(Id);
+		if (searchedEmployee is null) return;
+		_employee = searchedEmployee;
+		_isLoading = false;
+	}
+
+	private async Task<bool> OnSubmit(Employee editedEmployee)
+	{
+		if (_employee.Equals(editedEmployee))
+		{
+			ToastService.Notify(ToastMessages.Secondary($"No changes was found!"));
+			return false;
+		}
+
+		var parameters = new Dictionary<string, object>
+		{
+			{ "EmployeeOriginal", _employee },
+			{ "EmployeeEdited", editedEmployee }
+		};
+
+		var confirmation = await _dialog.ShowAsync<SummaryEmployeeEdit>("Edit this employee?", parameters, DialogOptions.Edit(DialogSize.ExtraLarge));
+		if (!confirmation) return false;
+
+		_isLoading = true;
+		await EmployeeService.UpdateEmployeeAsync(editedEmployee);
+		await EmployeeService.FetchEmployeeAsync(editedEmployee.Id);
+		_isLoading = false;
+
+		await JsRuntime.InvokeVoidAsync("history.back");
+		return false;
+	}
+
+	private async Task<bool> OnDelete(Employee editedEmployee)
+	{
+		var parameters = new Dictionary<string, object> { { "Employee", editedEmployee } };
+
+		var confirmation = await _dialog.ShowAsync<SummaryEmployee>("Deactivate this employee?", parameters, DialogOptions.Confirm());
+		if (!confirmation) return false;
+
+		_isLoading = true;
+		await LocalDbService.DeactivateUserAsync(editedEmployee.Id);
+		await EmployeeService.FetchEmployeeAsync(editedEmployee.Id);
+		_isLoading = false;
+
+		await JsRuntime.InvokeVoidAsync("history.back");
+		return false;
+	}
+
+}
