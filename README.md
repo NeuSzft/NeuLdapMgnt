@@ -1,5 +1,7 @@
 # Neu LDAP Management System
 
+[![Tests](https://github.com/NeuSzft/NeuLdapMgnt/actions/workflows/run-tests.yml/badge.svg)](https://github.com/NeuSzft/NeuLdapMgnt/actions/workflows/run-tests.yml)
+
 ### Table of Contents
 1. [Project Summary](#project-summary)
 2. [Dependencies](#dependencies)
