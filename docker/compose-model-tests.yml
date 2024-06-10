@@ -9,6 +9,6 @@ services:
         COPY ./NeuLdapMgnt/Models.Tests /app/Models.Tests
         COPY ./NeuLdapMgnt/Models /app/Models
         WORKDIR /app/Models.Tests
-        ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/tr/models.md" ]
+        ENTRYPOINT [ "dotnet", "test", "--logger", "trx;LogFileName=/tr/models.trx" ]
     volumes:
-      - ../testing/results:/tr
+      - ../test-results:/tr

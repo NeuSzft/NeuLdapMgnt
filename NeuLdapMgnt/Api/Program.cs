@@ -23,7 +23,7 @@ internal static class Program {
 	public static void Main(string[] args) {
 		LdapService ldapService = LdapService.FromEnvs();
 
-		ILoggerService loggerService = true.ToString().Equals(Environment.GetEnvironmentVariable("LOG_TO_DB"), StringComparison.OrdinalIgnoreCase)
+		ILoggerService loggerService = bool.TryParse(Environment.GetEnvironmentVariable("LOG_TO_DB"), out bool logToDb) && logToDb
 			? PgLoggerService.FromEnvs().SetIgnoredRoutes("/api/docs")
 			: new DummyLoggerService();
 
@@ -107,7 +107,7 @@ internal static class Program {
 			app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {req.Host} → {req.Method} {req.Path} ({context.Response.StatusCode})");
 
 			req.Headers.TryGetValue("Audience", out var aud);
-			var user = aud.ToString().DefaultIfNullOrEmpty("__NOAUTH__");
+			string user = aud.ToString().DefaultIfNullOrEmpty("__NOAUTH__");
 
 			loggerService.CreateLogEntry(new() {
 				Time = now,

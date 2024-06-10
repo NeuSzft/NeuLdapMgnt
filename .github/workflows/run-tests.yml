@@ -1,0 +1,40 @@
+name: Test Runner
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  checks: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Create test results directory
+      run: mkdir test-results
+
+    - name: Run Model tests
+      run: make model-tests
+
+    - name: Run API tests
+      run: make api-tests
+
+    - name: Run WebApp tests
+      run: make web-tests
+
+    - name: Publish test results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: test-results/*
+        fail_on: error
+        action_fail: true
+        comment_on_pr: false
+        check_run: true

@@ -43,7 +43,7 @@ services:
       LDAP_USERNAME: admin
       LDAP_PASSWORD: ldappass
     volumes:
-      - ../testing/results:/tr
+      - ../test-results:/tr
 
 volumes:
   api-app:

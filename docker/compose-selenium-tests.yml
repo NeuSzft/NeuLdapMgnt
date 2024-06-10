@@ -69,7 +69,7 @@ services:
         COPY ./NeuLdapMgnt/WebApp.Tests /app/WebApp.Tests
         COPY ./NeuLdapMgnt/Models /app/Models
         WORKDIR /app/WebApp.Tests
-        ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/tr/selenium.md" ]
+        ENTRYPOINT [ "dotnet", "test", "--logger", "trx;LogFileName=/tr/selenium.trx" ]
     environment:
       DEFAULT_ADMIN_NAME: admin
       DEFAULT_ADMIN_PASSWORD: adminpass
@@ -84,7 +84,7 @@ services:
       nginx:
         condition: service_started
     volumes:
-      - ../testing/results:/tr
+      - ../test-results:/tr
 
   hub:
     image: selenium/hub:4.0.0

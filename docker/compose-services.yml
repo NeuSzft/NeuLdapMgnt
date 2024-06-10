@@ -64,7 +64,7 @@ services:
         COPY ./NeuLdapMgnt/Api.Tests /app/Api.Tests
         COPY ./NeuLdapMgnt/Models /app/Models
         WORKDIR /app/Api.Tests
-        ENTRYPOINT [ "dotnet", "test", "--logger", "liquid.md;logfilename=/tr/api.md" ]
+        ENTRYPOINT [ "dotnet", "test", "--logger", "trx;LogFileName=/tr/api.trx" ]
 
   webapp-build:
     build:
