@@ -11,7 +11,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  build:
+  run-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +34,5 @@ jobs:
       if: always()
       with:
         files: test-results/*
-        fail_on: error
-        action_fail: true
         comment_on_pr: false
         check_run: true
