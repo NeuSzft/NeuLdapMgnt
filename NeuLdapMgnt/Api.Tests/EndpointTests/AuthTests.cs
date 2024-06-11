@@ -7,23 +7,23 @@ public class AuthTests {
 	[ClassInitialize]
 	public static void Init(TestContext context) {
 		Employee employee = new() {
-			Id = "george.sears",
-			Uid = 4000,
-			Gid = 4000,
-			Class = "-",
-			Username = "geosea",
-			FirstName = "George",
-			LastName = "Sears",
-			MiddleName = "",
-			Email = "solidus@mail.com",
+			Id            = "george.sears",
+			Uid           = 4000,
+			Gid           = 4000,
+			Class         = "-",
+			Username      = "geosea",
+			FirstName     = "George",
+			LastName      = "Sears",
+			MiddleName    = null,
+			Email         = "solidus@mail.com",
 			HomeDirectory = "/home/geosea",
-			Password = "lalilulelo",
-			FullName = "George Sears"
+			Password      = Utils.BCryptHashPassword("lalilulelo"),
+			FullName      = "George Sears",
+			IsTeacher     = true,
+			IsAdmin       = true
 		};
-		employee.SetPassword(employee.Password);
 
 		Testing.LdapService.TryAddEntity(employee, employee.Id, true).AssertSuccess();
-		Testing.LdapService.TryAddEntityToGroup("admin", employee.Id).AssertSuccess();
 	}
 
 	[ClassCleanup]

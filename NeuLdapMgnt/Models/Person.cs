@@ -109,18 +109,19 @@ namespace NeuLdapMgnt.Models
 		}
 
 		[Password]
-		[PasswordPropertyText]
+		[PasswordPropertyText(true)]
 		[JsonInclude, JsonPropertyName("password")]
 		[LdapAttribute("userPassword", true)]
-		public virtual string? Password { get; set; } = string.Empty;
+		public virtual string? Password { get; set; }
 
 		[JsonPropertyName("full_name")]
 		[LdapAttribute("displayName")]
 		public string FullName { get; set; } = string.Empty;
 
-		[JsonIgnore]
+		[JsonInclude, JsonPropertyName("is_inactive")]
+		[LdapFlag("inactive")]
 		public bool IsInactive { get; set; }
-		
+
 		private string GetFullName()
 		{
 			StringBuilder builder = new();

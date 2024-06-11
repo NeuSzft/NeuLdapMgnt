@@ -10,7 +10,7 @@ public static class ValueExtensions {
 	/// <param name="key">The key or name of the pair.</param>
 	/// <returns><c>true</c> if the key-value pair exists or <c>false</c> if it does not exist or the request fails.</returns>
 	public static bool ValueExists(this LdapService ldap, string key) {
-		SearchRequest   request  = new($"cn={key},ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, []);
+		SearchRequest   request  = new($"cn={key},ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, [ ]);
 		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
 		return response?.Entries.Count == 1;
@@ -50,7 +50,7 @@ public static class ValueExtensions {
 		}
 
 		DirectoryAttributeModification mod = new() {
-			Name = "description",
+			Name      = "description",
 			Operation = DirectoryAttributeOperation.Replace
 		};
 		mod.Add(value);
@@ -84,7 +84,7 @@ public static class ValueExtensions {
 		SearchResponse? response = ldap.TryRequest(request, out error) as SearchResponse;
 
 		if (response is null)
-			return [];
+			return [ ];
 
 		Dictionary<string, string> values = new();
 

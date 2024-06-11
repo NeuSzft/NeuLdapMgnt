@@ -22,18 +22,7 @@ public static class DbDumpExtensions {
 		List<string> errors = new();
 
 		errors.AddRange(ldap.TryAddEntities(dump.Students, student => student.Id.ToString(), true, overwrite).Errors);
-		errors.AddRange(ldap.TryAddEntities(dump.Teachers, teacher => teacher.Id, true, overwrite).Errors);
-
-		if (overwrite) {
-			if (!ldap.SetMembersOfGroup("inactive", dump.Inactives))
-				errors.Add("Failed to set the members of the 'inactive' group");
-			if (!ldap.SetMembersOfGroup("admin", dump.Admins))
-				errors.Add("Failed to set the members of the 'admin' group");
-		}
-		else {
-			errors.AddRange(ldap.TryAddEntitiesToGroup("inactive", dump.Inactives).Errors);
-			errors.AddRange(ldap.TryAddEntitiesToGroup("admin", dump.Admins).Errors);
-		}
+		errors.AddRange(ldap.TryAddEntities(dump.Employees, employee => employee.Id, true, overwrite).Errors);
 
 		foreach (var item in dump.Values) {
 			if (!ldap.SetValue(item.Key, item.Value, out var error))
@@ -48,17 +37,15 @@ public static class DbDumpExtensions {
 	/// <returns>A <see cref="RequestResult{T}">RequestResult&lt;LdapDbDump&gt;</see> containing the outcome of the operation.</returns>
 	public static RequestResult<LdapDbDump> ExportDatabase(this LdapService ldap) {
 		var studentResults = ldap.GetAllEntities<Student>(true);
-		var teacherResults = ldap.GetAllEntities<Employee>(true);
+		var employeeResults = ldap.GetAllEntities<Employee>(true);
 
 		List<string> errors = new();
 		errors.AddRange(studentResults.Errors);
-		errors.AddRange(teacherResults.Errors);
+		errors.AddRange(employeeResults.Errors);
 
 		LdapDbDump dump = new() {
 			Students = studentResults.Values,
-			Teachers = teacherResults.Values,
-			Inactives = ldap.GetMembersOfGroup("inactive"),
-			Admins = ldap.GetMembersOfGroup("admin"),
+			Employees = employeeResults.Values,
 			Values = ldap.GetAllValues(out var error)
 		};
 

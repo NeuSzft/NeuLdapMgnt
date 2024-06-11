@@ -40,12 +40,14 @@ public sealed class Employee : Person, IEquatable<Employee>
 	[LdapAttribute("roomNumber")]
 	public string Class { get; set; } = "-";
 
-	[JsonIgnore]
+	[JsonInclude, JsonPropertyName("is_admin")]
+	[LdapFlag("admin")]
 	public bool IsAdmin { get; set; }
-	
-	[JsonIgnore]
+
+	[JsonInclude, JsonPropertyName("is_teacher")]
+	[LdapFlag("teacher")]
 	public bool IsTeacher { get; set; }
-	
+
 	public bool Equals(Employee? other)
 	{
 		if (other == null) return false;

@@ -5,6 +5,8 @@ obj
 .vs
 .vscode
 
+test-results
+
 .env
 
 *.user

@@ -11,8 +11,9 @@
       "middle_name": null,
       "email": "idet.lenke@example.com",
       "home_directory": "/home/idelen",
-      "password": "",
-      "full_name": "Idét Lenke"
+      "password": null,
+      "full_name": "Idét Lenke",
+      "is_inactive": false
     },
     {
       "id": 70000123456,
@@ -25,8 +26,9 @@
       "middle_name": "Éva",
       "email": "bognar.karina@cim.hu",
       "home_directory": "/home/bogkar",
-      "password": "",
-      "full_name": "Bognár Éva Karina"
+      "password": null,
+      "full_name": "Bognár Éva Karina",
+      "is_inactive": false
     },
     {
       "id": 70012345678,
@@ -39,8 +41,9 @@
       "middle_name": "Krisztina",
       "email": "balazs.petra@example.com",
       "home_directory": "/home/balpet",
-      "password": "",
-      "full_name": "Balázs Krisztina Petra"
+      "password": null,
+      "full_name": "Balázs Krisztina Petra",
+      "is_inactive": false
     },
     {
       "id": 70023456789,
@@ -53,8 +56,9 @@
       "middle_name": "Réka",
       "email": "molnar.antonia@cim.hu",
       "home_directory": "/home/molant",
-      "password": "",
-      "full_name": "Molnár Réka Antónia"
+      "password": null,
+      "full_name": "Molnár Réka Antónia",
+      "is_inactive": false
     },
     {
       "id": 70034567890,
@@ -67,8 +71,9 @@
       "middle_name": "Zsolt",
       "email": "horvath.istvan@cim.hu",
       "home_directory": "/home/horist",
-      "password": "",
-      "full_name": "Horváth Zsolt István"
+      "password": null,
+      "full_name": "Horváth Zsolt István",
+      "is_inactive": false
     },
     {
       "id": 70045678901,
@@ -81,8 +86,9 @@
       "middle_name": "Mariann",
       "email": "fekete.eva@example.com",
       "home_directory": "/home/fekeva",
-      "password": "",
-      "full_name": "Fekete Mariann Eva"
+      "password": null,
+      "full_name": "Fekete Mariann Eva",
+      "is_inactive": true
     },
     {
       "id": 70056789012,
@@ -95,8 +101,9 @@
       "middle_name": "Tamás",
       "email": "varadi.jozsef@cim.hu",
       "home_directory": "/home/varjoe",
-      "password": "",
-      "full_name": "Váradi Tamás József"
+      "password": null,
+      "full_name": "Váradi Tamás József",
+      "is_inactive": false
     },
     {
       "id": 70099999999,
@@ -109,8 +116,9 @@
       "middle_name": "Eszter",
       "email": "major.daniella@cim.hu",
       "home_directory": "/home/majdan",
-      "password": "",
-      "full_name": "Major Eszter Daniella"
+      "password": null,
+      "full_name": "Major Eszter Daniella",
+      "is_inactive": false
     },
     {
       "id": 70100000001,
@@ -123,8 +131,9 @@
       "middle_name": "Márton",
       "email": "orban.bela@cim.hu",
       "home_directory": "/home/orbela",
-      "password": "",
-      "full_name": "Orbán Márton Bela"
+      "password": null,
+      "full_name": "Orbán Márton Bela",
+      "is_inactive": false
     },
     {
       "id": 70100000002,
@@ -137,8 +146,9 @@
       "middle_name": "Ilona",
       "email": "kristof.zita@cim.hu",
       "home_directory": "/home/kriszi",
-      "password": "",
-      "full_name": "Kristóf Ilona Zita"
+      "password": null,
+      "full_name": "Kristóf Ilona Zita",
+      "is_inactive": false
     },
     {
       "id": 70100000003,
@@ -151,8 +161,9 @@
       "middle_name": "András",
       "email": "viktor.tamas@cim.hu",
       "home_directory": "/home/viktam",
-      "password": "",
-      "full_name": "Viktor András Tamás"
+      "password": null,
+      "full_name": "Viktor András Tamás",
+      "is_inactive": false
     },
     {
       "id": 70100000004,
@@ -165,8 +176,9 @@
       "middle_name": "Krisztina",
       "email": "ferenc.csilla@cim.hu",
       "home_directory": "/home/ferenc",
-      "password": "",
-      "full_name": "Ferenc Krisztina Csilla"
+      "password": null,
+      "full_name": "Ferenc Krisztina Csilla",
+      "is_inactive": false
     },
     {
       "id": 70100000005,
@@ -179,8 +191,9 @@
       "middle_name": "Eszter",
       "email": "erdos.tamara@cim.hu",
       "home_directory": "/home/ervtam",
-      "password": "",
-      "full_name": "Erdős Eszter Tamara"
+      "password": null,
+      "full_name": "Erdős Eszter Tamara",
+      "is_inactive": false
     },
     {
       "id": 70100000006,
@@ -193,8 +206,9 @@
       "middle_name": "Norbert",
       "email": "peto.laszlo@cim.hu",
       "home_directory": "/home/petlan",
-      "password": "",
-      "full_name": "Pető Norbert László"
+      "password": null,
+      "full_name": "Pető Norbert László",
+      "is_inactive": false
     },
     {
       "id": 70100000007,
@@ -207,8 +221,9 @@
       "middle_name": "Réka",
       "email": "szabo.mariann@cim.hu",
       "home_directory": "/home/szamar",
-      "password": "",
-      "full_name": "Szabó Réka Mariann"
+      "password": null,
+      "full_name": "Szabó Réka Mariann",
+      "is_inactive": false
     },
     {
       "id": 70100000008,
@@ -221,8 +236,9 @@
       "middle_name": "Lajos",
       "email": "toth.jozsef@cim.hu",
       "home_directory": "/home/tojzol",
-      "password": "",
-      "full_name": "Tóth Lajos József"
+      "password": null,
+      "full_name": "Tóth Lajos József",
+      "is_inactive": false
     },
     {
       "id": 70100000009,
@@ -235,8 +251,9 @@
       "middle_name": "Diana",
       "email": "lukacs.edit@cim.hu",
       "home_directory": "/home/lukedi",
-      "password": "",
-      "full_name": "Lukács Diana Edit"
+      "password": null,
+      "full_name": "Lukács Diana Edit",
+      "is_inactive": false
     },
     {
       "id": 70100000010,
@@ -249,8 +266,9 @@
       "middle_name": "Eszter",
       "email": "kardos.andrea@cim.hu",
       "home_directory": "/home/karand",
-      "password": "",
-      "full_name": "Kardos Eszter Andrea"
+      "password": null,
+      "full_name": "Kardos Eszter Andrea",
+      "is_inactive": false
     },
     {
       "id": 70100000011,
@@ -263,8 +281,9 @@
       "middle_name": "Miklós",
       "email": "goreg.tamas@cim.hu",
       "home_directory": "/home/gortam",
-      "password": "",
-      "full_name": "Görög Miklós Tamás"
+      "password": null,
+      "full_name": "Görög Miklós Tamás",
+      "is_inactive": false
     },
     {
       "id": 70100000012,
@@ -277,8 +296,9 @@
       "middle_name": "Mária",
       "email": "juhasz.anna@cim.hu",
       "home_directory": "/home/juhann",
-      "password": "",
-      "full_name": "Juhász Mária Anna"
+      "password": null,
+      "full_name": "Juhász Mária Anna",
+      "is_inactive": false
     },
     {
       "id": 70100000013,
@@ -291,8 +311,9 @@
       "middle_name": "László",
       "email": "veszpremi.zoltan@cim.hu",
       "home_directory": "/home/veszol",
-      "password": "",
-      "full_name": "Veszprémi László Zoltán"
+      "password": null,
+      "full_name": "Veszprémi László Zoltán",
+      "is_inactive": false
     },
     {
       "id": 70100000014,
@@ -305,8 +326,9 @@
       "middle_name": "Eszter",
       "email": "kis.katalin@cim.hu",
       "home_directory": "/home/kiskat",
-      "password": "",
-      "full_name": "Kis Eszter Katalin"
+      "password": null,
+      "full_name": "Kis Eszter Katalin",
+      "is_inactive": false
     },
     {
       "id": 70100000015,
@@ -319,8 +341,9 @@
       "middle_name": "Ildikó",
       "email": "nagy.beata@cim.hu",
       "home_directory": "/home/nagbea",
-      "password": "",
-      "full_name": "Nagy Ildikó Beáta"
+      "password": null,
+      "full_name": "Nagy Ildikó Beáta",
+      "is_inactive": false
     },
     {
       "id": 70100000016,
@@ -333,8 +356,9 @@
       "middle_name": "Ede",
       "email": "pal.tibor@cim.hu",
       "home_directory": "/home/paltet",
-      "password": "",
-      "full_name": "Pál Ede Tibor"
+      "password": null,
+      "full_name": "Pál Ede Tibor",
+      "is_inactive": true
     },
     {
       "id": 70100000017,
@@ -347,8 +371,9 @@
       "middle_name": "András",
       "email": "kormos.marton@cim.hu",
       "home_directory": "/home/kormar",
-      "password": "",
-      "full_name": "Kormos András Márton"
+      "password": null,
+      "full_name": "Kormos András Márton",
+      "is_inactive": false
     },
     {
       "id": 70100000018,
@@ -361,8 +386,9 @@
       "middle_name": "Réka",
       "email": "szekely.erika@cim.hu",
       "home_directory": "/home/szeeri",
-      "password": "",
-      "full_name": "Székely Réka Erika"
+      "password": null,
+      "full_name": "Székely Réka Erika",
+      "is_inactive": false
     },
     {
       "id": 70100000019,
@@ -375,8 +401,9 @@
       "middle_name": "Lajos",
       "email": "barta.balazs@cim.hu",
       "home_directory": "/home/barbal",
-      "password": "",
-      "full_name": "Barta Lajos Balázs"
+      "password": null,
+      "full_name": "Barta Lajos Balázs",
+      "is_inactive": false
     },
     {
       "id": 70100000020,
@@ -389,8 +416,9 @@
       "middle_name": "Norbert",
       "email": "olah.ivan@cim.hu",
       "home_directory": "/home/olivan",
-      "password": "",
-      "full_name": "Oláh Norbert Iván"
+      "password": null,
+      "full_name": "Oláh Norbert Iván",
+      "is_inactive": false
     },
     {
       "id": 70100000021,
@@ -403,8 +431,9 @@
       "middle_name": "Irén",
       "email": "szoboszlai.boglarka@cim.hu",
       "home_directory": "/home/szoborb",
-      "password": "",
-      "full_name": "Szoboszlai Irén Boglárka"
+      "password": null,
+      "full_name": "Szoboszlai Irén Boglárka",
+      "is_inactive": false
     },
     {
       "id": 70100000022,
@@ -417,8 +446,9 @@
       "middle_name": "Benedek",
       "email": "kovacs.gergo@cim.hu",
       "home_directory": "/home/kovger",
-      "password": "",
-      "full_name": "Kovács Benedek Gergő"
+      "password": null,
+      "full_name": "Kovács Benedek Gergő",
+      "is_inactive": true
     },
     {
       "id": 70100000023,
@@ -431,8 +461,9 @@
       "middle_name": "Attila",
       "email": "szabo.balint@cim.hu",
       "home_directory": "/home/szabbar",
-      "password": "",
-      "full_name": "Szabó Attila Bálint"
+      "password": null,
+      "full_name": "Szabó Attila Bálint",
+      "is_inactive": false
     },
     {
       "id": 70100000024,
@@ -445,8 +476,9 @@
       "middle_name": "Árpád",
       "email": "horvath.mernok@cim.hu",
       "home_directory": "/home/horvmer",
-      "password": "",
-      "full_name": "Horváth Árpád Mérnök"
+      "password": null,
+      "full_name": "Horváth Árpád Mérnök",
+      "is_inactive": false
     },
     {
       "id": 70100000025,
@@ -459,8 +491,9 @@
       "middle_name": "Levente",
       "email": "takacs.flora@cim.hu",
       "home_directory": "/home/takfle",
-      "password": "",
-      "full_name": "Takács Levente Flóra"
+      "password": null,
+      "full_name": "Takács Levente Flóra",
+      "is_inactive": false
     },
     {
       "id": 70100000026,
@@ -473,8 +506,9 @@
       "middle_name": "Réka",
       "email": "simon.julianna@cim.hu",
       "home_directory": "/home/simjul",
-      "password": "",
-      "full_name": "Simon Réka Julianna"
+      "password": null,
+      "full_name": "Simon Réka Julianna",
+      "is_inactive": true
     },
     {
       "id": 70100000027,
@@ -487,8 +521,9 @@
       "middle_name": "Károly",
       "email": "szilagyi.miklos@cim.hu",
       "home_directory": "/home/szomik",
-      "password": "",
-      "full_name": "Szilágyi Károly Miklós"
+      "password": null,
+      "full_name": "Szilágyi Károly Miklós",
+      "is_inactive": false
     },
     {
       "id": 70100000028,
@@ -501,8 +536,9 @@
       "middle_name": "Bertalan",
       "email": "nagy.jeno@cim.hu",
       "home_directory": "/home/nagyjen",
-      "password": "",
-      "full_name": "Nagy Bertalan Jenő"
+      "password": null,
+      "full_name": "Nagy Bertalan Jenő",
+      "is_inactive": false
     },
     {
       "id": 70100000029,
@@ -515,8 +551,9 @@
       "middle_name": "Virág",
       "email": "tokar.klaudia@cim.hu",
       "home_directory": "/home/tokkla",
-      "password": "",
-      "full_name": "Tokár Virág Klaudia"
+      "password": null,
+      "full_name": "Tokár Virág Klaudia",
+      "is_inactive": true
     },
     {
       "id": 70100000030,
@@ -529,8 +566,9 @@
       "middle_name": "Lilla",
       "email": "peto.viktoria@cim.hu",
       "home_directory": "/home/petvik",
-      "password": "",
-      "full_name": "Pető Lilla Viktória"
+      "password": null,
+      "full_name": "Pető Lilla Viktória",
+      "is_inactive": true
     },
     {
       "id": 70100000031,
@@ -543,8 +581,9 @@
       "middle_name": "Dávid",
       "email": "kovacs.sandor@cim.hu",
       "home_directory": "/home/kosado",
-      "password": "",
-      "full_name": "Kovács Dávid Sándor"
+      "password": null,
+      "full_name": "Kovács Dávid Sándor",
+      "is_inactive": false
     },
     {
       "id": 70100000032,
@@ -557,8 +596,9 @@
       "middle_name": "Attila",
       "email": "nagy.karoly@cim.hu",
       "home_directory": "/home/nagkar",
-      "password": "",
-      "full_name": "Nagy Attila Károly"
+      "password": null,
+      "full_name": "Nagy Attila Károly",
+      "is_inactive": true
     },
     {
       "id": 70100000033,
@@ -571,8 +611,9 @@
       "middle_name": "Gizella",
       "email": "molnar.hajnalka@cim.hu",
       "home_directory": "/home/muhagi",
-      "password": "",
-      "full_name": "Molnár Gizella Hajnalka"
+      "password": null,
+      "full_name": "Molnár Gizella Hajnalka",
+      "is_inactive": false
     },
     {
       "id": 70100000034,
@@ -585,8 +626,9 @@
       "middle_name": "László",
       "email": "toth.frigyes@cim.hu",
       "home_directory": "/home/tothfri",
-      "password": "",
-      "full_name": "Tóth László Frigyes"
+      "password": null,
+      "full_name": "Tóth László Frigyes",
+      "is_inactive": true
     },
     {
       "id": 70100000035,
@@ -599,8 +641,9 @@
       "middle_name": "Borbála",
       "email": "balogh.julianna@cim.hu",
       "home_directory": "/home/baljul",
-      "password": "",
-      "full_name": "Balogh Borbála Julianna"
+      "password": null,
+      "full_name": "Balogh Borbála Julianna",
+      "is_inactive": false
     },
     {
       "id": 70100000036,
@@ -613,8 +656,9 @@
       "middle_name": "Gyula",
       "email": "sas.benedek@cim.hu",
       "home_directory": "/home/sasben",
-      "password": "",
-      "full_name": "Sas Gyula Benedek"
+      "password": null,
+      "full_name": "Sas Gyula Benedek",
+      "is_inactive": false
     },
     {
       "id": 70245896314,
@@ -627,8 +671,9 @@
       "middle_name": "Péter",
       "email": "toth.peter.gabor@gmail.com",
       "home_directory": "/home/totgab",
-      "password": "",
-      "full_name": "Tóth Péter Gábor"
+      "password": null,
+      "full_name": "Tóth Péter Gábor",
+      "is_inactive": false
     },
     {
       "id": 70658423795,
@@ -641,8 +686,9 @@
       "middle_name": "Anna",
       "email": "",
       "home_directory": "/home/kovmar",
-      "password": "",
-      "full_name": "Kovács Anna Mária"
+      "password": null,
+      "full_name": "Kovács Anna Mária",
+      "is_inactive": false
     },
     {
       "id": 71000000000,
@@ -655,8 +701,9 @@
       "middle_name": null,
       "email": "halo.mester@freemail.com",
       "home_directory": "/home/halzit",
-      "password": "",
-      "full_name": "Háló Zita"
+      "password": null,
+      "full_name": "Háló Zita",
+      "is_inactive": false
     },
     {
       "id": 71234567890,
@@ -669,8 +716,9 @@
       "middle_name": null,
       "email": "",
       "home_directory": "/home/kabkor",
-      "password": "",
-      "full_name": "Kábel Kornél"
+      "password": null,
+      "full_name": "Kábel Kornél",
+      "is_inactive": false
     },
     {
       "id": 73062395729,
@@ -683,8 +731,9 @@
       "middle_name": null,
       "email": "milyen.aron@cim.hu",
       "home_directory": "/home/milaro",
-      "password": "",
-      "full_name": "Milyen Áron"
+      "password": null,
+      "full_name": "Milyen Áron",
+      "is_inactive": false
     },
     {
       "id": 76987123716,
@@ -697,8 +746,9 @@
       "middle_name": "Cerka",
       "email": "",
       "home_directory": "/home/ismmat",
-      "password": "",
-      "full_name": "Ismeretlen Cerka Máté"
+      "password": null,
+      "full_name": "Ismeretlen Cerka Máté",
+      "is_inactive": true
     },
     {
       "id": 77846291430,
@@ -711,8 +761,9 @@
       "middle_name": "Erzsébet",
       "email": "szabo.erzsebet.katalin@gmail.com",
       "home_directory": "/home/szakat",
-      "password": "",
-      "full_name": "Szabó Erzsébet Katalin"
+      "password": null,
+      "full_name": "Szabó Erzsébet Katalin",
+      "is_inactive": false
     },
     {
       "id": 77899000199,
@@ -725,8 +776,9 @@
       "middle_name": "Ifjabbik",
       "email": "",
       "home_directory": "/home/pixpet",
-      "password": "",
-      "full_name": "Pixel Ifjabbik Petra"
+      "password": null,
+      "full_name": "Pixel Ifjabbik Petra",
+      "is_inactive": false
     },
     {
       "id": 77899871100,
@@ -739,8 +791,9 @@
       "middle_name": null,
       "email": "",
       "home_directory": "/home/szapet",
-      "password": "",
-      "full_name": "Szabó Péter"
+      "password": null,
+      "full_name": "Szabó Péter",
+      "is_inactive": false
     },
     {
       "id": 77899871199,
@@ -753,8 +806,9 @@
       "middle_name": null,
       "email": "",
       "home_directory": "/home/kodkat",
-      "password": "",
-      "full_name": "Kód Kata"
+      "password": null,
+      "full_name": "Kód Kata",
+      "is_inactive": false
     },
     {
       "id": 78901532268,
@@ -767,8 +821,9 @@
       "middle_name": "László",
       "email": "nagy.laszlo.janos@gmail.com",
       "home_directory": "/home/nagjan",
-      "password": "",
-      "full_name": "Nagy László János"
+      "password": null,
+      "full_name": "Nagy László János",
+      "is_inactive": false
     },
     {
       "id": 79158250729,
@@ -781,8 +836,9 @@
       "middle_name": null,
       "email": "random.email@cim.hu",
       "home_directory": "/home/vinesz",
-      "password": "",
-      "full_name": "Vinch Eszter"
+      "password": null,
+      "full_name": "Vinch Eszter",
+      "is_inactive": false
     },
     {
       "id": 79358420017,
@@ -795,8 +851,9 @@
       "middle_name": "Judit",
       "email": "varga.judit.ilona@gmail.com",
       "home_directory": "/home/varilo",
-      "password": "",
-      "full_name": "Varga Judit Ilona"
+      "password": null,
+      "full_name": "Varga Judit Ilona",
+      "is_inactive": false
     },
     {
       "id": 79876543210,
@@ -809,8 +866,9 @@
       "middle_name": null,
       "email": "",
       "home_directory": "/home/propan",
-      "password": "",
-      "full_name": "Program Panna"
+      "password": null,
+      "full_name": "Program Panna",
+      "is_inactive": false
     },
     {
       "id": 79982367452,
@@ -823,8 +881,9 @@
       "middle_name": null,
       "email": "",
       "home_directory": "/home/bitben",
-      "password": "",
-      "full_name": "Bit Bence"
+      "password": null,
+      "full_name": "Bit Bence",
+      "is_inactive": false
     },
     {
       "id": 79999999999,
@@ -837,17 +896,19 @@
       "middle_name": null,
       "email": "",
       "home_directory": "/home/debden",
-      "password": "",
-      "full_name": "Debug Dénes"
+      "password": null,
+      "full_name": "Debug Dénes",
+      "is_inactive": false
     }
   ],
-  "teachers": [
+  "employees": [
     {
       "id": "toth.anna",
       "uid": 4004,
       "gid": 4004,
       "class": "-",
-      "IsEmployee": true,
+      "is_admin": true,
+      "is_teacher": true,
       "username": "anntot",
       "first_name": "Anna",
       "last_name": "Tóth",
@@ -855,14 +916,16 @@
       "email": "toth.anna@management.hu",
       "home_directory": "/home/totann",
       "password": "{CRYPT}$2a$11$RPT3.MHnsFO66XJkG2P2Bu6MvltzZspF4.rU2JKP4sT4CqsV1q2ee",
-      "full_name": "Tóth Anna"
+      "full_name": "Tóth Anna",
+      "is_inactive": true
     },
     {
       "id": "szabo.anna",
       "uid": 4002,
       "gid": 4002,
       "class": "-",
-      "IsEmployee": true,
+      "is_admin": false,
+      "is_teacher": false,
       "username": "annsza",
       "first_name": "Anna",
       "last_name": "Szabó",
@@ -870,14 +933,16 @@
       "email": "szabo.anna@management.hu",
       "home_directory": "/home/szabann",
       "password": "{CRYPT}$2a$11$RXyTG5C2MWmzU3vl/nUwXurQBN5tTn5J5kE4KjwmYR/JmNzE39S3G",
-      "full_name": "Szabó Anna"
+      "full_name": "Szabó Anna",
+      "is_inactive": false
     },
     {
       "id": "kiss.attila",
       "uid": 4007,
       "gid": 4007,
       "class": "12.a",
-      "IsEmployee": false,
+      "is_admin": false,
+      "is_teacher": true,
       "username": "attkis",
       "first_name": "Attila",
       "last_name": "Kiss",
@@ -885,14 +950,16 @@
       "email": "kiss.attila@management.hu",
       "home_directory": "/home/kisatt",
       "password": "{CRYPT}$2a$11$kN3.ZFdbFbqFEs3jKXfF2ekuM8PbPBzFLRM3NtbP94jUlrB2mqGJ.",
-      "full_name": "Kiss Attila"
+      "full_name": "Kiss Attila",
+      "is_inactive": false
     },
     {
       "id": "nagy.istvan",
       "uid": 4003,
       "gid": 4003,
       "class": "-",
-      "IsEmployee": true,
+      "is_admin": false,
+      "is_teacher": true,
       "username": "istnag",
       "first_name": "István",
       "last_name": "Nagy",
@@ -900,14 +967,16 @@
       "email": "nagy.istvan@management.hu",
       "home_directory": "/home/nagist",
       "password": "{CRYPT}$2a$11$qNgFkbBX.yduFcI0y4eAx.W3kmR9jJURP3hRf6Qn.0MlU0TH.GF9.",
-      "full_name": "Nagy István"
+      "full_name": "Nagy István",
+      "is_inactive": true
     },
     {
       "id": "teszt.admin",
       "uid": 4000,
       "gid": 4000,
       "class": "-",
-      "IsEmployee": true,
+      "is_admin": true,
+      "is_teacher": false,
       "username": "admtes",
       "first_name": "Admin",
       "last_name": "Teszt",
@@ -915,14 +984,16 @@
       "email": "test.admin@management.hu",
       "home_directory": "/home/tesadm",
       "password": "{CRYPT}$2a$11$7bhQBWw/QjCd1s3QaD5EWOkUadbVPf8pZYE9phAs.j0NVzJgL9R16",
-      "full_name": "Teszt Admin"
+      "full_name": "Teszt Admin",
+      "is_inactive": false
     },
     {
       "id": "molnar.judit",
       "uid": 4008,
       "gid": 4008,
       "class": "11.b",
-      "IsEmployee": false,
+      "is_admin": false,
+      "is_teacher": true,
       "username": "judmol",
       "first_name": "Judit",
       "last_name": "Molnár",
@@ -930,14 +1001,16 @@
       "email": "molnar.judit@management.hu",
       "home_directory": "/home/moljud",
       "password": "{CRYPT}$2a$11$4PrVD/N5zzkWw2.8/jU./ejgwmPtdq4C1.YV7zSmX7/4BxSlXM4Ie",
-      "full_name": "Molnár Judit"
+      "full_name": "Molnár Judit",
+      "is_inactive": false
     },
     {
       "id": "szabo.laszlo",
       "uid": 4009,
       "gid": 4009,
       "class": "10.a",
-      "IsEmployee": false,
+      "is_admin": true,
+      "is_teacher": true,
       "username": "lassza",
       "first_name": "László",
       "last_name": "Szabó",
@@ -945,14 +1018,16 @@
       "email": "szabo.laszlo@management.hu",
       "home_directory": "/home/szablas",
       "password": "{CRYPT}$2a$11$gAijOp1KDrBAW8hrLjODZ.N5Kj.3ObddnbnQQPpySyyQxfmEG.F1K",
-      "full_name": "Szabó László"
+      "full_name": "Szabó László",
+      "is_inactive": true
     },
     {
       "id": "szekely.anna",
       "uid": 4006,
       "gid": 4006,
       "class": "2/14a",
-      "IsEmployee": false,
+      "is_admin": true,
+      "is_teacher": true,
       "username": "annsze",
       "first_name": "Anna",
       "last_name": "Székely",
@@ -960,14 +1035,16 @@
       "email": "szekely.anna@management.hu",
       "home_directory": "/home/szekann",
       "password": "{CRYPT}$2a$11$vMkd9fmoJB7wbR3OZaDcYOl0a25HrSfUyYZlZVTcXbuhwh7hqQC46",
-      "full_name": "Székely Anna"
+      "full_name": "Székely Anna",
+      "is_inactive": true
     },
     {
       "id": "horvath.peter",
       "uid": 4005,
       "gid": 4005,
       "class": "1/13a",
-      "IsEmployee": false,
+      "is_admin": false,
+      "is_teacher": false,
       "username": "pethor",
       "first_name": "Péter",
       "last_name": "Horváth",
@@ -975,14 +1052,16 @@
       "email": "horvath.peter@management.hu",
       "home_directory": "/home/horpet",
       "password": "{CRYPT}$2a$11$8NQ7ICeBkiz45kv3mnV0WeR9q21/XJLbAW5t/33BmkmwcbYJhTQvG",
-      "full_name": "Horváth Péter"
+      "full_name": "Horváth Péter",
+      "is_inactive": false
     },
     {
       "id": "kovacs.ferenc",
       "uid": 4001,
       "gid": 4001,
       "class": "-",
-      "IsEmployee": true,
+      "is_admin": true,
+      "is_teacher": true,
       "username": "ferkov",
       "first_name": "Ferenc",
       "last_name": "Kovács",
@@ -990,14 +1069,16 @@
       "email": "kovacs.ferenc@management.hu",
       "home_directory": "/home/kovfer",
       "password": "{CRYPT}$2a$11$MqEbl0i9DZ3EPNRveeBtR.yXW7Tc8F3ZPUjLLG0oTtUsX3JaxTzji",
-      "full_name": "Kovács Ferenc"
+      "full_name": "Kovács Ferenc",
+      "is_inactive": false
     },
     {
       "id": "balazs.mariann",
       "uid": 4010,
       "gid": 4010,
       "class": "9.ny",
-      "IsEmployee": false,
+      "is_admin": true,
+      "is_teacher": true,
       "username": "marbal",
       "first_name": "Mariann",
       "last_name": "Balázs",
@@ -1005,32 +1086,9 @@
       "email": "balazs.mariann@management.hu",
       "home_directory": "/home/balmar",
       "password": "{CRYPT}$2a$11$FwGx/5VGMu8/qdve4VL0vO7m2a.DjCpIv5PZP25y.3jORlqCTuxv2",
-      "full_name": "Balázs Mariann"
+      "full_name": "Balázs Mariann",
+      "is_inactive": false
     }
-  ],
-  "inactives": [
-    "nagy.istvan",
-    "szabo.laszlo",
-    "szekely.anna",
-    "toth.anna",
-    "70045678901",
-    "79358420017",
-    "70100000032",
-    "70100000026",
-    "70100000022",
-    "70100000016",
-    "76987123716",
-    "70100000034",
-    "70100000030",
-    "70100000029"
-  ],
-  "admins": [
-    "teszt.admin",
-    "kovacs.ferenc",
-    "toth.anna",
-    "szabo.laszlo",
-    "szekely.anna",
-    "balazs.mariann"
   ],
   "values": {
     "classes": "9.ny;9.a;9.b;9.c;9.e;10.a;10.b;10.c;10.d;10.e;11.a;11.b;11.c;11.d;11.e;12.a;12.b;12.c;12.d;1/13a;2/14a;2/14b;12.e",

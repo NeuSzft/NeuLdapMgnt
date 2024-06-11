@@ -91,7 +91,7 @@ public static class Authenticator {
 		if (request.Headers.Authorization.Count == 0)
 			return new(StatusCodes.Status400BadRequest, "Missing Authorization header.", null);
 
-		if (!TryGetCredentialsFromRequest(request, out var username, out var password))
+		if (!TryGetCredentialsFromRequest(request, out string username, out string password))
 			return new(StatusCodes.Status400BadRequest, "Invalid Authorization header.", null);
 
 		if (username == GetDefaultAdminName()) {
@@ -105,11 +105,12 @@ public static class Authenticator {
 			if (Utils.CheckBCryptPassword(bcryptHash, password))
 				return new(StatusCodes.Status200OK, null, username);
 		}
-		else if (ldap.PartOfGroup("inactive", username)) {
-			return new(StatusCodes.Status403Forbidden, "User is inactive.", null);
-		}
-		else if (ldap.PartOfGroup("admin", username) && ldap.TryGetPasswordOfEntity(username, typeof(Employee)) is { } bcryptHash && Utils.CheckBCryptPassword(bcryptHash, password)) {
-			return new(StatusCodes.Status200OK, null, username);
+		else if (ldap.TryGetEntity<Employee>(username, true) is { Value: { } employee }) {
+			if (employee.IsInactive)
+				return new(StatusCodes.Status403Forbidden, "User is inactive.", null);
+
+			if (employee is { IsAdmin: true, Password: not null } && Utils.CheckBCryptPassword(employee.Password, password))
+				return new(StatusCodes.Status200OK, null, username);
 		}
 
 		return new(StatusCodes.Status401Unauthorized, "Wrong credentials.", null);

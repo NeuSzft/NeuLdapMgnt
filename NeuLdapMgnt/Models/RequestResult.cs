@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Linq;
 using System.Text.Json.Serialization;
 
@@ -13,7 +15,7 @@ public class RequestResult {
 
 	/// <summary>The errors that occured.</summary>
 	[JsonRequired, JsonInclude, JsonPropertyName("errors")]
-	public string[] Errors { get; protected internal set; } = new string[0];
+	public string[] Errors { get; protected internal set; } = Array.Empty<string>();
 
 	/// <summary>The renewed JSON Web Token to use for the next request.</summary>
 	[JsonInclude, JsonPropertyName("new_token")]
@@ -36,10 +38,16 @@ public class RequestResult {
 /// <typeparam name="T">The type of the values to store.</typeparam>
 public sealed class RequestResult<T> : RequestResult {
 	[JsonRequired, JsonInclude, JsonPropertyName("values")]
-	public T[] Values { get; internal set; } = new T[0];
+	public T[] Values { get; internal set; } = Array.Empty<T>();
 
 	/// <summary>Gets the first or the default value.</summary>
 	/// <returns>The first element of <c>Values</c> or the <c>default</c> value of type <typeparamref name="T"/>.</returns>
+	[JsonIgnore]
+	public T? Value => Values.FirstOrDefault();
+
+	/// <summary>Gets the first or the default value.</summary>
+	/// <returns>The first element of <c>Values</c> or the <c>default</c> value of type <typeparamref name="T"/>.</returns>
+	[Obsolete("Use the Value property instead.")]
 	public T? GetValue() => Values.FirstOrDefault();
 }
 
@@ -92,8 +100,8 @@ public static class RequestResultExtensions {
 	public static RequestResult<T> ToGeneric<T>(this RequestResult result, params T[] values) {
 		return new RequestResult<T> {
 			StatusCode = result.StatusCode,
-			Errors = result.Errors,
-			NewToken = result.NewToken
+			Errors     = result.Errors,
+			NewToken   = result.NewToken
 		}.SetValues(values);
 	}
 }

@@ -1,6 +1,7 @@
 # Neu LDAP Management System
 
 [![Tests](https://github.com/NeuSzft/NeuLdapMgnt/actions/workflows/run-tests.yml/badge.svg)](https://github.com/NeuSzft/NeuLdapMgnt/actions/workflows/run-tests.yml)
+![API version](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fraw.githubusercontent.com%2FNeuSzft%2FNeuLdapMgnt%2Fmain%2FNeuLdapMgnt%2FApi%2FNeuLdapMgnt.Api.csproj&query=%2FProject%2FPropertyGroup%2FAssemblyVersion&label=API%20version&color=712CF9)
 
 ### Table of Contents
 1. [Project Summary](#project-summary)

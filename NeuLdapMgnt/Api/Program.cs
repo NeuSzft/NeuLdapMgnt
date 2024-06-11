@@ -160,7 +160,7 @@ internal static class Program {
 		app.MapAuthEndpoints();
 		app.MapClassEndpoints();
 		app.MapStudentEndpoints();
-		app.MapTeacherEndpoints();
+		app.MapEmployeeEndpoints();
 		app.MapInactiveUserEndpoints();
 		app.MapAdminUserEndpoints();
 		app.MapDbManagementEndpoints();

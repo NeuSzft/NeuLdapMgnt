@@ -23,7 +23,7 @@ public static class DbManagementEndpoints {
 			   if (result.IsFailure())
 				   return result.RenewToken(request).ToResult();
 
-			   return ldap.ImportDatabase(result.GetValue()!, false).RenewToken(request).ToResult();
+			   return ldap.ImportDatabase(result.Value!, false).RenewToken(request).ToResult();
 		   })
 		   .WithOpenApi()
 		   .WithTags("Database Management")
@@ -40,7 +40,7 @@ public static class DbManagementEndpoints {
 			   if (result.IsFailure())
 				   return result.RenewToken(request).ToResult();
 
-			   return ldap.ImportDatabase(result.GetValue()!, true).RenewToken(request).ToResult();
+			   return ldap.ImportDatabase(result.Value!, true).RenewToken(request).ToResult();
 		   })
 		   .WithOpenApi()
 		   .WithTags("Database Management")

@@ -28,11 +28,11 @@ public class EntityExtensionsTests {
 
 		Testing.LdapService.TryAddEntity(dummy, dummy.Id.ToString(), true).AssertSuccess();
 
-		Dummy? withHidden = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString(), true).AssertSuccess().GetValue();
+		Dummy? withHidden = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString(), true).AssertSuccess().Value;
 		Assert.IsNotNull(withHidden);
 		Assert.IsNotNull(withHidden.Password);
 
-		Dummy? withoutHidden = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString()).AssertSuccess().GetValue();
+		Dummy? withoutHidden = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString()).AssertSuccess().Value;
 		Assert.IsNotNull(withoutHidden);
 		Assert.IsNull(withoutHidden.Password);
 	}
@@ -55,7 +55,7 @@ public class EntityExtensionsTests {
 
 		foreach (var dummy in dummies) {
 			var result = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString(), true).AssertSuccess();
-			Assert.AreEqual(dummy, result.GetValue());
+			Assert.AreEqual(dummy, result.Value);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class EntityExtensionsTests {
 
 		modDummy.Id = 0;
 		var result = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString(), true).AssertSuccess();
-		Assert.AreEqual(modDummy, result.GetValue());
+		Assert.AreEqual(modDummy, result.Value);
 	}
 
 	[TestMethod]
@@ -128,7 +128,7 @@ public class EntityExtensionsTests {
 		Testing.LdapService.TryModifyEntity(modDummy, dummy.Id.ToString()).AssertSuccess();
 
 		var request = Testing.LdapService.TryGetEntity<Dummy>(dummy.Id.ToString(), true).AssertSuccess();
-		Assert.AreEqual(modDummy, request.GetValue());
+		Assert.AreEqual(modDummy, request.Value);
 	}
 
 	[TestMethod]
@@ -142,27 +142,5 @@ public class EntityExtensionsTests {
 		}
 
 		Assert.IsNull(Testing.LdapService.TryGetDisplayNameOfEntity("5", typeof(Dummy)));
-	}
-
-	[TestMethod]
-	public void TestGetPasswordOfEntity() {
-		Dummy[] dummies = Dummy.CreateDummies(5).ToArray();
-		Testing.LdapService.TryAddEntities(dummies, x => x.Id.ToString(), true).AssertSuccess();
-
-		foreach (Dummy dummy in dummies) {
-			string? password = Testing.LdapService.TryGetPasswordOfEntity(dummy.Id.ToString(), typeof(Dummy));
-			Assert.AreEqual(dummy.Password, password);
-		}
-
-		Assert.IsNull(Testing.LdapService.TryGetPasswordOfEntity("5", typeof(Dummy)));
-
-		string? hash = Authenticator.GetDefaultAdminPasswordAndCrateAdminWhenMissing(Testing.LdapService, out var error);
-		Assert.IsNull(error);
-		Assert.IsNotNull(hash);
-		Assert.IsTrue(Utils.CheckBCryptPassword(hash, "adminpass"));
-
-		hash = Testing.LdapService.TryGetPasswordOfEntity(Authenticator.GetDefaultAdminName());
-		Assert.IsNotNull(hash);
-		Assert.IsTrue(Utils.CheckBCryptPassword(hash, "adminpass"));
 	}
 }
