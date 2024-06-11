@@ -1,152 +1,173 @@
 ﻿@inherits LayoutComponentBase
 
 <EditForm Model="@_employeeUpdated" OnValidSubmit="HandleOnSubmit" class="d-flex flex-column gap-2 my-2">
-	<DataAnnotationsValidator/>
+    <DataAnnotationsValidator />
 
-	<div class="text-end">
-		@if (IsReadonly)
-		{
-			<ButtonEdit OnClick="ToggleEditMode" Text="Edit" IsDisabled="_isEditModeEnabled"/>
-		}
-	</div>
+    <div class="text-end">
+        @if (IsReadonly)
+        {
+            <ButtonEdit OnClick="ToggleEditMode" Text="Edit" IsDisabled="_isEditModeEnabled" />
+        }
+    </div>
 
-	<div class="form-floating">
-		<InstantInputText class="form-control"
-		                  type="text"
-		                  disabled="@(Employee.Id != string.Empty)"
-		                  @bind-Value="_employeeUpdated.Id"
-		                  id="teacher-id"/>
-		<label for="teacher-id">ID</label>
-		<ValidationMessage For="() => _employeeUpdated.Id" id="teacher-id-validation-message"/>
-	</div>
+    <div class="form-floating">
+        <InstantInputText class="form-control"
+                          type="text"
+                          disabled="@(Employee.Id != string.Empty)"
+                          @bind-Value="_employeeUpdated.Id"
+                          id="employee-id" />
+        <label for="employee-id">ID</label>
+        <ValidationMessage For="() => _employeeUpdated.Id" id="employee-id-validation-message" />
+    </div>
 
-	<div class="input-group gap-2">
-		<label class="input-group-text user-select-none col-12 rounded gap-2" for="first-name">
-			Name
-			@if (!IsReadonly && _employeeUpdated.FullName.Length > 2)
-			{
-				<span>[@_employeeUpdated.FullName]</span>
-			}
-		</label>
+    <div class="form-floating">
+        <InstantInputText class="form-control" id="employee-name" @bind-Value="_employeeUpdated.FullName" disabled />
+        <label for="employee-name">Full Name</label>
+    </div>
 
-		<div class="d-flex flex-column flex-md-row gap-2 w-100">
-			<div class="form-floating w-100">
-				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="first-name" @bind-Value="_employeeUpdated.FirstName"/>
-				<label for="first-name">First</label>
-				<ValidationMessage For="() => _employeeUpdated.FirstName" id="teacher-first-name-validation-message"/>
-			</div>
-			<div class="form-floating w-100">
-				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="middle-name" @bind-Value="_employeeUpdated.MiddleName"/>
-				<label for="middle-name">Middle</label>
-				<ValidationMessage For="() => _employeeUpdated.MiddleName" id="teacher-middle-name-validation-message"/>
-			</div>
-			<div class="form-floating w-100">
-				<InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="last-name" @bind-Value="_employeeUpdated.LastName"/>
-				<label for="last-name">Last</label>
-				<ValidationMessage For="() => _employeeUpdated.LastName" id="teacher-last-name-validation-message"/>
-			</div>
-		</div>
-	</div>
+    <div class="input-group gap-2">
+        <div class="d-flex flex-column flex-md-row gap-2 w-100">
+            <div class="form-floating w-100">
+                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="surname" @bind-Value="_employeeUpdated.GivenName" />
+                <label for="surname">Surname</label>
+                <ValidationMessage For="() => _employeeUpdated.Surname" id="employee-surname-validation-message" />
+            </div>
+            <div class="form-floating w-100">
+                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="given-name" @bind-Value="_employeeUpdated.Surname" />
+                <label for="given-name">Given name</label>
+                <ValidationMessage For="() => _employeeUpdated.GivenName" id="employee-given-name-validation-message" />
+            </div>
+            <div class="form-floating w-100">
+                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="middle-name" @bind-Value="_employeeUpdated.MiddleName" />
+                <label for="middle-name">Middle name</label>
+                <ValidationMessage For="() => _employeeUpdated.MiddleName" id="employee-middle-name-validation-message" />
+            </div>
+        </div>
+    </div>
 
-	<div class="form-floating">
-		<InputSelect class="form-select rounded" id="class-select" disabled="@(IsReadonly || IsAction)" @bind-Value="_employeeUpdated.Class">
-			<option value="-">-</option>
-			@foreach (var cls in LocalDbService.Classes)
-			{
-				<option value="@cls">@cls</option>
-			}
-		</InputSelect>
-		<label for="class-select">Class</label>
-		<ValidationMessage For="() => _employeeUpdated.Class" id="student-class-validation-message"/>
-	</div>
+    <div class="form-floating">
+        <InstantInputText class="form-control" disabled="@(IsReadonly || IsAction)" id="employee-email" @bind-Value="_employeeUpdated.Email" />
+        <label for="employee-email">Email</label>
+        <ValidationMessage For="() => _employeeUpdated.Email" id="employee-email-validation-message" />
+    </div>
 
-	<div class="form-floating">
-		<InstantInputText class="form-control" disabled="@(IsReadonly || IsAction)" id="teacher-email" @bind-Value="_employeeUpdated.Email"/>
-		<label for="teacher-email">Email</label>
-		<ValidationMessage For="() => _employeeUpdated.Email" id="teacher-email-validation-message"/>
-	</div>
+    @if (!IsReadonly)
+    {
+        <div class="btn-group" role="group">
+            <input type="checkbox" class="btn-check" @bind-value="_employeeUpdated.IsTeacher" checked="@(_employeeUpdated.IsTeacher)" disabled="@(IsReadonly || IsAction)" @onclick="ToggleIsTeacher" id="employee-is-employee" autocomplete="off">
+            <label class="btn btn-outline-primary" for="employee-is-employee">Teacher</label>
 
-	@if (!IsReadonly) {
-		@if (string.IsNullOrWhiteSpace(_employeeUpdated.Password)) {
-			<small class="text-muted">
-				Setting the password is optional. When left empty it will be ignored.
-			</small>
-		}
+            <input type="checkbox" class="btn-check" @bind-value="_employeeUpdated.IsAdmin" checked="@(_employeeUpdated.IsAdmin)" disabled="@(IsReadonly || IsAction)" id="employee-is-administrator" autocomplete="off">
+            <label class="btn btn-outline-danger" for="employee-is-administrator">Administrator</label>
+            
+            <input type="checkbox" class="btn-check" @bind-value="_employeeUpdated.IsInactive" checked="@(_employeeUpdated.IsInactive)" disabled="@(IsReadonly || IsAction)" id="employee-is-inactive" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="employee-is-inactive">Inactive</label>
+        </div>
 
-		<PasswordInput @bind-Value="_employeeUpdated.Password" IdBase="teacher" InputsDisabled="@IsAction"/>
+        @if (_employeeUpdated.IsTeacher)
+        {
+            <div class="form-floating">
+                <InputSelect class="form-select rounded" id="class-select" disabled="@(IsReadonly || IsAction || !_employeeUpdated.IsTeacher)" @bind-Value="_employeeUpdated.Class">
+                    <option value="-">-</option>
+                    @foreach (var cls in LocalDbService.Classes)
+                    {
+                        <option value="@cls">@cls</option>
+                    }
+                </InputSelect>
+                <label for="class-select">Class</label>
+                <ValidationMessage For="() => _employeeUpdated.Class" id="student-class-validation-message" />
+            </div>
+        }
 
-		<div class="d-flex justify-content-end gap-2">
-			@if (CanDelete)
-			{
-				@if (_isDeleting)
-				{
-					<ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger"/>
-				}
-				else
-				{
-					<ButtonDelete OnClick="HandleOnDelete" Text="Deactivate" IsDisabled="IsAction"/>
-				}
-			}
+        @if (string.IsNullOrWhiteSpace(_employeeUpdated.Password))
+        {
+            <small class="text-muted">
+                Setting the password is optional. When left empty it will be ignored.
+            </small>
+        }
 
-			<ButtonCancel OnClick="ToggleEditMode" Text="Revert" IsDisabled="IsAction"/>
+        <PasswordInput @bind-Value="_employeeUpdated.Password" IdBase="employee" InputsDisabled="@IsAction" />
 
-			@if (_isSubmitting)
-			{
-				<ButtonLoading ButtonColor="ButtonColor.Success" SpinnerColor="SpinnerColor.Success"/>
-			}
-			else
-			{
-				<ButtonSubmit Text="Submit" IsDisabled="IsAction"/>
-			}
-		</div>
-	}
-</EditForm>
+        <div class="d-flex justify-content-end gap-2">
+            @if (CanDelete)
+            {
+                @if (_isDeleting)
+                {
+                    <ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger" />
+                }
+                else
+                {
+                    <ButtonDelete OnClick="HandleOnDelete" Text="Deactivate" IsDisabled="IsAction" />
+                }
+            }
 
-@code {
-	[Parameter] public Employee Employee { get; set; } = new();
+            <ButtonCancel OnClick="ToggleEditMode" Text="Revert" IsDisabled="IsAction" />
 
-	[Parameter] public Func<Employee, Task<bool>> OnSubmit { get; set; } = default!;
+            @if (_isSubmitting)
+            {
+                <ButtonLoading ButtonColor="ButtonColor.Success" SpinnerColor="SpinnerColor.Success" />
+            }
+            else
+            {
+                <ButtonSubmit Text="Submit" IsDisabled="IsAction" />
+            }
+        </div>
+    }
+    </EditForm>
 
-	[Parameter] public Func<Employee, Task<bool>> OnDelete { get; set; } = default!;
+    @code {
+    [Parameter] public Employee Employee { get; set; } = new();
 
-	[Parameter] public bool IsReadonly { get; set; }
+    [Parameter] public Func<Employee, Task<bool>> OnSubmit { get; set; } = default!;
 
-	[Parameter] public bool CanDelete { get; set; }
+    [Parameter] public Func<Employee, Task<bool>> OnDelete { get; set; } = default!;
 
-	private Employee _employeeOriginal = new();
-	private Employee _employeeUpdated  = new();
-	
-	private bool    _isDeleting;
-	private bool    _isSubmitting;
-	private bool    _isEditModeEnabled;
-	private bool    IsAction => _isDeleting || _isSubmitting;
+    [Parameter] public bool IsReadonly { get; set; }
 
-	protected override void OnInitialized()
-	{
-		_employeeOriginal = Utils.GetClone(Employee)!;
-		_employeeUpdated = Utils.GetClone(_employeeOriginal)!;
-	}
+    [Parameter] public bool CanDelete { get; set; }
 
-	private async Task HandleOnSubmit()
-	{
-		_isSubmitting = true;
-		await OnSubmit.Invoke(_employeeUpdated);
-		_isSubmitting = false;
-	}
+    private Employee _employeeOriginal = new();
+    private Employee _employeeUpdated = new();
 
-	private async Task HandleOnDelete()
-	{
-		_isDeleting = true;
-		await OnDelete.Invoke(_employeeUpdated);
-		_isDeleting = false;
-	}
+    private bool _isDeleting;
+    private bool _isSubmitting;
+    private bool _isEditModeEnabled;
+    private bool IsAction => _isDeleting || _isSubmitting;
 
-	private void ToggleEditMode()
-	{
-		_employeeUpdated = Utils.GetClone(_employeeOriginal)!;
-		if (_isEditModeEnabled || IsReadonly == false) return;
-		_isEditModeEnabled = true;
-		IsReadonly = !IsReadonly;
-	}
+    protected override void OnInitialized()
+    {
+        _employeeOriginal = Utils.GetClone(Employee)!;
+        _employeeUpdated = Utils.GetClone(_employeeOriginal)!;
+    }
+
+    private async Task HandleOnSubmit()
+    {
+        _isSubmitting = true;
+        await OnSubmit.Invoke(_employeeUpdated);
+        _isSubmitting = false;
+    }
+
+    private async Task HandleOnDelete()
+    {
+        _isDeleting = true;
+        await OnDelete.Invoke(_employeeUpdated);
+        _isDeleting = false;
+    }
+
+    private void ToggleIsTeacher()
+    {
+        if (!_employeeUpdated.IsTeacher)
+        {
+            _employeeUpdated.Class = "-";
+        }
+    }
+
+    private void ToggleEditMode()
+    {
+        _employeeUpdated = Utils.GetClone(_employeeOriginal)!;
+        if (_isEditModeEnabled || IsReadonly == false) return;
+        _isEditModeEnabled = true;
+        IsReadonly = !IsReadonly;
+    }
 
 }

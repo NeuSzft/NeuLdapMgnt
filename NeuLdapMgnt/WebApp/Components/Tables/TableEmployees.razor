@@ -3,7 +3,7 @@
 
 <ConfirmDialog @ref="_dialog"/>
 
-<Modal @ref="_modalEdit" title="Edit selected teachers" ModalType="ModalType.Warning" IsScrollable="true" OnHidden="ToggleEditMode">
+<Modal @ref="_modalEdit" title="Edit selected employees" ModalType="ModalType.Warning" IsScrollable="true" OnHidden="ToggleEditMode">
 	<BodyTemplate>
 		<div class="fw-bold mb-2">After saving this action cannot be reverted!</div>
 		<Switch @ref="_switchEditIsInactive" @bind-Value="_editIsInactive" Label="Set status to [Inactive]?"/>
@@ -31,7 +31,7 @@
 	</div>
 </div>
 
-<div class="table-teachers table-responsive rounded px-1 border flex-fill">
+<div class="table-employees table-responsive rounded px-1 border flex-fill">
 	<table class="table table-striped table-borderless align-middle">
 		<thead class="sticky-top">
 		<tr>
@@ -284,7 +284,7 @@
 
 	private string GetSortIcon(bool asc) => asc ? "bi-sort-up" : "bi-sort-down";
 
-	private void ShowEmployee(string id) => NavManager.NavigateTo($"/teachers/{id}");
+	private void ShowEmployee(string id) => NavManager.NavigateTo($"/employees/{id}");
 
 	private void InspectEmployee(Employee employee) => ShowEmployee(employee.Id.ToString());
 

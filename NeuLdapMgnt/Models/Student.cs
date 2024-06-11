@@ -43,9 +43,9 @@ namespace NeuLdapMgnt.Models
 			if (other == null) return false;
 
 			return Id == other.Id
-				&& FirstName == other.FirstName
+				&& GivenName == other.GivenName
 				&& MiddleName == other.MiddleName
-				&& LastName == other.LastName
+				&& Surname == other.Surname
 				&& Class == other.Class
 				&& Username == other.Username
 				&& Uid == other.Uid
@@ -67,9 +67,9 @@ namespace NeuLdapMgnt.Models
 			hash.Add(Uid);
 			hash.Add(Gid);
 			hash.Add(Username);
-			hash.Add(FirstName);
+			hash.Add(GivenName);
 			hash.Add(MiddleName);
-			hash.Add(LastName);
+			hash.Add(Surname);
 			hash.Add(Class);
 			hash.Add(HomeDirectory);
 			hash.Add(Email);
