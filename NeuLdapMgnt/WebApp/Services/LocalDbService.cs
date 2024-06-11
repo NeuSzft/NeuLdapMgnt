@@ -39,7 +39,7 @@ public class LocalDbService
 			var response = await ApiRequests.GetAdminsAsync();
 			if (response.IsSuccess())
 			{
-				Admins = new(response.Values[0]);
+				Admins = new(response.Values);
 			}
 
 			if (response.Errors.Any())
@@ -63,7 +63,7 @@ public class LocalDbService
 			var response = await ApiRequests.GetInactiveUsersAsync();
 			if (response.IsSuccess())
 			{
-				InactiveUsers = new(response.Values[0]);
+				InactiveUsers = new(response.Values);
 			}
 
 			if (response.Errors.Any())

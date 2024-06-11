@@ -131,7 +131,7 @@ public class EmployeeService
 			if (isInactive)
 			{
 				var responseInactive = await ApiRequests.GetInactiveUsersAsync();
-				DatabaseService.InactiveUsers = new(responseInactive.Values[0]);
+				DatabaseService.InactiveUsers = new(responseInactive.Values);
 			}
 
 			var responseStatus = await UpdateEmployeesStatusAsync(employees, isAdmin, isInactive, errorList);

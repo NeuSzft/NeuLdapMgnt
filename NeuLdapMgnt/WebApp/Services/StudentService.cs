@@ -153,7 +153,7 @@ public class StudentService
 			if (isInactive)
 			{
 				var response = await ApiRequests.GetInactiveUsersAsync();
-				DatabaseService.InactiveUsers = new(response.Values[0]);
+				DatabaseService.InactiveUsers = new(response.Values);
 			}
 
 			foreach (var student in students)

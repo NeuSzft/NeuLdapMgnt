@@ -13,8 +13,8 @@ namespace NeuLdapMgnt.WebApp.Requests
 		public static async Task<RequestResult<IEnumerable<string>>> AddClassesAsync(this ApiRequests apiRequests, IEnumerable<string> classes)
 			=> await apiRequests.SendRequestAsync<IEnumerable<string>>(HttpMethod.Put, "/api/classes", classes);
 
-		public static async Task<RequestResult<string[]>> GetInactiveUsersAsync(this ApiRequests apiRequests)
-			=> await apiRequests.SendRequestAsync<string[]>(HttpMethod.Get, "/api/inactives");
+		public static async Task<RequestResult<string>> GetInactiveUsersAsync(this ApiRequests apiRequests)
+			=> await apiRequests.SendRequestAsync<string>(HttpMethod.Get, "/api/inactives");
 
 		public static async Task<RequestResult> DeactivateUserAsync(this ApiRequests apiRequests, string id)
 			=> await apiRequests.SendRequestAsync(HttpMethod.Post, $"/api/inactives/{id}");
