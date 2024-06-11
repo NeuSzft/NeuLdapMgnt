@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +10,9 @@ namespace NeuLdapMgnt.Api.Endpoints;
 public static class InactiveUserEndpoints {
 	public static void MapInactiveUserEndpoints(this WebApplication app) {
 		app.MapGet("/api/inactives", (LdapService ldap, HttpRequest request) => {
-				string[] uids = ldap.GetAllEntities<Employee>().Values.Where(x => x.IsInactive).Select(x => x.Id).ToArray();
+				IEnumerable<string> employeeUids = ldap.GetAllEntities<Employee>().Values.Where(x => x.IsInactive).Select(x => x.Id);
+				IEnumerable<string> studentUids  = ldap.GetAllEntities<Student>().Values.Where(x => x.IsInactive).Select(x => x.Id.ToString());
+				string[]            uids         = employeeUids.Concat(studentUids).ToArray();
 				return new RequestResult<string>().SetValues(uids).RenewToken(request).ToResult();
 			})
 			.WithOpenApi()
