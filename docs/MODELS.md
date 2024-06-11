@@ -14,9 +14,7 @@
 |Type|Name|Attributes|
 |:---|:---|:---|
 |IEnumerable\<Student\>|Students|RequiredMember, JsonRequired, JsonPropertyName|
-|IEnumerable\<Teacher\>|Teachers|RequiredMember, JsonRequired, JsonPropertyName|
-|IEnumerable\<String\>|Inactives|RequiredMember, JsonRequired, JsonPropertyName|
-|IEnumerable\<String\>|Admins|RequiredMember, JsonRequired, JsonPropertyName|
+|IEnumerable\<Employee\>|Employees|RequiredMember, JsonRequired, JsonPropertyName|
 |Dictionary\<String, String\>|Values|RequiredMember, JsonRequired, JsonPropertyName|
 
 ### Methods
@@ -97,6 +95,7 @@
 |Type|Name|Attributes|
 |:---|:---|:---|
 |T[]|Values|JsonRequired, JsonInclude, JsonPropertyName|
+|T|Value|Nullable, JsonIgnore|
 |Int32|StatusCode|JsonRequired, JsonInclude, JsonPropertyName|
 |String[]|Errors|JsonRequired, JsonInclude, JsonPropertyName|
 |String|NewToken|Nullable, JsonInclude, JsonPropertyName|
@@ -134,7 +133,7 @@
 |String|HomeDirectory|Required, Directory, JsonRequired, JsonPropertyName, LdapAttribute|
 |String|Password|Nullable, Password, PasswordPropertyText, JsonInclude, JsonPropertyName, LdapAttribute|
 |String|FullName|JsonPropertyName, LdapAttribute|
-|Boolean|IsInactive|JsonIgnore|
+|Boolean|IsInactive|JsonInclude, JsonPropertyName, LdapFlag|
 
 ### Methods
 |Return Type|Name|
@@ -167,7 +166,7 @@
 |String|HomeDirectory|Required, Directory, JsonRequired, JsonPropertyName, LdapAttribute|
 |String|Password|Nullable, Password, PasswordPropertyText, JsonInclude, JsonPropertyName, LdapAttribute|
 |String|FullName|JsonPropertyName, LdapAttribute|
-|Boolean|IsInactive|JsonIgnore|
+|Boolean|IsInactive|JsonInclude, JsonPropertyName, LdapFlag|
 
 ### Methods
 |Return Type|Name|
@@ -180,7 +179,7 @@
 |String|ToString()|
 
 
-## Teacher : Person
+## Employee : Person
 
 ### Attributes
 - NullableContext
@@ -189,12 +188,12 @@
 ### Properties
 |Type|Name|Attributes|
 |:---|:---|:---|
-|String|Id|Required, IdTeacher, JsonPropertyName, LdapAttribute|
+|String|Id|Required, IdEmployee, JsonPropertyName, LdapAttribute|
 |Int32|Uid|Required, UserId, JsonRequired, JsonPropertyName, LdapAttribute|
 |Int32|Gid|Required, UserId, JsonRequired, JsonPropertyName, LdapAttribute|
 |String|Class|JsonRequired, JsonPropertyName, LdapAttribute|
-|Boolean|IsAdmin|JsonIgnore|
-|Boolean|IsEmployee||
+|Boolean|IsAdmin|JsonInclude, JsonPropertyName, LdapFlag|
+|Boolean|IsTeacher|JsonInclude, JsonPropertyName, LdapFlag|
 |String|Username|Required, JsonRequired, JsonPropertyName, LdapAttribute|
 |String|FirstName|Required, FirstName, JsonRequired, JsonPropertyName, LdapAttribute|
 |String|LastName|Required, LastName, JsonRequired, JsonPropertyName, LdapAttribute|
@@ -203,12 +202,12 @@
 |String|HomeDirectory|Required, Directory, JsonRequired, JsonPropertyName, LdapAttribute|
 |String|Password|Nullable, Password, PasswordPropertyText, JsonInclude, JsonPropertyName, LdapAttribute|
 |String|FullName|JsonPropertyName, LdapAttribute|
-|Boolean|IsInactive|JsonIgnore|
+|Boolean|IsInactive|JsonInclude, JsonPropertyName, LdapFlag|
 
 ### Methods
 |Return Type|Name|
 |:---|:---|
-|Boolean|Equals(Teacher)|
+|Boolean|Equals(Employee)|
 |Boolean|Equals(Object)|
 |Int32|GetHashCode()|
 |String|GetUsername()|
