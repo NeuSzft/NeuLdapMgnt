@@ -6,28 +6,24 @@
 1. [Overview](#overview)
 2. [Default Admin](#default-admin)
 3. [Entities](#entities)
-4. [Groups](#groups)
-5. [Key-value pairs](#key-value-pairs)
+4. [Key-value pairs](#key-value-pairs)
 
 
 ## Overview
 The LDAP database is an essential part of this project.
-It is responsible for storing the teachers, students, classes and which teachers have administrator privileges.
+It is responsible for storing the employees, students, classes and which employees have administrator privileges.
 
-The API handles these split into three groups:
-- [entities](#entities)
-- [groups](#groups)
-- [key-value pairs](#key-value-pairs)
+The API handles these split into [entities](#entities) and [key-value pairs](#key-value-pairs).
 
-The teachers and students are entities.\
-If a teacher or student is no longer needed they can be put into the `inactive` group which prevents teachers if they are admins from logging in.\
-A teacher is an admin if they are part of the `admin` group.
-The classes that the students can be a part of or the teachers can be in charge of are stores as a key-value pair under the name `classes`. 
+The employees and students are entities.\
+If an employee or student is no longer needed they can be made inactive using the `inactive` flag, which prevents employees if they are admins from logging in.\
+An employee is an admin if they have the `admin` flag.
+The classes that the students can be a part of or the employees (teachers) can be in charge of are stored as a key-value pair under the name `classes`. 
 The password of the [default admin](#default-admin) and wether or not it is enabled is also stored as two key value pairs.
 
 
 ## Default Admin
-The default admin acts as an admin teacher, but does not actually exist as an entity.\
+The default admin acts as an admin user, but does not actually exist as an entity.\
 It instead is defined by two [environment variables](../README.md#environment-variables).
 
 The `DEFAULT_ADMIN_USERNAME` env specifies the username the default admin should use to authenticate itself and is not stored within the database and is read each time the API starts.
@@ -46,11 +42,6 @@ The class of the models can use the [LdapObjectClasses](../NeuLdapMgnt/Models/Ld
 
 The properties of these classes can use the [LdapAttribute](../NeuLdapMgnt/Models/LdapAttributes.cs) attribute to specify which LDAP attribute they should bind to and if they count as hidden or not.\
 If an attribute is marked as hidden, then it is not set or returned from the database by default. An example for this is the `userPassword` which does not need to be updated or returned in most cases.
-
-
-## Groups
-Groups store the `uid`s of the entities that belong in the group.
-> If an entity is deleted and they belong in a group, their uid is not removed from the group.
 
 
 ## Key-value pairs
