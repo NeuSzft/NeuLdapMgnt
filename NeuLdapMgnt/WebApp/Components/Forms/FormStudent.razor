@@ -21,30 +21,27 @@
         <ValidationMessage For="() => _studentUpdated.Id" id="student-id-validation-message" />
     </div>
 
+    <div class="form-floating">
+        <InstantInputText class="form-control" id="student-name" @bind-Value="_studentUpdated.FullName" disabled />
+        <label for="student-name">Full Name</label>
+    </div>
+    
     <div class="input-group gap-2">
-        <label class="input-group-text user-select-none col-12 rounded gap-2" for="first-name">
-            Name
-            @if (!IsReadonly && _studentUpdated.FullName.Length > 2)
-            {
-                <span>[@_studentUpdated.FullName]</span>
-            }
-        </label>
-
         <div class="d-flex flex-column flex-md-row gap-2 w-100">
             <div class="form-floating w-100">
-                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="first-name" @bind-Value="_studentUpdated.GivenName" />
-                <label for="first-name">First</label>
-                <ValidationMessage For="() => _studentUpdated.GivenName" id="student-first-name-validation-message" />
+                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="surname" @bind-Value="_studentUpdated.GivenName" />
+                <label for="given-name">Given name</label>
+                <ValidationMessage For="() => _studentUpdated.GivenName" id="student-given-name-validation-message" />
+            </div>
+            <div class="form-floating w-100">
+                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="given-name" @bind-Value="_studentUpdated.Surname" />
+                <label for="surname">Surname</label>
+                <ValidationMessage For="() => _studentUpdated.Surname" id="student-surname-validation-message" />
             </div>
             <div class="form-floating w-100">
                 <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="middle-name" @bind-Value="_studentUpdated.MiddleName" />
-                <label for="middle-name">Middle</label>
+                <label for="middle-name">Middle name</label>
                 <ValidationMessage For="() => _studentUpdated.MiddleName" id="student-middle-name-validation-message" />
-            </div>
-            <div class="form-floating w-100">
-                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="last-name" @bind-Value="_studentUpdated.Surname" />
-                <label for="last-name">Last</label>
-                <ValidationMessage For="() => _studentUpdated.Surname" id="student-last-name-validation-message" />
             </div>
         </div>
     </div>

@@ -34,7 +34,7 @@ namespace NeuLdapMgnt.Models
         [LdapAttribute("cn")]
         public string Username { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "First name is required.")]
+        [Required(ErrorMessage = "Given name is required.")]
         [GivenName]
         [JsonRequired, JsonPropertyName("first_name")]
         [LdapAttribute("givenName")]
@@ -50,7 +50,7 @@ namespace NeuLdapMgnt.Models
             }
         }
 
-        [Required(ErrorMessage = "Last name is required.")]
+        [Required(ErrorMessage = "Surname is required.")]
         [Surname]
         [JsonRequired, JsonPropertyName("last_name")]
         [LdapAttribute("sn")]
