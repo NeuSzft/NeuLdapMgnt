@@ -242,7 +242,7 @@ public class AttributesUnitTests
     public void FirstNameAttributeShortFails()
     {
         var attribute = new GivenNameAttribute();
-        Assert.AreEqual("First name must be at least 3 characters long.",
+        Assert.AreEqual("Given name must be at least 3 characters long.",
             attribute.GetValidationResult("Jo", _validationContext)!.ErrorMessage);
     }
 
@@ -250,7 +250,7 @@ public class AttributesUnitTests
     public void FirstNameAttributeWithInvalidDataTypeFails()
     {
         var attribute = new GivenNameAttribute();
-        Assert.AreEqual("First name: Invalid data type",
+        Assert.AreEqual("Given name: Invalid data type",
             attribute.GetValidationResult(123, _validationContext)!.ErrorMessage);
     }
 
@@ -269,7 +269,7 @@ public class AttributesUnitTests
     {
         var attribute = new SurnameAttribute();
 
-        Assert.AreEqual("Last name must be at least 3 characters long.",
+        Assert.AreEqual("Surname must be at least 3 characters long.",
             attribute.GetValidationResult("Do", _validationContext)!.ErrorMessage);
     }
 
@@ -278,7 +278,7 @@ public class AttributesUnitTests
     {
         var attribute = new SurnameAttribute();
 
-        Assert.AreEqual("Last name: Invalid data type",
+        Assert.AreEqual("Surname: Invalid data type",
             attribute.GetValidationResult(123, _validationContext)!.ErrorMessage);
     }
 
