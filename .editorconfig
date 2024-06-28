@@ -4,16 +4,16 @@ root = true
 end_of_line = lf
 insert_final_newline = true
 
-[Makefile,makefile]
+[makefile]
 indent_style = tab
 trim_trailing_whitespace = true
 
-[*.cs,*.razor]
+[*.{cs,razor}]
 charset = utf-8
 indent_style = tab
 trim_trailing_whitespace = true
 
-[*.yml,*.yaml]
+[*.{yaml,yml}]
 indent_style = space
 indent_size = 2
 trim_trailing_whitespace = true
