@@ -1,8 +1,7 @@
-﻿using System;
-using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
 using NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes;
-using NeuLdapMgnt.Models.CustomValidationAttributes;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models
 {
@@ -52,7 +51,7 @@ namespace NeuLdapMgnt.Models
 				&& Gid == other.Gid
 				&& Email == other.Email
 				&& HomeDirectory == other.HomeDirectory
-				&& Password == other.Password;
+				&& IsInactive == other.IsInactive;
 		}
 
 		public override bool Equals(object? obj)
@@ -73,7 +72,6 @@ namespace NeuLdapMgnt.Models
 			hash.Add(Class);
 			hash.Add(HomeDirectory);
 			hash.Add(Email);
-			hash.Add(Password);
 			return hash.ToHashCode();
 		}
 	}
