@@ -1,22 +1,35 @@
-﻿<div class="border rounded">
-	<div class="row p-1 m-1 border-bottom">
-		<div class="col-3 col-sm-2">ID:</div>
-		<div class="col">@Student.Id</div>
-	</div>
-	<div class="row p-1 m-1 border-bottom">
-		<div class="col-3 col-sm-2">Name:</div>
-		<div class="col">@Student.FullName</div>
-	</div>
-	<div class="row p-1 m-1 border-bottom">
-		<div class="col-3 col-sm-2">Class:</div>
-		<div class="col">@Student.Class</div>
-	</div>
-	<div class="row p-1 m-1">
-		<div class="col-3 col-sm-2">Email:</div>
-		<div class="col">@Student.Email</div>
-	</div>
+<div class="border rounded">
+    <div class="row p-1 m-1 border-bottom">
+        <div class="col-3 col-sm-2">ID:</div>
+        <div class="col">@Student.Id</div>
+    </div>
+    <div class="row p-1 m-1 border-bottom">
+        <div class="col-3 col-sm-2">Name:</div>
+        <div class="col">@Student.FullName</div>
+    </div>
+    <div class="row p-1 m-1 border-bottom">
+        <div class="col-3 col-sm-2">Class:</div>
+        <div class="col">@Student.Class</div>
+    </div>
+    <div class="row p-1 m-1 border-bottom">
+        <div class="col-3 col-sm-2">Email:</div>
+        <div class="col">@Student.Email</div>
+    </div>
+    <div class="row p-1 m-1">
+        <div class="col-3 col-sm-2">Status:</div>
+        <div class="col d-flex align-items-center gap-2">
+            @if (Student.IsInactive)
+            {
+                <BadgeInactive />
+            }
+            else
+            {
+                <BadgeActive />
+            }
+        </div>
+    </div>
 </div>
 
 @code {
-	[Parameter] public Student Student { get; set; } = default!;
+    [Parameter] public Student Student { get; set; } = default!;
 }
