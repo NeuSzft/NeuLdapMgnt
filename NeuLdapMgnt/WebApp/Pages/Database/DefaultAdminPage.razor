@@ -24,7 +24,7 @@
 	private bool _adminEnabled;
 
 	private async Task EnableAdmin(bool enable) {
-		RequestResult result = await ApiRequests.SendStringAsync(HttpMethod.Put, "/api/defaultadmin/enabled", enable.ToString());
+		RequestResult result = await ApiRequests.SendStringAsync(HttpMethod.Put, "/api/default-admin/enabled", enable.ToString());
 		ToastService.Notify(result.IsSuccess()
 			? ToastMessages.Success($"Successfully {(enable ? "en" : "dis")}abled the Default Admin.")
 			: ToastMessages.Error(result.GetError())
@@ -35,7 +35,7 @@
 		if (!ApiRequests.EnsureAuthentication(NavManager))
 			return;
 
-		RequestResult<bool> result = await ApiRequests.SendRequestAsync<bool>(HttpMethod.Get, "/api/defaultadmin/enabled");
+		RequestResult<bool> result = await ApiRequests.SendRequestAsync<bool>(HttpMethod.Get, "/api/default-admin/enabled");
 		if (result.IsSuccess())
 			_adminEnabled = result.GetValue();
 		else
