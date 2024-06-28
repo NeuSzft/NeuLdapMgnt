@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
 <EditForm Model="@_studentUpdated" OnValidSubmit="HandleOnSubmit" class="d-flex flex-column gap-2 my-2">
     <DataAnnotationsValidator />
@@ -25,7 +25,7 @@
         <InstantInputText class="form-control" id="student-name" @bind-Value="_studentUpdated.FullName" disabled />
         <label for="student-name">Full Name</label>
     </div>
-    
+
     <div class="input-group gap-2">
         <div class="d-flex flex-column flex-md-row gap-2 w-100">
             <div class="form-floating w-100">
@@ -64,13 +64,14 @@
         <ValidationMessage For="() => _studentUpdated.Email" id="student-email-validation-message" />
     </div>
 
-    <div class="btn-group" role="group">
-        <input type="checkbox" class="btn-check" @bind-value="_studentUpdated.IsInactive" id="student-is-inactive" autocomplete="off">
-        <label class="btn btn-outline-secondary" for="student-is-inactive">Inactive</label>
-    </div>
 
     @if (!IsReadonly)
     {
+        <div class="btn-group" role="group">
+            <input type="checkbox" class="btn-check" @bind-value="_studentUpdated.IsInactive" checked="@(_studentUpdated.IsInactive)" id="student-is-inactive" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="student-is-inactive">Inactive</label>
+        </div>
+
         @if (string.IsNullOrWhiteSpace(_studentUpdated.Password))
         {
             <small class="text-muted">
@@ -105,9 +106,9 @@
             }
         </div>
     }
-    </EditForm>
+</EditForm>
 
-    @code {
+@code {
     [Parameter] public Student Student { get; set; } = new();
 
     [Parameter] public Func<Student, Task<bool>> OnSubmit { get; set; } = default!;
