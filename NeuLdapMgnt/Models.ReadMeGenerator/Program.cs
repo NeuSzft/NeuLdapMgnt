@@ -28,8 +28,13 @@ internal static class Program {
 		return sb.ToString();
 	}
 
-	private static string GetAttributeName(Type type) {
-		return type.Name[..type.Name.LastIndexOf("Attribute", StringComparison.InvariantCulture)];
+	private static string GetAttributeName(CustomAttributeData data) {
+		string type = data.AttributeType.Name;
+		string name = type[..type.LastIndexOf("Attribute", StringComparison.InvariantCulture)];
+		var    args = data.ConstructorArguments.Where(x => x.Value?.ToString() != x.Value?.GetType().ToString());
+		return args.Any()
+			? $"{name}(`{string.Join("`, `", args.Select(x => x.Value))}`)"
+			: name;
 	}
 
 	private static string ModelToMarkdown(Type type) {
@@ -42,7 +47,7 @@ internal static class Program {
 		sb.AppendLine();
 
 		sb.AppendLine("### Attributes");
-		foreach (string name in type.CustomAttributes.Select(x => GetAttributeName(x.AttributeType)))
+		foreach (string name in type.CustomAttributes.Select(GetAttributeName))
 			sb.AppendLine($"- {name}");
 		sb.AppendLine();
 
@@ -50,7 +55,7 @@ internal static class Program {
 		sb.AppendLine("|Type|Name|Attributes|");
 		sb.AppendLine("|:---|:---|:---|");
 		foreach (PropertyInfo info in type.GetProperties())
-			sb.AppendLine($"|{GetNameOfType(info.PropertyType)}|{info.Name}|{string.Join(", ", info.CustomAttributes.Select(x => GetAttributeName(x.AttributeType)))}|");
+			sb.AppendLine($"|{GetNameOfType(info.PropertyType)}|{info.Name}|{string.Join(", ", info.CustomAttributes.Select(GetAttributeName))}|");
 		sb.AppendLine();
 
 		sb.AppendLine("### Methods");

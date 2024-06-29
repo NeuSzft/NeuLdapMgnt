@@ -6,16 +6,16 @@
 ## LdapDbDump
 
 ### Attributes
-- NullableContext
-- Nullable
+- NullableContext(`1`)
+- Nullable(`0`)
 - RequiredMember
 
 ### Properties
 |Type|Name|Attributes|
 |:---|:---|:---|
-|IEnumerable\<Student\>|Students|RequiredMember, JsonRequired, JsonPropertyName|
-|IEnumerable\<Employee\>|Employees|RequiredMember, JsonRequired, JsonPropertyName|
-|Dictionary\<String, String\>|Values|RequiredMember, JsonRequired, JsonPropertyName|
+|IEnumerable\<Student\>|Students|RequiredMember, JsonRequired, JsonPropertyName(`students`)|
+|IEnumerable\<Employee\>|Employees|RequiredMember, JsonRequired, JsonPropertyName(`employees`)|
+|Dictionary\<String, String\>|Values|RequiredMember, JsonRequired, JsonPropertyName(`values`)|
 
 ### Methods
 |Return Type|Name|
@@ -30,8 +30,8 @@
 ## LogEntry
 
 ### Attributes
-- NullableContext
-- Nullable
+- NullableContext(`1`)
+- Nullable(`0`)
 - RequiredMember
 
 ### Properties
@@ -40,8 +40,8 @@
 |BigInteger|Id||
 |DateTime|Time|RequiredMember|
 |String|LogLevel|RequiredMember|
-|String|Username|Nullable|
-|String|FullName|Nullable|
+|String|Username|Nullable(`2`)|
+|String|FullName|Nullable(`2`)|
 |String|Host|RequiredMember|
 |String|Method|RequiredMember|
 |String|RequestPath|RequiredMember|
@@ -61,17 +61,17 @@
 ## RequestResult
 
 ### Attributes
-- NullableContext
-- Nullable
+- NullableContext(`1`)
+- Nullable(`0`)
 - JsonSourceGenerationOptions
-- JsonSerializable
+- JsonSerializable(`NeuLdapMgnt.Models.RequestResult`)
 
 ### Properties
 |Type|Name|Attributes|
 |:---|:---|:---|
-|Int32|StatusCode|JsonRequired, JsonInclude, JsonPropertyName|
-|String[]|Errors|JsonRequired, JsonInclude, JsonPropertyName|
-|String|NewToken|Nullable, JsonInclude, JsonPropertyName|
+|Int32|StatusCode|JsonRequired, JsonInclude, JsonPropertyName(`status_code`)|
+|String[]|Errors|JsonRequired, JsonInclude, JsonPropertyName(`errors`)|
+|String|NewToken|Nullable(`2`), JsonInclude, JsonPropertyName(`new_token`)|
 
 ### Methods
 |Return Type|Name|
@@ -88,22 +88,21 @@
 ## RequestResult\<T\> : RequestResult
 
 ### Attributes
-- NullableContext
-- Nullable
+- NullableContext(`1`)
+- Nullable(`0`)
 
 ### Properties
 |Type|Name|Attributes|
 |:---|:---|:---|
-|T[]|Values|JsonRequired, JsonInclude, JsonPropertyName|
-|T|Value|Nullable, JsonIgnore|
-|Int32|StatusCode|JsonRequired, JsonInclude, JsonPropertyName|
-|String[]|Errors|JsonRequired, JsonInclude, JsonPropertyName|
-|String|NewToken|Nullable, JsonInclude, JsonPropertyName|
+|T[]|Values|JsonRequired, JsonInclude, JsonPropertyName(`values`)|
+|T|Value|Nullable(`2`), JsonIgnore|
+|Int32|StatusCode|JsonRequired, JsonInclude, JsonPropertyName(`status_code`)|
+|String[]|Errors|JsonRequired, JsonInclude, JsonPropertyName(`errors`)|
+|String|NewToken|Nullable(`2`), JsonInclude, JsonPropertyName(`new_token`)|
 
 ### Methods
 |Return Type|Name|
 |:---|:---|
-|T|GetValue()|
 |String|GetError()|
 |Boolean|IsSuccess()|
 |Boolean|IsFailure()|
@@ -116,24 +115,24 @@
 ## Person
 
 ### Attributes
-- NullableContext
-- Nullable
+- NullableContext(`1`)
+- Nullable(`0`)
 - LdapObjectClasses
 
 ### Properties
 |Type|Name|Attributes|
 |:---|:---|:---|
-|Int32|Uid|Required, JsonRequired, JsonPropertyName, LdapAttribute|
-|Int32|Gid|Required, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|Username|Required, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|FirstName|Required, FirstName, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|LastName|Required, LastName, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|MiddleName|Nullable, MiddleName, JsonInclude, JsonPropertyName, LdapAttribute|
-|String|Email|Nullable, Email, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|HomeDirectory|Required, Directory, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|Password|Nullable, Password, PasswordPropertyText, JsonInclude, JsonPropertyName, LdapAttribute|
-|String|FullName|JsonPropertyName, LdapAttribute|
-|Boolean|IsInactive|JsonInclude, JsonPropertyName, LdapFlag|
+|Int32|Uid|Required, JsonRequired, JsonPropertyName(`uid`), LdapAttribute(`uidNumber`, `False`)|
+|Int32|Gid|Required, JsonRequired, JsonPropertyName(`gid`), LdapAttribute(`gidNumber`, `False`)|
+|String|Username|Required, JsonRequired, JsonPropertyName(`username`), LdapAttribute(`cn`, `False`)|
+|String|GivenName|Required, GivenName, JsonRequired, JsonPropertyName(`first_name`), LdapAttribute(`givenName`, `False`)|
+|String|Surname|Required, Surname, JsonRequired, JsonPropertyName(`last_name`), LdapAttribute(`sn`, `False`)|
+|String|MiddleName|Nullable(`2`), MiddleName, JsonInclude, JsonPropertyName(`middle_name`), LdapAttribute(`title`, `False`)|
+|String|Email|Nullable(`2`), Email, JsonRequired, JsonPropertyName(`email`), LdapAttribute(`mail`, `False`)|
+|String|HomeDirectory|Required, Directory, JsonRequired, JsonPropertyName(`home_directory`), LdapAttribute(`homeDirectory`, `False`)|
+|String|Password|Nullable(`2`), Password, PasswordPropertyText(`True`), JsonInclude, JsonPropertyName(`password`), LdapAttribute(`userPassword`, `True`)|
+|String|FullName|JsonPropertyName(`full_name`), LdapAttribute(`displayName`, `False`)|
+|Boolean|IsInactive|JsonInclude, JsonPropertyName(`is_inactive`), LdapFlag(`inactive`)|
 
 ### Methods
 |Return Type|Name|
@@ -148,25 +147,25 @@
 ## Student : Person
 
 ### Attributes
-- NullableContext
-- Nullable
+- NullableContext(`1`)
+- Nullable(`0`)
 
 ### Properties
 |Type|Name|Attributes|
 |:---|:---|:---|
-|Int64|Id|Required, IdStudent, JsonPropertyName, LdapAttribute|
-|Int32|Uid|Required, UserId, JsonRequired, JsonPropertyName, LdapAttribute|
-|Int32|Gid|Required, GroupId, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|Class|Required, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|Username|Required, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|FirstName|Required, FirstName, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|LastName|Required, LastName, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|MiddleName|Nullable, MiddleName, JsonInclude, JsonPropertyName, LdapAttribute|
-|String|Email|Nullable, Email, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|HomeDirectory|Required, Directory, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|Password|Nullable, Password, PasswordPropertyText, JsonInclude, JsonPropertyName, LdapAttribute|
-|String|FullName|JsonPropertyName, LdapAttribute|
-|Boolean|IsInactive|JsonInclude, JsonPropertyName, LdapFlag|
+|Int64|Id|Required, IdStudent(`70000000000`, `79999999999`), JsonPropertyName(`id`), LdapAttribute(`uid`, `False`)|
+|Int32|Uid|Required, UserId(`6000`, `9999`), JsonRequired, JsonPropertyName(`uid`), LdapAttribute(`uidNumber`, `False`)|
+|Int32|Gid|Required, GroupId(`6000`, `9999`), JsonRequired, JsonPropertyName(`gid`), LdapAttribute(`gidNumber`, `False`)|
+|String|Class|Required, JsonRequired, JsonPropertyName(`class`), LdapAttribute(`roomNumber`, `False`)|
+|String|Username|Required, JsonRequired, JsonPropertyName(`username`), LdapAttribute(`cn`, `False`)|
+|String|GivenName|Required, GivenName, JsonRequired, JsonPropertyName(`first_name`), LdapAttribute(`givenName`, `False`)|
+|String|Surname|Required, Surname, JsonRequired, JsonPropertyName(`last_name`), LdapAttribute(`sn`, `False`)|
+|String|MiddleName|Nullable(`2`), MiddleName, JsonInclude, JsonPropertyName(`middle_name`), LdapAttribute(`title`, `False`)|
+|String|Email|Nullable(`2`), Email, JsonRequired, JsonPropertyName(`email`), LdapAttribute(`mail`, `False`)|
+|String|HomeDirectory|Required, Directory, JsonRequired, JsonPropertyName(`home_directory`), LdapAttribute(`homeDirectory`, `False`)|
+|String|Password|Nullable(`2`), Password, PasswordPropertyText(`True`), JsonInclude, JsonPropertyName(`password`), LdapAttribute(`userPassword`, `True`)|
+|String|FullName|JsonPropertyName(`full_name`), LdapAttribute(`displayName`, `False`)|
+|Boolean|IsInactive|JsonInclude, JsonPropertyName(`is_inactive`), LdapFlag(`inactive`)|
 
 ### Methods
 |Return Type|Name|
@@ -182,27 +181,27 @@
 ## Employee : Person
 
 ### Attributes
-- NullableContext
-- Nullable
+- NullableContext(`1`)
+- Nullable(`0`)
 
 ### Properties
 |Type|Name|Attributes|
 |:---|:---|:---|
-|String|Id|Required, IdEmployee, JsonPropertyName, LdapAttribute|
-|Int32|Uid|Required, UserId, JsonRequired, JsonPropertyName, LdapAttribute|
-|Int32|Gid|Required, UserId, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|Class|JsonRequired, JsonPropertyName, LdapAttribute|
-|Boolean|IsAdmin|JsonInclude, JsonPropertyName, LdapFlag|
-|Boolean|IsTeacher|JsonInclude, JsonPropertyName, LdapFlag|
-|String|Username|Required, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|FirstName|Required, FirstName, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|LastName|Required, LastName, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|MiddleName|Nullable, MiddleName, JsonInclude, JsonPropertyName, LdapAttribute|
-|String|Email|Nullable, Email, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|HomeDirectory|Required, Directory, JsonRequired, JsonPropertyName, LdapAttribute|
-|String|Password|Nullable, Password, PasswordPropertyText, JsonInclude, JsonPropertyName, LdapAttribute|
-|String|FullName|JsonPropertyName, LdapAttribute|
-|Boolean|IsInactive|JsonInclude, JsonPropertyName, LdapFlag|
+|String|Id|Required, IdEmployee, JsonPropertyName(`id`), LdapAttribute(`uid`, `False`)|
+|Int32|Uid|Required, UserId(`4000`, `5999`), JsonRequired, JsonPropertyName(`uid`), LdapAttribute(`uidNumber`, `False`)|
+|Int32|Gid|Required, UserId(`4000`, `5999`), JsonRequired, JsonPropertyName(`gid`), LdapAttribute(`gidNumber`, `False`)|
+|String|Class|JsonRequired, JsonPropertyName(`class`), LdapAttribute(`roomNumber`, `False`)|
+|Boolean|IsAdmin|JsonInclude, JsonPropertyName(`is_admin`), LdapFlag(`admin`)|
+|Boolean|IsTeacher|JsonInclude, JsonPropertyName(`is_teacher`), LdapFlag(`teacher`)|
+|String|Username|Required, JsonRequired, JsonPropertyName(`username`), LdapAttribute(`cn`, `False`)|
+|String|GivenName|Required, GivenName, JsonRequired, JsonPropertyName(`first_name`), LdapAttribute(`givenName`, `False`)|
+|String|Surname|Required, Surname, JsonRequired, JsonPropertyName(`last_name`), LdapAttribute(`sn`, `False`)|
+|String|MiddleName|Nullable(`2`), MiddleName, JsonInclude, JsonPropertyName(`middle_name`), LdapAttribute(`title`, `False`)|
+|String|Email|Nullable(`2`), Email, JsonRequired, JsonPropertyName(`email`), LdapAttribute(`mail`, `False`)|
+|String|HomeDirectory|Required, Directory, JsonRequired, JsonPropertyName(`home_directory`), LdapAttribute(`homeDirectory`, `False`)|
+|String|Password|Nullable(`2`), Password, PasswordPropertyText(`True`), JsonInclude, JsonPropertyName(`password`), LdapAttribute(`userPassword`, `True`)|
+|String|FullName|JsonPropertyName(`full_name`), LdapAttribute(`displayName`, `False`)|
+|Boolean|IsInactive|JsonInclude, JsonPropertyName(`is_inactive`), LdapFlag(`inactive`)|
 
 ### Methods
 |Return Type|Name|
