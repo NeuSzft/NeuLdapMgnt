@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @implements IDisposable
 
 <ConfirmDialog @ref="_dialog"/>
@@ -158,16 +158,16 @@
 
 	private async Task UpdateSelected()
 	{
-		if (!_editIsInactive && !_editIsAdmin)
-		{
-			ToastService.Notify(ToastMessages.Light("Set status to continue."));
-			return;
-		}
-
 		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", _selectedEmployees.Select(x => $"[{x.Class}] {x.FullName}").ToList());
+        parameters.Add("List", _selectedEmployees.Select(x =>
+        {
+            var id = x.GetType().GetProperty("Id")?.GetValue(x);
+            return id is not null
+                ? $"{id}: {x.FullName}"
+                : x.FullName;
+        }).ToList());
 
-		string confirmTitle = "Set status to";
+        string confirmTitle = "Set status to";
 		if (_editIsInactive)
 		{
 			confirmTitle += " [Inactive]";

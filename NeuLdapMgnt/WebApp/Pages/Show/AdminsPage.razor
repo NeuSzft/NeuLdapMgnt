@@ -1,166 +1,166 @@
-﻿@page "/db/admins"
+@page "/db/admins"
 
 <PageTitle>Administrators</PageTitle>
-<ConfirmDialog @ref="_dialog"/>
+<ConfirmDialog @ref="_dialog" />
 
 <h1>Admins <span class="badge bg-primary p-1 mb-1 align-middle">@_admins.Count</span></h1>
 
 @if (_isLoading)
 {
-	<Loading Text="Loading admins"/>
+    <Loading Text="Loading admins" />
 }
 else if (_isRemoving)
 {
-	<Loading Text="Removing admins"/>
+    <Loading Text="Removing admins" />
 }
 else
 {
-	@if (!_admins.Any())
-	{
-		<div class="d-flex justify-content-center text-center">
-			<h3 class="my-4">There are no teachers with <BadgeAdministrator/> status</h3>
-		</div>
-	}
-	else
-	{
-		<div class="d-flex justify-content-end align-items-center g-2 mb-3">
-			<Button id="remove-selected" Color="ButtonColor.Danger" Outline="true" Disabled="!_selectedAdmins.Any()" @onclick="OnRemoveSelectedAdmins">
-				Remove selected
-			</Button>
-		</div>
-		<div class="table-admins table-responsive rounded px-1 border flex-fill">
-			<table class="table table-striped table-borderless align-middle">
-				<thead class="sticky-top">
-				<tr>
-					<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllAdmins">
-						@if (!IsAdminSelected)
-						{
-							<span>Select all</span>
-						}
-						else
-						{
-							<span>Deselect</span>
-						}
-					</th>
-					<th class="user-select-none" role="button">ID</th>
-					<th class="user-select-none" role="button">Name</th>
-					<th class="user-select-none" role="button">Status</th>
-					<th class="user-select-none" role="button">Class</th>
-					<th class="user-select-none text-end">Inspect</th>
-				</tr>
-				</thead>
-				<tbody>
-				@foreach (var employee in EmployeeService.Employees.Where(x => x.IsAdmin))
-				{
-					<tr>
-						<td class="rounded-start">
-							<input class="form-check-input"
-							       type="checkbox"
-							       checked="@_selectedAdmins.Contains(employee.Id)"
-							       @onchange="() => SelectAdmin(employee.Id)"/>
-						</td>
-						<td>@employee.Id</td>
-						<td>@employee.FullName</td>
-						<td>
-							<div class="d-flex flex-column flex-grow-0 gap-1 align-items-start">
-								@if (employee.IsInactive)
-								{
-									<BadgeInactive/>
-								}
-								else
-								{
-									<BadgeActive/>
-								}
-								@if (employee.IsTeacher)
-								{
-									<BadgeEmployee/>
-								}
-								else
-								{
-									<BadgeEmployee/>
-								}
-							</div>
-						</td>
-						<td >
-							@if (!employee.IsTeacher)
-							{
-								<BadgeClass Class="@employee.Class"/>
-							}
-						</td>
-						<td class="text-end rounded-end">
-							<ButtonInspect Id="@employee.Id"/>
-						</td>
-					</tr>
-				}
-				</tbody>
-			</table>
-		</div>
-	}
+    @if (!_admins.Any())
+    {
+        <div class="d-flex justify-content-center text-center">
+            <h3 class="my-4">There are no teachers with <BadgeAdministrator /> status</h3>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-end align-items-center g-2 mb-3">
+            <Button id="remove-selected" Color="ButtonColor.Danger" Outline="true" Disabled="!_selectedAdmins.Any()" @onclick="OnRemoveSelectedAdmins">
+                Remove selected
+            </Button>
+        </div>
+        <div class="table-admins table-responsive rounded px-1 border flex-fill">
+            <table class="table table-striped table-borderless align-middle">
+                <thead class="sticky-top">
+                    <tr>
+                        <th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllAdmins">
+                            @if (!IsAdminSelected)
+                            {
+                                <span>Select all</span>
+                            }
+                            else
+                            {
+                                <span>Deselect</span>
+                            }
+                        </th>
+                        <th class="user-select-none" role="button">ID</th>
+                        <th class="user-select-none" role="button">Name</th>
+                        <th class="user-select-none" role="button">Status</th>
+                        <th class="user-select-none" role="button">Class</th>
+                        <th class="user-select-none text-end">Inspect</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var employee in EmployeeService.Employees.Where(x => x.IsAdmin))
+                    {
+                        <tr>
+                            <td class="rounded-start">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       checked="@_selectedAdmins.Contains(employee)"
+                                       @onchange="() => SelectAdmin(employee)" />
+                            </td>
+                            <td>@employee.Id</td>
+                            <td>@employee.FullName</td>
+                            <td>
+                                <div class="d-flex flex-column flex-grow-0 gap-1 align-items-start">
+                                    @if (employee.IsInactive)
+                                    {
+                                        <BadgeInactive />
+                                    }
+                                    else
+                                    {
+                                        <BadgeActive />
+                                    }
+                                    @if (employee.IsTeacher)
+                                    {
+                                        <BadgeEmployee />
+                                    }
+                                    else
+                                    {
+                                        <BadgeEmployee />
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @if (!employee.IsTeacher)
+                                {
+                                    <BadgeClass Class="@employee.Class" />
+                                }
+                            </td>
+                            <td class="text-end rounded-end">
+                                <ButtonInspect Id="@employee.Id" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 }
 
 @code {
-	private List<string>  _admins         = new();
-	private List<string>  _selectedAdmins = new();
-	private ConfirmDialog _dialog         = default!;
+    private List<Employee> _admins = new();
+    private List<Employee> _selectedAdmins = new();
+    private ConfirmDialog _dialog = default!;
 
-	private bool _isLoading;
-	private bool _isRemoving;
-	private bool IsAdminSelected => _selectedAdmins.Count > 0;
+    private bool _isLoading;
+    private bool _isRemoving;
+    private bool IsAdminSelected => _selectedAdmins.Count > 0;
 
-	protected override async Task OnInitializedAsync()
-	{
-		ApiRequests.EnsureAuthentication(NavManager);
-		_isLoading = true;
-		await LocalDbService.FetchAdminsAsync();
-		await EmployeeService.FetchEmployeesAsync();
-		_admins = LocalDbService.Admins.ToList();
-		_isLoading = false;
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        ApiRequests.EnsureAuthentication(NavManager);
+        _isLoading = true;
+        await EmployeeService.FetchEmployeesAsync();
+        _admins = EmployeeService.Employees.Where(x => x.IsAdmin).ToList();
+        _isLoading = false;
+    }
 
-	private void SelectAdmin(string id)
-	{
-		if (_selectedAdmins.Contains(id))
-		{
-			_selectedAdmins.Remove(id);
-		}
-		else
-		{
-			_selectedAdmins.Add(id);
-		}
-	}
+    private void SelectAdmin(Employee employee)
+    {
+        if (_selectedAdmins.Contains(employee))
+        {
+            _selectedAdmins.Remove(employee);
+        }
+        else
+        {
+            _selectedAdmins.Add(employee);
+        }
+    }
 
-	private void SelectAllAdmins()
-	{
-		if (IsAdminSelected)
-		{
-			_selectedAdmins.Clear();
-		}
-		else
-		{
-			_selectedAdmins = LocalDbService.Admins.ToList();
-		}
-	}
+    private void SelectAllAdmins()
+    {
+        if (IsAdminSelected)
+        {
+            _selectedAdmins.Clear();
+        }
+        else
+        {
+            _selectedAdmins = EmployeeService.Employees.Where(x => x.IsAdmin).ToList();
+        }
+    }
 
-	private async Task OnRemoveSelectedAdmins()
-	{
-		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", _selectedAdmins);
+    private async Task OnRemoveSelectedAdmins()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("List", _selectedAdmins.Select(x => $"{x.Id}: {x.FullName}"));
 
-		var confirmation = await _dialog.ShowAsync<CustomList>(
-			title: $"Remove [{_selectedAdmins.Count}] admin(s)?",
-			parameters: parameters,
-			confirmDialogOptions: DialogOptions.Confirm());
+        var confirmation = await _dialog.ShowAsync<CustomList>(
+            title: $"Remove [{_selectedAdmins.Count}] admin(s)?",
+            parameters: parameters,
+            confirmDialogOptions: DialogOptions.Confirm());
 
-		if (!confirmation) return;
+        if (!confirmation) return;
 
-		_isRemoving = true;
-		await LocalDbService.DeleteAdminsAsync(_selectedAdmins);
-		await EmployeeService.FetchEmployeesAsync();
-		_admins = LocalDbService.Admins.ToList();
-		_selectedAdmins.Clear();
-		_isRemoving = false;
+        _isRemoving = true;
+        StateHasChanged();
+        await LocalDbService.DeleteAdminsAsync(_selectedAdmins);
+        await EmployeeService.FetchEmployeesAsync();
+        _admins = EmployeeService.Employees.Where(x => x.IsAdmin).ToList();
+        _selectedAdmins.Clear();
+        _isRemoving = false;
 
-		NotificationService.NotifySuccess("Selected admins were removed!");
-	}
+        NotificationService.NotifySuccess("Selected admins were removed!");
+    }
 
 }
