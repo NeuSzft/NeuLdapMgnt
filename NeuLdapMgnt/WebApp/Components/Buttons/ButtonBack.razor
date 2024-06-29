@@ -1,0 +1,18 @@
+@inject IJSRuntime JSRuntime
+
+<Button Color="ButtonColor.Secondary" Disabled="@IsDisabled" @onclick="GoBack">
+    <i class="bi bi-arrow-left-circle"></i>
+    @Text
+</Button>
+
+@code {
+    [Parameter]
+    public string Text { get; set; } = "Go back";
+
+    [Parameter] public bool IsDisabled { get; set; }
+
+    private async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+    }
+}
