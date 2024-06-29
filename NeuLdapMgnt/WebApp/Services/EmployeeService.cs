@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using NeuLdapMgnt.Models;
 using NeuLdapMgnt.WebApp.Requests;
 
@@ -40,13 +40,7 @@ public class EmployeeService
 			var response = await ApiRequests.GetEmployeesAsync();
 			if (response.IsSuccess())
 			{
-				Employees.Clear();
-				foreach (var employee in response.Values)
-				{
-					employee.IsInactive = DatabaseService.InactiveUsers.Contains(employee.Id);
-					employee.IsAdmin = DatabaseService.Admins.Contains(employee.Id);
-					Employees.Add(employee);
-				}
+				Employees = new(response.Values);
 			}
 			else
 			{
@@ -128,17 +122,8 @@ public class EmployeeService
 		List<string> errorList = new();
 		try
 		{
-			if (isInactive)
-			{
-				var responseInactive = await ApiRequests.GetInactiveUsersAsync();
-				DatabaseService.InactiveUsers = new(responseInactive.Values);
-			}
-
 			var responseStatus = await UpdateEmployeesStatusAsync(employees, isAdmin, isInactive, errorList);
 			errorList = responseStatus.ToList();
-
-			if (isInactive) await FetchEmployeesAsync();
-			if (isAdmin) await DatabaseService.FetchAdminsAsync();
 
 			NotificationService.NotifySuccess($"Status was updated for {employees.Count} employee(s)");
 		}
@@ -162,23 +147,8 @@ public class EmployeeService
 	{
 		foreach (var employee in employees)
 		{
-			if (isAdmin && !DatabaseService.Admins.Contains(employee.Id))
-			{
-				var responseAdd = await ApiRequests.AddAdminAsync(employee.Id);
-				if (responseAdd.IsFailure())
-				{
-					errorList.AddRange(responseAdd.Errors);
-				}
-			}
-
-			if (isInactive && !DatabaseService.InactiveUsers.Contains(employee.Id))
-			{
-				var responseDeactivate = await ApiRequests.DeactivateUserAsync(employee.Id);
-				if (responseDeactivate.IsFailure())
-				{
-					errorList.AddRange(responseDeactivate.Errors);
-				}
-			}
+			employee.IsAdmin = isAdmin;
+			employee.IsInactive = isInactive;
 
 			var responseUpdate = await ApiRequests.UpdateEmployeeAsync(employee.Id, employee, !string.IsNullOrWhiteSpace(employee.Password));
 			if (responseUpdate.IsFailure())

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using NeuLdapMgnt.Models;
 using NeuLdapMgnt.WebApp.Requests;
 
@@ -40,12 +40,7 @@ public class StudentService
 			var response = await ApiRequests.GetStudentsAsync();
 			if (response.IsSuccess())
 			{
-				Students.Clear();
-				foreach (var student in response.Values)
-				{
-					student.IsInactive = DatabaseService.InactiveUsers.Contains(student.Id.ToString());
-					Students.Add(student);
-				}
+				Students = new(response.Values);
 			}
 			else
 			{
@@ -70,9 +65,7 @@ public class StudentService
 			var response = await ApiRequests.GetStudentAsync(id);
 			if (response.IsSuccess())
 			{
-				Student student = response.Values[0];
-				student.IsInactive = DatabaseService.InactiveUsers.Contains(student.Id.ToString());
-				return student;
+				return response.Values[0];
 			}
 
 			NotificationService.NotifyError(response.GetError());
@@ -150,26 +143,18 @@ public class StudentService
 		List<string> errorList = new();
 		try
 		{
-			if (isInactive)
-			{
-				var response = await ApiRequests.GetInactiveUsersAsync();
-				DatabaseService.InactiveUsers = new(response.Values);
-			}
-
 			foreach (var student in students)
 			{
-				if (isInactive && !DatabaseService.InactiveUsers.Contains(student.Id.ToString()))
+				if (isInactive && !student.IsInactive)
 				{
-					var responseDeactivate = await ApiRequests.DeactivateUserAsync(student.Id.ToString());
-					if (responseDeactivate.IsFailure())
-					{
-						errorList.AddRange(responseDeactivate.Errors);
-					}
+					student.IsInactive = true;
 				}
 
-				if (string.IsNullOrEmpty(newClass) || student.Class.Equals(newClass)) continue;
-				
-				student.Class = newClass;
+				if (!string.IsNullOrEmpty(newClass) && !student.Class.Equals(newClass))
+				{
+					student.Class = newClass;
+				}
+
 				var response = await ApiRequests.UpdateStudentAsync(student.Id.ToString(), student, !string.IsNullOrWhiteSpace(student.Password));
 				if (response.IsFailure())
 				{
