@@ -37,7 +37,7 @@
 
 		RequestResult<bool> result = await ApiRequests.SendRequestAsync<bool>(HttpMethod.Get, "/api/default-admin/enabled");
 		if (result.IsSuccess())
-			_adminEnabled = result.GetValue();
+			_adminEnabled = result.Value;
 		else
 			NotificationService.NotifyError(result.GetError());
 	}

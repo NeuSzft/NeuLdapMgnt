@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Linq;
 using System.Text.Json.Serialization;
 
@@ -44,11 +43,6 @@ public sealed class RequestResult<T> : RequestResult {
 	/// <returns>The first element of <c>Values</c> or the <c>default</c> value of type <typeparamref name="T"/>.</returns>
 	[JsonIgnore]
 	public T? Value => Values.FirstOrDefault();
-
-	/// <summary>Gets the first or the default value.</summary>
-	/// <returns>The first element of <c>Values</c> or the <c>default</c> value of type <typeparamref name="T"/>.</returns>
-	[Obsolete("Use the Value property instead.")]
-	public T? GetValue() => Values.FirstOrDefault();
 }
 
 public static class RequestResultExtensions {
