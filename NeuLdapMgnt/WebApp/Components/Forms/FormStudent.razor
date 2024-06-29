@@ -82,16 +82,9 @@
         <PasswordInput @bind-Value="_studentUpdated.Password" IdBase="student" InputsDisabled="@IsAction" />
 
         <div class="d-flex justify-content-end gap-2">
-            @if (CanDelete)
+            @if (CanDelete || _isEditModeEnabled)
             {
-                @if (_isDeleting)
-                {
-                    <ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger" />
-                }
-                else
-                {
-                    <ButtonDelete OnClick="HandleOnDelete" Text="Deactivate" IsDisabled="IsAction" />
-                }
+                <ButtonBack IsDisabled="IsAction" Text="Cancel" />
             }
 
             <ButtonCancel OnClick="ToggleEditMode" Text="Revert" IsDisabled="IsAction" />

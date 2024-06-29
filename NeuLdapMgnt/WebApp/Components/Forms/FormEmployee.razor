@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
 <EditForm Model="@_employeeUpdated" OnValidSubmit="HandleOnSubmit" class="d-flex flex-column gap-2 my-2">
     <DataAnnotationsValidator />
@@ -89,16 +89,9 @@
         <PasswordInput @bind-Value="_employeeUpdated.Password" IdBase="employee" InputsDisabled="@IsAction" />
 
         <div class="d-flex justify-content-end gap-2">
-            @if (CanDelete)
+            @if (CanDelete || _isEditModeEnabled)
             {
-                @if (_isDeleting)
-                {
-                    <ButtonLoading ButtonColor="ButtonColor.Danger" SpinnerColor="SpinnerColor.Danger" />
-                }
-                else
-                {
-                    <ButtonDelete OnClick="HandleOnDelete" Text="Deactivate" IsDisabled="IsAction" />
-                }
+                <ButtonBack IsDisabled="IsAction" Text="Cancel" />                
             }
 
             <ButtonCancel OnClick="ToggleEditMode" Text="Revert" IsDisabled="IsAction" />
@@ -145,13 +138,6 @@
         _isSubmitting = true;
         await OnSubmit.Invoke(_employeeUpdated);
         _isSubmitting = false;
-    }
-
-    private async Task HandleOnDelete()
-    {
-        _isDeleting = true;
-        await OnDelete.Invoke(_employeeUpdated);
-        _isDeleting = false;
     }
 
     private void ToggleIsTeacher()
