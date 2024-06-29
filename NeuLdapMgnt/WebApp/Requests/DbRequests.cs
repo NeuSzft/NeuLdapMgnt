@@ -1,4 +1,4 @@
-﻿using NeuLdapMgnt.Models;
+using NeuLdapMgnt.Models;
 
 namespace NeuLdapMgnt.WebApp.Requests
 {
@@ -15,11 +15,5 @@ namespace NeuLdapMgnt.WebApp.Requests
 
 		public static async Task<RequestResult<string>> GetInactiveUsersAsync(this ApiRequests apiRequests)
 			=> await apiRequests.SendRequestAsync<string>(HttpMethod.Get, "/api/inactives");
-
-		public static async Task<RequestResult> DeactivateUserAsync(this ApiRequests apiRequests, string id)
-			=> await apiRequests.SendRequestAsync(HttpMethod.Post, $"/api/inactives/{id}");
-
-		public static async Task<RequestResult> ActivateUserAsync(this ApiRequests apiRequests, string id)
-			=> await apiRequests.SendRequestAsync(HttpMethod.Delete, $"/api/inactives/{id}");
 	}
 }
