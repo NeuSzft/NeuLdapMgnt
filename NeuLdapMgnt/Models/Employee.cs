@@ -1,21 +1,21 @@
-﻿using System;
-using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
 using NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models;
 
-public sealed class Teacher : Person, IEquatable<Teacher>
+public sealed class Employee : Person, IEquatable<Employee>
 {
 	private string _id = string.Empty;
-
+	private string @class = "-";
 	public const int UidMinValue = 4000;
 	public const int UidMaxValue = 5999;
 	public const int GidMinValue = 4000;
 	public const int GidMaxValue = 5999;
 
 	[Required]
-	[IdTeacher]
+	[IdEmployee]
 	[JsonPropertyName("id")]
 	[LdapAttribute("uid")]
 	public string Id
@@ -38,34 +38,39 @@ public sealed class Teacher : Person, IEquatable<Teacher>
 
 	[JsonRequired, JsonPropertyName("class")]
 	[LdapAttribute("roomNumber")]
-	public string Class { get; set; } = "-";
-
-	[JsonIgnore]
+	public string Class
+	{
+		get => IsTeacher ? @class : "-";
+		set => @class = value;
+	}
+	[JsonInclude, JsonPropertyName("is_admin")]
+	[LdapFlag("admin")]
 	public bool IsAdmin { get; set; }
-	
-	public bool Equals(Teacher? other)
+
+	[JsonInclude, JsonPropertyName("is_teacher")]
+	[LdapFlag("teacher")]
+	public bool IsTeacher { get; set; }
+
+	public bool Equals(Employee? other)
 	{
 		if (other == null) return false;
 
 		return Id == other.Id
-			&& FirstName == other.FirstName
+			&& GivenName == other.GivenName
 			&& MiddleName == other.MiddleName
-			&& LastName == other.LastName
+			&& Surname == other.Surname
 			&& Class == other.Class
 			&& Username == other.Username
 			&& Uid == other.Uid
 			&& Gid == other.Gid
 			&& Email == other.Email
 			&& HomeDirectory == other.HomeDirectory
-			&& Password == other.Password;
+			&& IsInactive == other.IsInactive
+			&& IsTeacher == other.IsTeacher
+			&& IsAdmin == other.IsAdmin;
 	}
 
-	public bool IsEmployee => Class.Equals("-");
-	
-	public override bool Equals(object? obj)
-	{
-		return Equals(obj as Teacher);
-	}
+	public override bool Equals(object? obj) => Equals(obj as Employee);
 
 	public override int GetHashCode()
 	{
@@ -74,13 +79,12 @@ public sealed class Teacher : Person, IEquatable<Teacher>
 		hash.Add(Uid);
 		hash.Add(Gid);
 		hash.Add(Username);
-		hash.Add(FirstName);
+		hash.Add(GivenName);
 		hash.Add(MiddleName);
-		hash.Add(LastName);
+		hash.Add(Surname);
 		hash.Add(Class);
 		hash.Add(HomeDirectory);
 		hash.Add(Email);
-		hash.Add(Password);
 		return hash.ToHashCode();
 	}
 }

@@ -6,24 +6,24 @@ namespace NeuLdapMgnt.Api.Tests.EndpointTests;
 public class AuthTests {
 	[ClassInitialize]
 	public static void Init(TestContext context) {
-		Teacher teacher = new() {
-			Id = "george.sears",
-			Uid = 4000,
-			Gid = 4000,
-			Class = "-",
-			Username = "geosea",
-			FirstName = "George",
-			LastName = "Sears",
-			MiddleName = "",
-			Email = "solidus@mail.com",
+		Employee employee = new() {
+			Id            = "george.sears",
+			Uid           = 4000,
+			Gid           = 4000,
+			Class         = "-",
+			Username      = "geosea",
+			GivenName     = "George",
+			Surname      = "Sears",
+			MiddleName    = null,
+			Email         = "solidus@mail.com",
 			HomeDirectory = "/home/geosea",
-			Password = "lalilulelo",
-			FullName = "George Sears"
+			Password      = Utils.BCryptHashPassword("lalilulelo"),
+			FullName      = "George Sears",
+			IsTeacher     = true,
+			IsAdmin       = true
 		};
-		teacher.SetPassword(teacher.Password);
 
-		Testing.LdapService.TryAddEntity(teacher, teacher.Id, true).AssertSuccess();
-		Testing.LdapService.TryAddEntityToGroup("admin", teacher.Id).AssertSuccess();
+		Testing.LdapService.TryAddEntity(employee, employee.Id, true).AssertSuccess();
 	}
 
 	[ClassCleanup]

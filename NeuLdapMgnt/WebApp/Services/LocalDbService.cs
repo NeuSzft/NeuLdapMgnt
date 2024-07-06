@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
+using NeuLdapMgnt.Models;
 using NeuLdapMgnt.WebApp.Requests;
 
 namespace NeuLdapMgnt.WebApp.Services;
@@ -39,7 +40,7 @@ public class LocalDbService
 			var response = await ApiRequests.GetAdminsAsync();
 			if (response.IsSuccess())
 			{
-				Admins = new(response.Values[0]);
+				Admins = new(response.Values);
 			}
 
 			if (response.Errors.Any())
@@ -63,7 +64,7 @@ public class LocalDbService
 			var response = await ApiRequests.GetInactiveUsersAsync();
 			if (response.IsSuccess())
 			{
-				InactiveUsers = new(response.Values[0]);
+				InactiveUsers = new(response.Values);
 			}
 
 			if (response.Errors.Any())
@@ -104,21 +105,21 @@ public class LocalDbService
 	/// <summary>
 	/// Deactivates a user asynchronously.
 	/// </summary>
-	/// <param name="id">The ID of the user to deactivate.</param>
-	public async Task DeactivateUserAsync(string id)
+	/// <param name="user">The user to deactivate.</param>
+	public async Task DeactivateUserAsync(Person user)
 	{
 		try
 		{
-			var response = await ApiRequests.DeactivateUserAsync(id);
-			if (response.IsSuccess())
+			user.IsInactive = true;
+			if (user is Student student)
 			{
-				InactiveUsers.Remove(id);
-				NotificationService.NotifySuccess($"{id} status was set to [Inactive]");
+				var response = await StudentRequests.UpdateStudentAsync(ApiRequests, student.Id.ToString(), student, false);
+				HandleNotification(response, $"{student.FullName}'s status was set to [Inactive]");
 			}
-
-			if (response.Errors.Any())
+			else if (user is Employee employee)
 			{
-				NotificationService.NotifyError(response.GetError());
+				var response = await EmployeeRequests.UpdateEmployeeAsync(ApiRequests, employee.Id, employee, false);
+				HandleNotification(response, $"{employee.FullName}'s status was set to [Inactive]");
 			}
 		}
 		catch (Exception e)
@@ -127,27 +128,48 @@ public class LocalDbService
 		}
 	}
 
+	private void HandleNotification<T>(RequestResult<T> result, string message)
+	{
+		if (result.IsSuccess())
+		{
+			NotificationService.NotifySuccess(message);
+		}
+
+		if (result.Errors.Any())
+		{
+			NotificationService.NotifyError(result.GetError());
+		}
+	}
+
 	/// <summary>
 	/// Activates users asynchronously.
 	/// </summary>
-	/// <param name="ids">The IDs of users to activate.</param>
+	/// <param name="users">List of users to activate.</param>
 	/// <returns>A list of error messages encountered during activation.</returns>
-	public async Task<List<string>> ActivateUsersAsync(List<string> ids)
+	public async Task<List<string>> ActivateUsersAsync(List<Person> users)
 	{
 		List<string> errorList = new();
 		try
 		{
-			await FetchInactiveUsersAsync();
-			foreach (string id in ids)
+			foreach (var user in users)
 			{
-				var response = await ApiRequests.ActivateUserAsync(id);
-				if (response.IsSuccess())
+				user.IsInactive = false;
+
+				if (user is Student student)
 				{
-					InactiveUsers.Remove(id);
+					var response = await StudentRequests.UpdateStudentAsync(ApiRequests, student.Id.ToString(), student, false);
+					if (response.IsFailure())
+					{
+						errorList.AddRange(response.Errors);
+					}
 				}
-				else
+				else if (user is Employee employee)
 				{
-					errorList.AddRange(response.Errors);
+					var response = await EmployeeRequests.UpdateEmployeeAsync(ApiRequests, employee.Id.ToString(), employee, false);
+					if (response.IsFailure())
+					{
+						errorList.AddRange(response.Errors);
+					}
 				}
 			}
 		}
@@ -162,38 +184,32 @@ public class LocalDbService
 	/// <summary>
 	/// Deletes users asynchronously.
 	/// </summary>
-	/// <param name="ids">The IDs of users to delete.</param>
+	/// <param name="users">List of users to delete.</param>
 	/// <returns>A list of error messages encountered during deletion.</returns>
-	public async Task<List<string>> DeleteUsersAsync(List<string> ids)
+	public async Task<List<string>> DeleteUsersAsync(List<Person> users)
 	{
 		List<string> errorList = new();
 		try
 		{
-			foreach (var id in ids)
+			foreach (var user in users)
 			{
-				if (Utils.IsStudent(id))
+				if (user is Student student)
 				{
-					var response = await ApiRequests.DeleteStudentAsync(id);
+					var response = await StudentRequests.DeleteStudentAsync(ApiRequests, student.Id.ToString());
 					if (response.IsFailure())
 					{
-						errorList.Add(response.GetError());
+						errorList.AddRange(response.Errors);
 					}
 				}
-				else
+				else if (user is Employee employee)
 				{
-					var response = await ApiRequests.DeleteTeacherAsync(id);
+					var response = await EmployeeRequests.DeleteEmployeeAsync(ApiRequests, employee.Id.ToString());
 					if (response.IsFailure())
 					{
-						errorList.Add(response.GetError());
-					}
-					else if (response.IsSuccess() && Admins.Contains(id))
-					{
-						await ApiRequests.DeleteAdminAsync(id);
+						errorList.AddRange(response.Errors);
 					}
 				}
 			}
-
-			await ActivateUsersAsync(ids.Where(x => !errorList.Contains(x)).ToList());
 		}
 		catch (Exception e)
 		{
@@ -206,23 +222,20 @@ public class LocalDbService
 	/// <summary>
 	/// Deletes administrators asynchronously.
 	/// </summary>
-	/// <param name="ids">The IDs of administrators to delete.</param>
+	/// <param name="admins">List of administrators to delete.</param>
 	/// <returns>A list of error messages encountered during deletion.</returns>
-	public async Task<List<string>> DeleteAdminsAsync(List<string> ids)
+	public async Task<List<string>> DeleteAdminsAsync(List<Employee> employees)
 	{
 		List<string> errorList = new();
 		try
 		{
-			foreach (var id in ids)
+			foreach (var employee in employees)
 			{
-				var response = await ApiRequests.DeleteAdminAsync(id);
+				employee.IsAdmin = false;
+				var response = await EmployeeRequests.UpdateEmployeeAsync(ApiRequests, employee.Id, employee, false);
 				if (response.IsFailure())
 				{
 					errorList.Add(response.GetError());
-				}
-				else
-				{
-					Admins.Remove(id);
 				}
 			}
 		}

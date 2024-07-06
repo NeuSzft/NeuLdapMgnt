@@ -1,4 +1,4 @@
-﻿@using System.ComponentModel
+@using System.ComponentModel
 @using System.ComponentModel.DataAnnotations
 @inherits LayoutComponentBase
 
@@ -26,7 +26,7 @@
 
 	<div class="d-flex justify-content-start gap-2 mt-4">
 		<ButtonSubmit Text="Change Password"/>
-		<ButtonCancel Text="Cancel" OnClick="@Cancel"/>
+		<ButtonRevert Text="Cancel" OnClick="@Cancel"/>
 	</div>
 </EditForm>
 
@@ -51,7 +51,7 @@
 	private void ResetEditContext() => _editContext = new(_adminPasswords);
 
 	private async Task Confirm() {
-		RequestResult result = await ApiRequests.SendStringAsync(HttpMethod.Put, "/api/defaultadmin/password", _adminPasswords.Password);
+		RequestResult result = await ApiRequests.SendStringAsync(HttpMethod.Put, "/api/default-admin/password", _adminPasswords.Password);
 		ToastService.Notify(result.IsSuccess()
 			? ToastMessages.Success("Successfully updated the Default Admin password.")
 			: ToastMessages.Error(result.GetError())

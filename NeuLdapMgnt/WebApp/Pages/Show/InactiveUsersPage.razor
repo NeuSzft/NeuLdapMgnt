@@ -1,247 +1,258 @@
-﻿@page "/db/inactive-users"
+@page "/db/inactive-users"
 
 <PageTitle>Inactive Users</PageTitle>
-<ConfirmDialog @ref="_dialog"/>
+<ConfirmDialog @ref="_dialog" />
 
 <h1>Inactive Users <span class="badge bg-primary p-1 mb-1 align-middle">@_usersList.Count</span></h1>
 
 @if (_isLoading)
 {
-	<Loading Text="Fetching Inactive Users"/>
+    <Loading Text="Fetching Inactive Users" />
 }
 else if (_isActivating)
 {
-	<Loading Text="Activating Users"/>
+    <Loading Text="Activating Users" />
 }
 else if (_isDeleting)
 {
-	<Loading Text="Deleting Users"/>
+    <Loading Text="Deleting Users" />
 }
 else
 {
-	@if (!_usersList.Any())
-	{
-		<div class="d-flex justify-content-center text-center">
-			<div>
-				<h3 class="my-4">There are no <BadgeInactive/> users</h3>
-			</div>
-		</div>
-	}
-	else
-	{
-		<div class="d-flex justify-content-end align-items-center g-2 mb-3">
-			<div class="ms-2">
-				<Button id="activate-users" Color="ButtonColor.Success" Outline="true" Disabled="@IsUserSelected" @onclick="OnActivateSelectedUsers">
-					Activate selected
-				</Button>
-			</div>
-			<div class="ms-2">
-				<Button id="delete-users" Color="ButtonColor.Danger" Outline="true" Disabled="@IsUserSelected" @onclick="OnDeleteSelectedUsers">
-					Delete permanently
-				</Button>
-			</div>
-		</div>
-		<div class="table-students table-responsive rounded px-1 border flex-fill">
-			<table class="table table-striped table-borderless align-middle">
-				<thead class="sticky-top">
-				<tr class="rounded">
-					<th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllUsers">
-						@if (!AreUsersSelected())
-						{
-							<span>Select all</span>
-						}
-						else
-						{
-							<span>Deselect all</span>
-						}
-					</th>
-					<th class="user-select-none">ID</th>
-					<th class="user-select-none">Name</th>
-					<th class="user-select-none">Status</th>
-					<th class="user-select-none">Class</th>
-					<th class="user-select-none text-end">Inspect</th>
-				</tr>
-				</thead>
-				<tbody>
-				@foreach (var teacher in TeacherService.Teachers.Where(x => x.IsInactive))
-				{
-					<tr>
-						<td class="rounded-start">
-							<input class="form-check-input"
-							       type="checkbox"
-							       checked="@_selectedUsers.Contains(teacher.Id)"
-							       @onchange="() => SelectUser(teacher.Id)"/>
-						</td>
-						<td>@teacher.Id</td>
-						<td>@teacher.FullName</td>
-						<td>
-							<div class="d-flex flex-column flex-grow-0 gap-1 align-items-start">
-								@if (teacher.IsAdmin)
-								{
-									<BadgeAdministrator/>
-								}
-								@if (teacher.IsEmployee)
-								{
-									<BadgeEmployee/>
-								}
-								else
-								{
-									<BadgeTeacher/>
-								}
-							</div>
-						</td>
-						<td>
-							@if (!teacher.IsEmployee)
-							{
-								<BadgeClass Class="@teacher.Class"/>
-							}
-						</td>
-						<td class="text-end rounded-end">
-							<Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(teacher.Id)">
-								<i class="bi bi-eye"></i>
-							</Button>
-						</td>
-					</tr>
-				}
-				@foreach (var student in StudentService.Students.Where(x => x.IsInactive))
-				{
-					<tr>
-						<td class="rounded-start">
-							<input class="form-check-input"
-							       type="checkbox"
-							       checked="@_selectedUsers.Contains(student.Id.ToString())"
-							       @onchange="() => SelectUser(student.Id.ToString())"/>
-						</td>
-						<td>@student.Id</td>
-						<td>@student.FullName</td>
-						<td>
-							<BadgeStudent/>
-						</td>
-						<td>
-							<BadgeClass Class="@student.Class"/>
-						</td>
-						<td class="text-end rounded-end">
-							<Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(student.Id.ToString())">
-								<i class="bi bi-eye"></i>
-							</Button>
-						</td>
-					</tr>
-				}
-				</tbody>
-			</table>
-		</div>
-	}
+    @if (!_usersList.Any())
+    {
+        <div class="d-flex justify-content-center text-center">
+            <div>
+                <h3 class="my-4">There are no <BadgeInactive /> users</h3>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-end align-items-center g-2 mb-3">
+            <div class="ms-2">
+                <Button id="activate-users" Color="ButtonColor.Success" Outline="true" Disabled="@IsUserSelected" @onclick="OnActivateSelectedUsers">
+                    Activate selected
+                </Button>
+            </div>
+            <div class="ms-2">
+                <Button id="delete-users" Color="ButtonColor.Danger" Outline="true" Disabled="@IsUserSelected" @onclick="OnDeleteSelectedUsers">
+                    Delete permanently
+                </Button>
+            </div>
+        </div>
+        <div class="table-students table-responsive rounded px-1 border flex-fill">
+            <table class="table table-striped table-borderless align-middle">
+                <thead class="sticky-top">
+                    <tr class="rounded">
+                        <th class="user-select-none text-wrap col-1" role="button" @onclick="SelectAllUsers">
+                            @if (!AreUsersSelected())
+                            {
+                                <span>Select all</span>
+                            }
+                            else
+                            {
+                                <span>Deselect all</span>
+                            }
+                        </th>
+                        <th class="user-select-none">ID</th>
+                        <th class="user-select-none">Name</th>
+                        <th class="user-select-none">Status</th>
+                        <th class="user-select-none">Class</th>
+                        <th class="user-select-none text-end">Inspect</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var employee in EmployeeService.Employees.Where(x => x.IsInactive))
+                    {
+                        <tr>
+                            <td class="rounded-start">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       checked="@_selectedUsers.Contains(employee)"
+                                       @onchange="() => SelectUser(employee)" />
+                            </td>
+                            <td>@employee.Id</td>
+                            <td>@employee.FullName</td>
+                            <td>
+                                <div class="d-flex flex-column flex-grow-0 gap-1 align-items-start">
+                                    @if (employee.IsAdmin)
+                                    {
+                                        <BadgeAdministrator />
+                                    }
+                                    @if (employee.IsTeacher)
+                                    {
+                                        <BadgeTeacher />
+                                    }
+                                    else
+                                    {
+                                        <BadgeEmployee />
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @if (!employee.IsTeacher)
+                                {
+                                    <BadgeClass Class="@employee.Class" />
+                                }
+                            </td>
+                            <td class="text-end rounded-end">
+                                <Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(employee.Id)">
+                                    <i class="bi bi-eye"></i>
+                                </Button>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var student in StudentService.Students.Where(x => x.IsInactive))
+                    {
+                        <tr>
+                            <td class="rounded-start">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       checked="@_selectedUsers.Contains(student)"
+                                       @onchange="() => SelectUser(student)" />
+                            </td>
+                            <td>@student.Id</td>
+                            <td>@student.FullName</td>
+                            <td>
+                                <BadgeStudent />
+                            </td>
+                            <td>
+                                <BadgeClass Class="@student.Class" />
+                            </td>
+                            <td class="text-end rounded-end">
+                                <Button Color="ButtonColor.Light" Class="border-secondary" Size="Size.Small" @onclick="() => InspectUser(student.Id.ToString())">
+                                    <i class="bi bi-eye"></i>
+                                </Button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 }
 
 @code {
-	private List<string>  _usersList     = new();
-	private List<string>  _selectedUsers = new();
-	private ConfirmDialog _dialog        = default!;
+    private List<Person> _usersList = new();
+    private List<Person> _selectedUsers = new();
+    private ConfirmDialog _dialog = default!;
 
-	private bool _isLoading;
-	private bool _isActivating;
-	private bool _isDeleting;
-	private bool IsUserSelected => !_selectedUsers.Any();
+    private bool _isLoading;
+    private bool _isActivating;
+    private bool _isDeleting;
+    private bool IsUserSelected => !_selectedUsers.Any();
 
-	protected override async Task OnInitializedAsync()
-	{
-		ApiRequests.EnsureAuthentication(NavManager);
-		_isLoading = true;
-		await Fetch();
-		_usersList = LocalDbService.InactiveUsers.ToList();
-		_isLoading = false;
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        ApiRequests.EnsureAuthentication(NavManager);
+        _isLoading = true;
+        await Fetch();
+        _isLoading = false;
+    }
 
-	private async Task Fetch()
-	{
-		await LocalDbService.FetchInactiveUsersAsync();
-		await TeacherService.FetchTeachersAsync();
-		await StudentService.FetchStudentsAsync();
-	}
-	
-	private async Task OnActivateSelectedUsers()
-	{
-		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", _selectedUsers);
+    private async Task Fetch()
+    {
+        await EmployeeService.FetchEmployeesAsync();
+        await StudentService.FetchStudentsAsync();
+        _usersList.AddRange(EmployeeService.Employees.Where(x => x.IsInactive));
+        _usersList.AddRange(StudentService.Students.Where(x => x.IsInactive));
+    }
 
-		var confirmation = await _dialog.ShowAsync<CustomList>(
-			title: $"Set {_selectedUsers.Count} user(s) status to [Active]?",
-			parameters: parameters,
-			confirmDialogOptions: DialogOptions.Confirm());
+    private async Task OnActivateSelectedUsers()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("List", _selectedUsers.Select(x =>
+        {
+            var id = x.GetType().GetProperty("Id")?.GetValue(x);
+            return id is not null
+                ? $"{id}: {x.FullName}"
+                : x.FullName;
+        }).ToList());
 
-		if (!confirmation) return;
+        var confirmation = await _dialog.ShowAsync<CustomList>(
+            title: $"Set {_selectedUsers.Count} user(s) status to [Active]?",
+            parameters: parameters,
+            confirmDialogOptions: DialogOptions.Confirm());
 
-		_isActivating = true;
-		StateHasChanged();
-		await LocalDbService.ActivateUsersAsync(_selectedUsers);
-		await Fetch();
-		_usersList = LocalDbService.InactiveUsers.ToList();
-		_selectedUsers.Clear();
-		_isActivating = false;
-		NotificationService.NotifySuccess("Selected users were activated.");
-	}
+        if (!confirmation) return;
 
-	private async Task OnDeleteSelectedUsers()
-	{
-		var parameters = new Dictionary<string, object>();
-		parameters.Add("List", _selectedUsers);
+        _isActivating = true;
+        StateHasChanged();
+        await LocalDbService.ActivateUsersAsync(_selectedUsers);
+        _selectedUsers.ForEach(x => _usersList.Remove(x));
+        _selectedUsers.Clear();
+        _isActivating = false;
+        NotificationService.NotifySuccess("Selected users were activated.");
+    }
 
-		var confirmation = await _dialog.ShowAsync<CustomList>(
-			title: $"Delete permanently {_selectedUsers.Count} user(s)?",
-			parameters: parameters,
-			confirmDialogOptions: DialogOptions.Confirm());
+    private async Task OnDeleteSelectedUsers()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("List", _selectedUsers.Select(x =>
+        {
+            var id = x.GetType().GetProperty("Id")?.GetValue(x);
+            return id is not null
+                ? $"{id}: {x.FullName}"
+                : x.FullName;
+        }).ToList());
 
-		if (!confirmation) return;
+        var confirmation = await _dialog.ShowAsync<CustomList>(
+            title: $"Delete permanently {_selectedUsers.Count} user(s)?",
+            parameters: parameters,
+            confirmDialogOptions: DialogOptions.Confirm());
 
-		_isDeleting = true;
-		StateHasChanged();
-		await LocalDbService.DeleteUsersAsync(_selectedUsers);
-		await Fetch();
-		_usersList = LocalDbService.InactiveUsers.ToList();
-		_selectedUsers.Clear();
-		_isDeleting = false;
-		NotificationService.NotifySuccess("Selected users were permanently deleted!");
-	}
+        if (!confirmation) return;
 
-	private async Task InspectUser(string userId)
-	{
-		if (long.TryParse(userId, out long studentId) && studentId != 0)
-		{
-			Student? student = await StudentService.FetchStudentAsync(studentId.ToString());
-			if (student is null) return;
-			NavManager.NavigateTo($"/students/{studentId}");
-		}
-		else
-		{
-			Teacher? teacher = await TeacherService.FetchTeacherAsync(userId);
-			if (teacher is null) return;
-			NavManager.NavigateTo($"/teachers/{userId}");
-		}
-	}
+        _isDeleting = true;
+        StateHasChanged();
+        await LocalDbService.DeleteUsersAsync(_selectedUsers);
+        _selectedUsers.ForEach(x => _usersList.Remove(x));
+        _selectedUsers.Clear();
+        _isDeleting = false;
+        NotificationService.NotifySuccess("Selected users were permanently deleted!");
+    }
 
-	private void SelectUser(string user)
-	{
-		if (_selectedUsers.Contains(user))
-		{
-			_selectedUsers.Remove(user);
-		}
-		else
-		{
-			_selectedUsers.Add(user);
-		}
-	}
+    private async Task InspectUser(string userId)
+    {
+        if (long.TryParse(userId, out long studentId) && studentId != 0)
+        {
+            Student? student = await StudentService.FetchStudentAsync(studentId.ToString());
+            if (student is null) return;
+            NavManager.NavigateTo($"/students/{studentId}");
+        }
+        else
+        {
+            Employee? employee = await EmployeeService.FetchEmployeeAsync(userId);
+            if (employee is null) return;
+            NavManager.NavigateTo($"/employees/{userId}");
+        }
+    }
 
-	private void SelectAllUsers()
-	{
-		if (AreUsersSelected())
-		{
-			_selectedUsers.Clear();
-		}
-		else
-		{
-			_selectedUsers = LocalDbService.InactiveUsers.ToList();
-		}
-	}
+    private void SelectUser(Person user)
+    {
+        if (_selectedUsers.Contains(user))
+        {
+            _selectedUsers.Remove(user);
+        }
+        else
+        {
+            _selectedUsers.Add(user);
+        }
+    }
 
-	private bool AreUsersSelected() => _selectedUsers.Count > 0;
+    private void SelectAllUsers()
+    {
+        if (AreUsersSelected())
+        {
+            _selectedUsers.Clear();
+        }
+        else
+        {
+            _selectedUsers.AddRange(EmployeeService.Employees.Where(x => x.IsInactive));
+            _selectedUsers.AddRange(StudentService.Students.Where(x => x.IsInactive));
+        }
+    }
+
+    private bool AreUsersSelected() => _selectedUsers.Count > 0;
 }

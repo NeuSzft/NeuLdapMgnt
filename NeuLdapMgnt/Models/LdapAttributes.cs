@@ -39,11 +39,32 @@ public sealed class LdapAttributeAttribute : Attribute {
 	/// <summary>Determines whether the attribute should be ignored in LDAP queries by default.</summary>
 	public readonly bool Hidden;
 
-	/// <summary>Initializes a new instance of the <see cref="LdapObjectClassesAttribute"/> class.</summary>
+	/// <summary>Initializes a new instance of the <see cref="LdapAttributeAttribute"/> class.</summary>
 	/// <param name="name">The name of the LDAP attribute.</param>
 	/// <param name="hidden">If <c>true</c> the property is ignored in LDAP queries by default.</param>
 	public LdapAttributeAttribute(string name, bool hidden = false) {
 		Name = name;
 		Hidden = hidden;
 	}
+}
+
+/// <summary>Specifies that the property should be treated as a flag.</summary>
+/// <example><code>
+/// public class Example {
+///     [LdapFlag("teacher")]
+///     public bool IsTeacher { get; set; }
+///
+///     [LdapFlag("admin")]
+///     public bool IsAdmin { get; set; }
+///     ...
+/// }
+/// </code></example>
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class LdapFlagAttribute : Attribute {
+	/// <summary>Name of the flag.</summary>
+	public readonly string Name;
+
+	/// <summary>Initializes a new instance of the <see cref="LdapFlagAttribute"/> class.</summary>
+	/// <param name="name">The name of flag.</param>
+	public LdapFlagAttribute(string name) => Name = name;
 }

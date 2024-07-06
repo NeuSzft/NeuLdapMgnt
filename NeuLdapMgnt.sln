@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Models", "NeuLd
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Models.Tests", "NeuLdapMgnt\Models.Tests\NeuLdapMgnt.Models.Tests.csproj", "{18D3F87E-1748-43A0-BBBB-413F4E6E0C68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuLdapMgn.Models.ReadMeGenerator", "NeuLdapMgnt\Models.ReadMeGenerator\NeuLdapMgnt.Models.ReadMeGenerator.csproj", "{38844FC6-6FE2-4BAE-893A-C2955777AA56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.Models.ReadMeGenerator", "NeuLdapMgnt\Models.ReadMeGenerator\NeuLdapMgnt.Models.ReadMeGenerator.csproj", "{38844FC6-6FE2-4BAE-893A-C2955777AA56}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuLdapMgnt.WebApp", "NeuLdapMgnt\WebApp\NeuLdapMgnt.WebApp.csproj", "{459FF117-4555-4584-9C63-ED9E55D1CE6A}"
 EndProject
@@ -39,6 +39,10 @@ Global
 		{18D3F87E-1748-43A0-BBBB-413F4E6E0C68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18D3F87E-1748-43A0-BBBB-413F4E6E0C68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18D3F87E-1748-43A0-BBBB-413F4E6E0C68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38844FC6-6FE2-4BAE-893A-C2955777AA56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38844FC6-6FE2-4BAE-893A-C2955777AA56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38844FC6-6FE2-4BAE-893A-C2955777AA56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38844FC6-6FE2-4BAE-893A-C2955777AA56}.Release|Any CPU.Build.0 = Release|Any CPU
 		{459FF117-4555-4584-9C63-ED9E55D1CE6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{459FF117-4555-4584-9C63-ED9E55D1CE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{459FF117-4555-4584-9C63-ED9E55D1CE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,10 +51,6 @@ Global
 		{E85B5EAC-692C-4148-A159-22C66612DA35}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E85B5EAC-692C-4148-A159-22C66612DA35}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E85B5EAC-692C-4148-A159-22C66612DA35}.Release|Any CPU.Build.0 = Release|Any CPU
-		{38844FC6-6FE2-4BAE-893A-C2955777AA56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38844FC6-6FE2-4BAE-893A-C2955777AA56}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38844FC6-6FE2-4BAE-893A-C2955777AA56}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38844FC6-6FE2-4BAE-893A-C2955777AA56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,44 @@
+﻿@page "/employees/add"
+
+<PageTitle>Add Employee</PageTitle>
+
+<h1>Add Employee</h1>
+
+@if (_isSubmitting)
+{
+	<Loading Text="@SubmitString"/>
+}
+else
+{
+	<FormEmployee Employee="@_employee" CanDelete="@(false)" IsReadonly="@(false)" OnSubmit="OnSubmit"/>
+	<ConfirmDialog @ref="_dialog"/>
+}
+
+@code {
+	private Employee      _employee = new();
+	private ConfirmDialog _dialog   = default!;
+
+	private string SubmitString => $"Creating {_employee.FullName}";
+	private bool   _isSubmitting;
+
+	protected override async Task OnInitializedAsync()
+	{
+		ApiRequests.EnsureAuthentication(NavManager);
+		await LocalDbService.FetchClassesAsync();
+	}
+
+	private async Task<bool> OnSubmit(Employee employeeUpdated)
+	{
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("Employee", employeeUpdated);
+
+		var confirmation = await _dialog.ShowAsync<SummaryEmployee>("Create this employee?", parameters, DialogOptions.Confirm());
+		if (!confirmation) return false;
+
+		_isSubmitting = true;
+		await EmployeeService.AddEmployeeAsync(employeeUpdated);
+		_isSubmitting = false;
+		return false;
+	}
+
+}

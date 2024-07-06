@@ -18,13 +18,12 @@ make tests
 
 
 ## Running just the Model Validation Tests
+These tests are meant to check the validation of the models' fields.
 
 #### Command to run the tests:
 ```
 make model-tests
 ```
-
-[View the latest results of the tests](../testing/results/models.md)
 
 
 ## Running just the API Tests
@@ -35,8 +34,6 @@ These tests are meant to check the different services created for the API to int
 make api-tests
 ```
 
-[View the latest results of the tests](../testing/results/api.md)
-
 
 ## Running just the Selenium Tests
 
@@ -44,5 +41,3 @@ make api-tests
 ```
 make web-tests
 ```
-
-[View the latest results of the tests](../testing/results/selenium.md)

@@ -2,7 +2,7 @@
 
 namespace NeuLdapMgnt.Models.CustomValidationAttributes.NameAttributes
 {
-    public class FirstNameAttribute : ValidationAttribute
+    public class GivenNameAttribute : ValidationAttribute
     {
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
@@ -10,7 +10,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.NameAttributes
             {
                 if (firstName.Length < 3)
                 {
-                    return new ValidationResult("First name must be at least 3 characters long.",
+                    return new ValidationResult("Given name must be at least 3 characters long.",
                         new[] { validationContext.MemberName }!);
                 }
                 else
@@ -19,7 +19,7 @@ namespace NeuLdapMgnt.Models.CustomValidationAttributes.NameAttributes
                 }
             }
 
-            return new ValidationResult("First name: Invalid data type", new[] { validationContext.MemberName }!);
+            return new ValidationResult("Given name: Invalid data type", new[] { validationContext.MemberName }!);
         }
     }
 }

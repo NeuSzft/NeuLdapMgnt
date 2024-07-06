@@ -113,7 +113,7 @@ internal static class Program {
 				Time = now,
 				LogLevel = LogLevel.Information.ToString(),
 				Username = aud.ToString(),
-				FullName = aud == Authenticator.GetDefaultAdminName() ? "DEFAULT ADMIN" : ldapService.TryGetDisplayNameOfEntity(user, typeof(Teacher)),
+				FullName = aud == Authenticator.GetDefaultAdminName() ? "DEFAULT ADMIN" : ldapService.TryGetDisplayNameOfEntity(user, typeof(Employee)),
 				Host = context.TryGetClientAddress() ?? "unknown",
 				Method = req.Method,
 				RequestPath = req.Path,
@@ -160,7 +160,7 @@ internal static class Program {
 		app.MapAuthEndpoints();
 		app.MapClassEndpoints();
 		app.MapStudentEndpoints();
-		app.MapTeacherEndpoints();
+		app.MapEmployeeEndpoints();
 		app.MapInactiveUserEndpoints();
 		app.MapAdminUserEndpoints();
 		app.MapDbManagementEndpoints();

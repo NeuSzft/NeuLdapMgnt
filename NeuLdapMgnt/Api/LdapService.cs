@@ -43,8 +43,8 @@ public sealed class LdapService {
 	/// <example><code>var ldapHelper = new LdapHelper("localhost", 389, "example.local", "admin", "admin-password");</code></example>
 	public LdapService(string server, int port, string domain, string username, string password) {
 		DomainComponents = $"dc={domain.Replace(".", ",dc=")}";
-		_identifier = new(server, port);
-		_credential = new($"cn={username},{DomainComponents}", password);
+		_identifier      = new(server, port);
+		_credential      = new($"cn={username},{DomainComponents}", password);
 	}
 
 	/// <summary>Tries to send a request to the LDAP server.</summary>
@@ -147,11 +147,10 @@ public sealed class LdapService {
 	/// <param name="distinguishedName">The distinguished name of the root element.</param>
 	/// <returns>A <see cref="List{T}">List&lt;string&gt;</see> containing the errors that occured during the operations.</returns>
 	public List<string> EraseTreeElements(string distinguishedName) {
-		SearchRequest   searchRequest = new(distinguishedName, AnyFilter, SearchScope.OneLevel, null);
-		SearchResponse? response      = TryRequest(searchRequest, out var error) as SearchResponse;
+		SearchRequest searchRequest = new(distinguishedName, AnyFilter, SearchScope.OneLevel, null);
 
-		if (response is null)
-			return [error!];
+		if (TryRequest(searchRequest, out var error) is not SearchResponse response)
+			return [ error! ];
 
 		List<string> errors = new();
 
@@ -187,6 +186,15 @@ public sealed class LdapService {
 				string? value = entry.Attributes[attribute.Name].GetValues(typeof(string)).FirstOrDefault() as string;
 				info.SetValue(obj, Convert.ChangeType(value, info.PropertyType));
 			}
+			else if (
+				info.GetCustomAttribute<LdapFlagAttribute>() is { } flag
+				&& info.PropertyType == typeof(bool)
+				&& entry.Attributes.Contains("description")
+				&& entry.Attributes["description"].GetValues(typeof(string)).FirstOrDefault() is string flags
+			) {
+				bool hasFlag = flags.Split('|').Contains(flag.Name);
+				info.SetValue(obj, Convert.ChangeType(hasFlag, info.PropertyType));
+			}
 
 		return obj;
 	}
@@ -208,19 +216,35 @@ public sealed class LdapService {
 		}
 	}
 
-	/// <summary>Gets all properties of an object that are marked with <see cref="LdapAttributeAttribute"/> as <see cref="DirectoryAttribute"/>s.</summary>
+	/// <summary>
+	/// Gets all properties of an object that are marked with the <see cref="LdapAttributeAttribute"/> as <see cref="DirectoryAttribute"/>s.
+	/// Also returns the properties that are marked with the <see cref="LdapFlagAttribute"/> and are <c>true</c>
+	/// joined together by <c>|</c> separators as the value of the "description" <see cref="DirectoryAttribute"/>.
+	/// </summary>
 	/// <param name="obj">The object to get the attributes from.</param>
 	/// <param name="getHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are returned.</param>
 	/// <returns>An <see cref="IEnumerable{T}">IEnumerable&lt;DirectoryAttribute&gt;</see> containing the <see cref="DirectoryAttribute"/>s.</returns>
-	/// <remarks>If the property is not set then The <see cref="DirectoryAttribute"/> will contain the value of <c>"&lt;!&gt; NULL &lt;!&gt;"</c></remarks>
+	/// <remarks>If the property is not set then the <see cref="DirectoryAttribute"/> will contain the value of <c>"&lt;!&gt; NULL &lt;!&gt;"</c></remarks>
 	public static IEnumerable<DirectoryAttribute> GetDirectoryAttributes(object obj, bool getHiddenAttributes = false) {
+		List<string> flags = [ ];
+
 		foreach (PropertyInfo info in obj.GetType().GetProperties())
 			if (
-				info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute
+				info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute
 				&& (!attribute.Hidden || getHiddenAttributes)
 				&& info.GetValue(obj) is { } value
-			)
+			) {
 				yield return new(attribute.Name, value.ToString());
+			}
+			else if (
+				info.GetCustomAttribute<LdapFlagAttribute>() is { } flag
+				&& info.GetValue(obj) is true
+			) {
+				flags.Add(flag.Name);
+			}
+
+		if (flags.Count > 0)
+			yield return new("description", string.Join('|', flags));
 	}
 
 	/// <summary>Creates a new <see cref="LdapService"/> using the specified environment variables.</summary>

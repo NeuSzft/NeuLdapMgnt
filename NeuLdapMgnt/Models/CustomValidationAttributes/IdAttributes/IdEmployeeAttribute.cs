@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace NeuLdapMgnt.Models.CustomValidationAttributes.IdAttributes
 {
-	public class IdTeacherAttribute : ValidationAttribute
+	public class IdEmployeeAttribute : ValidationAttribute
 	{
 		protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 		{

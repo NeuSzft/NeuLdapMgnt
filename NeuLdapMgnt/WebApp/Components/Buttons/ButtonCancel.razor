@@ -1,21 +1,21 @@
-﻿<Button Color="ButtonColor.Secondary" Disabled="@IsDisabled" @onclick="HandleOnCancel">
-	<i class="bi bi-x-lg"></i>
-	@Text
+<Button Color="ButtonColor.Secondary" Disabled="@IsDisabled" @onclick="HandleOnCancel">
+    <i class="bi bi-arrow-counterclockwise"></i>
+    @Text
 </Button>
 
 @code {
-	[Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
 
-	[Parameter] public string Text { get; set; } = string.Empty;
+    [Parameter] public string Text { get; set; } = string.Empty;
 
-	[Parameter] public bool IsDisabled { get; set; }
+    [Parameter] public bool IsDisabled { get; set; }
 
-	private async Task HandleOnCancel()
-	{
-		if (OnClick.HasDelegate)
-		{
-			await OnClick.InvokeAsync();
-		}
-	}
+    private async Task HandleOnCancel()
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
 
 }

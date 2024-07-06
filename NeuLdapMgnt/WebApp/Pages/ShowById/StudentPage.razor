@@ -1,4 +1,4 @@
-﻿@page "/students/{id}"
+@page "/students/{id}"
 @inject IJSRuntime JsRuntime
 
 <PageTitle>@_student.FullName</PageTitle>
@@ -81,7 +81,7 @@ else
 		if (!confirmation) return false;
 
 		_isLoading = true;
-		await LocalDbService.DeactivateUserAsync(editedStudent.Id.ToString());
+		await LocalDbService.DeactivateUserAsync(editedStudent);
 		await StudentService.FetchStudentAsync(editedStudent.Id.ToString());
 		_isLoading = false;
 

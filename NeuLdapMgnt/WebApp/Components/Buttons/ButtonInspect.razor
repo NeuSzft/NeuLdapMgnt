@@ -11,6 +11,6 @@
 	[Parameter] public bool IsDisabled { get; set; }
 
 	private void Inspect()
-		=> NavManager.NavigateTo(Utils.IsStudent(Id) ? $"/students/{Id}" : $"/teachers/{Id}");
+		=> NavManager.NavigateTo(Utils.IsStudent(Id) ? $"/students/{Id}" : $"/employees/{Id}");
 
 }

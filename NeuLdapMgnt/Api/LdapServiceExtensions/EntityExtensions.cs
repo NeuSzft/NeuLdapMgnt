@@ -15,7 +15,7 @@ public static class EntityExtensions {
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>Returns <c>true</c> if the entity exists. If it does not exist or the search request fails it returns <c>false</c>.</returns>
 	public static bool EntityExists<T>(this LdapService ldap, string id) where T : class {
-		SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, []);
+		SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, [ ]);
 		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
 		return response?.Entries.Count == 1;
@@ -30,7 +30,9 @@ public static class EntityExtensions {
 		SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
 		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
 
-		return response?.Entries.Count > 0 ? response.Entries[0].Attributes.Values.Cast<DirectoryAttribute>().Select(x => x.Name) : [];
+		return response?.Entries.Count > 0
+			? response.Entries[0].Attributes.Values.Cast<DirectoryAttribute>().Select(x => x.Name)
+			: [ ];
 	}
 
 	/// <summary>Gets all entities of the specified type from the database.</summary>
@@ -43,14 +45,12 @@ public static class EntityExtensions {
 
 		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"), false);
 
-		SearchRequest   request  = new($"ou={type.GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, null);
-		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
-
-		if (response is null)
+		SearchRequest request = new($"ou={type.GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, null);
+		if (ldap.TryRequest(request) is not SearchResponse response)
 			return new RequestResult<T>().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors($"Failed to fetch entities of type {type.Name}.");
 
-		List<T>      entities = new();
-		List<string> errors   = new();
+		List<T>      entities = [ ];
+		List<string> errors   = [ ];
 
 		foreach (SearchResultEntry entry in response.Entries) {
 			if (LdapService.TryParseEntry<T>(entry, out var error, getHiddenAttributes) is { } entity)
@@ -69,16 +69,15 @@ public static class EntityExtensions {
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
 	public static RequestResult<T> TryGetEntity<T>(this LdapService ldap, string id, bool getHiddenAttributes = false) where T : class, new() {
-		SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
-		SearchResponse? response = ldap.TryRequest(request, out var error) as SearchResponse;
+		SearchRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
 
-		if (response is null || response.Entries.Count == 0)
+		if (ldap.TryRequest(request, out var error) is not SearchResponse response || response.Entries.Count == 0)
 			return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors(error ?? "The object does not exist.");
 
 		T? entity = LdapService.TryParseEntry<T>(response.Entries[0], out error, getHiddenAttributes);
-		if (entity is not null)
-			return new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity);
-		return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
+		return entity is not null
+			? new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity)
+			: new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
 	}
 
 	/// <summary>Tries to add the entity to the database with the specified uid.</summary>
@@ -103,9 +102,9 @@ public static class EntityExtensions {
 		foreach (DirectoryAttribute attribute in LdapService.GetDirectoryAttributes(entity, setHiddenAttributes))
 			request.Attributes.Add(attribute);
 
-		if (ldap.TryRequest(request, out var error) is not null)
-			return new RequestResult<T>().SetStatus(StatusCodes.Status201Created).SetValues(entity);
-		return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
+		return ldap.TryRequest(request, out var error) is not null
+			? new RequestResult<T>().SetStatus(StatusCodes.Status201Created).SetValues(entity)
+			: new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
 	}
 
 	/// <summary>Tries to modify an entity in the database with the specified uid.</summary>
@@ -121,9 +120,9 @@ public static class EntityExtensions {
 
 		ModifyRequest request = CreateModifyRequest(ldap, entity, id, setHiddenAttributes);
 
-		if (ldap.TryRequest(request, out var error) is not null)
-			return new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity);
-		return new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
+		return ldap.TryRequest(request, out var error) is not null
+			? new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity)
+			: new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
 	}
 
 	/// <summary>Tries to remove an entity from the database with the specified uid.</summary>
@@ -137,9 +136,9 @@ public static class EntityExtensions {
 
 		DeleteRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}");
 
-		if (ldap.TryRequest(request, out var error) is not null)
-			return new RequestResult().SetStatus(StatusCodes.Status200OK);
-		return new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
+		return ldap.TryRequest(request, out var error) is not null
+			? new RequestResult().SetStatus(StatusCodes.Status200OK)
+			: new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
 	}
 
 	/// <summary>Tries to add the entities to the database.</summary>
@@ -203,42 +202,23 @@ public static class EntityExtensions {
 		return null;
 	}
 
-	/// <summary>Tries to get the bcrypt password hash of an entity.</summary>
-	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
-	/// <param name="id">The uid of the entity to find.</param>
-	/// <param name="typesToTry">The model types to search trough.</param>
-	/// <returns>The <c>userPassword</c> attribute of the entity or <c>null</c> if not found.</returns>
-	public static string? TryGetPasswordOfEntity(this LdapService ldap, string id, params Type[] typesToTry) {
-		if (id == Authenticator.GetDefaultAdminName())
-			return ldap.GetValue(Authenticator.DefaultAdminPasswordValueName, out _);
-
-		foreach (Type type in typesToTry) {
-			SearchRequest   request  = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, "userPassword");
-			SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
-
-			try {
-				return response!.Entries[0].Attributes["userPassword"][0].ToString();
-			}
-			catch {
-				continue;
-			}
-		}
-
-		return null;
-	}
-
 	private static ModifyRequest CreateModifyRequest<T>(LdapService ldap, T entity, string id, bool setHiddenAttributes) where T : class {
 		Type type = typeof(T);
+
+		List<string> flags = [ ];
 
 		IEnumerable<string> presentAttributes = ldap.TryGetPresentEntityAttributes<T>(id);
 
 		ModifyRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}");
 
 		foreach (PropertyInfo info in type.GetProperties())
-			if (info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute && (!attribute.Hidden || setHiddenAttributes)) {
+			if (
+				info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute
+				&& (!attribute.Hidden || setHiddenAttributes)
+			) {
 				if (info.GetValue(entity) is { } value) {
 					DirectoryAttributeModification mod = new() {
-						Name = attribute.Name,
+						Name      = attribute.Name,
 						Operation = DirectoryAttributeOperation.Replace
 					};
 					mod.Add(value.ToString());
@@ -246,11 +226,33 @@ public static class EntityExtensions {
 				}
 				else if (presentAttributes.Contains(attribute.Name)) {
 					request.Modifications.Add(new() {
-						Name = attribute.Name,
+						Name      = attribute.Name,
 						Operation = DirectoryAttributeOperation.Delete
 					});
 				}
 			}
+			else if (
+				info.GetCustomAttribute<LdapFlagAttribute>() is { } flag
+				&& info.GetValue(entity) is true
+			) {
+				flags.Add(flag.Name);
+			}
+
+
+		if (flags.Count > 0) {
+			DirectoryAttributeModification mod = new() {
+				Name      = "description",
+				Operation = DirectoryAttributeOperation.Replace
+			};
+			mod.Add(string.Join('|', flags));
+			request.Modifications.Add(mod);
+		}
+		else if (presentAttributes.Contains("description")) {
+			request.Modifications.Add(new() {
+				Name      = "description",
+				Operation = DirectoryAttributeOperation.Delete
+			});
+		}
 
 		return request;
 	}

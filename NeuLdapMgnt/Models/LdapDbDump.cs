@@ -9,17 +9,9 @@ public record LdapDbDump {
     [JsonRequired, JsonPropertyName("students")]
     public required IEnumerable<Student> Students { get; init; }
 
-    /// <summary>The <see cref="Teacher"/> entities.</summary>
-    [JsonRequired, JsonPropertyName("teachers")]
-    public required IEnumerable<Teacher> Teachers { get; init; }
-
-    /// <summary>The uids of the "<c>inactive</c>" group.</summary>
-    [JsonRequired, JsonPropertyName("inactives")]
-    public required IEnumerable<string> Inactives { get; init; }
-
-    /// <summary>The uids of the "<c>admin</c>" group.</summary>
-    [JsonRequired, JsonPropertyName("admins")]
-    public required IEnumerable<string> Admins { get; init; }
+    /// <summary>The <see cref="Employee"/> entities.</summary>
+    [JsonRequired, JsonPropertyName("employees")]
+    public required IEnumerable<Employee> Employees { get; init; }
 
     /// <summary>A dictionary of the key-value pairs.</summary>
     [JsonRequired, JsonPropertyName("values")]

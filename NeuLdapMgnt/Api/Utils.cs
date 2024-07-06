@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using NeuLdapMgnt.Models;
@@ -26,7 +24,7 @@ public static class Utils {
 
 	/// <summary>Hashes the password using bcrypt.</summary>
 	/// <param name="password">The password to hash.</param>
-	/// <returns>The hashed password with the "<c>{CRYPT}</c>" string prepended to it.</returns>
+	/// <returns>The hashed password with the <c>"{CRYPT}"</c> string prepended to it.</returns>
 	public static string BCryptHashPassword(string password) {
 		return "{CRYPT}" + BCrypt.Net.BCrypt.HashPassword(password);
 	}
@@ -44,10 +42,27 @@ public static class Utils {
 		}
 	}
 
-	/// <summary>Gets the version of the assembly in the <c>major.minor.revision</c> format.</summary>
-	/// <returns>The version of the assembly or 1.0.0 if it is not specified.</returns>
+	/// <summary>Gets the version of an assembly in the <c>&lt;major&gt;.&lt;minor&gt;.&lt;build&gt;</c> format.</summary>
+	/// <param name="assembly">The <see cref="Assembly"/> the use.</param>
+	/// <returns>The version of the assembly or <c>"unspecified"</c> if it is not specified.</returns>
 	public static string GetAssemblyVersion(Assembly assembly) {
-		return assembly.GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Revision}" : "1.0.0";
+		return assembly.GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Build}" : "unspecified";
+	}
+
+	/// <summary>Tries to parse the csv line and create either a <see cref="Student"/> or an <see cref="Employee"/> from it.</summary>
+	/// <param name="csv">The csv string to parse.</param>
+	/// <returns>A <see cref="Person"/> if the parsing was successful or <c>null</c> if it was not.</returns>
+	public static Person? GetPersonFromCsv(string csv) {
+		throw new NotImplementedException();
+	}
+
+	/// <summary>Tries to parse each csv line and create either a <see cref="Student"/> or an <see cref="Employee"/> from it.</summary>
+	/// <param name="csvLines">The lines of csv to parse.</param>
+	/// <returns>All successfully parsed <see cref="Person"/> objects.</returns>
+	public static IEnumerable<Person> GetPersonsFromCsv(IEnumerable<string> csvLines) {
+		foreach (string csv in csvLines)
+			if (GetPersonFromCsv(csv) is { } person)
+				yield return person;
 	}
 }
 
