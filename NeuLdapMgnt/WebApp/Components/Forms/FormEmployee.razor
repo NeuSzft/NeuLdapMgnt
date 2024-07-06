@@ -63,22 +63,25 @@
             <input type="checkbox" class="btn-check" @bind-value="_employeeUpdated.IsInactive" checked="@(_employeeUpdated.IsInactive)" disabled="@(IsReadonly || IsAction)" id="employee-is-inactive" autocomplete="off">
             <label class="btn btn-outline-secondary" for="employee-is-inactive">Inactive</label>
         </div>
+    }
 
-        @if (_employeeUpdated.IsTeacher)
-        {
-            <div class="form-floating">
-                <InputSelect class="form-select rounded" id="class-select" disabled="@(IsReadonly || IsAction || !_employeeUpdated.IsTeacher)" @bind-Value="_employeeUpdated.Class">
-                    <option value="-">-</option>
-                    @foreach (var cls in LocalDbService.Classes)
-                    {
-                        <option value="@cls">@cls</option>
-                    }
-                </InputSelect>
-                <label for="class-select">Class</label>
-                <ValidationMessage For="() => _employeeUpdated.Class" id="student-class-validation-message" />
-            </div>
-        }
+    @if (_employeeUpdated.IsTeacher)
+    {
+        <div class="form-floating">
+            <InputSelect class="form-select rounded" id="class-select" disabled="@(IsReadonly || IsAction || !_employeeUpdated.IsTeacher)" @bind-Value="_employeeUpdated.Class">
+                <option value="-">-</option>
+                @foreach (var cls in LocalDbService.Classes)
+                {
+                    <option value="@cls">@cls</option>
+                }
+            </InputSelect>
+            <label for="class-select">Class</label>
+            <ValidationMessage For="() => _employeeUpdated.Class" id="student-class-validation-message" />
+        </div>
+    }
 
+    @if(!IsReadonly)
+    {
         @if (string.IsNullOrWhiteSpace(_employeeUpdated.Password))
         {
             <small class="text-muted">

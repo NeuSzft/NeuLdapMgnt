@@ -73,7 +73,7 @@ else
                                     }
                                     @if (employee.IsTeacher)
                                     {
-                                        <BadgeEmployee />
+                                        <BadgeTeacher />
                                     }
                                     else
                                     {
@@ -82,7 +82,7 @@ else
                                 </div>
                             </td>
                             <td>
-                                @if (!employee.IsTeacher)
+                                @if (employee.IsTeacher)
                                 {
                                     <BadgeClass Class="@employee.Class" />
                                 }

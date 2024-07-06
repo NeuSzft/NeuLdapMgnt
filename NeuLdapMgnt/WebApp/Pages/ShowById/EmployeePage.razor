@@ -19,11 +19,11 @@ else
 		@if (_employee.IsTeacher)
 		{
 			<BadgeTeacher/>
+			<BadgeClass Class="@_employee.Class"/>
 		}
 		else
 		{
 			<BadgeEmployee/>
-			<BadgeClass Class="@_employee.Class"/>
 		}
 
 		@if (_employee.IsInactive)
