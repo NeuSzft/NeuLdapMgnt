@@ -234,8 +234,8 @@ public class SeleniumTests
 		Assert.AreEqual(Student.IdMinValue.ToString(),
 			form.FindElement(By.CssSelector("div:nth-child(2) > .form-control")).GetAttribute("value"));
 
-		Assert.AreEqual(string.Empty, form.FindElement(By.Id("first-name")).GetAttribute("value"));
-		Assert.AreEqual(string.Empty, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.AreEqual(string.Empty, form.FindElement(By.Id("surname")).GetAttribute("value"));
+		Assert.AreEqual(string.Empty, form.FindElement(By.Id("given-name")).GetAttribute("value"));
 		Assert.AreEqual(string.Empty, form.FindElement(By.Id("middle-name")).GetAttribute("value"));
 		Assert.AreEqual(string.Empty, form.FindElement(By.Id("class-select")).GetAttribute("value"));
 		Assert.AreEqual(string.Empty, form.FindElement(By.Id("student-password")).GetAttribute("value"));
@@ -275,29 +275,29 @@ public class SeleniumTests
 		NavLinks.Find(x => x.Text.Equals("Add Student"))?.Click();
 
 		var form = _webDriver.FindElement(By.TagName("form"));
-		form.FindElement(By.Id("first-name")).SendKeys(Keys.Space);
-		Assert.AreEqual("First name is required.",
-			form.FindElement(By.Id("student-first-name-validation-message")).Text);
+		form.FindElement(By.Id("surname")).SendKeys(Keys.Space);
+		Assert.AreEqual("Surname is required.",
+			form.FindElement(By.Id("student-surname-validation-message")).Text);
 
-		form.FindElement(By.Id("first-name")).SendKeys("Aa");
-		Assert.AreEqual("First name must be at least 3 characters long.",
-			form.FindElement(By.Id("student-first-name-validation-message")).Text);
+		form.FindElement(By.Id("surname")).SendKeys("Aa");
+		Assert.AreEqual("Surname must be at least 3 characters long.",
+			form.FindElement(By.Id("student-surname-validation-message")).Text);
 
-		form.FindElement(By.Id("first-name")).SendKeys("Test");
+		form.FindElement(By.Id("surname")).SendKeys("Test");
 		Assert.ThrowsException<NoSuchElementException>(() =>
-			form.FindElement(By.Id("student-first-name-validation-message")));
+			form.FindElement(By.Id("student-surname-validation-message")));
 
-		form.FindElement(By.Id("last-name")).SendKeys(Keys.Space);
-		Assert.AreEqual("Last name is required.",
-			form.FindElement(By.Id("student-last-name-validation-message")).Text);
+		form.FindElement(By.Id("given-name")).SendKeys(Keys.Space);
+		Assert.AreEqual("Given name is required.",
+			form.FindElement(By.Id("student-given-name-validation-message")).Text);
 
-		form.FindElement(By.Id("last-name")).SendKeys("Aa");
-		Assert.AreEqual("Last name must be at least 3 characters long.",
-			form.FindElement(By.Id("student-last-name-validation-message")).Text);
+		form.FindElement(By.Id("given-name")).SendKeys("Aa");
+		Assert.AreEqual("Given name must be at least 3 characters long.",
+			form.FindElement(By.Id("student-given-name-validation-message")).Text);
 
-		form.FindElement(By.Id("last-name")).SendKeys("Test");
+		form.FindElement(By.Id("given-name")).SendKeys("Test");
 		Assert.ThrowsException<NoSuchElementException>(() =>
-			form.FindElement(By.Id("student-last-name-validation-message")));
+			form.FindElement(By.Id("student-given-name-validation-message")));
 
 		form.FindElement(By.Id("middle-name")).SendKeys(Keys.Space);
 		Assert.ThrowsException<NoSuchElementException>(() =>
@@ -404,8 +404,8 @@ public class SeleniumTests
 	[TestMethod]
 	public void AddStudentCreatesStudent()
 	{
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -418,8 +418,8 @@ public class SeleniumTests
 		_wait.Until(ExpectedConditions.TitleIs("Add Student"));
 
 		var form = _webDriver.FindElement(By.TagName("form"));
-		form.FindElement(By.Id("first-name")).SendKeys(firstName);
-		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("surname")).SendKeys(surName);
+		form.FindElement(By.Id("given-name")).SendKeys(givenName);
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -432,8 +432,8 @@ public class SeleniumTests
 	[TestMethod]
 	public void CannotAddDuplicateStudent()
 	{
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -442,8 +442,8 @@ public class SeleniumTests
 		_wait.Until(ExpectedConditions.TitleIs("Add Student"));
 
 		var form = _webDriver.FindElement(By.TagName("form"));
-		form.FindElement(By.Id("first-name")).SendKeys(firstName);
-		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("surname")).SendKeys(surName);
+		form.FindElement(By.Id("given-name")).SendKeys(givenName);
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -457,8 +457,8 @@ public class SeleniumTests
 	public void CreatedStudentAppearsInTable()
 	{
 		string id        = "70000000000";
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -468,7 +468,7 @@ public class SeleniumTests
 
 		var tds = _webDriver.FindElements(By.CssSelector("table > tbody > tr > td")).ToList();
 		Assert.AreEqual(id, tds[1].Text);
-		Assert.AreEqual($"{firstName} {lastName}", tds[2].Text);
+		Assert.AreEqual($"{givenName} {surName}", tds[2].Text);
 		Assert.AreEqual(cls, tds[3].Text);
 	}
 
@@ -533,8 +533,8 @@ public class SeleniumTests
 	public void AddEmployeeCreatesEmployee()
 	{
 		string id        = "john.doe";
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -548,8 +548,8 @@ public class SeleniumTests
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
-		form.FindElement(By.Id("first-name")).SendKeys(firstName);
-		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("surname")).SendKeys(surName);
+		form.FindElement(By.Id("given-name")).SendKeys(givenName);
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -563,8 +563,8 @@ public class SeleniumTests
 	public void CannotAddDuplicateEmployee()
 	{
 		string id        = "john.doe";
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -574,8 +574,8 @@ public class SeleniumTests
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
-		form.FindElement(By.Id("first-name")).SendKeys(firstName);
-		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("surname")).SendKeys(surName);
+		form.FindElement(By.Id("given-name")).SendKeys(givenName);
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElement(By.CssSelector($"option[value='{cls}']")).Click();
 		form.Submit();
@@ -589,8 +589,8 @@ public class SeleniumTests
 	public void CreatedEmployeeAppearsInTable()
 	{
 		string id        = "john.doe";
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -600,7 +600,7 @@ public class SeleniumTests
 
 		var tds = _webDriver.FindElements(By.CssSelector("table > tbody > tr > td")).ToList();
 		Assert.AreEqual(id, tds[1].Text);
-		Assert.AreEqual($"{firstName} {lastName}", tds[2].Text);
+		Assert.AreEqual($"{givenName} {surName}", tds[2].Text);
 		Assert.AreEqual(cls, tds[4].Text);
 	}
 
@@ -665,8 +665,8 @@ public class SeleniumTests
 	public void EmployeeStatusCanBeSetToAdmin()
 	{
 		string id        = "john.doe";
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -676,8 +676,8 @@ public class SeleniumTests
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
-		form.FindElement(By.Id("first-name")).SendKeys(firstName);
-		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("surname")).SendKeys(surName);
+		form.FindElement(By.Id("given-name")).SendKeys(givenName);
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -730,8 +730,8 @@ public class SeleniumTests
 	public void DeletingEmployeePermanentlyDeletesFromAdmins()
 	{
 		string id        = "john.doe";
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -741,8 +741,8 @@ public class SeleniumTests
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
-		form.FindElement(By.Id("first-name")).SendKeys(firstName);
-		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("surname")).SendKeys(surName);
+		form.FindElement(By.Id("given-name")).SendKeys(givenName);
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -789,8 +789,8 @@ public class SeleniumTests
 	[TestMethod]
 	public void StudentCanBeInspectedFromStudentsPage()
 	{
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -799,8 +799,8 @@ public class SeleniumTests
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("form")));
 
 		var form = _webDriver.FindElement(By.TagName("form"));
-		form.FindElement(By.Id("first-name")).SendKeys(firstName);
-		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("surname")).SendKeys(surName);
+		form.FindElement(By.Id("given-name")).SendKeys(givenName);
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -811,20 +811,20 @@ public class SeleniumTests
 
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
 		_webDriver.FindElement(By.ClassName("bi-eye")).Click();
-		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		_wait.Until(ExpectedConditions.TitleIs($"{givenName} {surName}"));
 
 		form = _webDriver.FindElement(By.TagName("form"));
 		Assert.AreEqual("70000000000", form.FindElement(By.CssSelector("input[type='number']")).GetAttribute("value"));
-		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
-		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.AreEqual(surName, form.FindElement(By.Id("surname")).GetAttribute("value"));
+		Assert.AreEqual(givenName, form.FindElement(By.Id("given-name")).GetAttribute("value"));
 		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
 	}
 
 	[TestMethod]
 	public void StudentCanBeInspectedFromInactiveUsersPage()
 	{
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -842,12 +842,12 @@ public class SeleniumTests
 		NavLinks.Find(x => x.Text.Equals("Inactive Users"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
 		_webDriver.FindElement(By.ClassName("bi-eye")).Click();
-		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		_wait.Until(ExpectedConditions.TitleIs($"{givenName} {surName}"));
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 		Assert.AreEqual("70000000000", form.FindElement(By.CssSelector("input[type='number']")).GetAttribute("value"));
-		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
-		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.AreEqual(surName, form.FindElement(By.Id("surname")).GetAttribute("value"));
+		Assert.AreEqual(givenName, form.FindElement(By.Id("given-name")).GetAttribute("value"));
 		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
 	}
 
@@ -855,8 +855,8 @@ public class SeleniumTests
 	public void EmployeeCanBeInspectedFromEmployeesPage()
 	{
 		string id        = "john.doe";
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -866,8 +866,8 @@ public class SeleniumTests
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
-		form.FindElement(By.Id("first-name")).SendKeys(firstName);
-		form.FindElement(By.Id("last-name")).SendKeys(lastName);
+		form.FindElement(By.Id("surname")).SendKeys(surName);
+		form.FindElement(By.Id("given-name")).SendKeys(givenName);
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -878,12 +878,12 @@ public class SeleniumTests
 
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
 		_webDriver.FindElements(By.ClassName("bi-eye")).LastOrDefault()?.Click();
-		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		_wait.Until(ExpectedConditions.TitleIs($"{givenName} {surName}"));
 
 		form = _webDriver.FindElement(By.TagName("form"));
 		Assert.AreEqual(id, form.FindElement(By.Id("employee-id")).GetAttribute("value"));
-		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
-		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.AreEqual(surName, form.FindElement(By.Id("surname")).GetAttribute("value"));
+		Assert.AreEqual(givenName, form.FindElement(By.Id("given-name")).GetAttribute("value"));
 		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
 	}
 
@@ -891,8 +891,8 @@ public class SeleniumTests
 	public void EmployeeCanBeInspectedFromAdminsPage()
 	{
 		string id        = "john.doe";
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -910,12 +910,12 @@ public class SeleniumTests
 		NavLinks.Find(x => x.Text.Equals("Administrators"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
 		_webDriver.FindElements(By.ClassName("bi-eye")).LastOrDefault()?.Click();
-		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		_wait.Until(ExpectedConditions.TitleIs($"{givenName} {surName}"));
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 		Assert.AreEqual(id, form.FindElement(By.Id("employee-id")).GetAttribute("value"));
-		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
-		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.AreEqual(surName, form.FindElement(By.Id("surname")).GetAttribute("value"));
+		Assert.AreEqual(givenName, form.FindElement(By.Id("given-name")).GetAttribute("value"));
 		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
 	}
 
@@ -923,8 +923,8 @@ public class SeleniumTests
 	public void EmployeeCanBeInspectedFromInactiveUsersPage()
 	{
 		string id        = "john.doe";
-		string firstName = "John";
-		string lastName  = "Doe";
+		string surName = "John";
+		string givenName  = "Doe";
 		string cls       = "10.a";
 
 		Login();
@@ -942,12 +942,12 @@ public class SeleniumTests
 		NavLinks.Find(x => x.Text.Equals("Inactive Users"))?.Click();
 		_wait.Until(ExpectedConditions.ElementIsVisible(By.TagName("table")));
 		_webDriver.FindElements(By.ClassName("bi-eye")).FirstOrDefault()?.Click();
-		_wait.Until(ExpectedConditions.TitleIs($"{firstName} {lastName}"));
+		_wait.Until(ExpectedConditions.TitleIs($"{givenName} {surName}"));
 
 		var form = _webDriver.FindElement(By.TagName("form"));
 		Assert.AreEqual(id, form.FindElement(By.Id("employee-id")).GetAttribute("value"));
-		Assert.AreEqual(firstName, form.FindElement(By.Id("first-name")).GetAttribute("value"));
-		Assert.AreEqual(lastName, form.FindElement(By.Id("last-name")).GetAttribute("value"));
+		Assert.AreEqual(surName, form.FindElement(By.Id("surname")).GetAttribute("value"));
+		Assert.AreEqual(givenName, form.FindElement(By.Id("given-name")).GetAttribute("value"));
 		Assert.IsTrue(form.FindElement(By.Id("class-select")).Text.Contains(cls));
 	}
 }
