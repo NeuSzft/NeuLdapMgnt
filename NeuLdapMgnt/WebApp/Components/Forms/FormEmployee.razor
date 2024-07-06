@@ -28,12 +28,12 @@
     <div class="input-group gap-2">
         <div class="d-flex flex-column flex-md-row gap-2 w-100">
             <div class="form-floating w-100">
-                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="surname" @bind-Value="_employeeUpdated.GivenName" />
+                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="given-name" @bind-Value="_employeeUpdated.GivenName" />
                 <label for="given-name">Given name</label>
                 <ValidationMessage For="() => _employeeUpdated.GivenName" id="employee-given-name-validation-message" />
             </div>
             <div class="form-floating w-100">
-                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="given-name" @bind-Value="_employeeUpdated.Surname" />
+                <InstantInputText class="form-control rounded" disabled="@(IsReadonly || IsAction)" id="surname" @bind-Value="_employeeUpdated.Surname" />
                 <label for="surname">Surname</label>
                 <ValidationMessage For="() => _employeeUpdated.Surname" id="employee-surname-validation-message" />
             </div>
