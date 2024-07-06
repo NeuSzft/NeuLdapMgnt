@@ -550,6 +550,7 @@ public class SeleniumTests
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
 		form.FindElement(By.Id("surname")).SendKeys(surName);
 		form.FindElement(By.Id("given-name")).SendKeys(givenName);
+		form.FindElement(By.CssSelector(".btn-outline-primary")).Click();
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -576,6 +577,7 @@ public class SeleniumTests
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
 		form.FindElement(By.Id("surname")).SendKeys(surName);
 		form.FindElement(By.Id("given-name")).SendKeys(givenName);
+		form.FindElement(By.CssSelector(".btn-outline-primary")).Click();
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElement(By.CssSelector($"option[value='{cls}']")).Click();
 		form.Submit();
@@ -678,6 +680,7 @@ public class SeleniumTests
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
 		form.FindElement(By.Id("surname")).SendKeys(surName);
 		form.FindElement(By.Id("given-name")).SendKeys(givenName);
+		form.FindElement(By.CssSelector(".btn-outline-primary")).Click();
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -743,6 +746,7 @@ public class SeleniumTests
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
 		form.FindElement(By.Id("surname")).SendKeys(surName);
 		form.FindElement(By.Id("given-name")).SendKeys(givenName);
+		form.FindElement(By.CssSelector(".btn-outline-primary")).Click();
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
@@ -868,6 +872,7 @@ public class SeleniumTests
 		form.FindElement(By.Id("employee-id")).SendKeys(id);
 		form.FindElement(By.Id("surname")).SendKeys(surName);
 		form.FindElement(By.Id("given-name")).SendKeys(givenName);
+		form.FindElement(By.CssSelector(".btn-outline-primary")).Click();
 		form.FindElement(By.Id("class-select")).Click();
 		_webDriver.FindElements(By.TagName("option")).First(x => x.Text.Equals(cls)).Click();
 		form.Submit();
