@@ -61,9 +61,9 @@ else
 
 	private async Task<bool> OnSubmit(Employee editedEmployee)
 	{
-		if (_employee.Equals(editedEmployee))
+		if (_employee.Equals(editedEmployee) && string.IsNullOrEmpty(editedEmployee.Password))
 		{
-			ToastService.Notify(ToastMessages.Secondary($"No changes was found!"));
+			ToastService.Notify(ToastMessages.Secondary("No changes was found!"));
 			return false;
 		}
 
