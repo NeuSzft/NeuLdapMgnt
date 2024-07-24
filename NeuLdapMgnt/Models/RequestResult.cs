@@ -1,11 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace NeuLdapMgnt.Models;
 
-/// <summary>A model for storing the outcome of HTTP requests.</summary>
-[JsonSourceGenerationOptions(WriteIndented = true)]
+/// <summary>A model for storing the outcome of a HTTP request.</summary>
 [JsonSerializable(typeof(RequestResult))]
 public class RequestResult {
 	/// <summary>The status code of the response.</summary>
@@ -33,9 +33,21 @@ public class RequestResult {
 	public bool IsFailure() => !IsSuccess();
 }
 
-/// <summary>A model for storing the outcome of HTTP requests.</summary>
+/// <summary>A model for storing the outcome of a HTTP request that is meant to return an array of values.</summary>
 /// <typeparam name="T">The type of the values to store.</typeparam>
+[JsonSerializable(typeof(RequestResult<>))]
 public sealed class RequestResult<T> : RequestResult {
+	/// <summary>Checks if the response is successful and contains at least one value or not.</summary>
+	/// <returns><c>true</c> if <c>StatusCode</c> is between 200 and 299 and contains at least one value and no errors, otherwise <c>false</c>.</returns>
+	[MemberNotNullWhen(true, nameof(Value))]
+	public bool IsSuccessAndNotEmpty() => StatusCode is >= 200 and <= 299 && Errors.Length == 0 && Values.Length > 0;
+
+	/// <summary>Checks if the response is a failure or contains no values.</summary>
+	/// <returns><c>false</c> if <c>StatusCode</c> is between 200 and 299 and contains at least one value and no errors, otherwise <c>true</c>.</returns>
+	[MemberNotNullWhen(false, nameof(Value))]
+	public bool IsFailureOrEmpty() => !IsSuccessAndNotEmpty();
+
+	/// <summary>The values of the response.</summary>
 	[JsonRequired, JsonInclude, JsonPropertyName("values")]
 	public T[] Values { get; internal set; } = Array.Empty<T>();
 
@@ -95,7 +107,8 @@ public static class RequestResultExtensions {
 		return new RequestResult<T> {
 			StatusCode = result.StatusCode,
 			Errors     = result.Errors,
-			NewToken   = result.NewToken
-		}.SetValues(values);
+			NewToken   = result.NewToken,
+			Values     = values
+		};
 	}
 }
