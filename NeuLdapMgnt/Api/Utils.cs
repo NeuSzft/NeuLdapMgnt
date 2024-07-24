@@ -19,7 +19,7 @@ public static class Utils {
 	/// <returns>The new <see cref="SymmetricSecurityKey"/>.</returns>
 	public static SymmetricSecurityKey LoadOrCreateSecurityKey(string env, int size = 256) {
 		string? base64Key = Environment.GetEnvironmentVariable(env);
-		return new(base64Key is null ? RandomNumberGenerator.GetBytes(size) : Convert.FromBase64String(base64Key));
+		return new(base64Key is not null ? Convert.FromBase64String(base64Key) : RandomNumberGenerator.GetBytes(size));
 	}
 
 	/// <summary>Hashes the password using bcrypt.</summary>
@@ -53,6 +53,7 @@ public static class Utils {
 	/// <param name="csv">The csv string to parse.</param>
 	/// <returns>A <see cref="Person"/> if the parsing was successful or <c>null</c> if it was not.</returns>
 	public static Person? GetPersonFromCsv(string csv) {
+		// TODO: Implement csv parsing
 		throw new NotImplementedException();
 	}
 
@@ -64,12 +65,41 @@ public static class Utils {
 			if (GetPersonFromCsv(csv) is { } person)
 				yield return person;
 	}
+
+	/// <summary>Gets the value of an environment variable.</summary>
+	/// <param name="name">The name of the env.</param>
+	/// <returns>The value of the env.</returns>
+	/// <exception cref="ApplicationException">The value of the env is <c>null</c> or whitespace.</exception>
+	public static string GetEnv(string name) {
+		string? env = Environment.GetEnvironmentVariable(name);
+		if (string.IsNullOrWhiteSpace(env))
+			throw new ApplicationException($"The '{name}' environment variable is not defined");
+		return env;
+	}
+
+	/// <summary>Gets the value of an environment variable.</summary>
+	/// <param name="name">The name of the env.</param>
+	/// <param name="fallback">The value to return if the env is unspecified.</param>
+	/// <returns>The value of the env or the <paramref name="fallback"/> value if it is <c>null</c> or whitespace.</returns>
+	public static string GetEnv(string name, string fallback) {
+		string? env = Environment.GetEnvironmentVariable(name);
+		return string.IsNullOrWhiteSpace(env)
+			? fallback
+			: env;
+	}
+
+	/// <summary>Gets the value of an environment variable and determines if it's value is <c>true</c> or not.</summary>
+	/// <param name="name">The name of the env.</param>
+	/// <returns><c>true</c> if the value of the env can be parsed into a valid <see cref="bool"/> and it is also <c>true</c>.</returns>
+	public static bool IsEnvTrue(string name) {
+		return bool.TryParse(Environment.GetEnvironmentVariable(name), out bool value) && value;
+	}
 }
 
 public static class ExtensionUtils {
 	/// <summary>If the provided string is <c>null</c> or has the length of zero then it returns <paramref name="defaultStr"/>, otherwise it returns the original string.</summary>
 	/// <param name="str">The original string.</param>
-	/// <param name="defaultStr">The string to return if the the original string is null or empty.</param>
+	/// <param name="defaultStr">The string to return if the original string is null or empty.</param>
 	/// <returns>The original string or <paramref name="defaultStr"/>.</returns>
 	public static string DefaultIfNullOrEmpty(this string? str, string defaultStr) {
 		if (str is null || str.Length == 0)
@@ -104,7 +134,7 @@ public static class ExtensionUtils {
 		return e.Message.DefaultIfNullOrEmpty(type.FullName ?? type.Name);
 	}
 
-	/// <summary>Get the the of a type that should be used for it's organizational unit.</summary>
+	/// <summary>Get the of a type that should be used for it's organizational unit.</summary>
 	/// <param name="type">The type to get the name of.</param>
 	/// <returns>The lowercase pluralized form of <paramref name="type"/>'s <c>Name</c>.</returns>
 	public static string GetOuName(this Type type) {
@@ -130,22 +160,30 @@ public static class ExtensionUtils {
 
 	/// <summary>Tries to get the address of the client that sent the request.</summary>
 	/// <param name="context">The <see cref="HttpContext"/> of the request.</param>
-	/// <returns>The IP address of the client as a string or <c>null</c>.</returns>
-	public static string? TryGetClientAddress(this HttpContext context) {
-		if (context.Request.Headers.TryGetValue("X-Real-IP", out var ip))
-			return ip;
-		if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var forwarded))
-			return forwarded.FirstOrDefault();
+	/// <param name="checkHeaders">If <c>true</c> the method should try to get the address of the remote from the "X-Real-IP" or "X-Forwarded-For" headers. If <c>false</c> or the headers do not specify an address it will return the remote address of the <see cref="ConnectionInfo"/>.</param>
+	/// <returns>The IP address of the client as a string or <c>null</c> if it cannot be determined.</returns>
+	public static string? TryGetClientAddress(this HttpContext context, bool checkHeaders) {
+		if (checkHeaders) {
+			if (context.Request.Headers.TryGetValue("X-Real-IP", out var realIp))
+				return realIp;
+			if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var ff) && ff.FirstOrDefault() is { } ffIp)
+				return ffIp;
+		}
 		return context.Connection.RemoteIpAddress?.ToString();
 	}
 
+	/// <summary>Sets the password of a <see cref="Person"/>.</summary>
+	/// <param name="person">The <see cref="Person"/> to set the password of.</param>
+	/// <param name="password">The plain text password to be hashed.</param>
 	public static void SetPassword(this Person person, string password) {
 		person.Password = Utils.BCryptHashPassword(password);
 	}
 
+	/// <summary>Checks if the password's hash is the same as the <see cref="Person"/>'s.</summary>
+	/// <param name="person">The <see cref="Person"/> to check the password hash of.</param>
+	/// <param name="password">The password to hash and check.</param>
+	/// <returns><c>true</c> if the hashes match, otherwise <c>false</c>.</returns>
 	public static bool CheckPassword(this Person person, string password) {
-		if (person.Password is null)
-			return false;
-		return Utils.CheckBCryptPassword(person.Password, password);
+		return person.Password is not null && Utils.CheckBCryptPassword(person.Password, password);
 	}
 }
