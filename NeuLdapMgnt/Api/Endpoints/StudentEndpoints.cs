@@ -34,15 +34,14 @@ public static class StudentEndpoints {
 
 		app.MapPost("/api/students", async (LdapService ldap, HttpRequest request, string? pwd) => {
 				var result = await ModelValidator.ValidateRequest<Student>(request);
-				if (result.IsFailure())
+				if (result.IsFailureOrEmpty())
 					return result.RenewToken(request).ToResult();
 
-				Student student = result.Value!;
+				Student student = result.Value;
 				if (!string.IsNullOrEmpty(student.Password))
 					student.SetPassword(student.Password);
 
-				bool setPass = bool.TryParse(pwd, out var value) && value;
-
+				bool setPass = bool.TryParse(pwd, out bool value) && value;
 				return ldap.TryAddEntity(student, student.Id.ToString(), setPass).RenewToken(request).ToResult();
 			})
 			.WithOpenApi()
@@ -64,14 +63,14 @@ public static class StudentEndpoints {
 
 		app.MapPut("/api/students/{id}", async (LdapService ldap, HttpRequest request, string id, string? pwd) => {
 				var result = await ModelValidator.ValidateRequest<Student>(request);
-				if (result.IsFailure())
+				if (result.IsFailureOrEmpty())
 					return result.RenewToken(request).ToResult();
 
-				Student student = result.Value!;
+				Student student = result.Value;
 				if (!string.IsNullOrEmpty(student.Password))
 					student.SetPassword(student.Password);
 
-				bool setPass = bool.TryParse(pwd, out var value) && value;
+				bool setPass = bool.TryParse(pwd, out bool value) && value;
 				return ldap.TryModifyEntity(student, id, setPass).RenewToken(request).ToResult();
 			})
 			.WithOpenApi()
