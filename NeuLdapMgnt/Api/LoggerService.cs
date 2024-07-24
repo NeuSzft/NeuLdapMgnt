@@ -51,9 +51,9 @@ public sealed class PgLoggerService : ILoggerService {
 	/// <exception cref="ArgumentException">An environment variable is not set or is an empty string.</exception>
 	public static PgLoggerService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD") {
 		return new(
-			Environment.GetEnvironmentVariable(hostEnv).ThrowIfNullOrEmpty(nameof(hostEnv)),
-			Environment.GetEnvironmentVariable(dbEnv).ThrowIfNullOrEmpty(nameof(dbEnv)),
-			Environment.GetEnvironmentVariable(passwordEnv).ThrowIfNullOrEmpty(nameof(passwordEnv))
+			Utils.GetEnv(hostEnv),
+			Utils.GetEnv(dbEnv),
+			Utils.GetEnv(passwordEnv)
 		);
 	}
 
@@ -90,7 +90,7 @@ public sealed class PgLoggerService : ILoggerService {
 				VALUES
 				(@Username, @FullName)
 				ON CONFLICT DO NOTHING;
-				
+
 				INSERT INTO "entries"
 				("time", "log_level", "username", "host", "method", "request_path", "status_code")
 				VALUES

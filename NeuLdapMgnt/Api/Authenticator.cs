@@ -30,11 +30,11 @@ public static class Authenticator {
 	public const string DefaultAdminPasswordValueName = "default-admin-password";
 
 	/// <summary>Returns the name of the default admin.</summary>
-	public static string GetDefaultAdminName() => Environment.GetEnvironmentVariable("DEFAULT_ADMIN_NAME").DefaultIfNullOrEmpty("admin");
+	public static string GetDefaultAdminName() => Utils.GetEnv("DEFAULT_ADMIN_NAME", "admin");
 
 	/// <summary>Tires to get the default admin password. If it is not or incorrectly set, then sets it to the default value defined by the <c>DEFAULT_ADMIN_PASSWORD</c> environment variable or "<c>adminpass</c>".</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
-	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
+	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise, it will be set to <c>null</c>.</param>
 	/// <returns>The base64 encoded password hash or <c>null</c> if an error occured.</returns>
 	/// <remarks>When the default password is set, the default admin is also enabled.</remarks>
 	public static string GetDefaultAdminPasswordAndCrateAdminWhenMissing(LdapService ldap, out string? error) {
@@ -42,7 +42,7 @@ public static class Authenticator {
 		if (pwd is not null)
 			return pwd;
 
-		string bcryptHash = Utils.BCryptHashPassword(Environment.GetEnvironmentVariable("DEFAULT_ADMIN_PASSWORD").DefaultIfNullOrEmpty("adminpass"));
+		string bcryptHash = Utils.BCryptHashPassword(Utils.GetEnv("DEFAULT_ADMIN_PASSWORD", "adminpass"));
 		ldap.SetValue(DefaultAdminEnabledValueName, true.ToString(), out error);
 		ldap.SetValue(DefaultAdminPasswordValueName, bcryptHash, out error);
 
@@ -51,11 +51,11 @@ public static class Authenticator {
 
 	/// <summary>Checks whether the default admin is enabled or not.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
-	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
+	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise, it will be set to <c>null</c>.</param>
 	/// <returns><c>true</c> if the value belonging to the <c>DefaultAdminEnabledValueName</c> key is also <c>true</c>, otherwise <c>false</c>.</returns>
 	public static bool IsDefaultAdminEnabled(LdapService ldap, out string? error) {
 		try {
-			return bool.TryParse(ldap.GetValue(DefaultAdminEnabledValueName, out error), out var value) && value;
+			return bool.TryParse(ldap.GetValue(DefaultAdminEnabledValueName, out error), out bool value) && value;
 		}
 		catch (Exception e) {
 			error = e.ToString();
@@ -95,7 +95,7 @@ public static class Authenticator {
 			return new(StatusCodes.Status400BadRequest, "Invalid Authorization header.", null);
 
 		if (username == GetDefaultAdminName()) {
-			string bcryptHash = GetDefaultAdminPasswordAndCrateAdminWhenMissing(ldap, out var error);
+			string bcryptHash = GetDefaultAdminPasswordAndCrateAdminWhenMissing(ldap, out string? error);
 			if (error is not null)
 				return new(StatusCodes.Status503ServiceUnavailable, error, null);
 
@@ -109,7 +109,7 @@ public static class Authenticator {
 			if (employee.IsInactive)
 				return new(StatusCodes.Status403Forbidden, "User is inactive.", null);
 
-			if (employee is { IsAdmin: true, Password: not null } && Utils.CheckBCryptPassword(employee.Password, password))
+			if (employee is { IsAdmin: true } && employee.CheckPassword(password))
 				return new(StatusCodes.Status200OK, null, username);
 		}
 

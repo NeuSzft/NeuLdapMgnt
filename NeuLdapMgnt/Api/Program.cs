@@ -23,7 +23,7 @@ internal static class Program {
 	public static void Main(string[] args) {
 		LdapService ldapService = LdapService.FromEnvs();
 
-		ILoggerService loggerService = bool.TryParse(Environment.GetEnvironmentVariable("LOG_TO_DB"), out bool logToDb) && logToDb
+		ILoggerService loggerService = Utils.IsEnvTrue("LOG_TO_DB")
 			? PgLoggerService.FromEnvs().SetIgnoredRoutes("/api/docs")
 			: new DummyLoggerService();
 
@@ -114,7 +114,7 @@ internal static class Program {
 				LogLevel = LogLevel.Information.ToString(),
 				Username = aud.ToString(),
 				FullName = aud == Authenticator.GetDefaultAdminName() ? "DEFAULT ADMIN" : ldapService.TryGetDisplayNameOfEntity(user, typeof(Employee)),
-				Host = context.TryGetClientAddress() ?? "unknown",
+				Host = context.TryGetClientAddress(true) ?? "unknown",
 				Method = req.Method,
 				RequestPath = req.Path,
 				StatusCode = context.Response.StatusCode
@@ -142,7 +142,7 @@ internal static class Program {
 				loggerService.CreateLogEntry(new() {
 					Time = DateTime.UtcNow,
 					LogLevel = LogLevel.Critical.ToString(),
-					Host = context.TryGetClientAddress() ?? "unknown",
+					Host = context.TryGetClientAddress(true) ?? "unknown",
 					Method = context.Response.HttpContext.Request.Method,
 					RequestPath = context.Response.HttpContext.Request.Path.ToString(),
 					StatusCode = context.Response.StatusCode

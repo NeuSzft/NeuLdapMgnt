@@ -20,7 +20,7 @@ public record UniqueDirectoryRequest(DirectoryRequest Request, string Identifier
 
 /// <summary>This class is used to return either a directory response or an error message.</summary>
 /// <param name="Response">A <c>nullable</c> <see cref="DirectoryResponse"/> that contains the response on success.</param>
-/// <param name="Error">A <c>nullable</c> <c>string</c> that contains the error message on failure.</param>
+/// <param name="Error">A <c>nullable</c> <see cref="string"/> that contains the error message on failure.</param>
 public record LdapResult(DirectoryResponse? Response, string? Error = null);
 
 /// <summary>The <see cref="LdapService"/> class provides helper methods for easier interaction with a LDAP server.</summary>
@@ -53,7 +53,7 @@ public sealed class LdapService {
 	/// <param name="callerMemberName">Obtains the name of the member that called the method. This parameter should not be explicitly set.</param>
 	/// <param name="callerLineNumber">Obtains the line number at which the method was called. This parameter should not be explicitly set.</param>
 	/// <param name="callerFilePath">Obtains the path of the file where the method call originates from. This parameter should not be explicitly set.</param>
-	/// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
+	/// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
 	/// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
 	public DirectoryResponse? TryRequest(
 		DirectoryRequest          request, bool logErrors = true,
@@ -64,12 +64,12 @@ public sealed class LdapService {
 
 	/// <summary>Tries to send a request to the LDAP server.</summary>
 	/// <param name="request">The <see cref="DirectoryRequest"/> to be sent.</param>
-	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
+	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise, it will be set to <c>null</c>.</param>
 	/// <param name="logErrors">Specifies whether the exceptions should be logged. The default is <c>true</c>.</param>
 	/// <param name="callerMemberName">Obtains the name of the member that called the method. This parameter should not be explicitly set.</param>
 	/// <param name="callerLineNumber">Obtains the line number at which the method was called. This parameter should not be explicitly set.</param>
 	/// <param name="callerFilePath">Obtains the path of the file where the method call originates from. This parameter should not be explicitly set.</param>
-	/// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
+	/// <returns>A <c>nullable</c> <see cref="DirectoryResponse"/> that either contains the response to the request or <c>null</c> if there was an error with the request and there was no response.</returns>
 	/// <exception cref="LdapBindingException">The connection failed to bind to the database.</exception>
 	public DirectoryResponse? TryRequest(
 		DirectoryRequest          request,
@@ -149,7 +149,7 @@ public sealed class LdapService {
 	public List<string> EraseTreeElements(string distinguishedName) {
 		SearchRequest searchRequest = new(distinguishedName, AnyFilter, SearchScope.OneLevel, null);
 
-		if (TryRequest(searchRequest, out var error) is not SearchResponse response)
+		if (TryRequest(searchRequest, out string? error) is not SearchResponse response)
 			return [ error! ];
 
 		List<string> errors = new();
@@ -201,7 +201,7 @@ public sealed class LdapService {
 
 	/// <summary>Tries to create a new instance of the specified type and set it's properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
 	/// <param name="entry">The <see cref="SearchResultEntry"/> that contains the values that are used to set object's properties.</param>
-	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
+	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise, it will be set to <c>null</c>.</param>
 	/// <param name="getHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are returned.</param>
 	/// <typeparam name="T">The type of the object to be created.</typeparam>
 	/// <returns>A new object with the type <typeparamref name="T"/>.</returns>
@@ -265,11 +265,11 @@ public sealed class LdapService {
 		string passwordEnv = "LDAP_PASSWORD"
 	) {
 		return new LdapService(
-			Environment.GetEnvironmentVariable(serverEnv).ThrowIfNullOrEmpty(serverEnv),
-			int.Parse(Environment.GetEnvironmentVariable(portEnv).ThrowIfNullOrEmpty(portEnv)),
-			Environment.GetEnvironmentVariable(domainEnv).ThrowIfNullOrEmpty(userEnv),
-			Environment.GetEnvironmentVariable(userEnv).ThrowIfNullOrEmpty(userEnv),
-			Environment.GetEnvironmentVariable(passwordEnv).ThrowIfNullOrEmpty(passwordEnv)
+			Utils.GetEnv(serverEnv),
+			int.Parse(Utils.GetEnv(portEnv)),
+			Utils.GetEnv(domainEnv),
+			Utils.GetEnv(userEnv),
+			Utils.GetEnv(passwordEnv)
 		);
 	}
 }
