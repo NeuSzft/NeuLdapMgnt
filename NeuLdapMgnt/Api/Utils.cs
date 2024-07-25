@@ -82,10 +82,7 @@ public static class Utils {
 	/// <param name="fallback">The value to return if the env is unspecified.</param>
 	/// <returns>The value of the env or the <paramref name="fallback"/> value if it is <c>null</c> or whitespace.</returns>
 	public static string GetEnv(string name, string fallback) {
-		string? env = Environment.GetEnvironmentVariable(name);
-		return string.IsNullOrWhiteSpace(env)
-			? fallback
-			: env;
+		return Environment.GetEnvironmentVariable(name).FallbackIfNullOrWhitespace(fallback);
 	}
 
 	/// <summary>Gets the value of an environment variable and determines if its value is <c>true</c> or not.</summary>
