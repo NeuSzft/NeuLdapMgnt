@@ -166,7 +166,7 @@ public sealed class LdapService {
 	/// <summary>An LDAP filter that returns all objects.</summary>
 	public const string AnyFilter = "(objectClass=*)";
 
-	/// <summary>Creates a new instance of the specified type and tries to set it's properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
+	/// <summary>Creates a new instance of the specified type and tries to set its properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
 	/// <param name="entry">The <see cref="SearchResultEntry"/> that contains the values that are used to set object's properties.</param>
 	/// <param name="getHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are returned.</param>
 	/// <typeparam name="T">The type of the object to be created.</typeparam>
@@ -199,7 +199,7 @@ public sealed class LdapService {
 		return obj;
 	}
 
-	/// <summary>Tries to create a new instance of the specified type and set it's properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
+	/// <summary>Tries to create a new instance of the specified type and set its properties marked with <see cref="LdapAttributeAttribute"/> based on the <see cref="SearchResultEntry"/>.</summary>
 	/// <param name="entry">The <see cref="SearchResultEntry"/> that contains the values that are used to set object's properties.</param>
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise, it will be set to <c>null</c>.</param>
 	/// <param name="getHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are returned.</param>

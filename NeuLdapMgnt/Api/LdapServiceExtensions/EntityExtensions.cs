@@ -9,7 +9,7 @@ using NeuLdapMgnt.Models;
 namespace NeuLdapMgnt.Api.LdapServiceExtensions;
 
 public static class EntityExtensions {
-	/// <summary>Checks if the entity exists within the database using it's uid.</summary>
+	/// <summary>Checks if the entity exists within the database using its uid.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="id">The uid of the entity.</param>
 	/// <typeparam name="T">The type of the entity.</typeparam>
@@ -21,7 +21,7 @@ public static class EntityExtensions {
 		return response?.Entries.Count == 1;
 	}
 
-	/// <summary>Returns the attributes of the entity that are present within the database using it's uid.</summary>
+	/// <summary>Returns the attributes of the entity that are present within the database using its uid.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="id">The uid of the entity.</param>
 	/// <typeparam name="T">The type of the entity.</typeparam>
@@ -62,7 +62,7 @@ public static class EntityExtensions {
 		return new RequestResult<T>().SetStatus(StatusCodes.Status207MultiStatus).SetValues(entities.ToArray()).SetErrors(errors.ToArray());
 	}
 
-	/// <summary>Tries to get the entity from the database using it's uid.</summary>
+	/// <summary>Tries to get the entity from the database using its uid.</summary>
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <param name="id">The uid of the entity.</param>
 	/// <param name="getHiddenAttributes">If <c>true</c> even the attributes that are set to be hidden are returned.</param>

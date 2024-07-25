@@ -50,7 +50,7 @@ public static class ModelValidator {
 	}
 
 	/// <summary>Tries to deserializes the json body of the <see cref="HttpRequest"/>, then validate the <see cref="ValidationAttribute"/>s of the model.</summary>
-	/// <param name="request">The request containing the json to deserialize within it's body.</param>
+	/// <param name="request">The request containing the json to deserialize within its body.</param>
 	/// <typeparam name="T">The type of the model.</typeparam>
 	/// <returns>A <see cref="RequestResult{T}"/> containing the result of the validation.</returns>
 	public static async Task<RequestResult<T>> ValidateRequest<T>(HttpRequest request) where T : class {

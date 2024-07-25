@@ -88,7 +88,7 @@ public static class Utils {
 			: env;
 	}
 
-	/// <summary>Gets the value of an environment variable and determines if it's value is <c>true</c> or not.</summary>
+	/// <summary>Gets the value of an environment variable and determines if its value is <c>true</c> or not.</summary>
 	/// <param name="name">The name of the env.</param>
 	/// <returns><c>true</c> if the value of the env can be parsed into a valid <see cref="bool"/> and it is also <c>true</c>.</returns>
 	public static bool IsEnvTrue(string name) {
@@ -121,7 +121,7 @@ public static class ExtensionUtils {
 		return FallbackIfNullOrWhitespace(e.Message, type.FullName ?? type.Name);
 	}
 
-	/// <summary>Get the of a type that should be used for it's organizational unit.</summary>
+	/// <summary>Get the of a type that should be used for its organizational unit.</summary>
 	/// <param name="type">The type to get the name of.</param>
 	/// <returns>The lowercase pluralized form of <paramref name="type"/>'s <c>Name</c>.</returns>
 	public static string GetOuName(this Type type) {
@@ -132,13 +132,13 @@ public static class ExtensionUtils {
 	/// <param name="result">The <see cref="RequestResult"/> to add the new token to.</param>
 	/// <param name="request">The <see cref="HttpRequest"/> to get the Authorization header from, containing the current token.</param>
 	/// <typeparam name="T">The type of the result which must inherit from <see cref="RequestResult"/>.</typeparam>
-	/// <returns>The <paramref name="result"/> with it's <c>NewToken</c> set.</returns>
+	/// <returns>The <paramref name="result"/> with its <c>NewToken</c> set.</returns>
 	public static T RenewToken<T>(this T result, HttpRequest request) where T : RequestResult {
 		result.SetToken(Authenticator.RenewToken(request));
 		return result;
 	}
 
-	/// <summary>Returns an <see cref="IResult"/> that contains the <see cref="RequestResult"/> serialized to json and it's status code set to the result's <c>StatusCode</c>.</summary>
+	/// <summary>Returns an <see cref="IResult"/> that contains the <see cref="RequestResult"/> serialized to json and its status code set to the result's <c>StatusCode</c>.</summary>
 	/// <param name="result">The <see cref="RequestResult"/> to serialize to json.</param>
 	/// <returns>An <see cref="IResult"/> containing the <see cref="RequestResult"/> serilaized to json.</returns>
 	public static IResult ToResult(this RequestResult result) {

@@ -117,7 +117,7 @@ public static class Authenticator {
 	}
 
 	/// <summary>Reads the JSON Web Token out from the Authorization header of a <see cref="HttpRequest"/>.</summary>
-	/// <param name="request">The <see cref="HttpRequest"/> that contains the token within it's Authorization header.</param>
+	/// <param name="request">The <see cref="HttpRequest"/> that contains the token within its Authorization header.</param>
 	/// <returns>The <see cref="JwtSecurityToken"/> that was read from the header.</returns>
 	/// <exception cref="FormatException">The Authorization header is in an incorrect format.</exception>
 	/// <exception cref="SecurityTokenMalformedException">The token is in an incorrect format.</exception>
@@ -126,7 +126,7 @@ public static class Authenticator {
 		return new JwtSecurityTokenHandler().ReadJwtToken(header.Parameter!);
 	}
 
-	/// <summary>Creates a new JSON Web Token for the specified user that will expire in 10 minutes after it's creation.</summary>
+	/// <summary>Creates a new JSON Web Token for the specified user that will expire in 10 minutes after its creation.</summary>
 	/// <param name="username">The username that will be used as the audience of the token.</param>
 	/// <returns>The base64url encoded JSON Web Token.</returns>
 	public static string CreateToken(string username) {
@@ -142,15 +142,15 @@ public static class Authenticator {
 		return new JwtSecurityTokenHandler().WriteToken(jwt);
 	}
 
-	/// <summary>Creates a new JSON Web Token that will use the first specified audience of the previous one. This token also expires in 10 minutes after it's creation.</summary>
+	/// <summary>Creates a new JSON Web Token that will use the first specified audience of the previous one. This token also expires in 10 minutes after its creation.</summary>
 	/// <param name="token">The <see cref="JwtSecurityToken"/> that needs to be renewed.</param>
 	/// <returns>The base64url encoded JSON Web Token.</returns>
 	public static string RenewToken(JwtSecurityToken token) {
 		return CreateToken(token.Audiences.First());
 	}
 
-	/// <summary>Creates a new JSON Web Token that will use the first specified audience of the previous one. This token also expires in 10 minutes after it's creation.</summary>
-	/// <param name="request">The <see cref="HttpRequest"/> that contains the token within it's Authorization header that needs to be renewed.</param>
+	/// <summary>Creates a new JSON Web Token that will use the first specified audience of the previous one. This token also expires in 10 minutes after its creation.</summary>
+	/// <param name="request">The <see cref="HttpRequest"/> that contains the token within its Authorization header that needs to be renewed.</param>
 	/// <returns>The base64url encoded JSON Web Token.</returns>
 	/// <exception cref="FormatException">The Authorization header is in an incorrect format.</exception>
 	/// <exception cref="SecurityTokenMalformedException">The token is in an incorrect format.</exception>
