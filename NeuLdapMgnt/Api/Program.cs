@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -33,14 +34,14 @@ internal static class Program {
 		builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
 			options.TokenValidationParameters = new TokenValidationParameters {
 				ValidateAudience = false,
-				ValidateIssuer = true,
+				ValidateIssuer   = true,
 				ValidateLifetime = true,
 
 				RequireAudience = true,
 
 				IssuerSigningKey = SecurityKey,
-				ValidIssuers = [ ServiceName ],
-				ValidAlgorithms = [ SecurityAlgorithms.HmacSha512 ]
+				ValidIssuers     = [ ServiceName ],
+				ValidAlgorithms  = [ SecurityAlgorithms.HmacSha512 ]
 			};
 
 			options.Events = new JwtBearerEvents {
@@ -64,8 +65,8 @@ internal static class Program {
 					};
 
 					if (error is not null) {
-						context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-						context.Response.ContentType = "text/plain";
+						context.Response.ContentType = MediaTypeNames.Text.Plain;
+						context.Response.StatusCode  = StatusCodes.Status401Unauthorized;
 						await context.Response.WriteAsync(context.ErrorDescription.FallbackIfNullOrWhitespace(error));
 						await context.Response.CompleteAsync();
 					}
@@ -110,14 +111,14 @@ internal static class Program {
 			string user = aud.ToString().FallbackIfNullOrWhitespace("__NOAUTH__");
 
 			loggerService.CreateLogEntry(new() {
-				Time = now,
-				LogLevel = LogLevel.Information.ToString(),
-				Username = aud.ToString(),
-				FullName = aud == Authenticator.GetDefaultAdminName() ? "DEFAULT ADMIN" : ldapService.TryGetDisplayNameOfEntity(user, typeof(Employee)),
-				Host = context.TryGetClientAddress(true) ?? "unknown",
-				Method = req.Method,
+				Time        = now,
+				LogLevel    = LogLevel.Information.ToString(),
+				Username    = aud.ToString(),
+				FullName    = aud == Authenticator.GetDefaultAdminName() ? "DEFAULT ADMIN" : ldapService.TryGetDisplayNameOfEntity(user, typeof(Employee)),
+				Host        = context.TryGetClientAddress(true) ?? "unknown",
+				Method      = req.Method,
 				RequestPath = req.Path,
-				StatusCode = context.Response.StatusCode
+				StatusCode  = context.Response.StatusCode
 			});
 		});
 
@@ -128,6 +129,7 @@ internal static class Program {
 			}
 			catch (LdapBindingException) {
 				const string message = "Unable to connect to the LDAP server.";
+
 				context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
 
 				if (context.Request.Headers.Authorization.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase)) {
@@ -139,13 +141,14 @@ internal static class Program {
 				}
 
 				await context.Response.CompleteAsync();
+
 				loggerService.CreateLogEntry(new() {
-					Time = DateTime.UtcNow,
-					LogLevel = LogLevel.Critical.ToString(),
-					Host = context.TryGetClientAddress(true) ?? "unknown",
-					Method = context.Response.HttpContext.Request.Method,
-					RequestPath = context.Response.HttpContext.Request.Path.ToString(),
-					StatusCode = context.Response.StatusCode
+					Time        = DateTime.UtcNow,
+					LogLevel    = LogLevel.Critical.ToString(),
+					Host        = context.TryGetClientAddress(true) ?? "unknown",
+					Method      = context.Request.Method,
+					RequestPath = context.Request.Path.ToString(),
+					StatusCode  = context.Response.StatusCode
 				});
 			}
 		});

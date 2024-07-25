@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -139,7 +140,7 @@ public static class ExtensionUtils {
 	/// <param name="result">The <see cref="RequestResult"/> to serialize to json.</param>
 	/// <returns>An <see cref="IResult"/> containing the <see cref="RequestResult"/> serilaized to json.</returns>
 	public static IResult ToResult(this RequestResult result) {
-		return Results.Content(JsonSerializer.Serialize(result, result.GetType()), "application/json", Encoding.UTF8, result.StatusCode);
+		return Results.Content(JsonSerializer.Serialize(result, result.GetType()), MediaTypeNames.Application.Json, Encoding.UTF8, result.StatusCode);
 	}
 
 	/// <summary>Tries to get the address of the client that sent the request.</summary>
