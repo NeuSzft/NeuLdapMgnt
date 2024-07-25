@@ -97,25 +97,12 @@ public static class Utils {
 }
 
 public static class ExtensionUtils {
-	/// <summary>If the provided string is <c>null</c> or has the length of zero then it returns <paramref name="defaultStr"/>, otherwise it returns the original string.</summary>
+	/// <summary>If the string is <c>null</c> or it only contains whitespaces then it returns <paramref name="fallback"/>, otherwise it returns the original string.</summary>
 	/// <param name="str">The original string.</param>
-	/// <param name="defaultStr">The string to return if the original string is null or empty.</param>
-	/// <returns>The original string or <paramref name="defaultStr"/>.</returns>
-	public static string DefaultIfNullOrEmpty(this string? str, string defaultStr) {
-		if (str is null || str.Length == 0)
-			return defaultStr;
-		return str;
-	}
-
-	/// <summary>If the provided string is <c>null</c> or has the length of zero then an exception is thrown.</summary>
-	/// <param name="str">The string to check.</param>
-	/// <param name="nameOf">The name of the string variable.</param>
-	/// <returns>The original string.</returns>
-	/// <exception cref="ArgumentException">The provided string is <c>null</c> or has the length of zero.</exception>
-	public static string ThrowIfNullOrEmpty(this string? str, string nameOf) {
-		if (str is null || str.Length == 0)
-			throw new ArgumentException($"{nameOf} is null or empty");
-		return str;
+	/// <param name="fallback">The string to return if the original string is null or empty.</param>
+	/// <returns>The original string or <paramref name="fallback"/>.</returns>
+	public static string FallbackIfNullOrWhitespace(this string? str, string fallback) {
+		return string.IsNullOrWhiteSpace(str) ? fallback : str;
 	}
 
 	/// <summary>Returns the elements of the collection that are not <c>null</c>.</summary>
@@ -131,7 +118,7 @@ public static class ExtensionUtils {
 	/// <returns>The message of the exception, or if that is null or empty, the longest available name of the exception's type.</returns>
 	public static string GetError(this Exception e) {
 		Type type = e.GetType();
-		return e.Message.DefaultIfNullOrEmpty(type.FullName ?? type.Name);
+		return FallbackIfNullOrWhitespace(e.Message, type.FullName ?? type.Name);
 	}
 
 	/// <summary>Get the of a type that should be used for it's organizational unit.</summary>

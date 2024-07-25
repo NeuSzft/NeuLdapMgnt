@@ -66,7 +66,7 @@ internal static class Program {
 					if (error is not null) {
 						context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 						context.Response.ContentType = "text/plain";
-						await context.Response.WriteAsync(context.ErrorDescription.DefaultIfNullOrEmpty(error));
+						await context.Response.WriteAsync(context.ErrorDescription.FallbackIfNullOrWhitespace(error));
 						await context.Response.CompleteAsync();
 					}
 				},
@@ -107,7 +107,7 @@ internal static class Program {
 			app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {req.Host} → {req.Method} {req.Path} ({context.Response.StatusCode})");
 
 			req.Headers.TryGetValue("Audience", out var aud);
-			string user = aud.ToString().DefaultIfNullOrEmpty("__NOAUTH__");
+			string user = aud.ToString().FallbackIfNullOrWhitespace("__NOAUTH__");
 
 			loggerService.CreateLogEntry(new() {
 				Time = now,
