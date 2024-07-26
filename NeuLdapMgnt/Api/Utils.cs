@@ -151,7 +151,7 @@ public static class ExtensionUtils {
 		if (checkHeaders) {
 			if (context.Request.Headers.TryGetValue("X-Real-IP", out var realIp))
 				return realIp;
-			if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var ff) && ff.FirstOrDefault() is { } ffIp)
+			if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var ff) && ff.FirstOrDefault()?.Split(',').Last().Trim() is { } ffIp)
 				return ffIp;
 		}
 		return context.Connection.RemoteIpAddress?.ToString();
