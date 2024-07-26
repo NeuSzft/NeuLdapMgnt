@@ -46,6 +46,7 @@
 |String|Method|RequiredMember|
 |String|RequestPath|RequiredMember|
 |Int32|StatusCode|RequiredMember|
+|String|Note|Nullable(`2`)|
 
 ### Methods
 |Return Type|Name|
