@@ -34,6 +34,7 @@ ifeq ($(wildcard ./.env),)
 	$(file >> .env,DEFAULT_ADMIN_PASSWORD = adminpass)
 	$(file >> .env,)
 	$(file >> .env,LOG_TO_DB = true)
+	$(file >> .env,CHECK_HEADERS_FOR_ADDR = true)
 	$(file >> .env,)
 	$(file >> .env,PORT = 80)
 	@echo Created .env file

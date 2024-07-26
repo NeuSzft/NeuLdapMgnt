@@ -21,7 +21,7 @@ internal static class Program {
 
 	public static readonly string ServiceName = typeof(Program).Namespace!;
 
-	private static readonly bool CheckHeadersForAddress = true;
+	private static readonly bool CheckHeadersForAddress = Utils.IsEnvTrue("CHECK_HEADERS_FOR_ADDR");
 
 	public static void Main(string[] args) {
 		LdapService ldapService = LdapService.FromEnvs();

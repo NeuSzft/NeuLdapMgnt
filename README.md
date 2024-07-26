@@ -67,6 +67,7 @@ This will generate a .env that will contain the necessary environment variables.
 | DEFAULT_ADMIN_USERNAME | admin | The username of the default API admin |
 | DEFAULT_ADMIN_PASSWORD | adminpass | The default password of the default API admin |
 | LOG_TO_DB | true | If `true` the API will log the incoming requests to the Postgres database |
+| CHECK_HEADERS_FOR_ADDR | true | If `true` the API will try to get the address of the client from the **X-Real-IP** or **X-Forwarded-For** headers |
 | PORT | 80 | The local port to be used by Nginx |
 
 ### Start the services:
