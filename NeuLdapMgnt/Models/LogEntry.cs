@@ -23,6 +23,8 @@ public class LogEntry {
 
 	public required int StatusCode { get; init; }
 
+	public string? Note { get; init; }
+
 	public override string ToString() {
 		return $"[{Time:yyyy.MM.dd - HH:mm:ss}] {Host} → {Method} {RequestPath} ({StatusCode})";
 	}
@@ -33,7 +35,7 @@ public class LogEntry {
 	/// <param name="entry">The <see cref="LogEntry"/> to use.</param>
 	/// <returns>The values of the <see cref="LogEntry"/> separated by tabs.</returns>
 	public static string ToTsv(LogEntry entry) {
-		return $"{entry.Id}\t{entry.Time.ToString(CultureInfo)}\t{entry.LogLevel}\t{entry.Username}\t{entry.FullName}\t{entry.Host}\t{entry.Method}\t{entry.RequestPath}\t{entry.StatusCode}";
+		return $"{entry.Id}\t{entry.Time.ToString(CultureInfo)}\t{entry.LogLevel}\t{entry.Username}\t{entry.FullName}\t{entry.Host}\t{entry.Method}\t{entry.RequestPath}\t{entry.StatusCode}\t{entry.Note}";
 	}
 
 	/// <summary>Creates a <see cref="LogEntry"/> from tab separated vales (tsv).</summary>
@@ -44,15 +46,16 @@ public class LogEntry {
 		string[] values = tsvLine.Split('\t');
 		try {
 			return new() {
-				Id = BigInteger.Parse(values[0]),
-				Time = DateTime.Parse(values[1], CultureInfo),
-				LogLevel = values[2],
-				Username = string.IsNullOrEmpty(values[3]) ? null : values[3],
-				FullName = string.IsNullOrEmpty(values[4]) ? null : values[4],
-				Host = values[5],
-				Method = values[6],
+				Id          = BigInteger.Parse(values[0]),
+				Time        = DateTime.Parse(values[1], CultureInfo),
+				LogLevel    = values[2],
+				Username    = string.IsNullOrEmpty(values[3]) ? null : values[3],
+				FullName    = string.IsNullOrEmpty(values[4]) ? null : values[4],
+				Host        = values[5],
+				Method      = values[6],
 				RequestPath = values[7],
-				StatusCode = int.Parse(values[8])
+				StatusCode  = int.Parse(values[8]),
+				Note        = values[9]
 			};
 		}
 		catch {

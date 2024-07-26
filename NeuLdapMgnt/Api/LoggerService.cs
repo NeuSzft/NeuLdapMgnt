@@ -26,14 +26,14 @@ public sealed class DummyLoggerService : ILoggerService {
 	public void CreateLogEntry(LogEntry entry) { }
 
 	/// <summary>Takes in two timestamps and returns an empty collection.</summary>
-	public IEnumerable<LogEntry> GetLogEntries(DateTime start, DateTime end) => [];
+	public IEnumerable<LogEntry> GetLogEntries(DateTime start, DateTime end) => [ ];
 }
 
 /// <summary>An <see cref="ILoggerService"/> that logs into a Postgres database.</summary>
 public sealed class PgLoggerService : ILoggerService {
 	private readonly string _connectionString;
 
-	private IEnumerable<string> _ignoredRoutes = [];
+	private IEnumerable<string> _ignoredRoutes = [ ];
 
 	/// <param name="host">The host to connect to.</param>
 	/// <param name="db">The name of the database to use.</param>
@@ -79,23 +79,23 @@ public sealed class PgLoggerService : ILoggerService {
 
 		string query = string.IsNullOrEmpty(entry.Username) || string.IsNullOrEmpty(entry.FullName)
 			? """
-				INSERT INTO "entries"
-				("time", "log_level", "username", "host", "method", "request_path", "status_code")
-				VALUES
-				(@Time, @LogLevel, null, @Host, @Method, @RequestPath, @StatusCode);
-			"""
+			  	INSERT INTO "entries"
+			  	("time", "log_level", "username", "host", "method", "request_path", "status_code", "note")
+			  	VALUES
+			  	(@Time, @LogLevel, null, @Host, @Method, @RequestPath, @StatusCode, @Note);
+			  """
 			: """
-				INSERT INTO "users"
-				("username", "full_name")
-				VALUES
-				(@Username, @FullName)
-				ON CONFLICT DO NOTHING;
+			  	INSERT INTO "users"
+			  	("username", "full_name")
+			  	VALUES
+			  	(@Username, @FullName)
+			  	ON CONFLICT DO NOTHING;
 
-				INSERT INTO "entries"
-				("time", "log_level", "username", "host", "method", "request_path", "status_code")
-				VALUES
-				(@Time, @LogLevel, @Username, @Host, @Method, @RequestPath, @StatusCode);
-			""";
+			  	INSERT INTO "entries"
+			  	("time", "log_level", "username", "host", "method", "request_path", "status_code", "note")
+			  	VALUES
+			  	(@Time, @LogLevel, @Username, @Host, @Method, @RequestPath, @StatusCode, @Note);
+			  """;
 
 		using NpgsqlConnection connection = OpenConnection();
 		connection.Execute(query, new {
@@ -106,27 +106,29 @@ public sealed class PgLoggerService : ILoggerService {
 			entry.Host,
 			entry.Method,
 			entry.RequestPath,
-			entry.StatusCode
+			entry.StatusCode,
+			entry.Note
 		});
 	}
 
 	public IEnumerable<LogEntry> GetLogEntries(DateTime start, DateTime end) {
 		string query = """
-			SELECT
-			    entries.id AS "Id",
-				entries.time AS "Time",
-				entries.log_level AS "LogLevel",
-				entries.username AS "UserName",
-				users.full_name AS "FullName",
-				entries.host AS "Host",
-				entries.method AS "Method",
-				entries.request_path AS "RequestPath",
-				entries.status_code AS "StatusCode"
-			FROM entries
-			LEFT JOIN users ON entries.username = users.username
-			WHERE time BETWEEN @Start AND @End
-			ORDER BY entries.id;
-			""";
+		               SELECT
+		               	entries.id AS "Id",
+		               	entries.time AS "Time",
+		               	entries.log_level AS "LogLevel",
+		               	entries.username AS "UserName",
+		               	users.full_name AS "FullName",
+		               	entries.host AS "Host",
+		               	entries.method AS "Method",
+		               	entries.request_path AS "RequestPath",
+		               	entries.status_code AS "StatusCode",
+		               	entries.note AS "Note"
+		               FROM entries
+		               LEFT JOIN users ON entries.username = users.username
+		               WHERE time BETWEEN @Start AND @End
+		               ORDER BY entries.id;
+		               """;
 
 		using NpgsqlConnection connection = OpenConnection();
 		return connection.Query<LogEntry>(query, new { Start = start, End = end });
@@ -135,22 +137,23 @@ public sealed class PgLoggerService : ILoggerService {
 	/// <summary>Creates the "users" and "entries" tables within the database.</summary>
 	private void CreateDefaultTables() {
 		string query = """
-			CREATE TABLE IF NOT EXISTS users(
-			    username VARCHAR(255) PRIMARY KEY,
-				full_name VARCHAR(255)
-			);
+		               CREATE TABLE IF NOT EXISTS users(
+		               	username VARCHAR(255) PRIMARY KEY,
+		               	full_name VARCHAR(255)
+		               );
 
-			CREATE TABLE IF NOT EXISTS entries(
-				id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-				time TIMESTAMP NOT NULL,
-				log_level VARCHAR(11) NOT NULL,
-				username VARCHAR(255) REFERENCES users(username),
-				host VARCHAR(255) NOT NULL,
-				method VARCHAR(7) NOT NULL,
-				request_path VARCHAR(255) NOT NULL,
-				status_code INT NOT NULL
-			);
-			""";
+		               CREATE TABLE IF NOT EXISTS entries(
+		               	id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+		               	time TIMESTAMP NOT NULL,
+		               	log_level VARCHAR(11) NOT NULL,
+		               	username VARCHAR(255) REFERENCES users(username),
+		               	host VARCHAR(255) NOT NULL,
+		               	method VARCHAR(7) NOT NULL,
+		               	request_path VARCHAR(255) NOT NULL,
+		               	status_code INT NOT NULL,
+		               	note VARCHAR(255)
+		               );
+		               """;
 
 		using NpgsqlConnection connection = OpenConnection();
 		connection.Query(query);

@@ -21,6 +21,8 @@ internal static class Program {
 
 	public static readonly string ServiceName = typeof(Program).Namespace!;
 
+	private static readonly bool CheckHeadersForAddress = true;
+
 	public static void Main(string[] args) {
 		LdapService ldapService = LdapService.FromEnvs();
 
@@ -99,38 +101,29 @@ internal static class Program {
 		WebApplication app = builder.Build();
 		ldapService.Logger = app.Logger;
 
-		// Add a middleware that logs each request to the console
+		// Add a middleware for handling LDAP connection binding errors and other exceptions
 		app.Use(async (HttpContext context, RequestDelegate next) => {
-			DateTime    now = DateTime.UtcNow;
-			HttpRequest req = context.Request;
+			DateTime now = DateTime.UtcNow;
+			LogLevel logLevel;
+			string?  note;
 
-			await next(context);
-			app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {req.Host} → {req.Method} {req.Path} ({context.Response.StatusCode})");
-
-			req.Headers.TryGetValue("Audience", out var aud);
-			string user = aud.ToString().FallbackIfNullOrWhitespace("__NOAUTH__");
-
-			loggerService.CreateLogEntry(new() {
-				Time        = now,
-				LogLevel    = LogLevel.Information.ToString(),
-				Username    = aud.ToString(),
-				FullName    = aud == Authenticator.GetDefaultAdminName() ? "DEFAULT ADMIN" : ldapService.TryGetDisplayNameOfEntity(user, typeof(Employee)),
-				Host        = context.TryGetClientAddress(true) ?? "unknown",
-				Method      = req.Method,
-				RequestPath = req.Path,
-				StatusCode  = context.Response.StatusCode
-			});
-		});
-
-		// Add a middleware for handling LDAP connection binding errors
-		app.Use(async (HttpContext context, RequestDelegate next) => {
 			try {
 				await next(context);
+
+				logLevel = LogLevel.Information;
+				note     = null;
+
+				HttpRequest req = context.Request;
+				app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {req.Host} → {req.Method} {req.Path} ({context.Response.StatusCode})");
 			}
 			catch (LdapBindingException) {
-				const string message = "Unable to connect to the LDAP server.";
+				const string message = "Unable to connect to the LDAP server";
 
+				logLevel                    = LogLevel.Critical;
+				note                        = message;
 				context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+
+				app.Logger.LogCritical($"[{now:yyyy.MM.dd - HH:mm:ss}] {message}");
 
 				if (context.Request.Headers.Authorization.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase)) {
 					var result = new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(message).RenewToken(context.Request);
@@ -141,16 +134,41 @@ internal static class Program {
 				}
 
 				await context.Response.CompleteAsync();
-
-				loggerService.CreateLogEntry(new() {
-					Time        = DateTime.UtcNow,
-					LogLevel    = LogLevel.Critical.ToString(),
-					Host        = context.TryGetClientAddress(true) ?? "unknown",
-					Method      = context.Request.Method,
-					RequestPath = context.Request.Path.ToString(),
-					StatusCode  = context.Response.StatusCode
-				});
 			}
+			catch (Exception e) {
+				logLevel                    = LogLevel.Critical;
+				note                        = app.Environment.IsDevelopment() ? e.ToString() : e.Message;
+				context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+				string message = $"{context.Response.StatusCode}: {note}";
+				HttpRequest req = context.Request;
+				app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {req.Host} → {req.Method} {req.Path} | {message}");
+
+				if (context.Request.Headers.Authorization.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase)) {
+					var result = new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(message).RenewToken(context.Request);
+					await context.Response.WriteAsJsonAsync(result);
+				}
+				else {
+					await context.Response.WriteAsync(message);
+				}
+
+				await context.Response.CompleteAsync();
+			}
+
+			context.Request.Headers.TryGetValue("Audience", out var audience);
+			string? fullName = ldapService.TryGetDisplayNameOfEntity(audience.ToString(), typeof(Employee));
+
+			loggerService.CreateLogEntry(new() {
+				Time        = now,
+				LogLevel    = logLevel.ToString(),
+				Username    = audience.ToString(),
+				FullName    = audience == Authenticator.GetDefaultAdminName() ? "DEFAULT ADMIN" : fullName,
+				Host        = context.TryGetClientAddress(CheckHeadersForAddress) ?? "unknown",
+				Method      = context.Request.Method,
+				RequestPath = context.Request.Path,
+				StatusCode  = context.Response.StatusCode,
+				Note        = note
+			});
 		});
 
 		// Set CORS to accept any connection
@@ -175,7 +193,7 @@ internal static class Program {
 
 		// Print the current security key as a base64 string when in development mode
 		if (app.Environment.IsDevelopment())
-			app.Logger.LogCritical($"Key: {Convert.ToBase64String(SecurityKey.Key)}");
+			app.Logger.LogDebug("Key: {}", Convert.ToBase64String(SecurityKey.Key));
 
 		app.Run();
 	}
