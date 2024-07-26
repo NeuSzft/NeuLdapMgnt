@@ -8,18 +8,18 @@ using System.Text;
 namespace NeuLdapMgnt.Models.ReadMeGenerator;
 
 internal static class Program {
-	private static string GetNameOfType(Type type) {
+	private static string GetNameOfType(Type type, bool attrArg = false) {
 		StringBuilder sb = new();
 
 		if (type.GenericTypeArguments.Any()) {
 			sb.Append(type.Name[..type.Name.IndexOf('`')]);
-			sb.Append("\\<");
+			sb.Append(@"\<");
 			sb.Append(string.Join(", ", type.GenericTypeArguments.Select(x => x.Name)));
-			sb.Append("\\>");
+			sb.Append(@"\>");
 		}
 		else if (type is { ContainsGenericParameters: true, IsGenericParameter: false, IsArray: false }) {
 			sb.Append(type.Name[..type.Name.IndexOf('`')]);
-			sb.Append("\\<T\\>");
+			sb.Append(attrArg ? "<>" : @"\<T\>");
 		}
 		else {
 			sb.Append(type.Name);
@@ -33,7 +33,7 @@ internal static class Program {
 		string name = type[..type.LastIndexOf("Attribute", StringComparison.InvariantCulture)];
 		var    args = data.ConstructorArguments.Where(x => x.Value?.ToString() != x.Value?.GetType().ToString());
 		return args.Any()
-			? $"{name}(`{string.Join("`, `", args.Select(x => x.Value))}`)"
+			? $"{name}(`{string.Join("`, `", args.Select(x => x.Value is Type value ? GetNameOfType(value, true) : x.Value))}`)"
 			: name;
 	}
 

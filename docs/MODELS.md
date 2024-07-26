@@ -63,8 +63,7 @@
 ### Attributes
 - NullableContext(`1`)
 - Nullable(`0`)
-- JsonSourceGenerationOptions
-- JsonSerializable(`NeuLdapMgnt.Models.RequestResult`)
+- JsonSerializable(`RequestResult`)
 
 ### Properties
 |Type|Name|Attributes|
@@ -90,6 +89,7 @@
 ### Attributes
 - NullableContext(`1`)
 - Nullable(`0`)
+- JsonSerializable(`RequestResult<>`)
 
 ### Properties
 |Type|Name|Attributes|
@@ -103,6 +103,8 @@
 ### Methods
 |Return Type|Name|
 |:---|:---|
+|Boolean|IsSuccessAndNotEmpty()|
+|Boolean|IsFailureOrEmpty()|
 |String|GetError()|
 |Boolean|IsSuccess()|
 |Boolean|IsFailure()|
