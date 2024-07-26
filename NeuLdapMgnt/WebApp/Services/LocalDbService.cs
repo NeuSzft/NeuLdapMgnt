@@ -88,7 +88,7 @@ public class LocalDbService
 			var response = await ApiRequests.GetClassesAsync();
 			if (response.IsSuccess())
 			{
-				Classes = response.Values.SelectMany(x => x).OrderBy(Utils.GetClassOrderValue).ToList();
+				Classes = response.Values.OrderBy(Utils.GetClassOrderValue).ToList();
 			}
 
 			if (response.Errors.Any())
