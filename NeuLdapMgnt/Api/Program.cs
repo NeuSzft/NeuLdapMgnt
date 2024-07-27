@@ -124,35 +124,17 @@ internal static class Program {
 				context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
 
 				app.Logger.LogCritical($"[{now:yyyy.MM.dd - HH:mm:ss}] {message}");
-
-				if (context.Request.Headers.Authorization.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase)) {
-					var result = new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(message).RenewToken(context.Request);
-					await context.Response.WriteAsJsonAsync(result);
-				}
-				else {
-					await context.Response.WriteAsync(message);
-				}
-
-				await context.Response.CompleteAsync();
+				await context.RespondWithError(message);
 			}
 			catch (Exception e) {
-				logLevel                    = LogLevel.Critical;
+				logLevel                    = LogLevel.Error;
 				note                        = app.Environment.IsDevelopment() ? e.ToString() : e.Message;
 				context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-				string message = $"{context.Response.StatusCode}: {note}";
-				HttpRequest req = context.Request;
-				app.Logger.LogInformation($"[{now:yyyy.MM.dd - HH:mm:ss}] {req.Host} → {req.Method} {req.Path} | {message}");
-
-				if (context.Request.Headers.Authorization.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase)) {
-					var result = new RequestResult().SetStatus(StatusCodes.Status503ServiceUnavailable).SetErrors(message).RenewToken(context.Request);
-					await context.Response.WriteAsJsonAsync(result);
-				}
-				else {
-					await context.Response.WriteAsync(message);
-				}
-
-				await context.Response.CompleteAsync();
+				string      message = $"{context.Response.StatusCode}: {note}";
+				HttpRequest req     = context.Request;
+				app.Logger.LogError($"[{now:yyyy.MM.dd - HH:mm:ss}] {req.Host} → {req.Method} {req.Path} | {message}");
+				await context.RespondWithError(message);
 			}
 
 			context.Request.Headers.TryGetValue("Audience", out var audience);
