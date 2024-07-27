@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using NeuLdapMgnt.Models;
@@ -131,6 +132,8 @@ public static class ExtensionUtils {
 	/// <param name="request">The <see cref="HttpRequest"/> to get the Authorization header from, containing the current token.</param>
 	/// <typeparam name="T">The type of the result which must inherit from <see cref="RequestResult"/>.</typeparam>
 	/// <returns>The <paramref name="result"/> with its <c>NewToken</c> set.</returns>
+	/// <exception cref="FormatException">The Authorization header is in an incorrect format.</exception>
+	/// <exception cref="SecurityTokenMalformedException">The token is in an incorrect format.</exception>
 	public static T RenewToken<T>(this T result, HttpRequest request) where T : RequestResult {
 		result.SetToken(Authenticator.RenewToken(request));
 		return result;
@@ -155,6 +158,26 @@ public static class ExtensionUtils {
 				return ffIp;
 		}
 		return context.Connection.RemoteIpAddress?.ToString();
+	}
+
+	/// <summary>Responds with an error message. If the user issuing the request was successfully authenticated it is sent back as an error of a <see cref="RequestResult"/>.</summary>
+	/// <param name="context">The <see cref="HttpContext"/> of the request.</param>
+	/// <param name="message">The message to be written into the response body or the <see cref="RequestResult"/>.</param>
+	public static async Task RespondWithError(this HttpContext context, string message) {
+		if (context.Request.Headers.Authorization.ToString().StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase)) {
+			try {
+				var result = new RequestResult().SetStatus(context.Response.StatusCode).SetErrors(message).RenewToken(context.Request);
+				await context.Response.WriteAsJsonAsync(result);
+			}
+			catch {
+				await context.Response.WriteAsync(message);
+			}
+		}
+		else {
+			await context.Response.WriteAsync(message);
+		}
+
+		await context.Response.CompleteAsync();
 	}
 
 	/// <summary>Sets the password of a <see cref="Person"/>.</summary>
