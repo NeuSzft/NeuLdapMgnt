@@ -43,8 +43,8 @@ public sealed class LdapService {
 	/// <example><code>var ldapHelper = new LdapHelper("localhost", 389, "example.local", "admin", "admin-password");</code></example>
 	public LdapService(string server, int port, string domain, string username, string password) {
 		DomainComponents = $"dc={domain.Replace(".", ",dc=")}";
-		_identifier      = new(server, port);
-		_credential      = new($"cn={username},{DomainComponents}", password);
+		_identifier      = new LdapDirectoryIdentifier(server, port);
+		_credential      = new NetworkCredential($"cn={username},{DomainComponents}", password);
 	}
 
 	/// <summary>Tries to send a request to the LDAP server.</summary>
@@ -128,16 +128,16 @@ public sealed class LdapService {
 
 		List<LdapResult> results = new();
 
-		foreach (UniqueDirectoryRequest request in requests)
+		foreach (var request in requests)
 			try {
-				results.Add(new(connection.SendRequest(request.Request)));
+				results.Add(new LdapResult(connection.SendRequest(request.Request)));
 			}
 			catch (DirectoryException e) {
 				string id    = request.Identifier;
 				string error = $"{id}: {e.GetError()}";
 				if (logErrors)
 					Logger?.LogError($"{callerMemberName} (line {callerLineNumber}) in {callerFilePath}{Environment.NewLine}- {error}");
-				results.Add(new(null, error));
+				results.Add(new LdapResult(null, error));
 			}
 
 		return results;
@@ -177,7 +177,7 @@ public sealed class LdapService {
 	public static T ParseEntry<T>(SearchResultEntry entry, bool getHiddenAttributes = false) where T : class, new() {
 		T obj = new();
 
-		foreach (PropertyInfo info in typeof(T).GetProperties())
+		foreach (var info in typeof(T).GetProperties())
 			if (
 				info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute
 				&& (!attribute.Hidden || getHiddenAttributes)
@@ -228,13 +228,13 @@ public sealed class LdapService {
 	public static IEnumerable<DirectoryAttribute> GetDirectoryAttributes(object obj, bool getHiddenAttributes = false) {
 		List<string> flags = [ ];
 
-		foreach (PropertyInfo info in obj.GetType().GetProperties())
+		foreach (var info in obj.GetType().GetProperties())
 			if (
 				info.GetCustomAttribute<LdapAttributeAttribute>() is { } attribute
 				&& (!attribute.Hidden || getHiddenAttributes)
 				&& info.GetValue(obj) is { } value
 			) {
-				yield return new(attribute.Name, value.ToString());
+				yield return new DirectoryAttribute(attribute.Name, value.ToString());
 			}
 			else if (
 				info.GetCustomAttribute<LdapFlagAttribute>() is { } flag
@@ -244,7 +244,7 @@ public sealed class LdapService {
 			}
 
 		if (flags.Count > 0)
-			yield return new("description", string.Join('|', flags));
+			yield return new DirectoryAttribute("description", string.Join('|', flags));
 	}
 
 	/// <summary>Creates a new <see cref="LdapService"/> using the specified environment variables.</summary>
@@ -263,13 +263,12 @@ public sealed class LdapService {
 		string domainEnv   = "LDAP_DOMAIN",
 		string userEnv     = "LDAP_USERNAME",
 		string passwordEnv = "LDAP_PASSWORD"
-	) {
-		return new LdapService(
+	)
+		=> new(
 			Utils.GetEnv(serverEnv),
 			int.Parse(Utils.GetEnv(portEnv)),
 			Utils.GetEnv(domainEnv),
 			Utils.GetEnv(userEnv),
 			Utils.GetEnv(passwordEnv)
 		);
-	}
 }

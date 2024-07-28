@@ -41,7 +41,7 @@ public static class ModelValidator {
 	/// <returns>A <see cref="RequestResult{T}"/> containing the result of the validation.</returns>
 	public static RequestResult<T> ValidateJson<T>(string json) where T : class {
 		try {
-			T obj = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { AllowTrailingCommas = true })!;
+			var obj = JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { AllowTrailingCommas = true })!;
 			return Validate(obj).ToGeneric(obj);
 		}
 		catch (Exception e) {

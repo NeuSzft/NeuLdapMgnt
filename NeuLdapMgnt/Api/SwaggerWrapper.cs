@@ -1,9 +1,8 @@
-using System.Linq;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Net.Mime;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace NeuLdapMgnt.Api;
 
@@ -13,10 +12,10 @@ internal static class SwaggerWrapper {
 			new OpenApiSecurityScheme {
 				Reference = new OpenApiReference {
 					Type = ReferenceType.SecurityScheme,
-					Id = "Basic"
+					Id   = Authenticator.Schemes.Basic
 				}
 			},
-			[]
+			[ ]
 		}
 	};
 
@@ -25,23 +24,12 @@ internal static class SwaggerWrapper {
 			new OpenApiSecurityScheme {
 				Reference = new OpenApiReference {
 					Type = ReferenceType.SecurityScheme,
-					Id = JwtBearerDefaults.AuthenticationScheme
+					Id   = Authenticator.Schemes.Jwt
 				}
 			},
-			[]
+			[ ]
 		}
 	};
-
-	private sealed class SecurityRequirementsOperationFilter : IOperationFilter {
-		public void Apply(OpenApiOperation operation, OperationFilterContext context) {
-			// Do not add security scheme if it is a testing endpoint
-			if (operation.Tags.All(x => x.Name != "Testing")) {
-				OpenApiSecurityRequirement securityRequirement = operation.OperationId == "BasicAuth" ? BasicAuthRequirement : JwtAuthRequirement;
-				if (!operation.Security.Contains(securityRequirement))
-					operation.Security.Add(securityRequirement);
-			}
-		}
-	}
 
 	/// <summary>Sets the Swagger document options and security definitions for the services.</summary>
 	/// <param name="services">The <see cref="IServiceCollection"/> to set the options for.</param>
@@ -54,25 +42,23 @@ internal static class SwaggerWrapper {
 			options.SupportNonNullableReferenceTypes();
 
 			options.SwaggerDoc(docName, new OpenApiInfo {
-				Title = title,
+				Title   = title,
 				Version = version
 			});
 
-			options.AddSecurityDefinition("Basic", new OpenApiSecurityScheme {
-				Type = SecuritySchemeType.Http,
-				In = ParameterLocation.Header,
-				Name = "Password Authentication",
-				Scheme = "Basic"
+			options.AddSecurityDefinition(Authenticator.Schemes.Basic, new OpenApiSecurityScheme {
+				Type   = SecuritySchemeType.Http,
+				In     = ParameterLocation.Header,
+				Name   = "Password Authentication",
+				Scheme = Authenticator.Schemes.Basic
 			});
-			options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme {
-				Type = SecuritySchemeType.Http,
-				In = ParameterLocation.Header,
-				Name = "JWT Authentication",
-				Scheme = JwtBearerDefaults.AuthenticationScheme,
+			options.AddSecurityDefinition(Authenticator.Schemes.Jwt, new OpenApiSecurityScheme {
+				Type         = SecuritySchemeType.Http,
+				In           = ParameterLocation.Header,
+				Name         = "JWT Authentication",
+				Scheme       = Authenticator.Schemes.Jwt,
 				BearerFormat = "JWT"
 			});
-
-			options.OperationFilter<SecurityRequirementsOperationFilter>();
 		});
 
 		return services;
@@ -90,5 +76,30 @@ internal static class SwaggerWrapper {
 		});
 
 		return app;
+	}
+
+	/// <summary>Adds an OpenAPI annotation the endpoint with the <see cref="Authenticator.Schemes.Basic"/> authentication scheme.</summary>
+	/// <param name="builder">The <see cref="RouteHandlerBuilder" />.</param>
+	/// <returns>The <paramref name="builder"/> that was passed to the method.</returns>
+	public static RouteHandlerBuilder WithOpenApiBasicAuth(this RouteHandlerBuilder builder) {
+		return builder.WithOpenApi(op => {
+				op.Security.Add(BasicAuthRequirement);
+				return op;
+			})
+			.Produces<string>(StatusCodes.Status400BadRequest, MediaTypeNames.Text.Plain)
+			.Produces<string>(StatusCodes.Status401Unauthorized, MediaTypeNames.Text.Plain)
+			.Produces<string>(StatusCodes.Status403Forbidden, MediaTypeNames.Text.Plain);
+	}
+
+	/// <summary>Adds an OpenAPI annotation the endpoint with the <see cref="Authenticator.Schemes.Jwt"/> authentication scheme.</summary>
+	/// <param name="builder">The <see cref="RouteHandlerBuilder" />.</param>
+	/// <returns>The <paramref name="builder"/> that was passed to the method.</returns>
+	public static RouteHandlerBuilder WithOpenApiJwtAuth(this RouteHandlerBuilder builder) {
+		return builder.WithOpenApi(op => {
+				op.Security.Add(JwtAuthRequirement);
+				return op;
+			})
+			.Produces<string>(StatusCodes.Status400BadRequest, MediaTypeNames.Text.Plain)
+			.Produces<string>(StatusCodes.Status401Unauthorized, MediaTypeNames.Text.Plain);
 	}
 }

@@ -49,13 +49,11 @@ public sealed class PgLoggerService : ILoggerService {
 	/// <param name="passwordEnv">The environment variable that specifies the password of the "postgres" user.</param>
 	/// <returns>The new <see cref="PgLoggerService"/>.</returns>
 	/// <exception cref="ArgumentException">An environment variable is not set or is an empty string.</exception>
-	public static PgLoggerService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD") {
-		return new(
-			Utils.GetEnv(hostEnv),
-			Utils.GetEnv(dbEnv),
-			Utils.GetEnv(passwordEnv)
-		);
-	}
+	public static PgLoggerService FromEnvs(string hostEnv = "POSTGRES_HOST", string dbEnv = "POSTGRES_DB", string passwordEnv = "POSTGRES_PASSWORD") => new(
+		Utils.GetEnv(hostEnv),
+		Utils.GetEnv(dbEnv),
+		Utils.GetEnv(passwordEnv)
+	);
 
 	/// <summary>Opens a new <see cref="NpgsqlConnection"/>.</summary>
 	/// <returns>The opened <see cref="NpgsqlConnection"/>.</returns>
@@ -97,7 +95,7 @@ public sealed class PgLoggerService : ILoggerService {
 			(@Time, @LogLevel, @Username, @Host, @Method, @RequestPath, @StatusCode, @Note);
 			""";
 
-		using NpgsqlConnection connection = OpenConnection();
+		using var connection = OpenConnection();
 		connection.Execute(query, new {
 			entry.Time,
 			entry.LogLevel,
@@ -131,7 +129,7 @@ public sealed class PgLoggerService : ILoggerService {
 			ORDER BY entries.id;
 			""";
 
-		using NpgsqlConnection connection = OpenConnection();
+		using var connection = OpenConnection();
 		return connection.Query<LogEntry>(query, new { Start = start, End = end });
 	}
 
@@ -156,7 +154,7 @@ public sealed class PgLoggerService : ILoggerService {
 			);
 			""";
 
-		using NpgsqlConnection connection = OpenConnection();
+		using var connection = OpenConnection();
 		connection.Query(query);
 	}
 }

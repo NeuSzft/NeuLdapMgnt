@@ -13,7 +13,7 @@ public class AuthTests {
 			Class         = "-",
 			Username      = "geosea",
 			GivenName     = "George",
-			Surname      = "Sears",
+			Surname       = "Sears",
 			MiddleName    = null,
 			Email         = "solidus@mail.com",
 			HomeDirectory = "/home/geosea",
@@ -34,7 +34,7 @@ public class AuthTests {
 		var response = await Testing.Client.GetAsync("/api/auth");
 
 		Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-		Assert.AreEqual("Missing Authorization header.", await response.Content.ReadAsStringAsync());
+		Assert.AreEqual("400: Missing Authorization header", await response.Content.ReadAsStringAsync());
 	}
 
 	[TestMethod]
@@ -43,7 +43,7 @@ public class AuthTests {
 		var response = await Testing.Client.SendAsync(request);
 
 		Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-		Assert.AreEqual("Invalid Authorization header.", await response.Content.ReadAsStringAsync());
+		Assert.AreEqual("400: Invalid Authorization header", await response.Content.ReadAsStringAsync());
 	}
 
 	[TestMethod]
@@ -52,7 +52,7 @@ public class AuthTests {
 		var response = await Testing.Client.SendAsync(request);
 
 		Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-		Assert.AreEqual("Wrong credentials.", await response.Content.ReadAsStringAsync());
+		Assert.AreEqual("401: Wrong credentials", await response.Content.ReadAsStringAsync());
 	}
 
 	[TestMethod]
@@ -61,7 +61,7 @@ public class AuthTests {
 		var response = await Testing.Client.SendAsync(request);
 
 		Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-		Assert.AreEqual("Wrong credentials.", await response.Content.ReadAsStringAsync());
+		Assert.AreEqual("401: Wrong credentials", await response.Content.ReadAsStringAsync());
 	}
 
 	[TestMethod]
@@ -84,7 +84,7 @@ public class AuthTests {
 		var response = await Testing.Client.SendAsync(request);
 
 		Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-		Assert.AreEqual("Wrong credentials.", await response.Content.ReadAsStringAsync());
+		Assert.AreEqual("401: Wrong credentials", await response.Content.ReadAsStringAsync());
 	}
 
 	[TestMethod]
@@ -102,21 +102,21 @@ public class AuthTests {
 	}
 
 	[TestMethod]
-	public async Task TestMissingToken() {
+	public async Task TestMissingAuthHeader() {
 		var request  = new HttpRequestMessage(HttpMethod.Get, "/api/testing/check-token");
 		var response = await Testing.Client.SendAsync(request);
 
-		Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-		Assert.AreEqual("Missing json web token.", await response.Content.ReadAsStringAsync());
+		Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+		Assert.AreEqual("400: Missing authorization header", await response.Content.ReadAsStringAsync());
 	}
 
 	[TestMethod]
-	public async Task TestInvalidToken() {
+	public async Task TestMalformedToken() {
 		var request  = new HttpRequestMessage(HttpMethod.Get, "/api/testing/check-token").SetAuthHeader("Bearer", "invalidtoken");
 		var response = await Testing.Client.SendAsync(request);
 
 		Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-		Assert.AreEqual("Invalid json web token.", await response.Content.ReadAsStringAsync());
+		Assert.AreEqual("401: Malformed json web token", await response.Content.ReadAsStringAsync());
 	}
 
 	[TestMethod]
@@ -125,7 +125,7 @@ public class AuthTests {
 		var response = await Testing.Client.SendAsync(request);
 
 		Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
-		Assert.IsTrue((await response.Content.ReadAsStringAsync()).Contains("expired"));
+		Assert.AreEqual("401: Expired json web token", await response.Content.ReadAsStringAsync());
 	}
 
 	[TestMethod]

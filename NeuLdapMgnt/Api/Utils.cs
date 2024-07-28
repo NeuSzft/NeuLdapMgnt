@@ -14,6 +14,7 @@ using PluralizeService.Core;
 
 namespace NeuLdapMgnt.Api;
 
+/// <summary>A collection of utility methods.</summary>
 public static class Utils {
 	/// <summary>Returns a new <see cref="SymmetricSecurityKey"/> that is either loaded from the specified environment variable as a base64 string or creates a new one with the specified size.</summary>
 	/// <param name="env">Name of the environment variable.</param>
@@ -21,15 +22,13 @@ public static class Utils {
 	/// <returns>The new <see cref="SymmetricSecurityKey"/>.</returns>
 	public static SymmetricSecurityKey LoadOrCreateSecurityKey(string env, int size = 256) {
 		string? base64Key = Environment.GetEnvironmentVariable(env);
-		return new(base64Key is not null ? Convert.FromBase64String(base64Key) : RandomNumberGenerator.GetBytes(size));
+		return new SymmetricSecurityKey(base64Key is not null ? Convert.FromBase64String(base64Key) : RandomNumberGenerator.GetBytes(size));
 	}
 
 	/// <summary>Hashes the password using bcrypt.</summary>
 	/// <param name="password">The password to hash.</param>
 	/// <returns>The hashed password with the <c>"{CRYPT}"</c> string prepended to it.</returns>
-	public static string BCryptHashPassword(string password) {
-		return "{CRYPT}" + BCrypt.Net.BCrypt.HashPassword(password);
-	}
+	public static string BCryptHashPassword(string password) => "{CRYPT}" + BCrypt.Net.BCrypt.HashPassword(password);
 
 	/// <summary>Checks if the password matches the bcrypt hash.</summary>
 	/// <param name="hash">The bcrypt hash.</param>
@@ -47,17 +46,14 @@ public static class Utils {
 	/// <summary>Gets the version of an assembly in the <c>&lt;major&gt;.&lt;minor&gt;.&lt;build&gt;</c> format.</summary>
 	/// <param name="assembly">The <see cref="Assembly"/> the use.</param>
 	/// <returns>The version of the assembly or <c>"unspecified"</c> if it is not specified.</returns>
-	public static string GetAssemblyVersion(Assembly assembly) {
-		return assembly.GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Build}" : "unspecified";
-	}
+	public static string GetAssemblyVersion(Assembly assembly) => assembly.GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{v.Build}" : "unspecified";
 
 	/// <summary>Tries to parse the csv line and create either a <see cref="Student"/> or an <see cref="Employee"/> from it.</summary>
 	/// <param name="csv">The csv string to parse.</param>
 	/// <returns>A <see cref="Person"/> if the parsing was successful or <c>null</c> if it was not.</returns>
-	public static Person? GetPersonFromCsv(string csv) {
+	public static Person? GetPersonFromCsv(string csv) => throw
 		// TODO: Implement csv parsing
-		throw new NotImplementedException();
-	}
+		new NotImplementedException();
 
 	/// <summary>Tries to parse each csv line and create either a <see cref="Student"/> or an <see cref="Employee"/> from it.</summary>
 	/// <param name="csvLines">The lines of csv to parse.</param>
@@ -83,16 +79,12 @@ public static class Utils {
 	/// <param name="name">The name of the env.</param>
 	/// <param name="fallback">The value to return if the env is unspecified.</param>
 	/// <returns>The value of the env or the <paramref name="fallback"/> value if it is <c>null</c> or whitespace.</returns>
-	public static string GetEnv(string name, string fallback) {
-		return Environment.GetEnvironmentVariable(name).FallbackIfNullOrWhitespace(fallback);
-	}
+	public static string GetEnv(string name, string fallback) => Environment.GetEnvironmentVariable(name).FallbackIfNullOrWhitespace(fallback);
 
 	/// <summary>Gets the value of an environment variable and determines if its value is <c>true</c> or not.</summary>
 	/// <param name="name">The name of the env.</param>
 	/// <returns><c>true</c> if the value of the env can be parsed into a valid <see cref="bool"/> and it is also <c>true</c>.</returns>
-	public static bool IsEnvTrue(string name) {
-		return bool.TryParse(Environment.GetEnvironmentVariable(name), out bool value) && value;
-	}
+	public static bool IsEnvTrue(string name) => bool.TryParse(Environment.GetEnvironmentVariable(name), out bool value) && value;
 }
 
 public static class ExtensionUtils {
@@ -100,9 +92,7 @@ public static class ExtensionUtils {
 	/// <param name="str">The original string.</param>
 	/// <param name="fallback">The string to return if the original string is null or empty.</param>
 	/// <returns>The original string or <paramref name="fallback"/>.</returns>
-	public static string FallbackIfNullOrWhitespace(this string? str, string fallback) {
-		return string.IsNullOrWhiteSpace(str) ? fallback : str;
-	}
+	public static string FallbackIfNullOrWhitespace(this string? str, string fallback) => string.IsNullOrWhiteSpace(str) ? fallback : str;
 
 	/// <summary>Returns the elements of the collection that are not <c>null</c>.</summary>
 	/// <param name="collection">The collection of elements.</param>
@@ -116,16 +106,14 @@ public static class ExtensionUtils {
 	/// <param name="e">The exception to get the error from.</param>
 	/// <returns>The message of the exception, or if that is null or empty, the longest available name of the exception's type.</returns>
 	public static string GetError(this Exception e) {
-		Type type = e.GetType();
+		var type = e.GetType();
 		return FallbackIfNullOrWhitespace(e.Message, type.FullName ?? type.Name);
 	}
 
 	/// <summary>Get the of a type that should be used for its organizational unit.</summary>
 	/// <param name="type">The type to get the name of.</param>
 	/// <returns>The lowercase pluralized form of <paramref name="type"/>'s <c>Name</c>.</returns>
-	public static string GetOuName(this Type type) {
-		return PluralizationProvider.Pluralize(type.Name.ToLower());
-	}
+	public static string GetOuName(this Type type) => PluralizationProvider.Pluralize(type.Name.ToLower());
 
 	/// <summary>Sets the <c>NewToken</c> of result to a new JSON Web Token.</summary>
 	/// <param name="result">The <see cref="RequestResult"/> to add the new token to.</param>
@@ -142,9 +130,7 @@ public static class ExtensionUtils {
 	/// <summary>Returns an <see cref="IResult"/> that contains the <see cref="RequestResult"/> serialized to json and its status code set to the result's <c>StatusCode</c>.</summary>
 	/// <param name="result">The <see cref="RequestResult"/> to serialize to json.</param>
 	/// <returns>An <see cref="IResult"/> containing the <see cref="RequestResult"/> serilaized to json.</returns>
-	public static IResult ToResult(this RequestResult result) {
-		return Results.Content(JsonSerializer.Serialize(result, result.GetType()), MediaTypeNames.Application.Json, Encoding.UTF8, result.StatusCode);
-	}
+	public static IResult ToResult(this RequestResult result) => Results.Content(JsonSerializer.Serialize(result, result.GetType()), MediaTypeNames.Application.Json, Encoding.UTF8, result.StatusCode);
 
 	/// <summary>Tries to get the address of the client that sent the request.</summary>
 	/// <param name="context">The <see cref="HttpContext"/> of the request.</param>
@@ -170,11 +156,11 @@ public static class ExtensionUtils {
 				await context.Response.WriteAsJsonAsync(result);
 			}
 			catch {
-				await context.Response.WriteAsync(message);
+				await context.Response.WriteAsync($"{context.Response.StatusCode}: {message}");
 			}
 		}
 		else {
-			await context.Response.WriteAsync(message);
+			await context.Response.WriteAsync($"{context.Response.StatusCode}: {message}");
 		}
 
 		await context.Response.CompleteAsync();
@@ -191,7 +177,5 @@ public static class ExtensionUtils {
 	/// <param name="person">The <see cref="Person"/> to check the password hash of.</param>
 	/// <param name="password">The password to hash and check.</param>
 	/// <returns><c>true</c> if the hashes match, otherwise <c>false</c>.</returns>
-	public static bool CheckPassword(this Person person, string password) {
-		return person.Password is not null && Utils.CheckBCryptPassword(person.Password, password);
-	}
+	public static bool CheckPassword(this Person person, string password) => person.Password is not null && Utils.CheckBCryptPassword(person.Password, password);
 }

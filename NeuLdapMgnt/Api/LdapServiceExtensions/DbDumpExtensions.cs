@@ -25,7 +25,7 @@ public static class DbDumpExtensions {
 		errors.AddRange(ldap.TryAddEntities(dump.Employees, employee => employee.Id, true, overwrite).Errors);
 
 		foreach (var item in dump.Values) {
-			if (!ldap.SetValue(item.Key, item.Value, out var error))
+			if (!ldap.SetValue(item.Key, item.Value, out string? error))
 				errors.Add(error);
 		}
 
@@ -36,7 +36,7 @@ public static class DbDumpExtensions {
 	/// <param name="ldap">The <see cref="LdapService"/> the method should use.</param>
 	/// <returns>A <see cref="RequestResult{T}">RequestResult&lt;LdapDbDump&gt;</see> containing the outcome of the operation.</returns>
 	public static RequestResult<LdapDbDump> ExportDatabase(this LdapService ldap) {
-		var studentResults = ldap.GetAllEntities<Student>(true);
+		var studentResults  = ldap.GetAllEntities<Student>(true);
 		var employeeResults = ldap.GetAllEntities<Employee>(true);
 
 		List<string> errors = new();
@@ -44,9 +44,9 @@ public static class DbDumpExtensions {
 		errors.AddRange(employeeResults.Errors);
 
 		LdapDbDump dump = new() {
-			Students = studentResults.Values,
+			Students  = studentResults.Values,
 			Employees = employeeResults.Values,
-			Values = ldap.GetAllValues(out var error)
+			Values    = ldap.GetAllValues(out string? error)
 		};
 
 		var response = new RequestResult<LdapDbDump>().SetStatus(StatusCodes.Status207MultiStatus).SetValues(dump);

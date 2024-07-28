@@ -10,8 +10,8 @@ public static class ValueExtensions {
 	/// <param name="key">The key or name of the pair.</param>
 	/// <returns><c>true</c> if the key-value pair exists or <c>false</c> if it does not exist or the request fails.</returns>
 	public static bool ValueExists(this LdapService ldap, string key) {
-		SearchRequest   request  = new($"cn={key},ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, [ ]);
-		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
+		SearchRequest request  = new($"cn={key},ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, [ ]);
+		var           response = ldap.TryRequest(request) as SearchResponse;
 
 		return response?.Entries.Count == 1;
 	}
@@ -22,8 +22,8 @@ public static class ValueExtensions {
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
 	/// <returns>The value the pair or <c>null</c> if it does not exist or the request fails.</returns>
 	public static string? GetValue(this LdapService ldap, string key, out string? error) {
-		SearchRequest   request  = new($"cn={key},ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, "description");
-		SearchResponse? response = ldap.TryRequest(request, out error) as SearchResponse;
+		SearchRequest request  = new($"cn={key},ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, "description");
+		var           response = ldap.TryRequest(request, out error) as SearchResponse;
 
 		if (response is null || response.Entries.Count == 0 || response.Entries[0].Attributes["description"].Count == 0)
 			return null;
@@ -42,8 +42,8 @@ public static class ValueExtensions {
 
 		if (!ldap.ValueExists(key)) {
 			AddRequest addRequest = new($"cn={key},ou=values,{ldap.DomainComponents}",
-				new("objectClass", "applicationProcess"),
-				new("description", value)
+				new DirectoryAttribute("objectClass", "applicationProcess"),
+				new DirectoryAttribute("description", value)
 			);
 
 			return ldap.TryRequest(addRequest, out error) is not null;
@@ -80,8 +80,8 @@ public static class ValueExtensions {
 	/// <param name="error">When the method returns, this will contain the error message if there was one. Otherwise it will be set to <c>null</c>.</param>
 	/// <returns>A <see cref="Dictionary{TKey,TValue}">Dictionary&lt;string, string&gt;</see> containing the key-value pairs or an empty collection if there was an error.</returns>
 	public static Dictionary<string, string> GetAllValues(this LdapService ldap, out string? error) {
-		SearchRequest   request  = new($"ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, "cn", "description");
-		SearchResponse? response = ldap.TryRequest(request, out error) as SearchResponse;
+		SearchRequest request  = new($"ou=values,{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.OneLevel, "cn", "description");
+		var           response = ldap.TryRequest(request, out error) as SearchResponse;
 
 		if (response is null)
 			return [ ];

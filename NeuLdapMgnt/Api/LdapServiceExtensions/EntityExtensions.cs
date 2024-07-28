@@ -15,8 +15,8 @@ public static class EntityExtensions {
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>Returns <c>true</c> if the entity exists. If it does not exist or the search request fails it returns <c>false</c>.</returns>
 	public static bool EntityExists<T>(this LdapService ldap, string id) where T : class {
-		SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, [ ]);
-		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
+		SearchRequest request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, [ ]);
+		var           response = ldap.TryRequest(request) as SearchResponse;
 
 		return response?.Entries.Count == 1;
 	}
@@ -27,8 +27,8 @@ public static class EntityExtensions {
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>Returns the LDAP attributes of the entity that are present within the database or an empty collection if it is not found.</returns>
 	public static IEnumerable<string> TryGetPresentEntityAttributes<T>(this LdapService ldap, string id) where T : class {
-		SearchRequest   request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
-		SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
+		SearchRequest request  = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
+		var           response = ldap.TryRequest(request) as SearchResponse;
 
 		return response?.Entries.Count > 0
 			? response.Entries[0].Attributes.Values.Cast<DirectoryAttribute>().Select(x => x.Name)
@@ -41,7 +41,7 @@ public static class EntityExtensions {
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>A <see cref="RequestResult{T}"/> containing the entities.</returns>
 	public static RequestResult<T> GetAllEntities<T>(this LdapService ldap, bool getHiddenAttributes = false) where T : class, new() {
-		Type type = typeof(T);
+		var type = typeof(T);
 
 		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"), false);
 
@@ -53,7 +53,7 @@ public static class EntityExtensions {
 		List<string> errors   = [ ];
 
 		foreach (SearchResultEntry entry in response.Entries) {
-			if (LdapService.TryParseEntry<T>(entry, out var error, getHiddenAttributes) is { } entity)
+			if (LdapService.TryParseEntry<T>(entry, out string? error, getHiddenAttributes) is { } entity)
 				entities.Add(entity);
 			if (error is not null)
 				errors.Add(error);
@@ -71,10 +71,10 @@ public static class EntityExtensions {
 	public static RequestResult<T> TryGetEntity<T>(this LdapService ldap, string id, bool getHiddenAttributes = false) where T : class, new() {
 		SearchRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, null);
 
-		if (ldap.TryRequest(request, out var error) is not SearchResponse response || response.Entries.Count == 0)
+		if (ldap.TryRequest(request, out string? error) is not SearchResponse response || response.Entries.Count == 0)
 			return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors(error ?? "The object does not exist.");
 
-		T? entity = LdapService.TryParseEntry<T>(response.Entries[0], out error, getHiddenAttributes);
+		var entity = LdapService.TryParseEntry<T>(response.Entries[0], out error, getHiddenAttributes);
 		return entity is not null
 			? new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity)
 			: new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
@@ -88,7 +88,7 @@ public static class EntityExtensions {
 	/// <typeparam name="T">The type of the entity.</typeparam>
 	/// <returns>A <see cref="RequestResult{T}"/> containing the outcome of the operation.</returns>
 	public static RequestResult<T> TryAddEntity<T>(this LdapService ldap, T entity, string id, bool setHiddenAttributes = false) where T : class {
-		Type type = typeof(T);
+		var type = typeof(T);
 
 		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"), false);
 
@@ -97,12 +97,12 @@ public static class EntityExtensions {
 
 		AddRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}");
 		if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
-			request.Attributes.Add(new("objectClass", objectClasses.Classes.Cast<object>().ToArray()));
+			request.Attributes.Add(new DirectoryAttribute("objectClass", objectClasses.Classes.Cast<object>().ToArray()));
 
-		foreach (DirectoryAttribute attribute in LdapService.GetDirectoryAttributes(entity, setHiddenAttributes))
+		foreach (var attribute in LdapService.GetDirectoryAttributes(entity, setHiddenAttributes))
 			request.Attributes.Add(attribute);
 
-		return ldap.TryRequest(request, out var error) is not null
+		return ldap.TryRequest(request, out string? error) is not null
 			? new RequestResult<T>().SetStatus(StatusCodes.Status201Created).SetValues(entity)
 			: new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
 	}
@@ -118,9 +118,9 @@ public static class EntityExtensions {
 		if (!ldap.EntityExists<T>(id))
 			return new RequestResult<T>().SetStatus(StatusCodes.Status404NotFound).SetErrors("The object does not exist.");
 
-		ModifyRequest request = CreateModifyRequest(ldap, entity, id, setHiddenAttributes);
+		var request = CreateModifyRequest(ldap, entity, id, setHiddenAttributes);
 
-		return ldap.TryRequest(request, out var error) is not null
+		return ldap.TryRequest(request, out string? error) is not null
 			? new RequestResult<T>().SetStatus(StatusCodes.Status200OK).SetValues(entity)
 			: new RequestResult<T>().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
 	}
@@ -136,7 +136,7 @@ public static class EntityExtensions {
 
 		DeleteRequest request = new($"uid={id},ou={typeof(T).GetOuName()},{ldap.DomainComponents}");
 
-		return ldap.TryRequest(request, out var error) is not null
+		return ldap.TryRequest(request, out string? error) is not null
 			? new RequestResult().SetStatus(StatusCodes.Status200OK)
 			: new RequestResult().SetStatus(StatusCodes.Status400BadRequest).SetErrors(error ?? string.Empty);
 	}
@@ -150,13 +150,13 @@ public static class EntityExtensions {
 	/// <typeparam name="T">The type of the entities.</typeparam>
 	/// <returns>A <see cref="RequestResult"/> containing the outcome of the operation.</returns>
 	public static RequestResult TryAddEntities<T>(this LdapService ldap, IEnumerable<T> entities, Func<T, string> idGetter, bool setHiddenAttributes = false, bool overwrite = false) where T : class {
-		Type type = typeof(T);
+		var type = typeof(T);
 
 		ldap.TryRequest(new AddRequest($"ou={type.GetOuName()},{ldap.DomainComponents}", "organizationalUnit"), false);
 
 		DirectoryAttribute? objectClassesAttribute = null;
 		if (type.GetCustomAttribute<LdapObjectClassesAttribute>() is { } objectClasses)
-			objectClassesAttribute = new("objectClass", objectClasses.Classes.Cast<object>().ToArray());
+			objectClassesAttribute = new DirectoryAttribute("objectClass", objectClasses.Classes.Cast<object>().ToArray());
 
 		var requests = entities.Select(entity => {
 			string id = idGetter(entity);
@@ -168,7 +168,7 @@ public static class EntityExtensions {
 			if (objectClassesAttribute is not null)
 				request.Attributes.Add(objectClassesAttribute);
 
-			foreach (DirectoryAttribute attribute in LdapService.GetDirectoryAttributes(entity, setHiddenAttributes))
+			foreach (var attribute in LdapService.GetDirectoryAttributes(entity, setHiddenAttributes))
 				request.Attributes.Add(attribute);
 
 			return new UniqueDirectoryRequest(request, id);
@@ -184,12 +184,12 @@ public static class EntityExtensions {
 	/// <param name="typesToTry">The model types to search trough.</param>
 	/// <returns>The <c>displayName</c> attribute of the entity or <c>null</c> if not found.</returns>
 	public static string? TryGetDisplayNameOfEntity(this LdapService ldap, string id, params Type[] typesToTry) {
-		if (id == Authenticator.GetDefaultAdminName())
+		if (string.IsNullOrWhiteSpace(id) || id == Authenticator.GetDefaultAdminName())
 			return null;
 
-		foreach (Type type in typesToTry) {
-			SearchRequest   request  = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, "displayName");
-			SearchResponse? response = ldap.TryRequest(request) as SearchResponse;
+		foreach (var type in typesToTry) {
+			SearchRequest request  = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}", LdapService.AnyFilter, SearchScope.Base, "displayName");
+			var           response = ldap.TryRequest(request) as SearchResponse;
 
 			try {
 				return response!.Entries[0].Attributes["displayName"][0].ToString();
@@ -203,7 +203,7 @@ public static class EntityExtensions {
 	}
 
 	private static ModifyRequest CreateModifyRequest<T>(LdapService ldap, T entity, string id, bool setHiddenAttributes) where T : class {
-		Type type = typeof(T);
+		var type = typeof(T);
 
 		List<string> flags = [ ];
 
@@ -211,7 +211,7 @@ public static class EntityExtensions {
 
 		ModifyRequest request = new($"uid={id},ou={type.GetOuName()},{ldap.DomainComponents}");
 
-		foreach (PropertyInfo info in type.GetProperties())
+		foreach (var info in type.GetProperties())
 			if (
 				info.GetCustomAttribute(typeof(LdapAttributeAttribute)) is LdapAttributeAttribute attribute
 				&& (!attribute.Hidden || setHiddenAttributes)
@@ -225,7 +225,7 @@ public static class EntityExtensions {
 					request.Modifications.Add(mod);
 				}
 				else if (presentAttributes.Contains(attribute.Name)) {
-					request.Modifications.Add(new() {
+					request.Modifications.Add(new DirectoryAttributeModification {
 						Name      = attribute.Name,
 						Operation = DirectoryAttributeOperation.Delete
 					});
@@ -248,7 +248,7 @@ public static class EntityExtensions {
 			request.Modifications.Add(mod);
 		}
 		else if (presentAttributes.Contains("description")) {
-			request.Modifications.Add(new() {
+			request.Modifications.Add(new DirectoryAttributeModification {
 				Name      = "description",
 				Operation = DirectoryAttributeOperation.Delete
 			});
