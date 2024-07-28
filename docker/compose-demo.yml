@@ -54,7 +54,7 @@ services:
       LDAP_ADDRESS: openldap
       POSTGRES_HOST: postgres
       LOG_TO_DB: true
-      LOGS_DIR: /logs
+      CHECK_HEADERS_FOR_ADDR: true
       SECURITY_KEY: ITN3pnH472FGG71aC1AWFDrTn2TpgHtBuZdD/LYkD4bXe4hhAKWj8CsTfGPQJHr3qoY8/KM0zShbyreW6RapyGAL2M8JBOWLknXoC/1zJ4+9QOC7hpk4jqM13vHoJeL8JTKdYGCzx6gwZK9a4vgcsVCCc1QT6//WO7x0xdcZUsiHqp2t9PJjzLfMvK2nlaWe+aoBBPvsM4CAyWTMT8sZVHSmrjTunhVOn9cqoouHwe33a5grSf9Z9AhFtBTSH2DvlW4/DdA1kKcNeju/wZGhnE0DKNsguV6b5NcYLsRgU1NK2nrWd8yhUskOQCoDvLwnWc3Qto5l/AFnht08FSjLSQ==
     ports:
       - 5000:5000
