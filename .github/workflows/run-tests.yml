@@ -3,8 +3,10 @@ name: Tests
 on:
   push:
     branches: [ main ]
+    paths: [ .github/workflows/run-tests.yml, NeuLdapMgnt/** ]
   pull_request:
     branches: [ main ]
+    paths: [ .github/workflows/run-tests.yml, NeuLdapMgnt/** ]
 
 permissions:
   checks: write
@@ -23,12 +25,15 @@ jobs:
 
     - name: Run Model tests
       run: make model-tests
+      continue-on-error: true
 
     - name: Run API tests
       run: make api-tests
+      continue-on-error: true
 
     - name: Run WebApp tests
       run: make web-tests
+      continue-on-error: true
 
     - name: Publish test results
       uses: EnricoMi/publish-unit-test-result-action@v2
